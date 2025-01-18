@@ -3,7 +3,11 @@ export default {
   content: ["./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Clash', 'Arial', 'sans-serif'], 
+        heading: ['Archivo', 'Arial', 'sans-serif'],
+      },},
   },
   plugins: [],
 }
