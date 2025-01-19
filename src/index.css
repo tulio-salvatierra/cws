@@ -15,12 +15,12 @@
 
 @font-face {
   font-family : 'Archivo';
-  src: url('/assets/fonts/archivo.woff2') format('woff2'),
+  src: url('./assets/fonts/archivo.woff2') format('woff2'),
 }
 
 @font-face {
   font-family : 'Clash';
-  src: url('/assets/fonts/clash.woff2') format('woff2'),
+  src: url('./assets/fonts/clash.woff2') format('woff2'),
 }
 
 body {

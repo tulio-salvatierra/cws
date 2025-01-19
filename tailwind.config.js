@@ -5,8 +5,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Clash', 'Arial', 'sans-serif'], 
-        heading: ['Archivo', 'Arial', 'sans-serif'],
+        main: ['Clash', 'Arial', 'sans-serif'], 
+        secondary: ['Archivo', 'Arial', 'sans-serif'],
       },},
   },
   plugins: [],
