@@ -6,10 +6,11 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="flex justify-between content-center text-main sticky top-0  z-50">
-      <a className="align-middle" href="/">
-        CWS
-      </a>
+    <div className="justify-between w-screen content-center sticky top-0 flex z-50">
+
+      <p className="font-extrabold text-2xl p-4 w-25 self-center">
+        [CWS]
+      </p>
 
       <div className="flex w-auto ml-auto justify-end">
         {/* Desktop Menu */}
@@ -21,7 +22,7 @@ export default function Header() {
           ))}
           <a
             href="tel:+17739199161"
-            className="p-4 font-main font-extralight text-lg  justify-self-end self-center ml-10 mx-20 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100 rounded-2xl"
+            className="p-4 rounded-full border-2 font-main font-bold text-lg  justify-self-end self-center ml-10 mx-20 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
           >
             Book now!
           </a>
@@ -41,7 +42,7 @@ export default function Header() {
         >
           <div className="content-top text-left gap-3">
             <a
-              className="p-4 bg-lightGreen text-mainBlue text-lg  mb-4 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-400 duration-300 tracking-tighter"
+              className="p-4 rounded-full text-lg  mb-4 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-400 duration-300 tracking-tighter"
               href="tel:+17739199161"
             >
               Book now!
@@ -74,9 +75,8 @@ export default function Header() {
                 CSW
               </a>
               <p className="text-muted-foreground text-left max-w-md font-second">
-                a family-owned cleaning company based in Chicago, offering
-                reliable and eco-friendly cleaning solutions for homes, offices,
-                and commercial spaces.
+              Our mission is to deliver tailored websites and software solutions that
+              solve real problems and drive meaningful growth.
               </p>
             </div>
           </footer>

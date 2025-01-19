@@ -8,8 +8,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background: linear-gradient(to top, #fbc2eb, #a6c1ee);
+  height: auto;
+  width: 100vw;
+  background: conic-gradient(at top, #3f3f46, #71717a, #d4d4d8);
   background-size: 100%;
   background-repeat: no-repeat;
   background-attachment: fixed;
