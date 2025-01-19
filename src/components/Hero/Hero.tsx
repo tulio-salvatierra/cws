@@ -1,17 +1,19 @@
-import React from 'react'
+import React from "react";
 
 function Hero() {
   return (
     <>
-      <h1 className='font-heading'>Hero</h1>
-      <h2>Hero</h2>
-        <h3>Hero</h3>
-        <h4>Hero</h4>
-        <h5>Hero</h5>
-        <h6>Hero</h6>
-        <p className='font-sans'>Hero</p>
+      <main className="container p-5  flex flex-col w-screen h-screen">
+        <h1 className="font-main font-bold text-[6rem] sm:text-[14rem] w-100 leading-tight">Cicero Web Studio</h1>
+        <h1 className="font-secondary font-thin sm:text-[1rem]">
+          by Tulio Salvatierra
+        </h1>
+        <p>Your partner in creating web solutions that grow your business.</p>
+        
+        
+      </main>
     </>
-  )
+  );
 }
 
-export default Hero
+export default Hero;

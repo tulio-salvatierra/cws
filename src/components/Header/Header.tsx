@@ -6,9 +6,9 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="p-4 flex justify-between text-mainBlue sticky top-0 shadow-2xl z-50">
-      <a href="/">
-        <strong>CWS</strong>
+    <div className="flex justify-between content-center text-main sticky top-0  z-50">
+      <a className="align-middle" href="/">
+        CWS
       </a>
 
       <div className="flex w-auto ml-auto justify-end">
@@ -21,7 +21,7 @@ export default function Header() {
           ))}
           <a
             href="tel:+17739199161"
-            className="p-4 bg-lightGreen text-mainBlue text-lg  justify-self-end self-center ml-10 mx-20 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100 rounded-2xl"
+            className="p-4 font-main font-extralight text-lg  justify-self-end self-center ml-10 mx-20 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100 rounded-2xl"
           >
             Book now!
           </a>
