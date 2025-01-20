@@ -10,7 +10,7 @@
   justify-content: center;
   height: auto;
   width: 100vw;
-  background: conic-gradient(at top, #3f3f46, #71717a, #d4d4d8);
+  background: linear-gradient(135deg, #FF5722, #FFC107);
   background-size: 100%;
   background-repeat: no-repeat;
   background-attachment: fixed;
