@@ -12,7 +12,7 @@ export default function Hero() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <video className="absolute top-0 left-0 w-full h-full object-cover"
+        <video className="absolute top-0 left-0 w-full h-full object-cover aspect-video"
         autoPlay
         loop
         muted
@@ -28,7 +28,7 @@ export default function Hero() {
             Based in Chicago, we specialize in creating websites and software
             solutions tailored to help small businesses thrive.
           </h1>
-          <a className="bg-orange-700 w-max border-solid text-white rounded-full block w-100 font-bold text-xl p-6">
+          <a className="bg-orange-700 w-max border-solid text-white rounded-full block w-100 font-bold text-xl p-6 text-left">
             Get my site started now!
           </a>
         </div>
