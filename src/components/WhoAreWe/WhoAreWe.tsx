@@ -1,4 +1,4 @@
-import React from "react";
+// Desc: This is the WhoAreWe component.
 
 export default function WhoAreWe() {
   return (

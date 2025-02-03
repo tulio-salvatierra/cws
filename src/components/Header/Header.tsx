@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { MENU_ITEM } from "../../Constants/Constants";
 
 export default function Header() {
@@ -6,7 +6,7 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="justify-between w-screen content-center sticky top-0 flex z-50">
+    <div className="justify-between text-orange-700 w-screen content-center sticky top-0 flex z-50">
 
       <p className="font-extrabold text-2xl p-4 w-25 self-center">
         [CWS]
@@ -22,7 +22,7 @@ export default function Header() {
           ))}
           <a
             href="tel:+17739199161"
-            className="p-4 rounded-full border-2 font-main font-bold text-lg  justify-self-end self-center ml-10 mx-20 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
+            className="p-4 rounded-full text-white border-2 font-main font-bold text-lg  justify-self-end self-center ml-10 mx-20 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
           >
             Book now!
           </a>
