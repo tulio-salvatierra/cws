@@ -1,6 +1,6 @@
 import "./App.css";
 import Footer from "./components/Footer/Footer";
-import Header from "./components/Header";
+
 import Hero from "./components/Hero";
 import Services from "./components/Services";
 import WhoAreWe from "./components/WhoAreWe";
@@ -8,7 +8,7 @@ import WhoAreWe from "./components/WhoAreWe";
 function App() {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <Hero />
       <WhoAreWe />
       <Services />
