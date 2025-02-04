@@ -6,15 +6,15 @@ export default function Hero() {
   return (
     <>
       <main
-        className="sm:grid w-screen h-screen justify-items-center bg-hero bg-cover bg-center grid-cols-2 gap-0 p-0"
+        className="sm:grid w-screen h-auto justify-items-center bg-hero bg-cover bg-center grid-cols-2 gap-0 p-0"
         style={{
-          backgroundSize: "50%",
+          backgroundSize: "1000%",
           backgroundPosition: "right",
           backgroundRepeat: "no-repeat",
         }}
       >
         <video
-          className="absolute top-0 left-0 w-full h-full object-cover aspect-video"
+          className="absolute top-0 left-0 w-full h-screen object-cover "
           autoPlay
           loop
           muted
@@ -24,7 +24,7 @@ export default function Hero() {
         </video>
         <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40"></div>
 
-        <div className="relative flex flex-col sm:justify-evenly justify-end items-center p-10">
+        <div className="relative flex flex-col sm:justify-evenly justify-between items-center p-10">
           <p className="font-secondary font-black sm:text-[6rem] text-[3rem] text-orange-700 sm:text-[6  rem] w-100 leading-tight">
             We don’t just build websites, we build growth
           </p>
