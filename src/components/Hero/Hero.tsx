@@ -8,7 +8,7 @@ export default function Hero() {
       <main
         className="sm:grid w-screen h-auto justify-items-center bg-hero bg-cover bg-center grid-cols-2 gap-0 p-0"
         style={{
-          backgroundSize: "1000%",
+          backgroundSize: "100%",
           backgroundPosition: "right",
           backgroundRepeat: "no-repeat",
         }}
