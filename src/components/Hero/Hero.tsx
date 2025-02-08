@@ -22,14 +22,14 @@ export default function Hero() {
         >
           <source src={Video} type="video/mp4" />
         </video>
-        <div className="absolute top-0 left-0 w-full h-auto bg-black opacity-40"></div>
+        <div className="absolute top-0 left-0 w-full h-auto bg-black opacity-10"></div>
 
-        <div className="relative h-screen flex flex-col justify-center sm:justify-stretch items-center p-4 w-100 sm:w-3/4">
-          <p className="font-secondary font-black text-[4rem] text-orange-700 sm:text-[6rem] w-100 leading-tighter">
+        <div className="relative h-screen flex flex-col justify-center items-center p-4 w-100 sm:w-3/4">
+          <p className="font-secondary leading-none font-black text-[4rem] text-orange-700 sm:text-[6rem] w-100 leading-tighter">
             We don’t just build websites, we build growth
           </p>
 
-          <h1 className="font-semibold sm:text-3xl text-xl text-white my-8">
+          <h1 className="font-semibold sm:text-3xl text-2xl text-white my-8">
             Based in Chicago, we specialize in creating websites and software
             solutions tailored to help small businesses thrive.
           </h1>
