@@ -25,7 +25,7 @@ export default function Hero() {
         <div className="absolute top-0 left-0 w-full h-auto bg-black opacity-40"></div>
 
         <div className="relative h-screen flex flex-col justify-center sm:justify-stretch items-center p-4 w-100 sm:w-3/4">
-          <p className="font-secondary font-black sm:text-[5rem] text-[4rem] text-orange-700 sm:text-[6  rem] w-100 leading-tighter">
+          <p className="font-secondary font-black text-[4rem] text-orange-700 sm:text-[6rem] w-100 leading-tighter">
             We don’t just build websites, we build growth
           </p>
 
