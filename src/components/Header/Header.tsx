@@ -8,7 +8,7 @@ export default function Header() {
 
   return (
     <div className="justify-between text-orange-700 w-screen content-center sticky top-0 flex z-50">
-      <p className="font-extrabold text-2xl p-4 w-25 self-center">[CWS]</p>
+      <p className="font-extrabold text-white text-4xl p-4 w-25 self-center">[CWS]</p>
 
       <div className="flex w-auto ml-auto justify-end">
         {/* Desktop Menu */}
@@ -20,7 +20,7 @@ export default function Header() {
           ))}
           <a
             href="tel:+17739199161"
-            className="p-4 rounded-full text-white border-2 font-main font-bold text-lg  justify-self-end self-center ml-10 mx-20 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
+            className="p-4 rounded-full text-white border-2 font-main font-bold text-lg  justify-self-end self-center mx-10 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
           >
             Book now!
           </a>
@@ -36,9 +36,10 @@ export default function Header() {
       {showMenu && (
         <nav className="md:hidden bg-zinc-700 fixed top-0 left-0 w-full h-2/3 z-50items-center p-4 justify-between">
           <div className="content-top flex flex-col text-left gap-3">
-          <nav className="flex justify-between">
-            <p className="font-extrabold text-4xl p-4 w-25">[CWS]</p>
-              {" "}
+            <nav className="flex justify-between">
+              <p className="font-extrabold text-4xl text-white p-4 w-25">
+                [CWS]
+              </p>{" "}
               <a
                 className="text-main text-4xl mt-4 font-black"
                 onClick={toggleMenu}
@@ -59,7 +60,6 @@ export default function Header() {
                 </a>
               ))}
             </nav>
-           
           </div>
           <a
             href="tel:+17739199161"
@@ -83,7 +83,6 @@ export default function Header() {
           </footer>
         </nav>
       )}
-    
     </div>
   );
 }
