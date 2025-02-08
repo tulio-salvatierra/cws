@@ -1,6 +1,7 @@
 import "./App.css";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
+import Problem from "./components/Problem";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
 import WhoAreWe from "./components/WhoAreWe";
@@ -13,6 +14,9 @@ function App() {
       
       <div className="h-screen">
       <Hero />
+      </div>
+      <div className="h-screen">
+        <Problem />
       </div>
       <div className="h-screen">
         <Services />
