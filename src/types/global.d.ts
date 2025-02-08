@@ -6,4 +6,12 @@ declare module "*.mp4" {
     export default src;
   
   }
+
+  declare module "*.svg" {
+
+    const src: string;
+  
+    export default src;
+  
+  }
   

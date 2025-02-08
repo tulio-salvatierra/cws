@@ -5,8 +5,8 @@ import { PHONE } from "./../../Constants/Constants";
 export default function Hero() {
   return (
     <>
-      <main
-        className="sm:grid w-screen h-auto justify-items-center bg-hero bg-cover bg-center grid-cols-2 gap-0 p-0"
+      <section
+        className="sm:flex w-screen h-fit justify-items-center bg-hero bg-cover overflow-hidden bg-center grid-cols-2 gap-0 p-0"
         style={{
           backgroundSize: "100%",
           backgroundPosition: "right",
@@ -22,14 +22,14 @@ export default function Hero() {
         >
           <source src={Video} type="video/mp4" />
         </video>
-        <div className="absolute top-0 left-0 w-full h-full bg-black opacity-40"></div>
+        <div className="absolute top-0 left-0 w-full h-auto bg-black opacity-40"></div>
 
-        <div className="relative flex flex-col sm:justify-evenly justify-between items-center p-10">
-          <p className="font-secondary font-black sm:text-[6rem] text-[3rem] text-orange-700 sm:text-[6  rem] w-100 leading-tight">
+        <div className="relative h-screen flex flex-col justify-center sm:justify-stretch items-center p-4 w-100 sm:w-3/4">
+          <p className="font-secondary font-black sm:text-[5rem] text-[4rem] text-orange-700 sm:text-[6  rem] w-100 leading-tighter">
             We don’t just build websites, we build growth
           </p>
 
-          <h1 className="font-semibold sm:text-3xl text-lg text-white">
+          <h1 className="font-semibold sm:text-3xl text-xl text-white my-8">
             Based in Chicago, we specialize in creating websites and software
             solutions tailored to help small businesses thrive.
           </h1>
@@ -40,7 +40,7 @@ export default function Hero() {
             Get my site started now!
           </a>
         </div>
-      </main>
+      </section>
     </>
   );
 }

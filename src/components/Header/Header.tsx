@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { MENU_ITEM } from "../../Constants/Constants";
+import Burger from "../../assets/icons/burger.svg";
 
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
@@ -7,10 +8,7 @@ export default function Header() {
 
   return (
     <div className="justify-between text-orange-700 w-screen content-center sticky top-0 flex z-50">
-
-      <p className="font-extrabold text-2xl p-4 w-25 self-center">
-        [CWS]
-      </p>
+      <p className="font-extrabold text-2xl p-4 w-25 self-center">[CWS]</p>
 
       <div className="flex w-auto ml-auto justify-end">
         {/* Desktop Menu */}
@@ -30,24 +28,26 @@ export default function Header() {
 
         {/* Mobile Menu Button */}
         <button className="md:hidden" onClick={toggleMenu}>
-          <img  className="p-6 hover:" alt="Menu" />
+          <img className="p-6" src={Burger} alt="Menu"></img>
         </button>
       </div>
 
       {/* Mobile Menu */}
       {showMenu && (
-        <nav
-          className="md:hidden fixed top-0 left-0 w-full h-full z-50 flex flex-col items-center p-4 justify-between"
-         
-        >
-          <div className="content-top text-left gap-3">
-            <a
-              className="p-4 rounded-full text-lg  mb-4 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-400 duration-300 tracking-tighter"
-              href="tel:+17739199161"
-            >
-              Book now!
-            </a>
-            <nav className=" xs:flex sm:flex p-4 text-right justify-end items-center">
+        <nav className="md:hidden bg-zinc-700 fixed top-0 left-0 w-full h-2/3 z-50items-center p-4 justify-between">
+          <div className="content-top flex flex-col text-left gap-3">
+          <nav className="flex justify-between">
+            <p className="font-extrabold text-4xl p-4 w-25">[CWS]</p>
+              {" "}
+              <a
+                className="text-main text-4xl mt-4 font-black"
+                onClick={toggleMenu}
+              >
+                X
+              </a>
+            </nav>
+
+            <nav className="flex-col p-4 mb-10 text-left justify-end items-center text-4xl font-black">
               {MENU_ITEM.map((navMobile, index) => (
                 <a
                   href={navMobile.url}
@@ -59,14 +59,15 @@ export default function Header() {
                 </a>
               ))}
             </nav>
-            <button
-              className="text-mainBlue text-xl  mt-4"
-              onClick={toggleMenu}
-            >
-              Close X
-            </button>
+           
           </div>
-          <footer className="content-end">
+          <a
+            href="tel:+17739199161"
+            className="p-4 mt-10 rounded-full text-white border-2 font-main font-bold text-2xl  self-center  transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
+          >
+            Book now!
+          </a>
+          <footer className="p-4 mt-32 bottom-0">
             <div
               className="flex flex-col items-start gap-4"
               onClick={toggleMenu}
@@ -75,13 +76,14 @@ export default function Header() {
                 CSW
               </a>
               <p className="text-muted-foreground text-left max-w-md font-second">
-              Our mission is to deliver tailored websites and software solutions that
-              solve real problems and drive meaningful growth.
+                Our mission is to deliver tailored websites and software
+                solutions that solve real problems and drive meaningful growth.
               </p>
             </div>
           </footer>
         </nav>
       )}
+    
     </div>
   );
 }

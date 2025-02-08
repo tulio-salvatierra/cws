@@ -1,4 +1,4 @@
-import React from "react";
+
 
 export default function Services() {
   return (
@@ -8,7 +8,7 @@ export default function Services() {
           <strong>[SERVICES]</strong>
         </header>
         <div>
-          <h2 className="font-secondary font-bold text-[5rem] sm:text-[10rem] w-100 leading-tight line-clamp-2">
+          <h2 className="font-secondary font-black sm:text-[6rem] text-[3rem] text-orange-700 sm:text-[6  rem] w-100 leading-tight">
             [What we do]
           </h2>
         </div>
