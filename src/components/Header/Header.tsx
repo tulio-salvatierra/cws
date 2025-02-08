@@ -34,7 +34,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {showMenu && (
-        <nav className="md:hidden bg-zinc-700 fixed top-0 left-0 w-full h-3/4 z-50items-center p-4 justify-between">
+        <nav className="md:hidden bg-zinc-700 fixed top-0 left-0 w-full h-3/4 z-50items-center p-4 justify-between shadow-2xl">
           <div className="content-top flex flex-col text-left gap-3">
             <nav className="flex justify-between">
               <p className="font-extrabold text-4xl text-white p-4 w-25">
