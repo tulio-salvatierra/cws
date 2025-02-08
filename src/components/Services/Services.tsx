@@ -4,11 +4,12 @@ export default function Services() {
   return (
     <>
       <section className="p-5  flex flex-col w-screen h-screen justify-evenly">
-        <header>
-          <strong>[SERVICES]</strong>
-        </header>
-        <div>
-          <h2 className="font-secondary font-black sm:text-[6rem] text-[3rem] text-orange-700 sm:text-[6  rem] w-100 leading-tight">
+        
+        
+        
+        <div className="flex flex-col">
+        <strong className="text-white">[SERVICES]</strong>
+          <h2 className="font-secondary font-black sm:text-[6rem] text-[3rem] text-zinc-700 sm:text-[6  rem] w-100 leading-tight">
             [What we do]
           </h2>
         </div>
