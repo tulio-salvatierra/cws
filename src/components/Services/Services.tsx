@@ -4,8 +4,8 @@ export default function Services() {
       <section className="p-5  flex flex-col w-screen h-screen justify-evenly">
         <div className="flex flex-col">
           <strong className="text-white">[SERVICES]</strong>
-          <h2 className="font-secondary font-black sm:text-[6rem] text-[3rem] text-zinc-700 sm:text-[6  rem] w-100 leading-tight">
-            [What we do]
+          <h2 className="font-main font-black sm:text-[6rem] text-[3rem] text-zinc-700 sm:text-[6  rem] w-100 leading-tight">
+            What we do
           </h2>
           <p className="font-normal text-4xl text-start w-3/4">
             Our mission is to deliver tailored websites and software solutions
