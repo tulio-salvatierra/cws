@@ -7,8 +7,8 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="justify-between text-zinc-500 w-screen content-center sticky top-0 flex z-50 m-4">
-      <p className="font-extrabold font-main text-white text-2xl p-4 w-25 self-center">[CICERO WEB STUDIO]</p>
+    <div className="justify-between text-zinc-500 w-100 content-center sticky top-0 flex z-50 m-4">
+      <p className="font-extrabold font-main text-white sm:text-2xl p-4 w-25 self-center">[CICERO WEB STUDIO]</p>
 
       <div className="flex w-auto ml-auto justify-end">
         {/* Desktop Menu */}
