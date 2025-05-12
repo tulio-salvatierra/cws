@@ -9,21 +9,16 @@ import WhoAreWe from "./components/WhoAreWe";
 function App() {
   return (
     <div className="App grid grid-cols-1">
-      
       <Header />
-      
-      <div className="h-screen">
+
       <Hero />
-      </div>
-      <div className="h-screen">
-        <Problem />
-      </div>
-      <div className="h-screen">
-        <Services />
-      </div>
-      <div className="h-screen">
-        <WhoAreWe />
-      </div>
+
+      <Problem />
+
+      <Services />
+
+      <WhoAreWe />
+
       <Footer />
     </div>
   );

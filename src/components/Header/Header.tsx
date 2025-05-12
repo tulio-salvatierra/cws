@@ -7,12 +7,12 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="justify-between text-orange-500 w-screen content-center sticky top-0 flex z-50">
-      <p className="font-extrabold font-main text-white text-4xl p-4 w-25 self-center">[CWS]</p>
+    <div className="justify-between text-zinc-500 w-screen content-center sticky top-0 flex z-50 m-4">
+      <p className="font-extrabold font-main text-white text-2xl p-4 w-25 self-center">[CICERO WEB STUDIO]</p>
 
       <div className="flex w-auto ml-auto justify-end">
         {/* Desktop Menu */}
-        <nav className="hidden md:flex p-4 text-right justify-end items-center">
+        <nav className="hidden md:flex p-0 mt-0 text-right justify-end items-center">
           {MENU_ITEM.map((nav, index) => (
             <a href={nav.url} key={index} className={nav.class}>
               {nav.name}
