@@ -9,17 +9,29 @@ import WhoAreWe from "./components/WhoAreWe";
 function App() {
   return (
     <div className="App grid grid-cols-1">
-      <Header />
+      <div>
+        <Header />
+      </div>
 
-      <Hero />
+      <div>
+        <Hero />
+      </div>
 
-      <Problem />
+      <div>
+        <Problem />
+      </div>
 
-      <Services />
+      <div>
+        <Services />
+      </div>
 
-      <WhoAreWe />
+      <div>
+        <WhoAreWe />
+      </div>
 
-      <Footer />
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -15,7 +15,7 @@ export default function Hero() {
       >
         {/* Background video */}
         <video
-          className=" relative top-0 left-0 w-screen h-screen object-cover "
+          className="absolute top-0 left-0 w-screen h-dvh object-cover "
           autoPlay
           loop
           muted
