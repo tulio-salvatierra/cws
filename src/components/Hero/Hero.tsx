@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <>
       <div
-        className="sm:flex w-screen h-screen bg-hero bg-cover bg-center gap-0 p-0 absolute"
+        className=" w-screen h-screen bg-hero bg-cover bg-center gap-0 p-0 absolute"
         style={{
           backgroundSize: "100%",
           backgroundPosition: "right",
@@ -26,16 +26,16 @@ export default function Hero() {
         </video>
         {/* overlay */}
 
-        <div className="flex flex-col p-4 h-max">
-          <div className="top-0">
+        <div className="relative flex flex-col p-4 h-max w-full justify-center items-left text-left text-white z-10">
+          <div className="top flex flex-col items-left w-full">
             <p className="relative font-main leading-none font-normal text-[4rem] text-orange-500 w-100 leading-tighter">
               We don’t just build websites...
             </p>
-            <p className="text-[5rem] leading-tight P-4 font-main font-extrabold text-zinc-700 font-stretch-150% outline-4-white">
+            <p className="relative text-[5rem] leading-tight P-4 font-main font-extrabold text-orange-700 font-stretch-150% outline-4-white">
               WE BUILD GROWTH
             </p>
           </div>
-          <div className="relative bottom-0">
+          <div className="relative flex flex-col items-left w-full">
             <h1 className="font-normal font-secondary w-50 text-orange-200 my-8">
               Based in Chicago, we specialize in creating websites and software
               solutions tailored to help small businesses thrive.
