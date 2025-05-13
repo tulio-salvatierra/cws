@@ -13,6 +13,7 @@ export default function Hero() {
           backgroundRepeat: "no-repeat",
         }}
       >
+        <div className="m-4 top-0 left-0 w-full h-100 bg-black opacity-10"></div>
         {/* Background video */}
         <video
           className="absolute top-0 left-0 w-screen h-dvh object-cover "
@@ -24,19 +25,18 @@ export default function Hero() {
           <source src={Video} type="video/mp4" />
         </video>
         {/* overlay */}
-        <div className=" relative m-4 top-0 left-0 w-full h-100 bg-black opacity-10"></div>
 
-        <div className="flex flex-col relative p-4 h-100">
+        <div className="flex flex-col p-4 h-max">
           <div className="top-0">
-            <p className="font-main leading-none font-normal text-[4rem] text-orange-500 w-100 leading-tighter">
+            <p className="relative font-main leading-none font-normal text-[4rem] text-orange-500 w-100 leading-tighter">
               We don’t just build websites...
             </p>
-            <p className="text-[5rem] leading-tight P-4 font-main font-bold leading-tighter text-orange-200 outline-4-white">
+            <p className="text-[5rem] leading-tight P-4 font-main font-extrabold text-zinc-700 font-stretch-150% outline-4-white">
               WE BUILD GROWTH
             </p>
           </div>
-          <div className="bottom-0">
-            <h1 className="font-normal font-secondary w-50 text-zinc-700 my-8">
+          <div className="relative bottom-0">
+            <h1 className="font-normal font-secondary w-50 text-orange-200 my-8">
               Based in Chicago, we specialize in creating websites and software
               solutions tailored to help small businesses thrive.
             </h1>
