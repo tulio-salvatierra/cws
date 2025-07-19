@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
+import Logo from "../../assets/images/logo.png";
 
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
@@ -8,7 +9,7 @@ export default function Header() {
 
   return (
     <div className="justify-between text-orange-700 w-screen content-center sticky top-0 flex z-50">
-      <p className="font-extrabold text-white text-4xl p-4 w-25 self-center">[CWS]</p>
+      <img src={Logo} alt="CWS Logo" className="p-4 w-auto h-20" />
 
       <div className="flex w-auto ml-auto justify-end">
         {/* Desktop Menu */}

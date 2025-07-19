@@ -1,10 +1,21 @@
 {
-    "compilerOptions": {
-      "strict": true,
-      "jsx": "react-native", 
-      "baseUrl": "./src",
-      "paths": {
-        "@/*": ["./*"]
-      }
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx", // ✅ key setting
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
     }
-  }
+  },
+  "include": ["src"]
+}

@@ -31,8 +31,30 @@ body {
   font-family: 'Archivo', sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1 {
   font-family: 'Clash', sans-serif;
+  font-weight: 700;
+  font-size: 2.5rem;
+  color: #FFFFFF;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  font-family: 'Clash', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+p {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #FFFFFF;
+  margin: 0.5rem 0;
 }
 
 
