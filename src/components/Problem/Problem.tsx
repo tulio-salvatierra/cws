@@ -3,9 +3,9 @@ export default function Problem() {
     <>
       <section className="p-5  flex flex-col w-screen h-screen justify-evenly">
         <div className="flex flex-col">
-          <strong className="text-white">[SERVICES]</strong>
+          
           <h2 className="font-main font-black sm:text-[6rem] text-[3rem] text-zinc-700 w-100 leading-tight">
-            [Problem we aim to solve:]
+            Problem we aim to solve:
           </h2>
           <p className="font-secondary text-xl sm:text-4xl text-start sm:w-3/4">
             Small businesses struggle to establish a credible online presence,

@@ -13,7 +13,7 @@ export default function Header() {
 
       <div className="flex w-auto ml-auto justify-end">
         {/* Desktop Menu */}
-        <nav className="hidden md:flex p-4 text-right justify-end items-center">
+        <nav className="hidden md:flex p-0 mt-0 text-right justify-end items-center">
           {MENU_ITEM.map((nav, index) => (
             <a href={nav.url} key={index} className={nav.class}>
               {nav.name}
