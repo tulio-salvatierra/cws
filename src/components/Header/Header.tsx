@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
-import Logo from "../../assets/images/logo.png";
+import Logo from "@/assets/Images/logo.png";
 
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
