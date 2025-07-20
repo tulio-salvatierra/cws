@@ -1,54 +1,52 @@
-// Code: Hero components
 import Video from "./../../assets/video/hero.mp4";
 import { PHONE } from "./../../Constants/Constants";
 
 export default function Hero() {
   return (
-    <>
-      <div
-        className=" w-screen h-screen bg-hero bg-cover bg-center gap-0 p-0 absolute"
-        style={{
-          backgroundSize: "100%",
-          backgroundPosition: "right",
-          backgroundRepeat: "no-repeat",
-        }}
+    <section className="relative h-screen flex items-center justify-center text-center overflow-hidden">
+      {/* Background video */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        autoPlay
+        loop
+        muted
+        playsInline
       >
-        <div className="m-4 top-0 left-0 w-full h-100 bg-black opacity-10"></div>
-        {/* Background video */}
-        <video
-          className="absolute top-0 left-0 w-screen h-dvh object-cover "
-          autoPlay
-          loop
-          muted
-          playsInline
-        >
-          <source src={Video} type="video/mp4" />
-        </video>
-        {/* overlay */}
+        <source src={Video} type="video/mp4" />
+      </video>
 
-        <div className="relative flex flex-col p-4 h-max w-full justify-center items-left text-left text-white z-10">
-          <div className="top flex flex-col items-left w-full">
-            <p className="relative font-main leading-none font-normal text-[4rem] text-orange-500 w-100 leading-tighter">
-              We don’t just build websites...
-            </p>
-            <p className="relative text-[5rem] leading-tight P-4 font-main font-extrabold text-orange-700 font-stretch-150% outline-4-white">
-              WE BUILD GROWTH
-            </p>
-          </div>
-          <div className="relative flex flex-col items-left w-full">
-            <h1 className="font-normal font-secondary w-50 text-orange-200 my-8">
-              Based in Chicago, we specialize in creating websites and software
-              solutions tailored to help small businesses thrive.
-            </h1>
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
+
+      {/* Content */}
+      <div className="relative z-10 container px-4 md:px-6">
+        <div className="mx-auto max-w-4xl text-center text-white">
+          <span className="mb-4 inline-block bg-orange-100 text-stone-500 px-4 py-2 rounded hover:bg-blue-200">
+            🆓 Get your free strategy session
+          </span>
+          <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
+            Transform Your Business <span className="text-orange-600">Optimize your Growth</span>
+          </h1>
+          <p className="mb-8 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto">
+         Chicago's premier web design studio creating elegant, powerful solution for local businesses and beyond 🚀
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-4 rounded"
+              href="#"
+            >
+              Learn More
+            </a>
             <a
               href={`tel:${PHONE}`}
-              className="bg-orange-500 max-w-fit border-solid text-white rounded-full block font-bold text-xl p-6 text-center"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-4 rounded"
             >
-              Get my site started now!
+              Schedule a Session
             </a>
           </div>
+   
         </div>
       </div>
-    </>
+    </section>
   );
 }
