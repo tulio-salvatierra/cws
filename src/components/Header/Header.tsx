@@ -8,7 +8,7 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="justify-between text-orange-700 w-screen content-center sticky top-0 flex z-50">
+    <div className="justify-between text-orange-500 w-screen content-center sticky top-0 flex z-50">
       <img src={Logo} alt="CWS Logo" className="p-4 w-auto h-20" />
 
       <div className="flex w-auto ml-auto justify-end">
