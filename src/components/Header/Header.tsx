@@ -13,7 +13,7 @@ export default function Header() {
         <h1 className="text-orange-500 text-6xl md:text-8xl font-bold tracking-tight">
           CICERO WEB STUDIO <sup className="text-2xl align-super">®</sup>
         </h1>
-        <div className="space-x-8 hidden justify-end md:flex text-orange-500 text-2xl font-bold tracking-tight">
+        <div className="space-x-8 hidden justify-end md:flex text-orange-500 text-lg  tracking-tight">
         {MENU_ITEM.map((nav, index) => (
                 <a
                   href={nav.url}
