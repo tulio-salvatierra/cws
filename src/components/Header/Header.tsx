@@ -1,36 +1,38 @@
 import { useState } from "react";
 import { MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
-import Logo from "@/assets/Images/logo.png";
 
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="justify-between text-orange-500 w-screen content-center sticky top-0 flex z-50">
-      <img src={Logo} alt="CWS Logo" className="p-4 w-auto h-20" />
+    <div className="flex mx-5 w-screen content-center sticky top-0 bg-transparent z-50">
+      
+      <div className="flex w-screen p-6 justify-between items-center">
+        <h1 className="text-orange-500 text-6xl md:text-8xl font-bold tracking-tight">
+          CICERO WEB STUDIO <sup className="text-2xl align-super">®</sup>
+        </h1>
+        <div className="space-x-8 hidden justify-end md:flex text-orange-500 text-2xl font-bold tracking-tight">
+        {MENU_ITEM.map((nav, index) => (
+                <a
+                  href={nav.url}
+                  key={index}
+                  className={nav.class}
+                  onClick={toggleMenu}
+                >
+                  {nav.name}
+                </a>
+              ))}
+        </div>
+        <div className="md:hidden">
+          <img
+            src={Burger}
+            alt="Menu"
+            className="w-10 h-10 cursor-pointer"
+            onClick={toggleMenu}
+          />
 
-      <div className="flex w-auto ml-auto justify-end">
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex p-0 mt-0 text-right justify-end items-center">
-          {MENU_ITEM.map((nav, index) => (
-            <a href={nav.url} key={index} className={nav.class}>
-              {nav.name}
-            </a>
-          ))}
-          <a
-            href="tel:+17739199161"
-            className="p-4 rounded-full text-white border-2 font-main font-bold text-lg  justify-self-end self-center mx-10 transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
-          >
-            Book now!
-          </a>
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <button className="md:hidden" onClick={toggleMenu}>
-          <img className="p-6" src={Burger} alt="Menu"></img>
-        </button>
       </div>
 
       {/* Mobile Menu */}
@@ -84,6 +86,7 @@ export default function Header() {
           </footer>
         </nav>
       )}
+    </div>
     </div>
   );
 }

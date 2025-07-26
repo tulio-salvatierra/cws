@@ -11,9 +11,6 @@ function App() {
     <div className="App grid grid-cols-1">
       <div>
         <Header />
-      </div>
-
-      <div>
         <Hero />
       </div>
 
