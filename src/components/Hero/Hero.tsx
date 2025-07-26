@@ -4,7 +4,7 @@ import CustomButton from "./../CustomButton";
 
 export default function Hero() {
   return (
-    <section className="relative h-screen flex items-center justify-center text-center overflow-hidden -my-56 md:-my-56">
+    <section className="relative h-screen flex items-center justify-center text-center overflow-hidden -my-60 md:-my-60">
       {/* Background video */}
       <video
         className="absolute inset-0 w-full h-full object-cover z-0"
@@ -26,7 +26,7 @@ export default function Hero() {
 
         {/* Bottom content row */}
         <div className="mt-auto flex justify-between items-end p-6 gap-4 flex-wrap">
-          <p className="text-white text-left text-xs md:text-sm max-w-3xl leading-relaxed">
+          <p className="text-white text-left text-lg md:text-lg max-w-3xl leading-relaxed">
             Cicero Web Studio is a digital agency specializing in web design,
             development, and digital marketing solutions. We create stunning,
             user-friendly websites that drive results and elevate your brand
