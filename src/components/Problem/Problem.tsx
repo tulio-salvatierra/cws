@@ -3,7 +3,7 @@ import CustomButton from "../CustomButton";
 export default function Problem() {
   return (
     <>
-      <section className="p-5 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-y-44 gap-y-20 flex flex-col w-screen h-50 justify-evenly mt-72">
+      <section className="p-5 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-y-40 gap-y-16 flex flex-col w-screen h-50 justify-evenly mt-72">
         <div>
           <h2 className="font-main font-black sm:text-[6rem] text-[3rem] overflow-visible text-zinc-400 w-100 leading-tight">
             We're not just another web design agency
