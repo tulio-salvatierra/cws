@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from "gsap";
-import BF from "@/assets/images/cwsbanner.svg";
+import BF from "@/assets/banner/cwsbanner.svg";
 import "./Banner.css";
 
 export default function Banner() {
