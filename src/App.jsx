@@ -5,41 +5,56 @@ import Problem from "./components/Problem";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
 import WhoAreWe from "./components/WhoAreWe";
-import { useEffect } from "react";
-import Lenis from "lenis";
+import { useEffect, useState } from "react";
+import Loader from "./components/Loader";
+import { useLenis } from "lenis/react";
 
 function App() {
+  useLenis();
+
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const lenis = new Lenis();
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000); // Adjust the time as needed
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
+
   return (
-    <div className="App grid grid-cols-1">
-      <div>
-        <Header />
-        <Hero />
+    <>
+      <div className="App grid grid-cols-1">
+        <div>
+          <Header />
+          <Hero />
+        </div>
+
+        <div>
+          <Problem />
+        </div>
+
+        <div>
+          <Services />
+        </div>
+
+        <div>
+          <WhoAreWe />
+        </div>
+
+        <div>
+          <Footer />
+        </div>
       </div>
 
-      <div>
-        <Problem />
-      </div>
-
-      <div>
-        <Services />
-      </div>
-
-      <div>
-        <WhoAreWe />
-      </div>
-
-      <div>
-        <Footer />
-      </div>
-    </div>
+      {loading && (
+        <div className="App grid grid-cols-1">
+          <Loader />
+        </div>
+      )}
+    </>
   );
 }
 
