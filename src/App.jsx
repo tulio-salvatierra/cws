@@ -7,10 +7,11 @@ import Services from "./components/Services";
 import WhoAreWe from "./components/WhoAreWe";
 import { useEffect, useState } from "react";
 import Loader from "./components/Loader";
-import { useLenis } from "lenis/react";
+import {useLenis} from "./Hooks/lenis";
 
 function App() {
-  useLenis();
+  useLenis(); // Custom hook for smooth scrolling
+  
 
   const [loading, setLoading] = useState(true);
 

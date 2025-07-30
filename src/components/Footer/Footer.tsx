@@ -1,51 +1,57 @@
-import React from 'react'
-import { MENU_ITEM } from '../../Constants/Constants'
+import CustomButton from "../CustomButton";
 
 export default function Footer() {
   return (
-    <footer className="bg-muted text-foreground py-12 border-t">
-    <div className="container max-w-5xl px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div className="flex flex-col items-start gap-4">
-        <a href="#" className="flex items-center gap-2">
-        <p className="font-extrabold text-2xl p-4 w-25 self-center">
-        [CWS]
-      </p>
-        </a>
-        <p className="text-muted-foreground text-left max-w-md font-second">
-            Cicero Web Studio is a web design and development agency based in
-            Chicago, IL. We specialize in helping small businesses thrive in the
-            digital landscape.
-        </p>
-      </div>
-      <div className="grid gap-2 text-center">
-        <h4 className="text-2xl font-semibold font-cyan-900">Menu</h4>
-        {MENU_ITEM.map((nav, index) => (
-          <a href={nav.url} key={index} className={nav.class}>
-            {nav.name}
-          </a>
-        ))}
-      </div>
-      <div className="grid gap-2">
-        <h4 className="text-lg font-semibold">Contact</h4>
-        <p className="text-muted-foreground">Phone: (786) 314-6121</p>
-        <p className="text-muted-foreground">
-        info@cicerowebstudio.xyz
-        </p>
-      </div>
-    </div>
-    <div className="container max-w-5xl px-4 md:px-6 mt-8 flex justify-between items-center text-xs text-muted-foreground">
-      <p>&copy; 2025 Cicero Web Studio </p>
-      <nav className="flex gap-4">
-        <a
-          href="https://tuliosalvatierra.com/"
-          target="_blank"
-          className="hover:text-foreground"
-        >
-          coded by <span className="font-semibold">Tulio Salvatierra</span>
-        </a>
-      </nav>
-    </div>
-  </footer>
-  )
-}
+    <footer className="bg-transparent text-gray-200 py-12 px-4 md:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Top Section: Navigation and Back to Top */}
+        <div className="flex flex-col sm:flex-row justify-between items-center pb-8">
+          <nav className="flex space-x-6 text-sm font-medium uppercase tracking-wider mb-4 sm:mb-0">
+            <a href="#" className="hover:text-white transition-colors">
+              Home
+            </a>
+            <a href="#about" className="hover:text-white transition-colors">
+              About
+            </a>
+            <a href="#portfolio" className="hover:text-white transition-colors">
+              Portfolio
+            </a>
+            <a href="#contact" className="hover:text-white transition-colors">
+              Contact
+            </a>
+          </nav>
+          <CustomButton label="Back to Top" href="#" secondary={true} />
+        </div>
 
+        {/* Dotted Line Separator */}
+        <div className="border-t border-dashed border-gray-700 my-8"></div>
+
+        {/* Middle Section: Large FOCAL text */}
+        <div className="flex items-end justify-center sm:justify-start py-16">
+          <h1 className="text-[6rem] leading-none font-extrabold text-gray-100 sm:text-[10rem] md:text-[12rem] lg:text-[15rem]">
+            CWS
+          </h1>
+          <span className="text-gray-500 text-4xl font-bold ml-4 mb-8 sm:mb-12 md:mb-16 lg:mb-20 border border-gray-500 rounded-full p-2">
+            &reg;
+          </span>
+        </div>
+
+        {/* Bottom Section: Copyright and Design Credits */}
+        <div className="flex flex-col sm:flex-row justify-between items-center pt-8 text-xs text-gray-400">
+          <p className="mb-2 sm:mb-0">
+            &copy; {new Date().getFullYear()} CICERO WEB STUDIO{" "}
+          </p>
+          <p>
+            DEVELOPMENT & DESIGN BY{" "}
+            <a
+              href="#"
+              className="underline hover:text-white transition-colors"
+            >
+              Tulio Salvatierra
+            </a>
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}

@@ -10,24 +10,24 @@ export const BLOG_URL = "/blog";
 export const MENU_ITEM = [
   {
     id: 2,
-    name: "Services",
+    name: "SERVICES",
     url: SERICES_URL,
     class:
-      "mr-4 justify-center text-secondary relative text-4xl block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-white mr-4 justify-center text-secondary relative text-xl block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
   {
     id: 3,
-    name: "About",
+    name: "ABOUT",
     url: ABOUT_URL,
     class:
-      "mr-4 justify-center text-main relative text-4xl block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-white mr-4 justify-center text-main relative text-xl block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
 
   {
     id: 5,
-    name: "Blog",
+    name: "BLOG",
     url: BLOG_URL,
     class:
-      "mr-5 justify-center text-main relative text-4xl block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-white mr-5 text-main relative text-xl block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
 ];
