@@ -8,7 +8,7 @@ export default function Problem() {
         <div className="flex flex-col justify-center items-start text-white w-full">
           <Banner />
           <p className="font-secondary text-white text-xl text-start">
-            We're your digital groth partners. Based in Chicago, we combine
+            We're your digital growth partners. Based in Chicago, we combine
             beautiful design with heavy metal determination to deliver solutions
             that actually move the needle for your business
           </p>
