@@ -7,11 +7,10 @@ import Services from "./components/Services";
 import WhoAreWe from "./components/WhoAreWe";
 import { useEffect, useState } from "react";
 import Loader from "./components/Loader";
-import {useLenis} from "./Hooks/lenis";
+import { useLenis } from "./Hooks/lenis";
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling
-  
 
   const [loading, setLoading] = useState(true);
 
@@ -32,19 +31,15 @@ function App() {
           <Header />
           <Hero />
         </div>
-
         <div>
           <Problem />
         </div>
-
         <div>
           <Services />
         </div>
-
         <div>
           <WhoAreWe />
         </div>
-
         <div>
           <Footer />
         </div>

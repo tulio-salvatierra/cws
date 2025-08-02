@@ -14,7 +14,13 @@ export default function Problem() {
           </p>
         </div>
         <div></div>
-        <div></div>
+        <div>
+          <img
+            src="https://i.pinimg.com/1200x/01/8f/3f/018f3fc28584f4331619094acd83fd3b.jpg"
+            alt="Illustration"
+            className="h-25 p-10 mx-auto rounded-lg shadow-lg w-full object-cover md:object-contain md:h-full md:w-auto"
+          />
+        </div>
         <div className="flex flex-col text-start w-full text-white">
           <h2 className="font-main font-black sm:text-4xl text-8xl text-orange-900 w-full leading-tight mb-4">
             What makes us different?
