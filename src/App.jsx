@@ -34,7 +34,7 @@ function App() {
         <div>
           <Problem />
         </div>
-        <div>
+        <div className="h-auto">
           <Services />
         </div>
         <div>

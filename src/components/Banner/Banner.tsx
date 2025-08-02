@@ -55,7 +55,7 @@ export default function Banner() {
   }, []);
 
   return (
-    <section className="mwg_effect013 h-screen flex items-center justify-center">
+    <section className="mwg_effect013 h-screen flex items-center justify-center banner-container">
       <div className="inner">
         <div className="banner-container" ref={containerRef}>
           <p className="phrase flex" ref={phraseRef} style={{ height: "500px" }}>
