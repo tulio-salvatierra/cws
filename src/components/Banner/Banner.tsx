@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import BF from "@/assets/banner/cwsbanner.svg";
 import "./Banner.css";
@@ -6,7 +6,6 @@ import "./Banner.css";
 export default function Banner() {
   const containerRef = useRef(null);
   const phraseRef = useRef<HTMLParagraphElement | null>(null);
-
 
   // This effect creates a horizontal scroll animation on the banner using GSAP.
   // The phrase (a horizontally repeated image) scrolls leftward continuously,
@@ -27,7 +26,7 @@ export default function Banner() {
 
     const xTo = gsap.quickTo(content, "x", {
       duration: 1,
-      ease: 'none',
+      ease: "none",
       modifiers: {
         x: gsap.utils.unitize(wrap),
       },
@@ -41,30 +40,36 @@ export default function Banner() {
       if (Math.abs(wheelDelta) < 0.01) wheelDelta = 0;
     };
 
-    const handleWheel = (e: { deltaY: number; }) => {
+    const handleWheel = (e: { deltaY: number }) => {
       wheelDelta += e.deltaY * 0.08;
     };
 
     gsap.ticker.add(tick);
-    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener("wheel", handleWheel, { passive: true });
 
     return () => {
-      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener("wheel", handleWheel);
       gsap.ticker.remove(tick);
     };
   }, []);
 
   return (
-    <section className="mwg_effect013 h-screen flex items-center justify-center banner-container">
-      <div className="inner">
-        <div className="banner-container" ref={containerRef}>
-          <p className="phrase flex" ref={phraseRef} style={{ height: "500px" }}>
-            {Array.from({ length: 10 }).map((_, index) => (
+    <section className="mwg_effect013 h-screen flex items-center justify-center">
+      <div className="banner-wrapper">
+        <div className="inner">
+          <div className="banner-container" ref={containerRef}>
+            <p
+              className="phrase flex"
+              ref={phraseRef}
+              style={{ height: "500px" }}
+            >
+              {Array.from({ length: 10 }).map((_, index) => (
                 <span key={index} className="phrase-item">
-                    <img src={BF} alt="Banner" />
+                  <img src={BF} alt="Banner" />
                 </span>
-            ))}
-          </p>
+              ))}
+            </p>
+          </div>
         </div>
       </div>
     </section>
