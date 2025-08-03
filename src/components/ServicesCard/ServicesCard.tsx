@@ -20,7 +20,7 @@ export default function ServicesCard() {
             <h2 className="text-orange-700 font-main text-2xl sm:text-3xl lg:text-4xl">
               {data.title}
             </h2>
-            <p className="text-white text-md w-100 font-secondary">
+            <p className="text-white text-xl w-100 font-secondary">
               {data.description}
             </p>
             <CustomButton secondary label="Web Development" href="#" />
