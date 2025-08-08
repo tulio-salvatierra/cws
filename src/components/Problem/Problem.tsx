@@ -22,7 +22,7 @@ export default function Problem() {
 
             <div>
               <div className="flex flex-col text-start w-full text-white">
-                <h2 className="font-main font-black sm:text-4xl text-8xl text-orange-900 w-full leading-tight mb-4">
+                <h2 className="font-main font-black sm:text-4xl text-6xl text-zinc-700 w-full leading-tight mb-4">
                   What makes us different?
                 </h2>
                 <p className="font-secondary text-lg sm:text-xl text-white flex-1">
