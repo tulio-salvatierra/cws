@@ -4,7 +4,7 @@ import Header from "./components/Header/Header";
 import Problem from "./components/Problem";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
-import WhoAreWe from "./components/WhoAreWe";
+import Contact from "./components/Contact";
 import Projects from "./components/Projects/Projects";
 import { useEffect, useState } from "react";
 import Loader from "./components/Loader";
@@ -43,7 +43,7 @@ function App() {
         </div>
         
         <div>
-          <WhoAreWe />
+          <Contact />
         </div>
         <div>
           <Footer />
