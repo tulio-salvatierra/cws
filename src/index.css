@@ -8,13 +8,11 @@
   color: linear-gradient(to bottom, #FE7018 0%, #4D433D 46%, #000000 70%)
 }
 :root {
-  background-color: #121212; /* Dark background */
-  --size-unit: 16; /* body font-size in design - no px */
-  --size-container-ideal: 1440; /* screen-size in design - no px */
-  --size-container-min: 992px;
-  --size-container-max: 1920px;
-  --size-container: clamp(var(--size-container-min), 100vw, var(--size-container-max));
-  --size-font: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
+  background-image: url("./assets/app_bg/greytexture.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
 }
 
 /* Tablet */
