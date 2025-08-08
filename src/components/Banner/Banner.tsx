@@ -61,9 +61,9 @@ export default function Banner() {
             <p
               className="phrase flex"
               ref={phraseRef}
-              style={{ height: "500px" }}
+              style={{ height: "400px" }}
             >
-              {Array.from({ length: 10 }).map((_, index) => (
+              {Array.from({ length: 100 }).map((_, index) => (
                 <span key={index} className="phrase-item">
                   <img src={BF} alt="Banner" />
                 </span>

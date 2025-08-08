@@ -5,6 +5,7 @@ import Problem from "./components/Problem";
 import Hero from "./components/Hero";
 import Services from "./components/Services";
 import WhoAreWe from "./components/WhoAreWe";
+import Projects from "./components/Projects/Projects";
 import { useEffect, useState } from "react";
 import Loader from "./components/Loader";
 import { useLenis } from "./Hooks/lenis";
@@ -37,6 +38,10 @@ function App() {
         <div className="h-auto">
           <Services />
         </div>
+        <div className="h-auto">
+          <Projects />
+        </div>
+        
         <div>
           <WhoAreWe />
         </div>
