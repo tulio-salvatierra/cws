@@ -3,7 +3,7 @@ import ServicesCard from "../ServicesCard";
 export default function Services() {
   return (
     <>
-      <section className="flex flex-col w-screen h-auto justify-evenly mx-5 my-32">
+      <section className="flex flex-col w-full h-auto justify-evenly px-5 py-32 overflow-x-hidden">
         <strong className="text-orange-500">[SERVICES]</strong>
         <h2 className="font-main font-black sm:text-[6rem] text-[3rem] text-zinc-700 sm:text-[6  rem] w-100 leading-tight">
           What we do

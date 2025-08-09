@@ -7,8 +7,8 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
-    <div className="flex p-3 w-screen content-center sticky top-0 bg-transparent z-50">
-      <div className="flex w-screen p-6 justify-between items-center">
+    <div className="flex p-3 w-full content-center sticky top-0 bg-transparent z-50 overflow-x-hidden">
+      <div className="flex w-full p-6 justify-between items-center">
         {/* Desktion Header */}
         <h1 className="text-orange-500 text-6xl md:text-8xl font-bold tracking-tight">
           CICERO WEB STUDIO <sup className="text-2xl align-super">®</sup>

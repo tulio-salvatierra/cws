@@ -3,7 +3,7 @@
 export default function WhoAreWe() {
   return (
     <>
-      <section className="p-5 bg-gray-700 flex flex-col w-screen h-screen justify-evenly">
+      <section className="p-5 bg-gray-700 flex flex-col w-full h-screen justify-evenly overflow-x-hidden">
         <div className="flex flex-col">
           <strong className="text-white">[ABOUT_US]</strong>
           <h2 className="font-main text-orange-500  font-black sm:text-[6rem] text-[3rem] sm:text-[6  rem] w-100 leading-tight">

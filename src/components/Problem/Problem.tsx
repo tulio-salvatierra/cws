@@ -4,7 +4,7 @@ import CustomButton from "../CustomButton";
 export default function Problem() {
   return (
     <>
-      <section className="p-5  flex flex-col w-screen h-50 justify-evenly mt-80">
+      <section className="p-5 flex flex-col w-full h-50 justify-evenly mt-80 overflow-x-hidden">
         <div className="flex flex-col mb-10">
           <strong className="text-orange-500 text-left">[PROJECTS]</strong>
           <h2 className="font-main text-left font-black sm:text-[6rem] text-[3rem] text-zinc-700 sm:text-[6  rem] w-100 leading-tight">

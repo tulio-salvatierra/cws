@@ -27,7 +27,7 @@ function App() {
 
   return (
     <>
-      <div className="App grid grid-cols-1">
+      <div className="App grid grid-cols-1 overflow-x-hidden w-full">
         <div>
           <Header />
           <Hero />
@@ -51,7 +51,7 @@ function App() {
       </div>
 
       {loading && (
-        <div className="App grid grid-cols-1">
+        <div className="App grid grid-cols-1 overflow-x-hidden w-full">
           <Loader />
         </div>
       )}

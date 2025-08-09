@@ -5,7 +5,7 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="flex flex-col w-screen h-auto justify-evenly mx-5 my-32"
+      className="flex flex-col w-full h-auto justify-evenly px-5 py-32 overflow-x-hidden"
     >
       <div className="flex flex-col mb-10">
         <strong className="text-orange-500 text-left">[PROJECTS]</strong>
