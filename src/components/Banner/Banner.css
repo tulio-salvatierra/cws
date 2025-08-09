@@ -7,7 +7,7 @@
 
 .mwg_effect013 {
     height: 50dvh;
-    overflow: visible;
+    overflow: hidden;
 }
 .mwg_effect013 .header {
     position: absolute;
