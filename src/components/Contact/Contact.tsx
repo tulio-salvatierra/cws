@@ -26,9 +26,10 @@ export default function Contact() {
       >
         Contact
       </h1>
+      
+      {/* Location under the heading */}
       <p className="absolute bottom-1/3 left-4 text-2xl leading-tight">Let's get in touch and work together.</p>
 
-      {/* Location under the heading */}
       <p className="text-orange-800 absolute top-[60%] left-4 text-xs uppercase tracking-wide">
         Chicago, IL, USA
       </p>
