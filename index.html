@@ -35,8 +35,22 @@
       name="twitter:image"
       content="https://cicerowebstudio.com/preview.jpg"
     />
-    <title>Vite + React</title>
+    <title>Cicero Web Studio | Modern Web Solutions for Small Businesses</title>
   </head>
+  <!-- Google tag (gtag.js) -->
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-H2J5FZ5Y5T"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-H2J5FZ5Y5T");
+  </script>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
