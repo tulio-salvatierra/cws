@@ -1,52 +1,50 @@
 // src/components/ContactSection.tsx
 export default function Contact() {
   return (
-    <section className="relative w-full min-h-screen bg-gray-900/50 text-white overflow-hidden">
-      {/* Top‑left tagline */}
-      <div className="absolute top-4 left-4 text-sm leading-tight">
-        <p>Website Design</p>
-        <p>Front‑end & Back‑end Development</p>
-      </div>
-
-      {/* Top‑right “Selected Work” list */}
-      <div className="absolute top-4 right-4 text-xs">
-        <p className="font-bold mb-1">Selected Work:</p>
-        <ul className="space-y-[2px] text-orange-800">
-          <li>TAMM Cleaning services</li>
-          <li>Carolina Skin Centre</li>
-          <li>Kike Vivaldy</li>
-          <li>Intermezzo Sound Studio</li>
-        </ul>
-      </div>
-
-      {/* Giant “Contact” heading */}
-      <h1
-        className="absolute top-1/2 left-4 -translate-y-1/2 font-black tracking-tight text-orange-500
-                     text-[10vw] sm:text-[12vw] md:text-[10vw] lg:text-[8vw]"
-      >
-        Contact
-      </h1>
-      
-      {/* Location under the heading */}
-      <p className="absolute bottom-1/3 left-4 text-2xl leading-tight">Let's get in touch and work together.</p>
-
-      <p className="text-orange-800 absolute top-[60%] left-4 text-xs uppercase tracking-wide">
-        Chicago, IL, USA
-      </p>
-
-      {/* Contact details and socials */}
-      <div className="absolute bottom-12 right-4 text-xs sm:text-sm space-y-2">
-        <div>
-          <p>Phone: (+1) 786‑314‑6121</p>
-          <p>Mail: info@cicerowebstudio.xyz</p>
+    <section className="relative w-full min-h-screen bg-black flex items-center justify-center p-4">
+      {/* Main white content block */}
+      <div className="bg-[url('/src/assets/images/contact.svg')] text-black w-full rounded-2xl h-[80vh] p-8 md:p-12 flex flex-col bg-image-contact">
+        {/* Header with brand name and navigation */}
+        <div className="flex justify-between items-start mb-16">
+          <h2 className="text-2xl text-orange-500 font-main font-black">CICERO WEB STUDIO</h2>
+          <nav className="flex space-x-6 text-sm">
+            <a href="#work" className="hover:underline">Work</a>
+            <a href="#about" className="hover:underline">About</a>
+            <a href="#contact" className="hover:underline">Contact</a>
+          </nav>
         </div>
-        <div className="flex flex-col">
-          <a href="#" className="hover:underline">
-            Instagram
+
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col justify-center">
+          {/* Main heading */}
+          <h1 className="text-8xl text-orange-500 font-main font-black mb-8">
+            GET IN TOUCH
+          </h1>
+
+          {/* Email address */}
+          <a 
+            href="mailto:info@cicerowebstudio.xyz" 
+            className="text-xl md:text-2xl underline mb-12 hover:opacity-70 transition-opacity"
+          >
+            info@cicerowebstudio.xyz
           </a>
-          <a href="#" className="hover:underline">
-            Twitter
-          </a>
+
+          {/* Social section */}
+          <div>
+            <h3 className="text-xl mb-4">Social:</h3>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2 font-secondary text-zinc-700">
+              <div className="space-y-2">
+                <a href="" className="block hover:underline">Instagram</a>
+                <a href="#" className="block hover:underline">YouTube</a>
+              </div>
+              <div className="space-y-2">
+                <a href="#" className="block hover:underline">Facebook</a>
+                <a href="#" className="block hover:underline">Twitter</a>
+                <a href="#" className="block hover:underline">Pinterest</a>
+                <a href="#" className="block hover:underline">LinkedIn</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

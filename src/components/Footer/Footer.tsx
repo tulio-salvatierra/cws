@@ -66,7 +66,7 @@ export default function Footer() {
           <p>
             DEVELOPMENT & DESIGN BY{" "}
             <a
-              href="#"
+              href="https://www.tuliosalvatierra.com"
               className="underline hover:text-white transition-colors"
             >
               Tulio Salvatierra

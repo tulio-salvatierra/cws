@@ -40,8 +40,7 @@ function App() {
         </div>
         <div className="h-auto">
           <Projects />
-        </div>
-        
+        </div>        
         <div>
           <Contact />
         </div>

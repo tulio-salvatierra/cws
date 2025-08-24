@@ -2,10 +2,11 @@ import ProjectCard from "../ProjectCard";
 import { projects } from "./ProjectsData";
 
 export default function Projects() {
+  console.log('Projects component rendering, projects data:', projects);
   return (
     <section
       id="projects"
-      className="flex flex-col w-full h-auto justify-evenly px-5 py-32 overflow-x-hidden"
+      className="flex flex-col w-full h-auto justify-evenly px-5 py-32"
     >
       <div className="flex flex-col mb-10">
         <strong className="text-orange-500 text-left">[PROJECTS]</strong>
@@ -34,7 +35,7 @@ export default function Projects() {
           <div key={index} className="mb-6 break-inside-avoid">
             <ProjectCard
               title={project.title}
-              images={project.image} // note: prop is `image`, not `images`
+              images={project.image}
               alt={project.alt}
               description={project.description}
               link={project.link}
