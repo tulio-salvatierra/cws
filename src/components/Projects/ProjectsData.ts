@@ -18,7 +18,7 @@ export const projects = [
     alt: "Carolina’s Skin Center Website",
     description:
       "An elegant, high-end site reflecting luxury branding with smooth navigation and service-focused layouts.",
-    link: "#",
+    link: "https://www.carolinaskincenter.com/",
   },
   {
     title: "Portfolio Website",
@@ -26,7 +26,7 @@ export const projects = [
     alt: "Tulio's Portfolio Website",
     description:
       "A clean and modern portfolio that showcases our design and development capabilities.",
-    link: "#",
+    link: "https://www.tuliosalvatierra.com/",
   },
   {
     title: "Probation officer community resources",
