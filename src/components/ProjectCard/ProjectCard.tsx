@@ -16,7 +16,7 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ title, images, alt, description, link }: ProjectCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<any>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -95,21 +95,41 @@ export default function ProjectCard({ title, images, alt, description, link }: P
       className="bg-zinc-700/50 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
     >
       <div className="relative h-40 overflow-hidden">
-        <img
-          ref={imageRef}
-          src={images}
-          alt={alt || "Project Image"}
-          loading="lazy"
-          className="w-full h-48 object-cover"
-          style={{ 
-            willChange: 'transform',
-            transform: 'translateY(-20px)' // Initial offset for parallax
-          }}
-          onError={(e) => {
-            console.error('Project card image failed to load:', e);
-            e.currentTarget.style.display = 'none';
-          }}
-        />
+        {images.endsWith('.mp4') ? (
+          <video
+            ref={imageRef}
+            src={images}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-48 object-cover"
+            style={{ 
+              willChange: 'transform',
+              transform: 'translateY(-20px)' // Initial offset for parallax
+            }}
+            onEnded={(e) => {
+              e.currentTarget.currentTime = 0;
+              e.currentTarget.play();
+            }}
+          />
+        ) : (
+          <img
+            ref={imageRef}
+            src={images}
+            alt={alt || "Project Image"}
+            loading="lazy"
+            className="w-full h-48 object-cover"
+            style={{ 
+              willChange: 'transform',
+              transform: 'translateY(-20px)' // Initial offset for parallax
+            }}
+            onError={(e) => {
+              console.error('Project card image failed to load:', e);
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
       </div>
       <div className="p-6">
         <h3 className="text-xl font-main font-semibold text-orange-700">

@@ -25,13 +25,7 @@ export default function Projects() {
         <div></div>
         <div></div>
         <div>
-          {" "}
-          <p className="font-secondary text-white text-xl sm:text-md text-start w-100 p-4">
-            At Cicero Web Studio, every project is built with one goal in mind:
-            helping businesses stand out online. From sleek, high-converting
-            websites to interactive, custom-built applications, our work blends
-            style, speed, and smart technology.
-          </p>
+         
         </div>
       </div>
 

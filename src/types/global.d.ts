@@ -22,4 +22,12 @@ declare module "*.mp4" {
     export default src;
   
   }
+
+declare module "*.jpg" {
+
+    const src: string;
+  
+    export default src;
+  
+  }
   

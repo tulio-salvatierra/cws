@@ -1,7 +1,12 @@
+import SJ from '../../assets/images/SJ.jpg';
+import CSC from '../../assets/images/csc.jpg';
+import Clean from '../../assets/images/cleaning.jpg';
+import Portfolio from '../../assets/images/Visualizing_Creativity_Trust_and_Power.mp4';
+
 export const projects = [
   {
     title: "TAMM Cleaning Services",
-    image: "/images/tamm-cleaning.jpg",
+    image: Clean,
     alt: "TAMM Cleaning Services Website",
     description:
       "A modern, mobile-friendly website designed to showcase services, capture leads, and boost Google rankings.",
@@ -9,34 +14,26 @@ export const projects = [
   },
   {
     title: "Carolina’s Skin Center",
-    image: "/images/carolina-skin.jpg",
+    image: CSC,
     alt: "Carolina’s Skin Center Website",
     description:
       "An elegant, high-end site reflecting luxury branding with smooth navigation and service-focused layouts.",
     link: "#",
   },
   {
-    title: "Jessica Story Game",
-    image: "/images/jessica-game.jpg",
-    alt: "Jessica Story Game",
-    description:
-      "An interactive, story-driven game using GSAP animations to create a dynamic and engaging experience.",
-    link: "#",
-  },
-  {
-    title: "E-Commerce Platform",
-    image: "/images/ecommerce.jpg",
-    alt: "Custom E-Commerce Platform",
-    description:
-      "A full-featured online store with cart functionality, secure checkout, and real-time product updates.",
-    link: "#",
-  },
-  {
     title: "Portfolio Website",
-    image: "/images/portfolio.jpg",
+    image: Portfolio,
     alt: "Tulio's Portfolio Website",
     description:
       "A clean and modern portfolio that showcases our design and development capabilities.",
     link: "#",
+  },
+  {
+    title: "Probation officer community resources",
+    image: SJ,
+    alt: "Probation Officers Resources platform",
+    description:
+      "Comprehensive resource guide for probation officers, case managers, and social workers helping individuals navigate Chicago's community services",
+    link: "https://www.chicagofreecommunityresources.com/",
   },
 ];
