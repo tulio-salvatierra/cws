@@ -1,17 +1,101 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
 
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
+  const [isFloating, setIsFloating] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
   const toggleMenu = () => setShowMenu(!showMenu);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const header = headerRef.current;
+    if (!header) return;
+
+    // Set initial state - header is visible but transparent in hero
+    gsap.set(header, {
+      backgroundColor: "transparent",
+      backdropFilter: "none",
+      y: 0
+    });
+
+    // Create ScrollTrigger for floating header effect
+    ScrollTrigger.create({
+      trigger: "body",
+      start: "top -100", // Start when scrolled past the hero section
+      end: "bottom bottom",
+      onUpdate: (self) => {
+        const progress = self.progress;
+        const isScrolledPastHero = self.scroll() > window.innerHeight * 0.8; // 80% of viewport
+        
+        if (isScrolledPastHero !== isFloating) {
+          setIsFloating(isScrolledPastHero);
+          
+          if (isScrolledPastHero) {
+            // Animate to floating state with slide down effect
+            gsap.fromTo(header, 
+              {
+                y: -100,
+                opacity: 0.8
+              },
+              {
+                y: 0,
+                opacity: 1,
+                backgroundColor: "rgba(39, 39, 42, 0.95)", // bg-zinc-800/95
+                backdropFilter: "blur(12px)",
+                borderBottom: "1px solid rgba(161, 161, 170, 0.2)", // border-zinc-400/20
+                duration: 0.4,
+                ease: "power2.out"
+              }
+            );
+          } else {
+            // Animate back to transparent state
+            gsap.to(header, {
+              backgroundColor: "transparent",
+              backdropFilter: "none",
+              borderBottom: "none",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
+        }
+      },
+      onToggle: ({ isActive }) => {
+        // Additional logic if needed when entering/leaving trigger area
+      }
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, [isFloating]);
+
   return (
-    <div className="flex p-3 w-full content-center sticky top-0 bg-transparent z-50 overflow-x-hidden">
+    <div 
+      ref={headerRef}
+      className={`flex p-3 w-full content-center sticky top-0 z-50 overflow-x-hidden transition-all duration-300 ${
+        isFloating 
+          ? 'bg-zinc-800/95 backdrop-blur-md border-b border-zinc-400/20 shadow-lg' 
+          : 'bg-transparent'
+      }`}
+    >
       <div className="flex w-full p-6 justify-between items-center">
-        {/* Desktion Header */}
-        <h1 className="text-orange-500 text-6xl md:text-8xl font-bold tracking-tight">
-          CICERO WEB STUDIO <sup className="text-2xl align-super">®</sup>
+        {/* Desktop Header */}
+        <h1 className={`text-orange-500 font-bold tracking-tight transition-all duration-300 ${
+          isFloating 
+            ? 'text-3xl md:text-4xl' 
+            : 'text-6xl md:text-8xl'
+        }`}>
+          CICERO WEB STUDIO <sup className={`align-super ${
+            isFloating ? 'text-sm' : 'text-2xl'
+          }`}>®</sup>
         </h1>
         <div className="space-x-8 hidden font-secondary items-start md:flex text-xs tracking-tight">
           {MENU_ITEM.map((nav, index) => (
