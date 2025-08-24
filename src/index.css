@@ -8,11 +8,8 @@
   color: linear-gradient(to bottom, #FE7018 0%, #4D433D 46%, #000000 70%)
 }
 :root {
-  background-image: url("./assets/app_bg/greytexture.jpg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center;
+  background-image: url("./assets/app_bg/wavey-fingerprint.svg");
+  background-size: fill;
 }
 
 /* Tablet */
