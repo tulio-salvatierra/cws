@@ -11,6 +11,9 @@ export function useLenis() {
       infinite: false,
     });
 
+    // Make lenis globally accessible
+    (window as any).lenis = lenis;
+
     interface RafFunction {
       (time: number): void;
     }
@@ -24,6 +27,7 @@ export function useLenis() {
 
     return () => {
       lenis.destroy(); 
+      delete (window as any).lenis;
     };
   }, []);
 }

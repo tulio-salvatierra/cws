@@ -1,6 +1,28 @@
 import CustomButton from "../CustomButton";
+import { useLenis } from "../../Hooks/lenis";
+import { useEffect, useRef } from "react";
 
 export default function Footer() {
+  const lenisRef = useRef<any>(null);
+  
+  // Get the Lenis instance
+  useLenis();
+  
+  useEffect(() => {
+    // Get the Lenis instance from the window object
+    if (typeof window !== 'undefined') {
+      lenisRef.current = (window as any).lenis;
+    }
+  }, []);
+  
+  const scrollToTop = () => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { duration: 2 });
+    } else {
+      // Fallback to regular smooth scroll if Lenis is not available
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
   return (
     <footer className="bg-transparent text-gray-200 py-12 px-4">
       <div className="mx-auto">
@@ -20,7 +42,7 @@ export default function Footer() {
               Contact
             </a>
           </nav>
-          <CustomButton label="Back to Top" href="#" secondary={true} />
+          <CustomButton label="Back to Top" onClick={scrollToTop} secondary={true} />
         </div>
 
         {/* Dotted Line Separator */}
