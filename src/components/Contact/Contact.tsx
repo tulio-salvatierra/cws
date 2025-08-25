@@ -1,4 +1,4 @@
-import contactBg from '../../assets/images/contact.svg';
+
 
 export default function Contact() {
   return (
