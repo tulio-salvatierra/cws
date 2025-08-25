@@ -1,9 +1,9 @@
-import SJ from '../../assets/images/SJ.jpg';
-import CSC from '../../assets/images/csc.jpg';
-import Clean from '../../assets/images/cleaning.jpg';
-import Portfolio from '../../assets/images/Visualizing_Creativity_Trust_and_Power.mp4';
-import Kike from '../../assets/images/kike.jpeg';
-import Intermezzo from '../../assets/images/intermezzo.jpg';
+import SJ from '../../assets/Images/SJ.jpg';
+import CSC from '../../assets/Images/csc.jpg';
+import Clean from '../../assets/Images/cleaning.jpg';
+import Portfolio from '../../assets/Images/Visualizing_Creativity_Trust_and_Power.mp4';
+import Kike from '../../assets/Images/kike.jpeg';
+import Intermezzo from '../../assets/Images/intermezzo.jpg';
 
 
 export const projects = [

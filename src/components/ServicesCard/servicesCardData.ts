@@ -5,9 +5,9 @@ export interface ServiceItem {
     image?: string;
 }
 
-import Web from '../../assets/images/website.jpg';
-import Business from '../../assets/images/auto.jpg';
-import IT from '../../assets/images/support.png';
+import Web from '../../assets/Images/website.jpg';
+import Business from '../../assets/Images/auto.jpg';
+import IT from '../../assets/Images/support.png';
 
 export const servicesData = [
     {
