@@ -92,9 +92,9 @@ export default function ProjectCard({ title, images, alt, description, link }: P
   return (
     <div 
       ref={cardRef}
-      className="bg-zinc-700/50 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+      className="rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-auto flex flex-col"
     >
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative h-72 overflow-hidden flex-shrink-0">
         {images.endsWith('.mp4') ? (
           <video
             ref={imageRef}
@@ -103,7 +103,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
             muted
             loop
             playsInline
-            className="w-full h-48 object-cover"
+            className="w-full h-64 object-cover"
             style={{ 
               willChange: 'transform',
               transform: 'translateY(-20px)' // Initial offset for parallax
@@ -119,7 +119,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
             src={images}
             alt={alt || "Project Image"}
             loading="lazy"
-            className="w-full h-48 object-cover"
+            className="w-full h-64 object-cover"
             style={{ 
               willChange: 'transform',
               transform: 'translateY(-20px)' // Initial offset for parallax
@@ -131,7 +131,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
           />
         )}
       </div>
-      <div className="p-6">
+      <div className="p-6 flex-1 flex flex-col">
         <h3 className="text-xl font-main font-semibold text-orange-700">
           {title}
         </h3>
@@ -139,7 +139,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
         <a
           href={link}
           target="_blank"
-          className="inline-block mt-4 text-white font-medium hover:underline transition-colors duration-200"
+          className="inline-block mt-4 text-white font-medium hover:underline transition-colors duration-200 mt-auto"
           rel="noopener noreferrer"
         >
           View Project →

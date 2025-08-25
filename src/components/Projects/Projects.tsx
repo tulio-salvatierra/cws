@@ -2,7 +2,6 @@ import ProjectCard from "../ProjectCard";
 import { projects } from "./ProjectsData";
 
 export default function Projects() {
-  console.log('Projects component rendering, projects data:', projects);
   return (
     <section
       id="projects"
