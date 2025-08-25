@@ -92,7 +92,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
   return (
     <div 
       ref={cardRef}
-      className="rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-auto flex flex-col"
+      className="rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 h-auto flex flex-col"
     >
       <div className="relative h-72 overflow-hidden flex-shrink-0">
         {images.endsWith('.mp4') ? (
@@ -139,7 +139,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
         <a
           href={link}
           target="_blank"
-          className="inline-block mt-4 text-white font-medium hover:underline transition-colors duration-200 mt-auto"
+          className="inline-block mt-4 text-zinc-400 font-medium hover:underline transition-colors duration-200 mt-auto"
           rel="noopener noreferrer"
         >
           View Project →
