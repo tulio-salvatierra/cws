@@ -5,8 +5,8 @@ export default function Contact() {
     <section className="relative w-full min-h-screen bg-black flex items-center justify-center p-4">
       {/* Main white content block */}
       <div 
-        className="text-black w-full rounded-2xl h-[80vh] p-8 md:p-12 flex flex-col bg-image-contact"
-        style={{ backgroundImage: `url(${contactBg})` }}
+        className="text-black w-full rounded-2xl h-[80vh] p-8 md:p-12 flex flex-col bg-zinc-700"
+        
       >
         {/* Header with brand name and navigation */}
         <div className="flex justify-between items-start mb-16">

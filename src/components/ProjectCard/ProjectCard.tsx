@@ -94,7 +94,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
       ref={cardRef}
       className="rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 h-auto flex flex-col"
     >
-      <div className="relative h-72 overflow-hidden flex-shrink-0">
+      <div className="relative h-72 flex-shrink-0">
         {images.endsWith('.mp4') ? (
           <video
             ref={imageRef}
