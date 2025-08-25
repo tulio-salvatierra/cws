@@ -1,9 +1,13 @@
-// src/components/ContactSection.tsx
+import contactBg from '../../assets/images/contact.svg';
+
 export default function Contact() {
   return (
     <section className="relative w-full min-h-screen bg-black flex items-center justify-center p-4">
       {/* Main white content block */}
-      <div className="bg-[url('/src/assets/images/contact.svg')] text-black w-full rounded-2xl h-[80vh] p-8 md:p-12 flex flex-col bg-image-contact">
+      <div 
+        className="text-black w-full rounded-2xl h-[80vh] p-8 md:p-12 flex flex-col bg-image-contact"
+        style={{ backgroundImage: `url(${contactBg})` }}
+      >
         {/* Header with brand name and navigation */}
         <div className="flex justify-between items-start mb-16">
           <h2 className="text-2xl text-orange-500 font-main font-black">CICERO WEB STUDIO</h2>
