@@ -1,10 +1,5 @@
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-// Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+import { useRef } from "react";
 
 interface ProjectCardProps {
   title: string;
@@ -15,99 +10,20 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ title, images, alt, description, link }: ProjectCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<any>(null);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const card = cardRef.current;
-    const image = imageRef.current;
-    
-    if (!card || !image) return;
-
-    // Initial entrance animation
-    gsap.fromTo(card, 
-      {
-        opacity: 0,
-        y: 50,
-        scale: 0.9
-      },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: card,
-          start: "top 90%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-
-    // Create parallax effect for the image
-    const parallaxTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: card,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: true,
-        onUpdate: (self) => {
-          // Calculate parallax offset based on scroll progress
-          const progress = self.progress;
-          const yPercent = (progress - 0.5) * 30; // Reduced intensity for smoother effect
-          
-          gsap.set(image, {
-            yPercent: yPercent,
-            ease: "none"
-          });
-        }
-      }
-    });
-
-    // Scale effect on hover
-    const hoverTl = gsap.timeline({ paused: true });
-    hoverTl.to(image, {
-      scale: 1.1,
-      duration: 0.4,
-      ease: "power2.out"
-    });
-
-    const handleMouseEnter = () => hoverTl.play();
-    const handleMouseLeave = () => hoverTl.reverse();
-
-    card.addEventListener("mouseenter", handleMouseEnter);
-    card.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      parallaxTl.kill();
-      hoverTl.kill();
-      card?.removeEventListener("mouseenter", handleMouseEnter);
-      card?.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, []);
+  const imageRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
 
   return (
-    <div 
-      ref={cardRef}
-      className="rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 h-auto flex flex-col"
-    >
-      <div className="relative h-72 flex-shrink-0">
+    <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto flex flex-col group">
+      <div className="relative h-72 flex-shrink-0 overflow-hidden">
         {images.endsWith('.mp4') ? (
           <video
-            ref={imageRef}
+            ref={imageRef as React.RefObject<HTMLVideoElement>}
             src={images}
             autoPlay
             muted
             loop
             playsInline
-            className="w-full h-64 object-cover"
-            style={{ 
-              willChange: 'transform',
-              transform: 'translateY(-20px)' // Initial offset for parallax
-            }}
+            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
             onEnded={(e) => {
               e.currentTarget.currentTime = 0;
               e.currentTarget.play();
@@ -115,15 +31,11 @@ export default function ProjectCard({ title, images, alt, description, link }: P
           />
         ) : (
           <img
-            ref={imageRef}
+            ref={imageRef as React.RefObject<HTMLImageElement>}
             src={images}
             alt={alt || "Project Image"}
             loading="lazy"
-            className="w-full h-64 object-cover"
-            style={{ 
-              willChange: 'transform',
-              transform: 'translateY(-20px)' // Initial offset for parallax
-            }}
+            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
               console.error('Project card image failed to load:', e);
               e.currentTarget.style.display = 'none';
@@ -139,7 +51,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
         <a
           href={link}
           target="_blank"
-          className="inline-block mt-4 text-zinc-400 font-medium hover:underline transition-colors duration-200 mt-auto"
+          className="inline-block text-zinc-400 font-medium hover:text-orange-500 hover:underline transition-colors duration-200 mt-auto"
           rel="noopener noreferrer"
         >
           View Project →
