@@ -7,6 +7,7 @@ import Layout from "./components/Layout/Layout";
 import Home from "./components/Home/Home";
 import About from "./components/About";
 import Policy from "./components/Policy";
+import ServicesPage from "./components/ServicesPage";
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling
@@ -36,6 +37,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="services" element={<ServicesPage />} />
           <Route path="about" element={<About />} />
           <Route path="policy" element={<Policy />} />
         </Route>
