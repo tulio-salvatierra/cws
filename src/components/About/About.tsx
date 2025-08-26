@@ -37,7 +37,7 @@ export default function About() {
                 <div className="relative">
                   <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-orange-500 shadow-2xl">
                     <video
-                      src="/images/hero.mp4"
+                      src="public/images/Visualizing_Creativity_Trust_and_Power.mp4"
                       autoPlay
                       muted
                       loop
