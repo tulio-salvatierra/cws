@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Link, useLocation } from "react-router-dom";
 import { MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
 
@@ -11,6 +12,7 @@ export default function Header() {
   const [showMenu, setShowMenu] = useState(false);
   const [isFloating, setIsFloating] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const toggleMenu = () => setShowMenu(!showMenu);
 
   useEffect(() => {
@@ -88,25 +90,27 @@ export default function Header() {
     >
       <div className="flex w-full p-6 justify-between items-center">
         {/* Desktop Header */}
-        <h1 className={`text-orange-500 font-bold tracking-tight transition-all duration-300 ${
-          isFloating 
-            ? 'text-3xl md:text-4xl' 
-            : 'text-6xl md:text-8xl'
-        }`}>
-          CICERO WEB STUDIO <sup className={`align-super ${
-            isFloating ? 'text-sm' : 'text-2xl'
-          }`}>®</sup>
-        </h1>
+        <Link to="/" className="no-underline">
+          <h1 className={`text-orange-500 font-bold tracking-tight transition-all duration-300 ${
+            isFloating 
+              ? 'text-3xl md:text-4xl' 
+              : 'text-6xl md:text-8xl'
+          }`}>
+            CICERO WEB STUDIO <sup className={`align-super ${
+              isFloating ? 'text-sm' : 'text-2xl'
+            }`}>®</sup>
+          </h1>
+        </Link>
         <div className="space-x-8 hidden font-secondary items-start md:flex text-xs tracking-tight">
           {MENU_ITEM.map((nav, index) => (
-            <a
-              href={nav.url}
+            <Link
+              to={nav.url}
               key={index}
-              className={nav.class}
+              className={`${nav.class} ${location.pathname === nav.url ? 'text-orange-500' : ''}`}
               onClick={toggleMenu}
             >
               {nav.name}
-            </a>
+            </Link>
           ))}
         </div>
         <div className="md:hidden">
@@ -136,14 +140,14 @@ export default function Header() {
 
               <nav className="flex-col p-4 mb-10 text-left justify-end items-center text-4xl font-black">
                 {MENU_ITEM.map((navMobile, index) => (
-                  <a
-                    href={navMobile.url}
+                  <Link
+                    to={navMobile.url}
                     key={index}
-                    className={navMobile.class}
+                    className={`${navMobile.class} ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
                     onClick={toggleMenu}
                   >
                     {navMobile.name}
-                  </a>
+                  </Link>
                 ))}
               </nav>
             </div>

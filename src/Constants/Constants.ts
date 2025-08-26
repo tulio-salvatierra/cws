@@ -2,8 +2,8 @@ export const PHONE = 7863146121;
 export const EMAIL = "salvacorp@gmail.com";
 export const PORTURL = "www.tuliosalvatierra.com";
 export const HOME_URL = "/";
-export const SERICES_URL = "/house-cleaning-services-chicago";
-export const ABOUT_URL = "#about";
+export const SERICES_URL = "/services";
+export const ABOUT_URL = "/about";
 export const CONTACT_URL = "#contact";
 export const BLOG_URL = "/blog";
 

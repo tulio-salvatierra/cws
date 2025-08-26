@@ -1,14 +1,11 @@
 import "./App.css";
-import Footer from "./components/Footer/Footer";
-import Header from "./components/Header/Header";
-import Problem from "./components/Problem";
-import Hero from "./components/Hero";
-import Services from "./components/Services";
-import Contact from "./components/Contact";
-import Projects from "./components/Projects/Projects";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loader from "./components/Loader";
 import { useLenis } from "./Hooks/lenis";
+import Layout from "./components/Layout/Layout";
+import Home from "./components/Home/Home";
+import About from "./components/About";
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling
@@ -25,36 +22,23 @@ function App() {
     };
   }, []);
 
-  return (
-    <>
+  if (loading) {
+    return (
       <div className="App grid grid-cols-1 overflow-x-hidden w-full">
-        <div>
-          <Header />
-          <Hero />
-        </div>
-        <div>
-          <Problem />
-        </div>
-        <div className="h-auto">
-          <Services />
-        </div>
-        <div className="h-auto">
-          <Projects />
-        </div>        
-        <div>
-          <Contact />
-        </div>
-        <div>
-          <Footer />
-        </div>
+        <Loader />
       </div>
+    );
+  }
 
-      {loading && (
-        <div className="App grid grid-cols-1 overflow-x-hidden w-full">
-          <Loader />
-        </div>
-      )}
-    </>
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
