@@ -36,7 +36,7 @@ export default function Footer() {
             </Link>
             {MENU_ITEM.map((nav, index) => (
               <Link
-                key={index}
+                key={nav.id}
                 to={nav.url}
                 className="hover:text-white transition-colors"
               >
