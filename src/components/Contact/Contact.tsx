@@ -5,7 +5,8 @@ import {
   FACEBOOK_URL, 
   INSTAGRAM_URL, 
   YOUTUBE_URL, 
-  LINKEDIN_URL 
+  LINKEDIN_URL,
+  TWITTER_URL
 } from '../../Constants/Constants';
 
 export default function Contact() {
@@ -51,6 +52,7 @@ export default function Contact() {
               </div>
               <div className="space-y-2">
                 <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">Facebook</a>
+                <a href={TWITTER_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">Twitter</a>
                 <a href={PINTEREST_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">Pinterest</a>
                 <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">LinkedIn</a>
               </div>
