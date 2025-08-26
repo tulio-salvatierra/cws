@@ -46,14 +46,13 @@ export default function Contact() {
             <h3 className="text-xl mb-4">Social:</h3>
             <div className="grid grid-cols-2 gap-x-8 gap-y-2 font-secondary text-zinc-700">
               <div className="space-y-2">
-                <a href="" className="block hover:underline">Instagram</a>
-                <a href="#" className="block hover:underline">YouTube</a>
+                <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">Instagram</a>
+                <a href={YOUTUBE_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">YouTube</a>
               </div>
               <div className="space-y-2">
-                <a href="#" className="block hover:underline">Facebook</a>
-                <a href="#" className="block hover:underline">Twitter</a>
-                <a href="#" className="block hover:underline">Pinterest</a>
-                <a href="#" className="block hover:underline">LinkedIn</a>
+                <a href={FACEBOOK_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">Facebook</a>
+                <a href={PINTEREST_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">Pinterest</a>
+                <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" className="block hover:underline">LinkedIn</a>
               </div>
             </div>
           </div>
