@@ -1,6 +1,8 @@
 import CustomButton from "../CustomButton";
 import { useLenis } from "../../Hooks/lenis";
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { MENU_ITEM } from "../../Constants/Constants";
 
 export default function Footer() {
   const lenisRef = useRef<any>(null);
@@ -29,18 +31,18 @@ export default function Footer() {
         {/* Top Section: Navigation and Back to Top */}
         <div className="flex flex-col sm:flex-row justify-between items-center pb-8">
           <nav className="flex space-x-6 text-sm font-medium uppercase tracking-wider mb-4 sm:mb-0">
-            <a href="#" className="hover:text-white transition-colors">
+            <Link to="/" className="hover:text-white transition-colors">
               Home
-            </a>
-            <a href="#about" className="hover:text-white transition-colors">
-              About
-            </a>
-            <a href="#portfolio" className="hover:text-white transition-colors">
-              Portfolio
-            </a>
-            <a href="#contact" className="hover:text-white transition-colors">
-              Contact
-            </a>
+            </Link>
+            {MENU_ITEM.map((nav, index) => (
+              <Link
+                key={index}
+                to={nav.url}
+                className="hover:text-white transition-colors"
+              >
+                {nav.name}
+              </Link>
+            ))}
           </nav>
           <CustomButton label="Back to Top" onClick={scrollToTop} secondary={true} />
         </div>

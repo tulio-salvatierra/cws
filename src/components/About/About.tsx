@@ -32,15 +32,18 @@ export default function About() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
             {/* Bio Section */}
             <div className="space-y-8">
-              {/* Avatar */}
+                            {/* Avatar */}
               <div className="flex justify-center lg:justify-start mb-8">
                 <div className="relative">
                   <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-orange-500 shadow-2xl">
-                                         <img
-                       src="/images/logo.png"
-                       alt="Tulio Salvatierra - Web Developer"
-                       className="w-full h-full object-cover"
-                     />
+                    <video
+                      src="/images/hero.mp4"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-white font-bold text-2xl">®</span>
