@@ -23,10 +23,26 @@ export default function ProjectCard({ title, images, alt, description, link }: P
             muted
             loop
             playsInline
+            preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
             onEnded={(e) => {
               e.currentTarget.currentTime = 0;
               e.currentTarget.play();
+            }}
+            onLoadStart={(e) => {
+              // Ensure video starts playing immediately when loaded
+              e.currentTarget.play().catch(() => {
+                // Fallback if autoplay fails
+                console.log('Autoplay prevented, will retry on user interaction');
+              });
+            }}
+            onCanPlay={(e) => {
+              // Start playing as soon as video can play
+              e.currentTarget.play().catch(() => {
+                // Silent fallback
+              });
             }}
           />
         ) : (
