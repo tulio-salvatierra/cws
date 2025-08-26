@@ -1,5 +1,13 @@
 
 
+import { 
+  PINTEREST_URL, 
+  FACEBOOK_URL, 
+  INSTAGRAM_URL, 
+  YOUTUBE_URL, 
+  LINKEDIN_URL 
+} from '../../Constants/Constants';
+
 export default function Contact() {
   return (
     <section className="relative w-full min-h-screen bg-black flex items-center justify-center p-4">
