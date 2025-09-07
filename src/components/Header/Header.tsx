@@ -31,46 +31,38 @@ export default function Header() {
     // Create ScrollTrigger for floating header effect
     ScrollTrigger.create({
       trigger: "body",
-      start: "top -100", // Start when scrolled past the hero section
+      start: "top -50", // Start when scrolled past the hero section
       end: "bottom bottom",
       onUpdate: (self) => {
-        const progress = self.progress;
-        const isScrolledPastHero = self.scroll() > window.innerHeight * 0.8; // 80% of viewport
+        const scrollY = self.scroll();
+        const heroHeight = window.innerHeight;
+        const isScrolledPastHero = scrollY > heroHeight * 0.3; // 30% of viewport height
         
         if (isScrolledPastHero !== isFloating) {
           setIsFloating(isScrolledPastHero);
           
           if (isScrolledPastHero) {
-            // Animate to floating state with slide down effect
-            gsap.fromTo(header, 
-              {
-                y: -100,
-                opacity: 0.8
-              },
-              {
-                y: 0,
-                opacity: 1,
-                backgroundColor: "rgba(39, 39, 42, 0.95)", // bg-zinc-800/95
-                backdropFilter: "blur(12px)",
-                borderBottom: "1px solid rgba(161, 161, 170, 0.2)", // border-zinc-400/20
-                duration: 0.4,
-                ease: "power2.out"
-              }
-            );
+            // Animate to floating state
+            gsap.to(header, {
+              backgroundColor: "rgba(39, 39, 42, 0.95)", // bg-zinc-800/95
+              backdropFilter: "blur(12px)",
+              borderBottom: "1px solid rgba(161, 161, 170, 0.2)", // border-zinc-400/20
+              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+              duration: 0.4,
+              ease: "power2.out"
+            });
           } else {
             // Animate back to transparent state
             gsap.to(header, {
               backgroundColor: "transparent",
               backdropFilter: "none",
               borderBottom: "none",
+              boxShadow: "none",
               duration: 0.3,
               ease: "power2.out"
             });
           }
         }
-      },
-      onToggle: ({ isActive }) => {
-        // Additional logic if needed when entering/leaving trigger area
       }
     });
 
@@ -82,7 +74,7 @@ export default function Header() {
   return (
     <div 
       ref={headerRef}
-      className={`flex p-3 w-full content-center sticky top-0 z-50 overflow-x-hidden transition-all duration-300 ${
+      className={`flex p-3 w-full content-center fixed top-0 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 ${
         isFloating 
           ? 'bg-zinc-800/95 backdrop-blur-md border-b border-zinc-400/20 shadow-lg' 
           : 'bg-transparent'

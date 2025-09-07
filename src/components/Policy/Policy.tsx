@@ -3,7 +3,7 @@ import Contact from '../Contact/Contact';
 
 export default function Policy() {
   return (
-    <section className="relative w-full min-h-screen bg-zinc-900 py-20 px-4">
+    <section className="relative w-full min-h-screen bg-zinc-900/50 py-20 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">

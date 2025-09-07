@@ -11,10 +11,10 @@ import {
 
 export default function Contact() {
   return (
-    <section className="relative w-full min-h-screen bg-black flex items-center justify-center p-4">
+    <section className="relative w-full min-h-screen flex items-center justify-center p-4">
       {/* Main white content block */}
       <div 
-        className="text-black w-full rounded-2xl h-[80vh] p-8 md:p-12 flex flex-col bg-zinc-700"
+        className="text-black w-full rounded-2xl h-[80vh] p-8 md:p-12 flex flex-col bg-zinc-700/50"
         
       >
         {/* Header with brand name and navigation */}
