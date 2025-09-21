@@ -330,6 +330,72 @@ export const landingPagesData: LandingPageData[] = [
       description: 'Professional website maintenance and support services for Elmwood Park businesses. Keep your site secure, fast, and up-to-date.',
       keywords: ['website maintenance', 'Elmwood Park', 'web support', 'website updates', 'security', 'performance']
     }
+  },
+  {
+    id: 'website-refresh-redesign',
+    headline: 'Give Your Website a Fresh Look That Brings in More Customers',
+    subtext: 'Fast, modern, and optimized for mobile — we redesign your site so it works harder for your business.',
+    ctaText: 'Request a Redesign Quote',
+    localKeyword: 'website redesign',
+    serviceType: 'Website Refresh & Redesign',
+    location: 'Chicago',
+    problemStatement: {
+      title: 'Is Your Outdated Website Holding You Back?',
+      description: 'An old or clunky design can hurt credibility and push customers to competitors.',
+      painPoints: [
+        'Outdated look and poor usability',
+        'Not optimized for mobile devices',
+        'Slow performance and poor SEO results'
+      ]
+    },
+    solution: {
+      title: 'Our Website Refresh & Redesign Package',
+      features: [
+        'Modern design tailored to your brand',
+        'Mobile-first, responsive layouts',
+        'Improved site speed and performance',
+        'SEO-friendly structure to boost rankings'
+      ],
+      startingPrice: 'Starting at $1,000+'
+    },
+    trustSection: {
+      clients: ['TAMM Cleaning Services', "Carolina's Skin Center", 'Intermezzo Sound Studio'],
+      testimonial: {
+        text: 'The redesign by Cicero Web Studio gave our site a professional edge. Customers are staying longer and contacting us more.',
+        author: 'Laura Martinez',
+        business: 'Chicago Business Owner'
+      }
+    },
+    howItWorks: {
+      title: 'How It Works',
+      steps: [
+        {
+          number: '01',
+          title: 'Free Consultation',
+          description: 'We review your existing website and goals'
+        },
+        {
+          number: '02',
+          title: 'Redesign & Development',
+          description: 'We create a new, modern design optimized for performance'
+        },
+        {
+          number: '03',
+          title: 'Launch & Showcase',
+          description: 'Your site goes live, complete with before-and-after examples'
+        }
+      ]
+    },
+    localHook: {
+      title: 'Proudly Serving Our Local Community',
+      description: 'Helping businesses across Chicago and surrounding areas modernize their online presence.',
+      areas: ['Chicago', 'Cicero', 'Chicagoland']
+    },
+    meta: {
+      title: 'Website Refresh & Redesign Services in Chicago | Cicero Web Studio',
+      description: 'Modern, mobile-friendly website redesigns for Chicago businesses. Improve performance, SEO, and customer experience.',
+      keywords: ['website redesign', 'Chicago website refresh', 'modern website design', 'mobile-friendly redesign']
+    }
   }
 ];
 
