@@ -9,6 +9,7 @@ import About from "./components/About";
 import Policy from "./components/Policy";
 import ServicesPage from "./components/ServicesPage";
 import Blog from "./components/Blog";
+import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
 import { getLandingPageData } from "./data/landingPagesData";
 
@@ -76,6 +77,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="policy" element={<Policy />} />
           <Route path="blog" element={<Blog />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
         {/* Dynamic landing page routes */}
         <Route 
