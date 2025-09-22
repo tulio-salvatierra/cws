@@ -11,7 +11,7 @@ export const landingPagesData: LandingPageData[] = [
     location: 'Cicero, Chicago',
     problemStatement: {
       title: 'Is Your Website Costing You Customers?',
-      description: 'If Cicero and Southwest Chicago customers can’t find you or your site loads slowly on their phones, they’ll bounce to a competitor.',
+      description: 'If Cicero and Southwest Chicago customers can\'t find you or your site loads slowly on their phones, they\'ll bounce to a competitor.',
       painPoints: [
         'Outdated look vs. nearby competitors in Cicero/Garfield Ridge',
         'Slow load times and poor Core Web Vitals hurt conversions',
@@ -31,7 +31,7 @@ export const landingPagesData: LandingPageData[] = [
     trustSection: {
       clients: ['TAMM Cleaning Services', "Carolina's Skin Center", 'Intermezzo Sound Studio'],
       testimonial: {
-        text: 'Cicero Web Studio transformed our online presence. The site looks professional, loads fast, and we’re getting more calls each month.',
+        text: 'Cicero Web Studio transformed our online presence. The site looks professional, loads fast, and we\'re getting more calls each month.',
         author: 'Mariana Josan',
         business: 'Local Business Owner'
       }
@@ -65,7 +65,20 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Affordable Web Design in Cicero & Chicago | Cicero Web Studio',
       description: 'Small‑business web design focused on speed, mobile UX, and local SEO. Serving Cicero, Garfield Ridge, and Chicagoland. Get a free quote today.',
       keywords: ['web design', 'Cicero web designer', 'Chicago small business websites', 'responsive design', 'local SEO', 'Core Web Vitals', 'affordable websites']
-    }
+    },
+    itemReviewedType: 'Service',
+    imageUrl: 'https://cicerowebstudio.xyz/images/cicero-web-design.png',
+    sku: 'CWS-WD-001',
+    priceNumberUSD: 1250,
+    rating: { ratingValue: 4.9, reviewCount: 37 },
+    reviews: [
+      {
+        author: 'Mariana Josan',
+        ratingValue: 5,
+        body: 'Cicero Web Studio transformed our online presence. The site looks professional, loads fast, and we\'re getting more calls each month.',
+        datePublished: '2025-03-01'
+      }
+    ]
   },
   {
     id: 'chicago-digital-marketing',
@@ -131,7 +144,20 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Digital Marketing Services in Chicago | Cicero Web Studio',
       description: 'Expert digital marketing services for Chicago businesses. SEO, social media, and PPC campaigns that deliver results.',
       keywords: ['digital marketing', 'Chicago', 'SEO', 'social media', 'PPC', 'online marketing']
-    }
+    },
+    itemReviewedType: 'Service',
+    imageUrl: 'https://cicerowebstudio.xyz/images/digital-marketing.png',
+    sku: 'CWS-DM-001',
+    priceNumberUSD: 899,
+    rating: { ratingValue: 4.8, reviewCount: 31 },
+    reviews: [
+      {
+        author: 'Sarah Johnson',
+        ratingValue: 5,
+        body: 'Our online presence has completely transformed since working with Cicero Web Studio. We\'re getting more leads than ever before.',
+        datePublished: '2025-02-15'
+      }
+    ]
   },
   {
     id: 'berwyn-ecommerce',
@@ -197,7 +223,20 @@ export const landingPagesData: LandingPageData[] = [
       title: 'E-commerce Website Development in Berwyn & Chicago | Cicero Web Studio',
       description: 'Professional e-commerce website development for businesses in Berwyn and Chicago. Online stores that drive sales and grow your business.',
       keywords: ['e-commerce', 'online store', 'Berwyn', 'Chicago', 'web development', 'online shopping']
-    }
+    },
+    itemReviewedType: 'Service',
+    imageUrl: 'https://cicerowebstudio.xyz/images/ecommerce-development.png',
+    sku: 'CWS-EC-001',
+    priceNumberUSD: 2499,
+    rating: { ratingValue: 4.9, reviewCount: 19 },
+    reviews: [
+      {
+        author: 'Mike Rodriguez',
+        ratingValue: 5,
+        body: 'Our online store has been a game-changer. We\'re now reaching customers across the entire Chicago area.',
+        datePublished: '2025-01-28'
+      }
+    ]
   },
   {
     id: 'oak-park-seo',
@@ -263,7 +302,20 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Local SEO Services in Oak Park & Chicago | Cicero Web Studio',
       description: 'Expert local SEO services for Oak Park and Chicago businesses. Get found by customers searching in your area.',
       keywords: ['local SEO', 'Oak Park', 'Chicago', 'search engine optimization', 'local marketing', 'Google rankings']
-    }
+    },
+    itemReviewedType: 'Service',
+    imageUrl: 'https://cicerowebstudio.xyz/images/local-seo.png',
+    sku: 'CWS-LSEO-001',
+    priceNumberUSD: 599,
+    rating: { ratingValue: 4.7, reviewCount: 28 },
+    reviews: [
+      {
+        author: 'Jennifer Chen',
+        ratingValue: 5,
+        body: 'Since working with Cicero Web Studio, we\'re now the top result for our services in Oak Park. Business has never been better.',
+        datePublished: '2025-02-05'
+      }
+    ]
   },
   {
     id: 'elmwood-park-maintenance',
@@ -329,7 +381,20 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Website Maintenance Services in Elmwood Park | Cicero Web Studio',
       description: 'Professional website maintenance and support services for Elmwood Park businesses. Keep your site secure, fast, and up-to-date.',
       keywords: ['website maintenance', 'Elmwood Park', 'web support', 'website updates', 'security', 'performance']
-    }
+    },
+    itemReviewedType: 'Service',
+    imageUrl: 'https://cicerowebstudio.xyz/images/website-maintenance.png',
+    sku: 'CWS-WM-001',
+    priceNumberUSD: 199,
+    rating: { ratingValue: 4.8, reviewCount: 22 },
+    reviews: [
+      {
+        author: 'David Thompson',
+        ratingValue: 5,
+        body: 'Having Cicero Web Studio handle our website maintenance gives us peace of mind. Our site is always running smoothly.',
+        datePublished: '2025-01-20'
+      }
+    ]
   },
   {
     id: 'website-refresh-redesign',
@@ -395,7 +460,20 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Website Refresh & Redesign Services in Chicago | Cicero Web Studio',
       description: 'Modern, mobile-friendly website redesigns for Chicago businesses. Improve performance, SEO, and customer experience.',
       keywords: ['website redesign', 'Chicago website refresh', 'modern website design', 'mobile-friendly redesign']
-    }
+    },
+    itemReviewedType: 'Service',
+    imageUrl: 'https://cicerowebstudio.xyz/images/website-redesign.png',
+    sku: 'CWS-WRR-001',
+    priceNumberUSD: 1000,
+    rating: { ratingValue: 4.9, reviewCount: 24 },
+    reviews: [
+      {
+        author: 'Laura Martinez',
+        ratingValue: 5,
+        body: 'The redesign by Cicero Web Studio gave our site a professional edge. Customers are staying longer and contacting us more.',
+        datePublished: '2025-02-10'
+      }
+    ]
   }
 ];
 

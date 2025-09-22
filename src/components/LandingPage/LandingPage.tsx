@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { LandingPageProps } from '../../types/landingPage';
 import CustomButton from '../CustomButton/CustomButton';
+import { buildReviewJsonLd } from '../../lib/jsonld';
 
 export default function LandingPage({ data }: LandingPageProps) {
   // Set page title and meta tags
@@ -28,6 +29,17 @@ export default function LandingPage({ data }: LandingPageProps) {
       meta.content = data.meta.keywords.join(', ');
       document.head.appendChild(meta);
     }
+
+    // Add JSON-LD structured data for reviews
+    const existingJsonLd = document.querySelector('script[type="application/ld+json"]');
+    if (existingJsonLd) {
+      existingJsonLd.remove();
+    }
+
+    const jsonLdScript = document.createElement('script');
+    jsonLdScript.type = 'application/ld+json';
+    jsonLdScript.textContent = buildReviewJsonLd(data);
+    document.head.appendChild(jsonLdScript);
   }, [data]);
 
   const scrollToContact = () => {
