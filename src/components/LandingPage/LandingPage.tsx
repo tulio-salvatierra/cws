@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { LandingPageProps } from '../../types/landingPage';
 import CustomButton from '../CustomButton/CustomButton';
 import { buildReviewJsonLd } from '../../lib/jsonld';
+import { PHONE, EMAIL } from '../../Constants/Constants';
 
 export default function LandingPage({ data }: LandingPageProps) {
   // Set page title and meta tags
@@ -222,7 +223,7 @@ export default function LandingPage({ data }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Contact Form Section */}
+      {/* Contact Section */}
       <section id="contact-form" className="py-20 bg-zinc-900">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -233,136 +234,27 @@ export default function LandingPage({ data }: LandingPageProps) {
               Contact us today for a free consultation and quote
             </p>
           </div>
-          
           <div className="bg-zinc-800 rounded-2xl p-8 md:p-12">
-            <form className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-zinc-300 mb-2">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Your full name"
-                  />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a 
+                href={`tel:+1${PHONE}`} 
+                className="btn-bounce group w-full sm:w-auto"
+              >
+                <div className="btn-bounce-bg"></div>
+                <div className="btn-bounce-text__wrap">
+                  <span className="btn-bounce-text">📞 Call ({PHONE.toString().slice(0,3)}) {PHONE.toString().slice(3,6)}-{PHONE.toString().slice(6)}</span>
                 </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="your@email.com"
-                  />
+              </a>
+              <a 
+                href={`mailto:${EMAIL}`} 
+                className="btn-bounce group w-full sm:w-auto"
+              >
+                <div className="btn-bounce-bg"></div>
+                <div className="btn-bounce-text__wrap">
+                  <span className="btn-bounce-text">✉️ Email Us</span>
                 </div>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-zinc-300 mb-2">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="(555) 123-4567"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="business" className="block text-sm font-medium text-zinc-300 mb-2">
-                    Business Type
-                  </label>
-                  <select
-                    id="business"
-                    name="business"
-                    className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  >
-                    <option value="">Select your business type</option>
-                    <option value="restaurant">Restaurant</option>
-                    <option value="retail">Retail Store</option>
-                    <option value="service">Service Business</option>
-                    <option value="healthcare">Healthcare</option>
-                    <option value="professional">Professional Services</option>
-                    <option value="nonprofit">Non-profit</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="service" className="block text-sm font-medium text-zinc-300 mb-2">
-                  Service Interested In *
-                </label>
-                <select
-                  id="service"
-                  name="service"
-                  required
-                  className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                >
-                  <option value="">Select a service</option>
-                  <option value="web-design">Web Design & Development</option>
-                  <option value="digital-marketing">Digital Marketing</option>
-                  <option value="ecommerce">E-commerce Website</option>
-                  <option value="seo">SEO Services</option>
-                  <option value="maintenance">Website Maintenance</option>
-                  <option value="consultation">Free Consultation</option>
-                </select>
-              </div>
-              
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-zinc-300 mb-2">
-                  Project Details
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={4}
-                  className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-vertical"
-                  placeholder="Tell us about your project, goals, and timeline..."
-                ></textarea>
-              </div>
-              
-              <div className="text-center">
-                <button
-                  type="submit"
-                  className="btn-bounce"
-                >
-                  <div className="btn-bounce-bg"></div>
-                  <div className="btn-bounce-text__wrap">
-                    <span className="btn-bounce-text">{data.ctaText}</span>
-                  </div>
-                </button>
-              </div>
-              
-              {/* Direct Contact Info */}
-              <div className="text-center pt-6 border-t border-zinc-700">
-                <p className="text-zinc-400 mb-4">Or contact us directly:</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                  <a 
-                    href="tel:+13125551234" 
-                    className="text-orange-500 hover:text-orange-400 font-medium flex items-center gap-2"
-                  >
-                    📞 (312) 555-1234
-                  </a>
-                  <a 
-                    href="mailto:info@cicerowebstudio.com" 
-                    className="text-orange-500 hover:text-orange-400 font-medium flex items-center gap-2"
-                  >
-                    ✉️ info@cicerowebstudio.com
-                  </a>
-                </div>
-              </div>
-            </form>
+              </a>
+            </div>
           </div>
         </div>
       </section>
