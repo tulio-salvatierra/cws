@@ -1,5 +1,5 @@
 import Video from "./../../assets/video/hero.mp4";
-import { PHONE } from "./../../Constants/Constants";
+import { CALENDLY_URL, PHONE } from "./../../Constants/Constants";
 import CustomButton from "./../CustomButton";
 
 export default function Hero() {
@@ -7,7 +7,7 @@ export default function Hero() {
     <section className="relative h-screen flex items-center justify-center text-center overflow-hidden -my-60 md:-my-60">
       {/* Background video */}
       <video
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        className="absolute inset-0 w-full h-full object-cover z-10"
         autoPlay
         loop
         muted
@@ -17,7 +17,7 @@ export default function Hero() {
       </video>
 
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
+      <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
 
       {/* Content */}
       <div className="relative z-10 w-full h-full flex flex-col">
@@ -34,7 +34,7 @@ export default function Hero() {
           </p>
           <div className="flex gap-4">
             <CustomButton href="#" label="WORKS" />
-            <CustomButton href={`tel:${PHONE}`} label="CONTACT" />
+            <CustomButton href={CALENDLY_URL} label="BOOK MY CONSULTATION" />
           </div>
         </div>
       </div>

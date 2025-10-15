@@ -15,6 +15,7 @@ export const INSTAGRAM_URL = "https://www.instagram.com/cicerowebstudio/";
 export const YOUTUBE_URL = "https://www.youtube.com/@cicerowebstudio";
 export const LINKEDIN_URL = "https://linkedin.com/company/cicero-web-studio";
 export const TWITTER_URL = "https://x.com/cicerowebstudio";
+export const CALENDLY_URL = "https://calendly.com/cicerowebstudio-info/30min"
 
 export const MENU_ITEM = [
   {

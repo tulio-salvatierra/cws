@@ -160,7 +160,7 @@ export const landingPagesData: LandingPageData[] = [
     ]
   },
   {
-    id: 'berwyn-ecommerce',
+    id: 'chicago-digital-marketing',
     headline: 'E-commerce Websites for Berwyn & Suburban Chicago Businesses',
     subtext: 'Launch your online store with a professional e-commerce website that converts visitors into customers.',
     ctaText: 'Launch My Store',

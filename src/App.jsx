@@ -48,17 +48,27 @@ function LandingPageWrapper() {
 function App() {
   useLenis(); // Custom hook for smooth scrolling
 
-  const [loading, setLoading] = useState(true);
+  // Show loader only once per session
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('hasLoaded') !== 'true';
+    }
+    return true;
+  });
 
   useEffect(() => {
+    if (!loading) return;
     const timer = setTimeout(() => {
       setLoading(false);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('hasLoaded', 'true');
+      }
     }, 3000); // Adjust the time as needed
 
     return () => {
       clearTimeout(timer);
     };
-  }, []);
+  }, [loading]);
 
   if (loading) {
     return (
@@ -78,12 +88,12 @@ function App() {
           <Route path="policy" element={<Policy />} />
           <Route path="blog" element={<Blog />} />
           <Route path="contact" element={<Contact />} />
+          {/* Dynamic landing page routes inside layout so providers apply */}
+          <Route 
+            path=":id" 
+            element={<LandingPageWrapper />} 
+          />
         </Route>
-        {/* Dynamic landing page routes */}
-        <Route 
-          path="/:id" 
-          element={<LandingPageWrapper />} 
-        />
       </Routes>
     </Router>
   );

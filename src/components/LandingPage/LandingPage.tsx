@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
+import { useModal } from '../LeadFormModal/ModalContext';
 import { LandingPageProps } from '../../types/landingPage';
 import CustomButton from '../CustomButton/CustomButton';
 import { buildReviewJsonLd } from '../../lib/jsonld';
 
 export default function LandingPage({ data }: LandingPageProps) {
+  const { openLeadForm } = useModal();
   // Set page title and meta tags
   useEffect(() => {
     document.title = data.meta.title;
@@ -41,6 +43,11 @@ export default function LandingPage({ data }: LandingPageProps) {
     jsonLdScript.textContent = buildReviewJsonLd(data);
     document.head.appendChild(jsonLdScript);
   }, [data]);
+
+  // Auto-open lead form modal when landing page mounts
+  useEffect(() => {
+    openLeadForm();
+  }, [openLeadForm]);
 
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact-form');

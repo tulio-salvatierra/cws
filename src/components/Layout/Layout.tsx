@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import Header from '../Header/Header';
+import { ModalProvider } from '../LeadFormModal/ModalContext';
 import Footer from '../Footer/Footer';
 
 export default function Layout() {
@@ -39,6 +40,7 @@ export default function Layout() {
   }, []);
 
   return (
+    <ModalProvider>
     <div className="App grid grid-cols-1 overflow-x-hidden w-full relative">
       {/* Background Pattern with Parallax */}
       <div 
@@ -99,5 +101,6 @@ export default function Layout() {
       </main>
       <Footer />
     </div>
+    </ModalProvider>
   );
 }
