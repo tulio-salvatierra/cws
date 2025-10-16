@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import Header from '../Header/Header';
+import Breadcrumbs from '../Breadcrumbs';
 import { ModalProvider } from '../LeadFormModal/ModalContext';
 import Footer from '../Footer/Footer';
 
@@ -97,6 +98,11 @@ export default function Layout() {
 
       <Header />
       <main className="pt-24">
+        <div className="w-full px-6 mt-20">
+          <div className="max-w-7xl mx-auto flex justify-end">
+            <Breadcrumbs />
+          </div>
+        </div>
         <Outlet />
       </main>
       <Footer />

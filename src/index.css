@@ -3,6 +3,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --- Article Readability Enhancements --- */
+article h2, article h3 {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+article p {
+  line-height: 1.7;
+  margin-bottom: 1rem;
+  color: #e0e0e0;
+}
+
+/* Blockquotes (questions, callouts) */
+article blockquote {
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid #f9b234;
+  padding: 1rem 1.5rem;
+  font-style: italic;
+  margin: 1.5rem 0;
+  color: #f2f2f2;
+  border-radius: 6px;
+}
+
+/* TL;DR styling */
+article strong:first-child {
+  display: inline-block;
+  background: rgba(249, 178, 52, 0.15);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #f9b234;
+}
+
+/* Add spacing between major sections */
+article section + section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* CTA Links */
+article a {
+  color: #f9b234;
+  font-weight: 600;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+article a:hover {
+  color: #fff;
+}
 
 .gradient{
   color: linear-gradient(to bottom, #FE7018 0%, #4D433D 46%, #000000 70%)

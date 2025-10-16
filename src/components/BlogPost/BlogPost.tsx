@@ -46,7 +46,7 @@ export default function BlogPost() {
           <img src={article.image} alt={article.title} className="w-full h-72 object-cover" />
         </div>
 
-        <ReactMarkdown className="prose prose-invert max-w-none">
+        <ReactMarkdown className="prose prose-invert text-white max-w-none">
           {article.content}
         </ReactMarkdown>
       </div>
