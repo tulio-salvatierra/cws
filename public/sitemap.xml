@@ -25,6 +25,44 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  
+  <!-- Blog articles -->
+  <url>
+    <loc>https://cicerowebstudio.xyz/blog/future-of-web-development-ai-tools</loc>
+    <lastmod>2025-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cicerowebstudio.xyz/blog/mobile-first-website-design-why-it-matters</loc>
+    <lastmod>2025-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cicerowebstudio.xyz/blog/seo-strategies-that-work-2024</loc>
+    <lastmod>2025-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cicerowebstudio.xyz/blog/scalable-ecommerce-lessons</loc>
+    <lastmod>2025-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cicerowebstudio.xyz/blog/choose-right-web-design-package</loc>
+    <lastmod>2025-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://cicerowebstudio.xyz/blog/why-lead-capture-forms-high-performing-website-chicago</loc>
+    <lastmod>2025-10-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
   <url>
     <loc>https://cicerowebstudio.xyz/policy</loc>
     <lastmod>2025-10-15</lastmod>

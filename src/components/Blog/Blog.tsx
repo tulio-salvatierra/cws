@@ -1,54 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { articles } from '../../data/articles';
 
 export default function Blog() {
-  const featuredArticle = {
-    id: 1,
-    title: "The Future of Web Development: AI-Powered Tools and What They Mean for Your Business",
-    excerpt: "Discover how artificial intelligence is revolutionizing web development and creating new opportunities for businesses to build better, faster, and more intelligent digital experiences.",
-    content: "As we move into 2024, the landscape of web development is undergoing a dramatic transformation. Artificial intelligence is no longer just a buzzword—it's becoming an integral part of how we build and maintain websites. From automated code generation to intelligent design systems, AI-powered tools are changing the game for developers and businesses alike...",
-    author: "Tulio Salvatierra",
-    date: "March 15, 2024",
-    readTime: "8 min read",
-    category: "Technology",
-    image: "/images/website.jpg",
-    tags: ["AI", "Web Development", "Technology", "Future"]
-  };
-
-  const relatedArticles = [
-    {
-      id: 2,
-      title: "Why Your Business Needs a Mobile-First Website Design",
-      excerpt: "With over 60% of web traffic coming from mobile devices, having a mobile-first approach isn't just recommended—it's essential for business success.",
-      author: "Tulio Salvatierra",
-      date: "March 10, 2024",
-      readTime: "5 min read",
-      category: "Design",
-      image: "/images/auto.jpg",
-      tags: ["Mobile", "Design", "UX"]
-    },
-    {
-      id: 3,
-      title: "SEO Strategies That Actually Work in 2024",
-      excerpt: "Google's algorithm updates have changed the SEO landscape. Learn the strategies that are driving real results this year.",
-      author: "Tulio Salvatierra",
-      date: "March 5, 2024",
-      readTime: "6 min read",
-      category: "Marketing",
-      image: "/images/support.png",
-      tags: ["SEO", "Marketing", "Google"]
-    },
-    {
-      id: 4,
-      title: "Building Scalable E-commerce Solutions: Lessons from Successful Online Stores",
-      excerpt: "What separates successful e-commerce businesses from the rest? Discover the technical and strategic foundations that drive growth.",
-      author: "Tulio Salvatierra",
-      date: "February 28, 2024",
-      readTime: "7 min read",
-      category: "E-commerce",
-      image: "/images/cleaning.jpg",
-      tags: ["E-commerce", "Business", "Technology"]
-    }
-  ];
+  const [featuredArticle, ...rest] = articles;
+  const relatedArticles = rest;
 
   return (
     <section className="relative w-full min-h-screen bg-zinc-900/50 py-20 px-4">
@@ -110,15 +66,15 @@ export default function Blog() {
                   ))}
                 </div>
 
-                <a
-                  href="#"
+                <Link
+                  to={`/blog/${featuredArticle.slug}`}
                   className="inline-flex items-center text-orange-500 hover:text-orange-400 font-semibold transition-colors duration-200"
                 >
                   Read Full Article
                   <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -131,7 +87,7 @@ export default function Blog() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {relatedArticles.map((article) => (
-              <article key={article.id} className="bg-zinc-800/50 rounded-2xl overflow-hidden hover:bg-zinc-800/70 transition-all duration-300 group">
+              <article key={article.slug} className="bg-zinc-800/50 rounded-2xl overflow-hidden hover:bg-zinc-800/70 transition-all duration-300 group">
                 {/* Article Image */}
                 <div className="relative h-48">
                   <img
@@ -164,12 +120,12 @@ export default function Blog() {
 
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-zinc-400">By {article.author}</span>
-                    <a
-                      href="#"
+                    <Link
+                      to={`/blog/${article.slug}`}
                       className="text-orange-500 hover:text-orange-400 font-semibold text-sm transition-colors duration-200"
                     >
                       Read More →
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </article>
