@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { getArticleBySlug } from '../../data/articles';
 
 export default function BlogPost() {
@@ -45,9 +46,9 @@ export default function BlogPost() {
           <img src={article.image} alt={article.title} className="w-full h-72 object-cover" />
         </div>
 
-        <article className="prose prose-invert max-w-none">
-          <p className="text-zinc-200 leading-8">{article.content}</p>
-        </article>
+        <ReactMarkdown className="prose prose-invert max-w-none">
+          {article.content}
+        </ReactMarkdown>
       </div>
     </section>
   );
