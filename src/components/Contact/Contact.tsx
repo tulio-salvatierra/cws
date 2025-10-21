@@ -16,12 +16,12 @@ export default function Contact() {
      
 
       {/* Main content block */}
-      <div className="text-white w-full max-w-6xl rounded-2xl p-8 md:p-12 lg:p-16 bg-zinc-800/01 backdrop-blur-sm border border-zinc-700/50">
+      <div className="text-white w-full rounded-2xl p-8 md:p-12 lg:p-16 bg-zinc-800/01 backdrop-blur-sm border border-zinc-700/50">
         
         {/* Header with brand name */}
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl lg:text-4xl text-orange-500 font-main font-black mb-4">
-            CICERO WEB STUDIO
+          GET IN TOUCH
           </h2>
           <div className="w-24 h-1 bg-orange-500 mx-auto"></div>
         </div>
@@ -57,9 +57,7 @@ export default function Contact() {
           {/* Contact Information Section */}
           <div className="flex-1 text-center lg:text-left">
             {/* Main heading */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-orange-500 font-main font-black mb-6 lg:mb-8">
-              GET IN TOUCH
-            </h1>
+            
 
             {/* Email address */}
             <a 
@@ -71,65 +69,78 @@ export default function Contact() {
 
             {/* Social section */}
             <div className="max-w-md mx-auto lg:mx-0">
-              <h3 className="text-lg md:text-xl lg:text-2xl text-white font-semibold mb-6">Connect With Us</h3>
+              <h3 className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12">Connect With Us</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-zinc-300">
                 <a 
                   href={INSTAGRAM_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
                 >
-                  <span className="text-orange-500 group-hover:text-orange-400">📷</span>
+                 
                   <span className="text-sm md:text-base">Instagram</span>
                 </a>
                 <a 
                   href={YOUTUBE_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 groutext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12p"
                 >
-                  <span className="text-orange-500 group-hover:text-orange-400">🎥</span>
+                  
                   <span className="text-sm md:text-base">YouTube</span>
                 </a>
                 <a 
                   href={FACEBOOK_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
                 >
-                  <span className="text-orange-500 group-hover:text-orange-400">📘</span>
+                 
                   <span className="text-sm md:text-base">Facebook</span>
                 </a>
                 <a 
                   href={TWITTER_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
                 >
-                  <span className="text-orange-500 group-hover:text-orange-400">🐦</span>
+                 
                   <span className="text-sm md:text-base">Twitter</span>
                 </a>
                 <a 
                   href={PINTEREST_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
                 >
-                  <span className="text-orange-500 group-hover:text-orange-400">📌</span>
                   <span className="text-sm md:text-base">Pinterest</span>
                 </a>
                 <a 
                   href={LINKEDIN_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
                 >
-                  <span className="text-orange-500 group-hover:text-orange-400">💼</span>
                   <span className="text-sm md:text-base">LinkedIn</span>
                 </a>
               </div>
             </div>
+            
           </div>
+        </div>
+
+        {/* Google Maps Embed */}
+        <div className="w-full mt-8 rounded-xl overflow-hidden">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d252.5880090363163!2d-87.7509307390869!3d41.95077474768748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880fcde85586be3d%3A0x88f84b57cb03f35b!2sCicero%20Web%20Studio!5e1!3m2!1sen!2sus!4v1761046047715!5m2!1sen!2sus" 
+            width="100%" 
+            height="400" 
+            style={{ border: 0 }} 
+            allowFullScreen={true}
+            loading="lazy" 
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Cicero Web Studio Location"
+          />
         </div>
       </div>
     </section>
