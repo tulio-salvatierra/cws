@@ -113,7 +113,7 @@ export default function ServicesPage() {
   ];
 
   return (
-    <section className="relative w-full min-h-screen bg-zinc-900 py-20 px-4">
+    <section className="relative w-full min-h-screen bg-zinc-900/10 py-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
@@ -128,7 +128,7 @@ export default function ServicesPage() {
         {/* Services Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           {services.map((service) => (
-            <div key={service.id} className="bg-zinc-800/50 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
+            <div key={service.id} className="bg-zinc-800/01 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
               {/* Service Header */}
               <div className="flex items-start mb-6">
                 <span className="text-4xl mr-4">{service.icon}</span>

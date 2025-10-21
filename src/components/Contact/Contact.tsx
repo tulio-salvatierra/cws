@@ -11,9 +11,12 @@ import {
 
 export default function Contact() {
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center p-4">
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center p-4 gap-8">
+      {/* Google Maps Commute Widget */}
+     
+
       {/* Main content block */}
-      <div className="text-white w-full max-w-6xl rounded-2xl p-8 md:p-12 lg:p-16 bg-zinc-800/50 backdrop-blur-sm border border-zinc-700/50">
+      <div className="text-white w-full max-w-6xl rounded-2xl p-8 md:p-12 lg:p-16 bg-zinc-800/01 backdrop-blur-sm border border-zinc-700/50">
         
         {/* Header with brand name */}
         <div className="text-center mb-12">
@@ -47,7 +50,7 @@ export default function Contact() {
               Tulio Salvatierra
             </h3>
             <p className="text-zinc-400 text-sm md:text-base">
-              Founder & Lead Developer
+              Founder & Developer
             </p>
           </div>
 
