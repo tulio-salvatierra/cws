@@ -6,14 +6,14 @@ import "./problem.css";
 export default function Problem() {
   return (
     <>
-      <section className="p-5 h-screen flex flex-col w-full justify-evenly mt-80 overflow-x-hidden pin">
+      <section className="p-5 sm:h-screen h-auto flex flex-col w-full justify-evenly mt-80 overflow-x-hidden pin">
         <div className="flex flex-col mb-10">
           <strong className="text-white text-left">[INTRODUCING]</strong>
-          <h2 className="font-main text-left font-black sm:text-[6rem] text-[3rem] text-orange-500 sm:text-[6rem] w-100 leading-tight">
+          <h2 className="font-main text-left font-semibold sm:text-[6rem] text-[3rem] text-orange-500 sm:text-[6rem] w-100 leading-tight">
             CICERO WEB STUDIO
           </h2>
         </div>
-        <div className="flex justify-center items-start h-auto w-full">
+        <div className="flex justify-center items-start h-auto w-full mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 sm:[grid-template-rows:1fr_01fr] gap-28 h-auto w-full">
             <p className="font-secondary text-white text-lg text-start paragraph">
               We're your digital growth partners. Based in Chicago, we combine
@@ -38,9 +38,10 @@ export default function Problem() {
                 <CustomButton href="/works" label="See our works" />
               </div>
             </div>
-            <img src={Logo} alt="Logo" className="sm:w-1/2 w-full h-full object-cover rounded-lg justify-self-center self-center" />
+          
           </div>
         </div>
+        <img src={Logo} alt="Logo" className="w-full h-full object-cover rounded-lg justify-self-center self-center" />
       </section>
     </>
   );
