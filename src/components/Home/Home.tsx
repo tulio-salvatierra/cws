@@ -3,6 +3,7 @@ import Hero from '../Hero';
 import Services from '../Services';
 import Projects from '../Projects/Projects';
 import Contact from '../Contact';
+import Banner from '../Banner/Banner';
 
 export default function Home() {
   return (
@@ -12,6 +13,9 @@ export default function Home() {
       </div>
       <div>
         <Problem />
+      </div>
+      <div>
+        <Banner />
       </div>
       <div className="h-auto">
         <Services />
