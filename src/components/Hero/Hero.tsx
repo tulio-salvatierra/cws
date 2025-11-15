@@ -26,7 +26,7 @@ export default function Hero() {
 
         {/* Bottom content grid */}
         <div className="mt-auto grid grid-cols-1 md:grid-cols-2 p-6 gap-4">
-          <p className="text-white sm:w-1/2 w-full text-left text-md md:text-lg leading-relaxed">
+          <p className="text-white sm:w-1/2 w-full text-left text-sm md:text-lg leading-tight">
             Cicero Web Studio is a digital agency specializing in web design,
             development, and digital marketing solutions. We create stunning,
             user-friendly websites that drive results and elevate your brand
