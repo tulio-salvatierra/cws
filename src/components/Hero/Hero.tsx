@@ -24,15 +24,15 @@ export default function Hero() {
         {/* Top bar with logo and nav */}
       
 
-        {/* Bottom content row */}
-        <div className="mt-auto flex justify-between items-end p-6 gap-4 flex-wrap">
-          <p className="text-white text-left text-lg md:text-lg max-w-3xl leading-relaxed">
+        {/* Bottom content grid */}
+        <div className="mt-auto grid grid-cols-1 md:grid-cols-2 p-6 gap-4">
+          <p className="text-white text-left text-md md:text-lg leading-relaxed">
             Cicero Web Studio is a digital agency specializing in web design,
             development, and digital marketing solutions. We create stunning,
             user-friendly websites that drive results and elevate your brand
             presence online.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-col md:flex-row gap-4 md:justify-end md:items-end">
             <CustomButton href="#" label="WORKS" />
             <CustomButton href={CALENDLY_URL} label="BOOK MY CONSULTATION" />
           </div>

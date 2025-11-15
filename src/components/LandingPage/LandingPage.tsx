@@ -3,6 +3,7 @@ import { useModal } from '../LeadFormModal/ModalContext';
 import { LandingPageProps } from '../../types/landingPage';
 import CustomButton from '../CustomButton/CustomButton';
 import { buildReviewJsonLd } from '../../lib/jsonld';
+import { EMAIL, PHONE } from '../../Constants/Constants';
 
 export default function LandingPage({ data }: LandingPageProps) {
   const { openLeadForm } = useModal();
@@ -356,16 +357,16 @@ export default function LandingPage({ data }: LandingPageProps) {
                 <p className="text-zinc-400 mb-4">Or contact us directly:</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <a 
-                    href="tel:+13125551234" 
+                    href={`tel:+1${PHONE}`} 
                     className="text-orange-500 hover:text-orange-400 font-medium flex items-center gap-2"
                   >
-                    📞 (312) 555-1234
+                    📞 +1 {String(PHONE).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
                   </a>
                   <a 
-                    href="mailto:info@cicerowebstudio.com" 
+                    href={`mailto:${EMAIL}`} 
                     className="text-orange-500 hover:text-orange-400 font-medium flex items-center gap-2"
                   >
-                    ✉️ info@cicerowebstudio.com
+                    {EMAIL}
                   </a>
                 </div>
               </div>

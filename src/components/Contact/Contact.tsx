@@ -6,7 +6,9 @@ import {
   INSTAGRAM_URL, 
   YOUTUBE_URL, 
   LINKEDIN_URL,
-  TWITTER_URL
+  TWITTER_URL,
+  EMAIL,
+  PHONE
 } from '../../Constants/Constants';
 
 export default function Contact() {
@@ -61,10 +63,18 @@ export default function Contact() {
 
             {/* Email address */}
             <a 
-              href="mailto:info@cicerowebstudio.xyz" 
+              href={`mailto:${EMAIL}`}
+              className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-4 lg:mb-6"
+            >
+              {EMAIL}
+            </a>
+
+            {/* Phone number */}
+            <a 
+              href={`tel:+1${PHONE}`}
               className="text-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12"
             >
-              info@cicerowebstudio.xyz
+              +1 {String(PHONE).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
             </a>
 
             {/* Social section */}
@@ -75,52 +85,54 @@ export default function Contact() {
                   href={INSTAGRAM_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
                 >
-                 
+                  <span className="text-orange-500 group-hover:text-orange-400">📷</span>
                   <span className="text-sm md:text-base">Instagram</span>
                 </a>
                 <a 
                   href={YOUTUBE_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 groutext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12p"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
                 >
-                  
+                  <span className="text-orange-500 group-hover:text-orange-400">🎥</span>
                   <span className="text-sm md:text-base">YouTube</span>
                 </a>
                 <a 
                   href={FACEBOOK_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
                 >
-                 
+                  <span className="text-orange-500 group-hover:text-orange-400">📘</span>
                   <span className="text-sm md:text-base">Facebook</span>
                 </a>
                 <a 
                   href={TWITTER_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
                 >
-                 
+                  <span className="text-orange-500 group-hover:text-orange-400">🐦</span>
                   <span className="text-sm md:text-base">Twitter</span>
                 </a>
                 <a 
                   href={PINTEREST_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
                 >
+                  <span className="text-orange-500 group-hover:text-orange-400">📌</span>
                   <span className="text-sm md:text-base">Pinterest</span>
                 </a>
                 <a 
                   href={LINKEDIN_URL} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 grotext-lg md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-8 lg:mb-12up"
+                  className="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-lg hover:bg-zinc-700/50 transition-colors duration-200 group"
                 >
+                  <span className="text-orange-500 group-hover:text-orange-400">💼</span>
                   <span className="text-sm md:text-base">LinkedIn</span>
                 </a>
               </div>
