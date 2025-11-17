@@ -1,53 +1,77 @@
-import { useLayoutEffect, RefObject } from "react";
-import { gsap } from "gsap";
+import { useEffect } from "react";
+import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// register plugin
 gsap.registerPlugin(ScrollTrigger);
 
-interface FadeInAnimationOptions {
-  y?: number;
-  opacity?: number;
-  duration?: number;
-  ease?: string;
-  stagger?: number;
-  start?: string;
-  end?: string;
-  scrub?: boolean;
-  onComplete?: (el: Element) => void;
-}
-
 export function useFadeInAnimation(
-  refsArray: RefObject<HTMLElement[]>,
-  options: FadeInAnimationOptions = {}
+  refs: React.MutableRefObject<HTMLElement[]>
 ) {
-  useLayoutEffect(() => {
-    if (!refsArray.current) return;
+  useEffect(() => {
+    let ctx: gsap.Context | null = null;
+    
+    // Use a timeout to wait for refs to be collected
+    const timeout = setTimeout(() => {
+      if (!refs.current.length) return;
 
-    const ctx = gsap.context(() => {
-      refsArray.current?.forEach((el) => {
-        gsap.from(el, {
-          y: options.y ?? 20,
-          opacity: options.opacity ?? 0,
-          duration: options.duration ?? 1,
-          ease: options.ease || "power2.out",
-          stagger: options.stagger ?? 0.2,
-          scrollTrigger: {
-            trigger: el,
-            start: options.start || "top 90%",
-            end: options.end || "bottom bottom",
-            scrub: options.scrub ?? false,
-          },
-          onComplete: () => {
-            if (typeof options.onComplete === "function") {
-              options.onComplete(el);
-            }
-          },
+      const elements = [...refs.current]; // Copy array
+      const scope = elements[0]?.parentElement || document.body;
+      
+      ctx = gsap.context(() => {
+        // Set initial hidden state
+        elements.forEach((el) => {
+          gsap.set(el, {
+            opacity: 0,
+            y: 40,
+          });
         });
-      });
-    }, refsArray);
 
-    return () => ctx.revert();
-  }, [refsArray, options]);
+        // Create animation for each element
+        elements.forEach((el) => {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              toggleActions: "play none none none",
+              once: true,
+            },
+          });
+        });
+        
+        // Refresh ScrollTrigger and check for elements already in view
+        ScrollTrigger.refresh();
+        
+        // After refresh, check if any elements are already past the trigger point
+        setTimeout(() => {
+          elements.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const triggerPoint = viewportHeight * 0.85;
+            
+            if (rect.top < triggerPoint) {
+              // Element is already past trigger, animate it now
+              gsap.to(el, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power2.out",
+                overwrite: "auto",
+              });
+            }
+          });
+        }, 50);
+      }, scope);
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout);
+      if (ctx) {
+        ctx.revert();
+      }
+    };
+  }, [refs]);
 }
-

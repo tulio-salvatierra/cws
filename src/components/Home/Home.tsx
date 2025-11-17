@@ -15,7 +15,6 @@ export default function Home() {
         <Problem />
       </div>
       <div>
-        <Banner />
       </div>
       <div className="h-auto">
         <Services />

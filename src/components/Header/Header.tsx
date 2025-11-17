@@ -87,12 +87,12 @@ export default function Header() {
       <div className="flex w-full p-6 justify-between items-center">
         {/* Desktop Header */}
         <Link to="/" className="no-underline">
-          <h1 className={`text-orange-500 font-bold tracking-tight transition-all duration-300 ${
+          <h1 className={`text-orange-500 font-semibold tracking-tight transition-all duration-300 ${
             isFloating 
               ? 'text-3xl md:text-4xl' 
               : 'text-6xl md:text-8xl'
           }`}>
-            CWS <sup className={`align-super ${
+            CWS <sup className={`align-super font-semibold ${
               isFloating ? 'text-sm' : 'text-2xl'
             }`}>®</sup>
           </h1>
