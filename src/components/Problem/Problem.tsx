@@ -17,7 +17,7 @@ export default function Problem() {
 
   return (
     <section 
-      className="p-5 sm:h-screen h-auto flex flex-col w-full justify-evenly mt-80 overflow-x-hidden pin"
+      className="p-5 h-auto flex flex-col w-full justify-evenly mt-80 overflow-x-hidden pin"
     >
       <div className="flex flex-col mb-10">
         <strong className="text-white text-left">
