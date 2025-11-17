@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link, useLocation } from "react-router-dom";
@@ -78,7 +79,7 @@ export default function Header() {
   return (
     <div 
       ref={headerRef}
-      className={`flex p-3 w-full content-center fixed top-0 left-0 right-0 z-40 overflow-x-hidden transition-all duration-300 ${
+      className={`flex p-3 w-full content-center fixed top-0 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 ${
         isFloating 
           ? 'bg-zinc-800/90 backdrop-blur-md border-b border-zinc-400/20 shadow-lg' 
           : 'bg-transparent'
@@ -122,40 +123,41 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu - always mounted for smooth transitions */}
-        <div
-          id="mobile-menu"
-          className={`md:hidden fixed inset-0 z-40 ${showMenu ? 'pointer-events-auto' : 'pointer-events-none'}`}
-          aria-hidden={!showMenu}
-        >
-          {/* Backdrop */}
+        {/* Mobile Menu - rendered via portal to escape stacking context */}
+        {typeof window !== 'undefined' && createPortal(
           <div
-            onClick={toggleMenu}
-            className={`absolute inset-0 bg-black/10 transition-opacity duration-300 ease-out ${showMenu ? 'opacity-100' : 'opacity-0'}`}
-          />
-
-          {/* Panel */}
-          <nav
-            className={`absolute top-0 left-0 w-full max-h-auto overflow-y-auto bg-zinc-800/95 backdrop-blur-md border-b border-zinc-400/20 p-4 shadow-2xl transform transition-transform duration-300 ease-out ${showMenu ? 'translate-y-0' : '-translate-y-full'}`}
+            id="mobile-menu"
+            className={`md:hidden fixed inset-0 z-[9999] ${showMenu ? 'pointer-events-auto' : 'pointer-events-none'}`}
+            aria-hidden={!showMenu}
           >
+            {/* Backdrop with blur */}
+            <div
+              onClick={toggleMenu}
+              className={`absolute inset-0 z-0 bg-black/60 backdrop-blur-md transition-all duration-300 ease-out ${showMenu ? 'opacity-100' : 'opacity-0'}`}
+            />
+
+            {/* Panel */}
+            <nav
+              className={`absolute top-0 left-0 z-10 w-full max-h-auto overflow-y-auto bg-zinc-800/95 backdrop-blur-md border-b border-zinc-400/20 p-4 shadow-2xl transform transition-transform duration-300 ease-out ${showMenu ? 'translate-y-0' : '-translate-y-full'}`}
+            >
             <div className="content-top flex flex-col text-left gap-3">
               <div className="flex justify-between items-center">
-                <p className="font-extrabold text-3xl text-white p-2">[CWS]</p>
+                <p className="font-semibold text-3xl text-orange-500 p-2">[CWS]</p>
                 <button
                   aria-label="Close menu"
                   onClick={toggleMenu}
-                  className="text-main text-3xl font-black px-3 py-1"
+                  className="text-main text-orange-500 text-3xl font-black px-3 py-1"
                 >
                   ×
                 </button>
               </div>
 
-              <div className="flex-col p-4 mb-6 text-left justify-end items-center text-3xl font-black">
+              <div className="flex-col p-4 mb-6 text-left justify-end items-center text-xl font-semibold">
                 {MENU_ITEM.map((navMobile, index) => (
                   <Link
                     to={navMobile.url}
                     key={index}
-                    className={`${navMobile.class} block py-2 ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
+                    className={`${navMobile.class} block py-2 text-lg tracking-tight ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
                     onClick={toggleMenu}
                   >
                     {navMobile.name}
@@ -165,13 +167,13 @@ export default function Header() {
             </div>
             <a
               href={CALENDLY_URL}
-              className="block p-4 rounded-full text-white border-2 font-main font-bold text-2xl text-center transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
+              className="block p-4 rounded-full text-white border-2 font-main font-semibold text-xl text-center transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
             >
               Book My Consultation!
             </a>
             <button
               onClick={openLeadForm}
-              className="mt-6 w-full btn-bounce"
+              className="mt-6 w-full btn-bounce text-lg tracking-tight"
             >
               <div className="btn-bounce-bg"></div>
               <div className="btn-bounce-text__wrap">
@@ -180,10 +182,8 @@ export default function Header() {
             </button>
             <footer className="p-4 mt-10">
               <div className="flex flex-col items-start gap-2">
-                <a href="#" className="flex items-center gap-2">
-                  CSW
-                </a>
-                <p className="text-muted-foreground text-left max-w-md font-second">
+                
+                <p className="text-zinc-300 text-left max-w-md font-second text-lg tracking-tight">
                   Our mission is to deliver tailored websites and software
                   solutions that solve real problems and drive meaningful
                   growth.
@@ -191,7 +191,9 @@ export default function Header() {
               </div>
             </footer>
           </nav>
-        </div>
+        </div>,
+        document.body
+        )}
       </div>
     </div>
   );

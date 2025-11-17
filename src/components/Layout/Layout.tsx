@@ -26,13 +26,13 @@ export default function Layout() {
         orb1Ref.current.style.transform = `translateY(${scrollY * 0.3}px) translateX(${scrollY * 0.1}px)`;
       }
       if (orb2Ref.current) {
-        orb2Ref.current.style.transform = `translateY(${scrollY * -0.2}px) translateX(${scrollY * -0.15}px)`;
+        orb2Ref.current.style.transform = `translateY(${scrollY * -0.2}px) translateX(${scrollY * -0.20}px)`;
       }
       if (orb3Ref.current) {
-        orb3Ref.current.style.transform = `translateY(${scrollY * 0.4}px) translateX(${scrollY * 0.2}px)`;
+        orb3Ref.current.style.transform = `translateY(${scrollY * 0.4}px) translateX(${scrollY * 0.3}px)`;
       }
       if (orb4Ref.current) {
-        orb4Ref.current.style.transform = `translateY(${scrollY * -0.1}px) translateX(${scrollY * -0.1}px)`;
+        orb4Ref.current.style.transform = `translateY(${scrollY * -0.1}px) translateX(${scrollY * -0.3}px)`;
       }
     };
 
@@ -46,7 +46,7 @@ export default function Layout() {
       {/* Background Pattern with Parallax */}
       <div 
         ref={svgRef}
-        className="fixed inset-0 opacity-10 pointer-events-none transition-transform duration-75 ease-out"
+        className="fixed inset-0 opacity-10 pointer-events-none transition-transform duration-75 ease-out z-0"
       >
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -81,23 +81,23 @@ export default function Layout() {
       {/* Ambient lighting effects with Parallax */}
       <div 
         ref={orb1Ref}
-        className="fixed top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out" 
+        className="fixed top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out z-0" 
       />
       <div 
         ref={orb2Ref}
-        className="fixed bottom-0 right-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out" 
+        className="fixed bottom-0 right-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out z-0" 
       />
       <div 
         ref={orb3Ref}
-        className="fixed top-1/2 left-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out" 
+        className="fixed top-1/2 left-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out z-0" 
       />
       <div 
         ref={orb4Ref}
-        className="fixed top-1/4 right-0 w-80 h-80 bg-red-500/5 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out" 
+        className="fixed top-1/4 right-0 w-80 h-80 bg-red-500/5 rounded-full blur-3xl pointer-events-none transition-transform duration-75 ease-out z-0" 
       />
 
       <Header />
-      <main className="pt-24">
+      <main className="pt-24 z-10">
         <div className="w-full px-6 mt-20">
           <div className="max-w-7xl mx-auto flex justify-end">
             <Breadcrumbs />
