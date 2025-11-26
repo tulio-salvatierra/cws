@@ -7,6 +7,7 @@ import { useModal } from "../LeadFormModal/ModalContext";
 import { CALENDLY_URL, MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
 import CustomButton from "../CustomButton";
+import MaskedLines from "../MaskedLines/MaskedLines";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -19,67 +20,12 @@ export default function Header() {
   const location = useLocation();
   const toggleMenu = () => setShowMenu(!showMenu);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const header = headerRef.current;
-    if (!header) return;
-
-    // Set initial state - subtle glass effect in hero
-    gsap.set(header, {
-      backgroundColor: "rgba(39, 39, 42, 0.4)", // bg-zinc-800/40
-      backdropFilter: "blur(8px)",
-      borderBottom: "1px solid rgba(161, 161, 170, 0.10)", // border-zinc-400/10
-      y: 0
-    });
-
-    // Create ScrollTrigger for floating header effect
-    ScrollTrigger.create({
-      trigger: "body",
-      start: "top -50", // Start when scrolled past the hero section
-      end: "bottom bottom",
-      onUpdate: (self) => {
-        const scrollY = self.scroll();
-        const heroHeight = window.innerHeight;
-        const isScrolledPastHero = scrollY > heroHeight * 0.3; // 30% of viewport height
-        
-        if (isScrolledPastHero !== isFloating) {
-          setIsFloating(isScrolledPastHero);
-          
-          if (isScrolledPastHero) {
-            // Animate to floating state
-            gsap.to(header, {
-              backgroundColor: "rgba(39, 39, 42, 0.95)", // bg-zinc-800/95
-              backdropFilter: "blur(12px)",
-              borderBottom: "1px solid rgba(161, 161, 170, 0.2)", // border-zinc-400/20
-              boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-              duration: 0.4,
-              ease: "power2.out"
-            });
-          } else {
-            // Animate back to subtle glass state
-            gsap.to(header, {
-              backgroundColor: "rgba(39, 39, 42, 0.4)",
-              backdropFilter: "blur(8px)",
-              borderBottom: "1px solid rgba(161, 161, 170, 0.10)",
-              boxShadow: "none",
-              duration: 0.3,
-              ease: "power2.out"
-            });
-          }
-        }
-      }
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, [isFloating]);
+ 
 
   return (
     <div 
-      ref={headerRef}
-      className={`flex p-3 w-full content-center fixed top-0 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 ${
+ 
+      className={`bg-zinc-800/90 backdrop-blur-md flex p-3 w-full content-center fixed top-0 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 ${
         isFloating 
           ? 'bg-zinc-800/90 backdrop-blur-md border-b border-zinc-400/20 shadow-lg' 
           : 'bg-transparent'
@@ -88,15 +34,23 @@ export default function Header() {
       <div className="flex w-full p-6 justify-between items-center">
         {/* Desktop Header */}
         <Link to="/" className="no-underline">
-          <h1 className={`text-orange-500 font-semibold tracking-tight transition-all duration-300 ${
-            isFloating 
-              ? 'text-3xl md:text-4xl' 
-              : 'text-6xl md:text-8xl'
-          }`}>
-            CWS <sup className={`align-super font-semibold ${
-              isFloating ? 'text-sm' : 'text-2xl'
-            }`}>®</sup>
-          </h1>
+          <MaskedLines
+            as="h1"
+            className={`text-orange-500 font-semibold tracking-tight transition-all duration-300 ${
+              isFloating 
+                ? "text-3xl md:text-4xl" 
+                : "text-6xl md:text-8xl"
+            }`}
+          >
+            CWS{" "}
+            <sup
+              className={`align-super font-semibold ${
+                isFloating ? "text-sm" : "text-2xl"
+              }`}
+            >
+              ®
+            </sup>
+          </MaskedLines>
         </Link>
         <div className="space-x-8 hidden font-secondary items-center md:flex text-xs tracking-tight">
           {MENU_ITEM.map((nav, index) => (
@@ -142,7 +96,12 @@ export default function Header() {
             >
             <div className="content-top flex flex-col text-left gap-3">
               <div className="flex justify-between items-center">
-                <p className="font-semibold text-3xl text-orange-500 p-2">[CWS]</p>
+                <MaskedLines
+                  as="p"
+                  className="font-semibold text-3xl text-orange-500 p-2"
+                >
+                  [CWS]
+                </MaskedLines>
                 <button
                   aria-label="Close menu"
                   onClick={toggleMenu}
@@ -183,11 +142,16 @@ export default function Header() {
             <footer className="p-4 mt-10">
               <div className="flex flex-col items-start gap-2">
                 
-                <p className="text-zinc-300 text-left max-w-md font-second text-lg tracking-tight">
+                <MaskedLines
+                  as="p"
+                  scroll
+                  scrollStart="top 90%"
+                  className="text-zinc-300 text-left max-w-md font-second text-lg tracking-tight"
+                >
                   Our mission is to deliver tailored websites and software
                   solutions that solve real problems and drive meaningful
                   growth.
-                </p>
+                </MaskedLines>
               </div>
             </footer>
           </nav>

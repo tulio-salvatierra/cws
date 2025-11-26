@@ -1,66 +1,82 @@
-import { useRef } from "react";
-import { useFadeInAnimation } from "../../Hooks/useFadeInAnimation";
 import CustomButton from "../CustomButton";
-import Logo from "/images/profile.png";
+import Logo from "./../../assets/video/hero.mp4";
+import MaskedLines from './../MaskedLines/MaskedLines'
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 
 export default function Problem() {
-  const fadeRefs = useRef<HTMLElement[]>([]);
-  
-  const addToRefs = (el: HTMLElement | null) => {
-    if (el && !fadeRefs.current.includes(el)) {
-      fadeRefs.current.push(el);
-    }
-  };
 
-  useFadeInAnimation(fadeRefs);
+  useGSAP(
+    () => {
+      // Animamos los elementos marcados con la clase .hero-anim
+      gsap.from(".video-anim", {
+        y: -30,
+        duration: 3,
+
+        ease: "power2.out",
+      });
+    },
+  );
 
   return (
-    <section 
-      className="p-5 h-auto flex flex-col w-full justify-evenly mt-80 overflow-x-hidden pin"
+    <section
+      className="p-5 h-auto flex flex-col w-full justify-evenly mt-80 overflow-x-hidden"
     >
       <div className="flex flex-col mb-10">
         <strong className="text-white text-left">
-          [INTRODUCING]
+          <MaskedLines>
+            [INTRODUCING]
+          </MaskedLines>
         </strong>
-        <h2
+        <MaskedLines
+          as="h1"
+          scroll
           className="font-main text-left font-semibold text-orange-500 sm:text-[6rem] text-[3rem] w-100 leading-tight"
         >
           CICERO WEB STUDIO
-        </h2>
+        </MaskedLines>
       </div>
 
       <div className="flex justify-center items-start h-auto w-full mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 sm:[grid-template-rows:1fr] mb-28 gap-28 h-auto w-full">
-          <p
+          <MaskedLines
+            as="p"
+            scroll
+            scrollStart="top 85%"
             className="font-secondary text-white text-lg text-start paragraph"
           >
             We're your digital growth partners. Based in Chicago, we combine
             beautiful design with dedication to deliver solutions that move the
             needle for your business.
-          </p>
+          </MaskedLines>
 
           <div>
             <div className="flex flex-col text-start w-full text-white paragraph">
-              <h2
-                
+              <MaskedLines
+                as="h2"
+                scroll
+                once
+                scrollStart="top 85%"
                 className="font-secondary font-medium sm:text-6xl text-5xl text-zinc-400 w-full leading-tight mb-4"
               >
                 What makes us different?
-              </h2>
-              <p
-        
+              </MaskedLines>
+              <MaskedLines
+                as="p"
+                scroll
+                scrollStart="top 85%"
                 className="font-secondary text-lg text-white flex-1 paragraph"
               >
                 Partnership approach: <br /> Your wins are our wins.
                 Problem-solving mindset with a can-do attitude. Elegant design
                 meets relentless execution. We go the extra mile, every single
                 time.
-              </p>
+              </MaskedLines>
             </div>
 
             <div
-        
+
               className="flex flex-col sm:flex-row gap-4 mt-8"
             >
               <CustomButton href="/contact" label="Let's talk" />
@@ -69,13 +85,37 @@ export default function Problem() {
           </div>
         </div>
       </div>
+      <div>
+        <video
 
-      <img
-        src={Logo}
-        alt="Logo"
-        
-        className="w-full h-full object-cover rounded-lg justify-self-center self-center -mt-20 sm:-mt-32"
-      />
+          src={Logo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          className="w-full video-anim h-50 rounded-lg object-cover transition-transform duration-300 group-hover:scale-25"
+          onEnded={(e) => {
+            e.currentTarget.currentTime = 0;
+            e.currentTarget.play();
+          }}
+          onLoadStart={(e) => {
+            // Ensure video starts playing immediately when loaded
+            e.currentTarget.play().catch(() => {
+              // Fallback if autoplay fails
+              console.log('Autoplay prevented, will retry on user interaction');
+            });
+          }}
+          onCanPlay={(e) => {
+            // Start playing as soon as video can play
+            e.currentTarget.play().catch(() => {
+              // Silent fallback
+            });
+          }}
+        />
+      </div>
     </section>
   );
 }

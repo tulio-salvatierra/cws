@@ -1,41 +1,62 @@
+import React, { useRef } from "react";
 import Video from "./../../assets/video/hero.mp4";
 import { CALENDLY_URL, PHONE } from "./../../Constants/Constants";
 import CustomButton from "./../CustomButton";
+import MaskedLines, { MaskedWords } from "./../MaskedLines/MaskedLines";
+import UnicornScene from "unicornstudio-react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 
 export default function Hero() {
+  const heroRef = useRef<HTMLDivElement | null>(null);
+
+  useGSAP(
+    () => {
+      // Animamos los elementos marcados con la clase .hero-anim
+      gsap.from(".hero-anim", {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power2.out",
+      });
+    },
+    { scope: heroRef } // limitamos el selector al contenedor del hero
+  );
+
   return (
-    <section className="relative h-screen flex items-center justify-center text-center overflow-hidden -my-60 md:-my-60">
-      {/* Background video */}
-      <video
-        className="absolute inset-0 w-screen h-screen object-cover z-10"
-        autoPlay
-        loop
-        muted
-        playsInline
+    <section className="relative w-full h-screen overflow-hidden">
+      {/* Background scene */}
+      <UnicornScene
+        projectId="HVejgNImevGuTqdsIEo9"
+        width="100%"
+        height="100%"
+        className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+        lazyLoad
+        production={true}
+      />
+
+      {/* Foreground content */}
+      <div
+        ref={heroRef}
+        className="relative hero-bg z-10 w-screen flex flex-col items-center justify-center text-center bottom-0 mt-[-300px] grid grid-cols-1 md:grid-cols-2 gap-1"
       >
-        <source src={Video} type="video/mp4" />
-      </video>
+        <div className="hero-anim">
+          <MaskedLines
+            as="p"
+            once={true}
+            scrollStart="false"
+            className="p-2 text-white text-left font-light sm:w-1/2 w-full"
+          >
+            Creative Web, Photo, Video to make incredible experience, your best
+            partner in taking your business to the next level. Take the lead,
+            make them jealous
+          </MaskedLines>
+        </div>
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
-
-      {/* Content */}
-      <div className="relative z-10 w-full h-full flex flex-col">
-        {/* Top bar with logo and nav */}
-      
-
-        {/* Bottom content grid */}
-        <div className="mt-auto grid grid-cols-1 md:grid-cols-2 p-6 gap-4">
-          <p className="text-white sm:w-1/2 w-full text-left text-sm md:text-lg leading-tight">
-            Cicero Web Studio is a digital agency specializing in web design,
-            development, and digital marketing solutions. We create stunning,
-            user-friendly websites that drive results and elevate your brand
-            presence online.
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 md:justify-end md:items-end">
-            <CustomButton href="#" label="WORKS" />
-            <CustomButton href={CALENDLY_URL} label="BOOK MY CONSULTATION" />
-          </div>
+        <div className="hero-anim flex flex-col md:flex-row gap-4 md:justify-end md:items-end p-2">
+          <CustomButton href="#" label="WORKS" />
+          <CustomButton href={CALENDLY_URL} label="BOOK MY CONSULTATION" />
         </div>
       </div>
     </section>

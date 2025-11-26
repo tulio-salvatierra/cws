@@ -19,7 +19,7 @@ export default function CustomButton({ label, href, secondary = false, newTab = 
     >
       <div className={`btn-bounce-bg ${secondary ? "is--secondary" : ""}`}></div>
       <div className="btn-bounce-text__wrap">
-        <span className="btn-bounce-text text-white font-main font-semibold text-lg">{label}</span>
+        <span className="btn-bounce-text text-white font-main font-semibold sm:text-md text-sm">{label}</span>
       </div>
     </a>
   );
