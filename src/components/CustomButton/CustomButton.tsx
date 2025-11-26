@@ -17,9 +17,9 @@ export default function CustomButton({ label, href, secondary = false, newTab = 
       rel={newTab ? "noopener noreferrer" : ""}
       onClick={onClick}
     >
-      <div className={`btn-bounce-bg ${secondary ? "is--secondary" : ""}`}></div>
+      <div className={`w-content btn-bounce-bg ${secondary ? "is--secondary" : ""}`}></div>
       <div className="btn-bounce-text__wrap">
-        <span className="btn-bounce-text text-white font-main font-semibold sm:text-md text-sm">{label}</span>
+        <span className="w-auto btn-bounce-text text-white font-main font-semibold sm:text-md text-sm">{label}</span>
       </div>
     </a>
   );
