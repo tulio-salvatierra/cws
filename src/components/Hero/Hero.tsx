@@ -39,18 +39,18 @@ export default function Hero() {
       {/* Foreground content */}
       <div
         ref={heroRef}
-        className="relative hero-bg z-10 w-screen flex flex-col items-center justify-center text-center bottom-0 mt-[-300px] grid grid-cols-1 md:grid-cols-2 gap-1"
+        className="relative hero-bg z-10 w-screen flex flex-col items-center justify-center text-center bottom-0 sm:mt-[-130px] mt-[-310px] grid grid-cols-1 md:grid-cols-2 gap-1"
       >
         <div className="hero-anim">
           <MaskedLines
             as="p"
             once={true}
             scrollStart="false"
-            className="p-2 text-white text-left font-light sm:w-1/2 w-full"
+            className="p-2 text-white text-lg text-left font-light sm:w-1/2 w-full"
           >
             Creative Web, Photo, Video to make incredible experience, your best
             partner in taking your business to the next level. Take the lead,
-            make them jealous
+            with unique and creative ideas that will build trust for your business and deliver growth
           </MaskedLines>
         </div>
 
