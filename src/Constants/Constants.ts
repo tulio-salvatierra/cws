@@ -1,5 +1,5 @@
 export const PHONE = 7863146121;
-export const EMAIL = "salvacorp@gmail.com";
+export const EMAIL = "info@cicerowebstudio.xyz";
 export const PORTURL = "www.tuliosalvatierra.com";
 export const HOME_URL = "/";
 export const SERICES_URL = "/services";
