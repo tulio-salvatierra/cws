@@ -29,7 +29,7 @@ export default function Projects() {
         </div>
       </div>
 
-      <div className="columns-1 sm:columns-2 lg:columns-4 gap-6 mt-10 mx-auto">
+      <div className="columns-1 sm:columns-2 lg:columns-4 gap-8 mt-10 mx-auto">
         {projects.map((project, index) => (
           <div key={index} className="mb-6 break-inside-avoid">
             <ProjectCard

@@ -59,7 +59,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
           />
         )}
       </div>
-      <div className="p-6 flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         <h3 className="text-xl font-main font-semibold text-orange-700">
           {title}
         </h3>
