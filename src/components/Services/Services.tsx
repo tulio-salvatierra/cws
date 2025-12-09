@@ -3,7 +3,7 @@ import TileMask from "../TileMask/TileMask";
 export default function Services() {
   return (
     <>
-      <section className="flex flex-col w-full h-auto justify-evenly px-5 py-32 overflow-x-hidden">
+      <section className="flex flex-col w-full h-auto justify-evenly px-5 py-8 overflow-x-hidden">
         <strong className="text-white">[SERVICES]</strong>
         
         <h2 className="font-main font-semibold sm:text-[6rem] text-lg text-orange-500 w-100 leading-tight">
@@ -17,7 +17,7 @@ export default function Services() {
           </p>
         </div>
         <ul className="flex flex-col">
-          <li className="py-20">
+          <li className="py-4">
             <ServicesCard />
           </li>
         </ul>

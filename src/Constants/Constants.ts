@@ -19,11 +19,18 @@ export const CALENDLY_URL = "https://calendly.com/cicerowebstudio-info/30min"
 
 export const MENU_ITEM = [
   {
+    id: 1,
+    name: "HOME",
+    url: HOME_URL,
+    class:
+      "text-white mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+  },
+  {
     id: 2,
     name: "SERVICES",
     url: SERICES_URL,
     class:
-      "text-white mr-2 justify-center text-secondary relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-white mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
   {
     id: 3,
