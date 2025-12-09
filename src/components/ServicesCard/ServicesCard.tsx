@@ -17,10 +17,10 @@ export default function ServicesCard() {
             </span>
           </div>
           <div className="sm:col-span-1 lg:col-span-2 flex flex-col justify-start gap-6 h-full">
-            <h2 className="text-orange-500 font-main text-2xl sm:text-3xl lg:text-4xl">
+            <h2 className="text-orange-500/80 font-main text-2xl sm:text-3xl lg:text-4xl">
               {data.title}
             </h2>
-            <p className="text-white text-xl w-100 font-secondary">
+            <p className="text-zinc-400 text-lg w-100 font-secondary">
               {data.description}
             </p>
             <CustomButton secondary label="Web Development" href="#" />
