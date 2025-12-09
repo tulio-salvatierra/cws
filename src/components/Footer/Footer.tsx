@@ -51,13 +51,11 @@ export default function Footer() {
         <div className="border-t border-dashed border-gray-700 my-8"></div>
 
         {/* Middle Section: Large FOCAL text */}
-        <div className="flex items-end justify-center sm:justify-start py-16">
-          <h1 className="text-[5rem] leading-none font-extrabold text-orange-500 sm:text-[3.2rem] md:text-[5rem] lg:text-[10rem]">
+        <div className="grid items-end justify-center sm:justify-start py-4">
+          <h1 className="mx-auto text-[8rem] md:text-[10rem] lg:text-[17rem] xl:text-[20rem] leading-none font-extrabold text-orange-500">
             CICERO WEB STUDIO
           </h1>
-          <span className="text-gray-500 text-4xl font-bold ml-4 mb-8 sm:mb-12 md:mb-16 lg:mb-20 border border-gray-500 rounded-full p-2">
-            &reg;
-          </span>
+       
         </div>
 
         {/* Bottom Section: Copyright and Design Credits */}
