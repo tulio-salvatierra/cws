@@ -12,7 +12,7 @@ export default function ServicesCard() {
           className="grid bg-zinc-100/10 p-2 rounded-md my-4 gap-y-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 items-start mx-auto h-auto hover:scale- "
         >
           <div className="col-span-1 flex items-start justify-start">
-            <span className="text-orange-500 font-bold font-main text-xl">
+            <span className="text-orange-500/80 font-bold font-main text-xl">
               {`[0${data.id}]`}
             </span>
           </div>
@@ -28,7 +28,7 @@ export default function ServicesCard() {
           <div className="sm:col-span-1 lg:col-span-2 flex items-start justify-center h-full">
             {data.image && (
               <img
-                className="w-full h-full max-w-xs sm:max-w-sm lg:max-w-md sm:ml-auto object-cover"
+                className="w-auto mx-auto h-[350px] max-w-xs sm:max-w-sm lg:max-w-md sm:ml-auto object-fit"
                 src={data.image}
                 alt={typeof data.title === 'string' ? data.title : 'Service Image'}
               />

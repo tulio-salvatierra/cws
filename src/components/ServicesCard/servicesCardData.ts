@@ -5,30 +5,30 @@ export interface ServiceItem {
     image?: string;
 }
 
-import Web from '../../assets/Images/website.jpg';
-import Business from '../../assets/Images/auto.jpg';
-import IT from '../../assets/Images/support.png';
+import Web from '/images/Palette.png';
+import Business from '/images/Arrow.png';
+import IT from '/images/Lifering.png';
 
 export const servicesData = [
     {
       id: 1,
-      title: "Web Design & Development",
+      title: "Custom Websites That Stand Out",
       description:
-        "Transform your online presence with sleek, conversion-focused websites that capture your brand's essence and drive customer action.",
+        "Modern, fast, and crafted for small-business growth.",
         image:Web
     },
     {
       id: 2,
-      title: "Business Automation",
+      title: "Local SEO & Visibility Boosting",
       description:
-        "Streamline your operations with smart automation solutions that save time, reduce errors, and boost productivity.",
+        "Streamline Get found in Chicago — Maps, Search, and everywhere that matters.",
         image:Business
     },
     {
       id: 3,
-      title: "IT Support & Consulting",
+      title: "Ongoing Support & Digital Enhancements",
       description:
-        "Keep your technology running smoothly with reliable support and strategic guidance tailored to your business needs.",
+        "Real partnership, updates, content, and strategy whenever you need it.",
         image:IT
     },
   ];
