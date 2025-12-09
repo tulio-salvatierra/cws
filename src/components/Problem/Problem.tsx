@@ -44,7 +44,7 @@ export default function Problem() {
             as="p"
             scroll
             scrollStart="top 85%"
-            className="font-secondary text-white text-lg text-start paragraph"
+            className="font-secondary text-zinc-400 text-lg text-start paragraph"
           >
             We're your digital growth partners. Based in Chicago, we combine
             beautiful design with dedication to deliver solutions that move the
@@ -58,7 +58,7 @@ export default function Problem() {
                 scroll
                 once
                 scrollStart="top 85%"
-                className="font-secondary font-medium sm:text-6xl text-5xl text-zinc-400 w-full leading-tight mb-4"
+                className="font-secondary font-medium sm:text-6xl text-5xl text-orange-500/80 w-full leading-tight mb-4"
               >
                 What makes us different?
               </MaskedLines>
@@ -66,7 +66,7 @@ export default function Problem() {
                 as="p"
                 scroll
                 scrollStart="top 85%"
-                className="font-secondary text-lg text-white flex-1 paragraph"
+                className="font-secondary text-lg text-zinc-400 flex-1 paragraph"
               >
                 Partnership approach: <br /> Your wins are our wins.
                 Problem-solving mindset with a can-do attitude. Elegant design

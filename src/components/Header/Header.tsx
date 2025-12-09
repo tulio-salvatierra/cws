@@ -38,18 +38,11 @@ export default function Header() {
             as="h1"
             className={`text-orange-500 font-semibold tracking-tight transition-all duration-300 ${
               isFloating 
-                ? "text-3xl md:text-4xl" 
-                : "text-6xl md:text-8xl"
+                ? "text-2xl md:text-3xl text-orange-500" 
+                : "text-4xl md:text-6xl text-orange-500"
             }`}
           >
-            CWS{" "}
-            <sup
-              className={`align-super font-semibold ${
-                isFloating ? "text-sm" : "text-2xl"
-              }`}
-            >
-              ®
-            </sup>
+            CWS
           </MaskedLines>
         </Link>
         <div className="space-x-8 hidden font-secondary items-center md:flex text-xs tracking-tight">
