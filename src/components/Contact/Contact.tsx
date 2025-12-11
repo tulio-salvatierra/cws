@@ -82,7 +82,7 @@ export default function Contact() {
                 I am available for call or emails. Let's talk about your
                 project.
               </p>
-              <div className="flex flex-row gap-4 items-center justify-start mt-4">
+              <div className="flex sm:flex-row flex-col gap-4 items-center justify-start mt-4">
                 <CustomButton label="Email Us" href={`mailto:${EMAIL}`} />
                 <CustomButton label="Call Us" href={`tel:+1${PHONE}`} />
               </div>
