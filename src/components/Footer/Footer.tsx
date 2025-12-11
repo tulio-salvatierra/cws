@@ -31,9 +31,7 @@ export default function Footer() {
         {/* Top Section: Navigation and Back to Top */}
         <div className="flex flex-col sm:flex-row justify-between items-center pb-8">
           <nav className="flex space-x-6 text-sm font-medium uppercase tracking-wider mb-4 sm:mb-0">
-            <Link to="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
+          
             {MENU_ITEM.map((nav, index) => (
               <Link
                 key={nav.id}
@@ -52,7 +50,7 @@ export default function Footer() {
 
         {/* Middle Section: Large FOCAL text */}
         <div className="grid items-end justify-center sm:justify-start py-4">
-          <h1 className="mx-auto text-[8rem] md:text-[10rem] lg:text-[17rem] xl:text-[20rem] leading-none font-extrabold text-orange-500">
+          <h1 className="mx-auto text-[6rem] md:text-[10rem] lg:text-[17rem] xl:text-[20rem] leading-none font-extrabold text-orange-500">
             CICERO WEB STUDIO
           </h1>
        
