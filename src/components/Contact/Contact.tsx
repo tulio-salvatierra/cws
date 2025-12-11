@@ -89,8 +89,8 @@ export default function Contact() {
             </div>
           </div>
           <div className="flex flex-col gap-4 items-center justify-center">
-            <h3 className="text-lg text-left md:text-xl lg:text-2xl xl:text-3xl text-white hover:text-orange-400 transition-colors duration-200 block mb-2">
-              [SOCIAL]
+            <h3 className="text-xl font-main font-bold sm:text-2xl text-left md:text-xl lg:text-2xl xl:text-3xl text-black hover:text-orange-400 transition-colors duration-200 block mb-2">
+              SOCIAL
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-zinc-300">
