@@ -9,17 +9,7 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 export default function Problem() {
 
-  useGSAP(
-    () => {
-      // Animamos los elementos marcados con la clase .hero-anim
-      gsap.from(".video-anim", {
-        y: -30,
-        duration: 3,
 
-        ease: "power2.out",
-      });
-    },
-    []);
     
     
     
@@ -27,12 +17,12 @@ export default function Problem() {
     
       gsap.from(".video-background", {
         duration: 3,
-        opacity: 0.25,
-        ease: "expo.inOut",
+        opacity: 0.15,
+        ease: "power2.out",
         scrollTrigger: {
           trigger: ".video-background-container",
           start: "top top",
-          end: "top top-=1",
+          end: "top top+=1",
           scrub: 4
         }
       });
@@ -51,7 +41,7 @@ export default function Problem() {
         <MaskedLines
           as="h1"
           scroll
-          className="font-main text-left font-semibold text-orange-500 sm:text-[6rem] text-[3rem] w-100 leading-tight"
+          className="font-main text-left font-semibold text-orange-500 sm:text-[6rem] text-[3rem] w-100 leading-12"
         >
           CICERO WEB STUDIO
         </MaskedLines>
@@ -63,7 +53,7 @@ export default function Problem() {
             as="p"
             scroll
             scrollStart="top 85%"
-            className="font-secondary text-zinc-400 text-lg text-start paragraph"
+            className="font-secondary text-zinc-400 text-lg text-start paragraph tracking-10"
           >
             We're your digital growth partners. Based in Chicago, we combine
             beautiful design with dedication to deliver solutions that move the
@@ -77,7 +67,7 @@ export default function Problem() {
                 scroll
                 once
                 scrollStart="top 85%"
-                className="font-secondary font-medium sm:text-6xl text-5xl text-orange-500/80 w-full leading-tight mb-4"
+                className="video-background-container font-secondary font-medium sm:text-6xl text-5xl text-orange-500/80 w-full leading-tight mb-4"
               >
                 What makes us different?
               </MaskedLines>
@@ -96,7 +86,7 @@ export default function Problem() {
 
             <div
 
-              className="flex flex-col sm:flex-row gap-4 mt-8 video-background-container"
+              className="flex flex-col sm:flex-row gap-4 mt-8"
             >
               <CustomButton href="/contact" label="Let's talk" />
               <CustomButton href="/works" label="See our works" />

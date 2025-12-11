@@ -7,7 +7,7 @@ export default function Services() {
         <strong className="text-white">[SERVICES]</strong>
         
         <h2 className="font-main font-semibold sm:text-[6rem] text-lg text-orange-500 w-100 leading-tight">
-          What we do
+          <TileMask text="Services" />
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-10">
           <p className="font-secondary text-zinc-400 text-lg sm:text-md text-start w--50 sm:w-3/4">
