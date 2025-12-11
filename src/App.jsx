@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Loader from "./components/Loader";
 import { useLenis } from "./Hooks/lenis";
 import Layout from "./components/Layout/Layout";
@@ -51,53 +51,50 @@ function App() {
 
   // Show loader only once per session
   const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('hasLoaded') !== 'true';
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("hasLoaded") !== "true";
     }
     return true;
   });
+  const [appVisible, setAppVisible] = useState(false);
 
   useEffect(() => {
-    if (!loading) return;
-    const timer = setTimeout(() => {
-      setLoading(false);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('hasLoaded', 'true');
-      }
-    }, 3000); // Adjust the time as needed
-
-    return () => {
-      clearTimeout(timer);
-    };
+    if (!loading) {
+      const revealTimer = setTimeout(() => setAppVisible(true), 150);
+      return () => clearTimeout(revealTimer);
+    }
+    setAppVisible(false);
   }, [loading]);
 
-  if (loading) {
-    return (
-      <div className="App grid grid-cols-1 overflow-x-hidden w-full">
-        <Loader />
-      </div>
-    );
-  }
+  const handleLoaderComplete = useCallback(() => {
+    setLoading(false);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("hasLoaded", "true");
+    }
+  }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="services" element={<ServicesPage />} />
-          <Route path="about" element={<About />} />
-          <Route path="policy" element={<Policy />} />
-          <Route path="blog" element={<Blog />} />
-          <Route path="blog/:slug" element={<BlogPost />} />
-          <Route path="contact" element={<Contact />} />
-          {/* Dynamic landing page routes inside layout so providers apply */}
-          <Route 
-            path=":id" 
-            element={<LandingPageWrapper />} 
-          />
-        </Route>
-      </Routes>
-    </Router>
+    <div className={`app-shell ${appVisible ? "app-shell--visible" : "app-shell--hidden"}`}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="services" element={<ServicesPage />} />
+            <Route path="about" element={<About />} />
+            <Route path="policy" element={<Policy />} />
+            <Route path="blog" element={<Blog />} />
+            <Route path="blog/:slug" element={<BlogPost />} />
+            <Route path="contact" element={<Contact />} />
+            {/* Dynamic landing page routes inside layout so providers apply */}
+            <Route 
+              path=":id" 
+              element={<LandingPageWrapper />} 
+            />
+          </Route>
+        </Routes>
+      </Router>
+      {loading && <Loader onComplete={handleLoaderComplete} />}
+    </div>
   );
 }
 

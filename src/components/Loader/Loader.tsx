@@ -1,8 +1,12 @@
 import { useLoaderAnimation } from "@/Hooks/Loader";
 import "./Loader.css";
 
-export default function Loader() {
-  useLoaderAnimation();
+type LoaderProps = {
+  onComplete?: () => void;
+};
+
+export default function Loader({ onComplete }: LoaderProps) {
+  useLoaderAnimation({ onComplete });
 
   return (
     <div data-loading-container className="loading-container">

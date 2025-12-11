@@ -1,7 +1,13 @@
 import { useEffect } from 'react';
 import gsap from 'gsap';
 
-export function useLoaderAnimation() {
+type LoaderAnimationOptions = {
+  onComplete?: () => void;
+};
+
+export function useLoaderAnimation(options: LoaderAnimationOptions = {}) {
+  const { onComplete } = options;
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -17,7 +23,7 @@ export function useLoaderAnimation() {
     if (!loadingWords || !wordsTarget || !wordsAttr) return;
 
     const words = wordsAttr.split(',').map(w => w.trim());
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({ onComplete });
 
     // Adjust the initial vertical offset of the loading words by changing yPercent here.
     tl.set(loadingWords, {
@@ -53,5 +59,9 @@ export function useLoaderAnimation() {
       duration: .5,
       ease: "Power1.easeInOut"
     }, "+=.4");
-  }, []);
+
+    return () => {
+      tl.kill();
+    };
+  }, [onComplete]);
 }
