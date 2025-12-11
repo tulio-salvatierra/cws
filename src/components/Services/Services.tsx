@@ -17,7 +17,7 @@ export default function Services() {
           </p>
         </div>
         <ul className="flex flex-col">
-          <li className="py-4">
+          <li className="py-2">
             <ServicesCard />
           </li>
         </ul>

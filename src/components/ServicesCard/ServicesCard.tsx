@@ -9,7 +9,7 @@ export default function ServicesCard() {
       {servicesData.map((data: { id: React.Key | null | undefined; title: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; description: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; image: string | undefined; }) => (
         <div
           key={data.id}
-          className="grid hover:bg-zinc-800 transition-all duration-200 bg-zinc-100/5 p-2 rounded-md my-4 gap-y-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 items-start mx-auto"
+          className="grid hover:bg-zinc-800 transition-all duration-200 bg-zinc-100/5 p-2 rounded-md my-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 items-start mx-auto w-full "
         >
           <div className="col-span-1 flex items-start justify-start">
             <span className="text-orange-500/80 font-bold font-main text-xl">
