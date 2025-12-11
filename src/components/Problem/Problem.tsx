@@ -26,9 +26,15 @@ export default function Problem() {
     useGSAP(() => {
     
       gsap.from(".video-background", {
-        y: -30,
         duration: 3,
-        ease: "power2.out",
+        opacity: 0.25,
+        ease: "expo.inOut",
+        scrollTrigger: {
+          trigger: ".video-background-container",
+          start: "top top",
+          end: "top top-=1",
+          scrub: 4
+        }
       });
     }, []);
 
@@ -90,7 +96,7 @@ export default function Problem() {
 
             <div
 
-              className="flex flex-col sm:flex-row gap-4 mt-8"
+              className="flex flex-col sm:flex-row gap-4 mt-8 video-background-container"
             >
               <CustomButton href="/contact" label="Let's talk" />
               <CustomButton href="/works" label="See our works" />
@@ -98,7 +104,7 @@ export default function Problem() {
           </div>
         </div>
       </div>
-      <div>
+      <div className="">
         
         <video
           src={Logo}
