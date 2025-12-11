@@ -3,6 +3,8 @@ import Logo from "./../../assets/video/hero.mp4";
 import MaskedLines from './../MaskedLines/MaskedLines'
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import "./video.css";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 
 export default function Problem() {
@@ -17,7 +19,18 @@ export default function Problem() {
         ease: "power2.out",
       });
     },
-  );
+    []);
+    
+    
+    
+    useGSAP(() => {
+    
+      gsap.from(".video-background", {
+        y: -30,
+        duration: 3,
+        ease: "power2.out",
+      });
+    }, []);
 
   return (
     <section
@@ -86,8 +99,8 @@ export default function Problem() {
         </div>
       </div>
       <div>
+        
         <video
-
           src={Logo}
           autoPlay
           muted
@@ -96,7 +109,7 @@ export default function Problem() {
           preload="auto"
           disablePictureInPicture
           disableRemotePlayback
-          className="w-full video-anim h-50 rounded-lg object-cover transition-transform duration-300 group-hover:scale-25"
+          className="video-background rounded-tl-[300px] rounded-tr-[300px] rounded-br-[300px] rounded-bl-[300px] w-full video-anim h-50 object-cover transition-transform duration-300 group-hover:scale-25"
           onEnded={(e) => {
             e.currentTarget.currentTime = 0;
             e.currentTarget.play();
@@ -115,6 +128,7 @@ export default function Problem() {
             });
           }}
         />
+        
       </div>
     </section>
   );
