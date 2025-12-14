@@ -1,5 +1,6 @@
 
 import { useRef } from "react";
+import { useFadeIn } from "../../Hooks/useFadeIn";
 
 interface ProjectCardProps {
   title: string;
@@ -11,9 +12,9 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ title, images, alt, description, link }: ProjectCardProps) {
   const imageRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
-
+  const fadeInRef = useFadeIn();
   return (
-    <div className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto flex flex-col group">
+    <div ref={fadeInRef} className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-auto flex flex-col group">
       <div className="relative h-72 flex-shrink-0 overflow-hidden">
         {images.endsWith('.mp4') ? (
           <video
@@ -60,7 +61,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
         )}
       </div>
       <div className="flex-1 flex flex-col">
-        <h3 className="text-xl font-main font-semibold text-orange-700">
+        <h3 ref={fadeInRef} className="text-xl font-main font-semibold text-orange-700">
           {title}
         </h3>
         <p className="mt-2 text-white text-sm">{description}</p>

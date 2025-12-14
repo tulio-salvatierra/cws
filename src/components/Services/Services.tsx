@@ -1,16 +1,20 @@
 import ServicesCard from "../ServicesCard";
 import TileMask from "../TileMask/TileMask";
+import { useScramble } from "../../Hooks/useScramble";
+import { useFadeIn } from "../../Hooks/useFadeIn";
 export default function Services() {
+  const scrambleRef = useScramble("SERVICES", 0.1);
+  const fadeInRef = useFadeIn();
   return (
     <>
       <section className="flex flex-col w-full h-auto justify-evenly px-5 py-8 overflow-x-hidden">
         <strong className="text-white">[SERVICES]</strong>
         
-        <h2 className="font-main font-semibold sm:text-[6rem] text-lg text-orange-500 w-100 leading-tight">
+        <h2 ref={scrambleRef} className="font-main font-semibold sm:text-[6rem] text-lg text-orange-500 w-100 leading-tight">
           <TileMask text="Services" />
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-10">
-          <p className="font-secondary text-zinc-400 text-lg sm:text-md text-start w--50 sm:w-3/4">
+          <p ref={fadeInRef} className="font-secondary text-zinc-400 text-lg sm:text-md text-start w--50 sm:w-3/4">
             Our mission is to deliver tailored websites and software solutions
             that solve real problems and drive meaningful growth. We offer a
             wide range of services to help you achieve your goals.

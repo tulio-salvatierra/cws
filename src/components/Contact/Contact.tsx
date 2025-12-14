@@ -11,9 +11,14 @@ import {
 import { MeshGradient } from "@paper-design/shaders-react";
 import { useEffect, useState } from "react";
 import CustomButton from "../CustomButton/CustomButton";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { useScramble } from "../../Hooks/useScramble";
 
 export default function Contact() {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
+  const scrambleRef = useScramble("GET IN TOUCH", 0.1);
+
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -29,7 +34,7 @@ export default function Contact() {
   }, []);
 
   return (
-    <section className="relative mt-10 w-full min-h-screen flex flex-col items-center justify-center p-4 gap-8 overflow-hidden">
+    <section className="relative mt-10 w-full min-h-screen flex flex-col items-center justify-center p-4 gap-8 overflow-hidden contact-container animate-in fade-in-0 fade-out-0 duration-300 ">
       {/* MeshGradient Background */}
       <div className="absolute inset-0 w-full h-screen z-0">
         <MeshGradient
@@ -51,7 +56,10 @@ export default function Contact() {
       <div className="relative z-10 text-white w-full rounded-2xl p-4 bg-zinc-800/01 backdrop-blur-xs">
         {/* Header with brand name */}
         <div className="text-center mb-12">
-          <h2 className="text-6xl text-left md:text-8xl lg:text-9xl text-orange-500 font-main font-black mb-4">
+          <h2 
+            ref={scrambleRef}
+            className="text-6xl text-left md:text-8xl lg:text-9xl text-orange-500 font-main font-black mb-4"
+          >
             GET IN TOUCH
           </h2>
         </div>

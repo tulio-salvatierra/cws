@@ -1,7 +1,10 @@
 import ProjectCard from "../ProjectCard";
 import { projects } from "./ProjectsData";
-
+import { useFadeIn } from "../../Hooks/useFadeIn";
+import { useScramble } from "../../Hooks/useScramble";
 export default function Projects() {
+  const scrambleRef = useScramble("PROJECTS", 0.1);
+  const fadeInRef = useFadeIn();
   return (
     <section
       id="projects"
@@ -9,13 +12,13 @@ export default function Projects() {
     >
       <div className="flex flex-col mb-10">
         <strong className="text-white text-left">[PROJECTS]</strong>
-        <h2 className="font-main text-left font-black sm:text-[6rem] text-[3rem] text-orange-500 w-100 leading-tight">
+        <h2 ref={scrambleRef} className="font-main text-left font-black sm:text-[6rem] text-[3rem] text-orange-500 w-100 leading-tight">
           What we do
         </h2>
       </div>
       <div className="grid gap-40 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
         <div>
-          <h3 className="font-secondary text-zinc-400 text-xl sm:text-md text-start w-100">
+          <h3 ref={fadeInRef} className="font-secondary text-zinc-400 text-xl sm:text-md text-start w-100">
             At Cicero Web Studio, every project is built with one goal in mind:
             helping businesses stand out online. From sleek, high-converting
             websites to interactive, custom-built applications, our work blends

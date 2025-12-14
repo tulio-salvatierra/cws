@@ -1,11 +1,9 @@
-import React from "react";
-import CustomButton from "../CustomButton";
 import { servicesData } from "./servicesCardData";
-
+import { useFadeIn } from "../../Hooks/useFadeIn";
 export default function ServicesCard() {
-  
+  const fadeInRef = useFadeIn();
   return (
-    <div className="flex flex-col mx-auto my-4 w-full ">
+    <div ref={fadeInRef} className="flex flex-col mx-auto my-4 w-full ">
       {servicesData.map((data: { id: React.Key | null | undefined; title: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; description: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; image: string | undefined; }) => (
         <div
           key={data.id}
