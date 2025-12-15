@@ -4,29 +4,32 @@ import MaskedLines from './../MaskedLines/MaskedLines'
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import "./video.css";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import { useFadeIn } from "../../Hooks/useFadeIn";
+import { useScramble } from "../../Hooks/useScramble";
+  
 
 
 export default function Problem() {
 
+  const scrambleRef = useScramble("WHAT MAKES US DIFFERENT?", 0.1);
+  const fadeInRef = useFadeIn();
 
-    
-    
-    
-    useGSAP(() => {
-    
-      gsap.from(".video-background", {
-        duration: 3,
-        opacity: 0.15,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".video-background-container",
-          start: "top top",
-          end: "top top+=1",
-          scrub: 4
-        }
-      });
-    }, []);
+
+
+  useGSAP(() => {
+
+    gsap.from(".video-background", {
+      duration: 3,
+      opacity: 0.15,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: ".video-background-container",
+        start: "top top",
+        end: "top top+=1",
+        scrub: 4
+      }
+    });
+  }, []);
 
   return (
     <section
@@ -61,27 +64,14 @@ export default function Problem() {
           </MaskedLines>
 
           <div>
-            <div className="flex flex-col text-start w-full text-white paragraph">
-              <MaskedLines
-                as="h2"
-                scroll
-                once
-                scrollStart="top 85%"
-                className="video-background-container font-secondary font-medium sm:text-6xl text-5xl text-orange-500/80 w-full leading-tight mb-4"
-              >
-                What makes us different?
-              </MaskedLines>
-              <MaskedLines
-                as="p"
-                scroll
-                scrollStart="top 85%"
-                className="font-secondary text-lg text-zinc-400 flex-1 paragraph"
-              >
-                Partnership approach: <br /> Your wins are our wins.
+            <div ref={fadeInRef} className="flex flex-col text-start w-full text-white paragraph">
+              <h2 ref={scrambleRef} className="font-secondary text-orange-400 text-2xl sm:text-4xl text-start paragraph tracking-10">What makes us different?</h2>
+              <p className="font-secondary text-zinc-400 text-lg text-start paragraph tracking-10">
+                <strong className="text-orange-900">Partnership approach:</strong> <br /> Your wins are our wins.
                 Problem-solving mindset with a can-do attitude. Elegant design
                 meets relentless execution. We go the extra mile, every single
                 time.
-              </MaskedLines>
+              </p>
             </div>
 
             <div
@@ -94,8 +84,8 @@ export default function Problem() {
           </div>
         </div>
       </div>
-      <div className="">
-        
+      <div className="video-background-container">
+
         <video
           src={Logo}
           autoPlay
@@ -124,7 +114,7 @@ export default function Problem() {
             });
           }}
         />
-        
+
       </div>
     </section>
   );

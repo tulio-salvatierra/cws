@@ -2,6 +2,7 @@ import ProjectCard from "../ProjectCard";
 import { projects } from "./ProjectsData";
 import { useFadeIn } from "../../Hooks/useFadeIn";
 import { useScramble } from "../../Hooks/useScramble";
+import MaskedLines from "../MaskedLines/MaskedLines";
 export default function Projects() {
   const scrambleRef = useScramble("PROJECTS", 0.1);
   const fadeInRef = useFadeIn();
@@ -18,12 +19,17 @@ export default function Projects() {
       </div>
       <div className="grid gap-40 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
         <div>
-          <h3 ref={fadeInRef} className="font-secondary text-zinc-400 text-xl sm:text-md text-start w-100">
+          <MaskedLines
+            as="p"
+            scroll
+            scrollStart="top 85%"
+            className="font-secondary text-zinc-400 text-lg w-100 font-secondary"
+          >
             At Cicero Web Studio, every project is built with one goal in mind:
             helping businesses stand out online. From sleek, high-converting
             websites to interactive, custom-built applications, our work blends
             style, speed, and smart technology.
-          </h3>
+          </MaskedLines>
         </div>
         <div></div>
         <div></div>

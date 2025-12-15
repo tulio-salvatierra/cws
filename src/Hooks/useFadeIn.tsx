@@ -5,7 +5,7 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-export function useFadeIn() {
+export function useFadeIn(selector?: string) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -13,48 +13,37 @@ export function useFadeIn() {
       if (!containerRef.current) return;
 
       const element = containerRef.current;
+      let elementsToAnimate: Element[];
 
-      const runFadeIn = () => {
-        // Get all direct children
+      if (selector) {
+        // If selector provided, find all matching elements within the container
+        elementsToAnimate = Array.from(element.querySelectorAll(selector));
+      } else {
+        // Default: check for children or animate self
         const children = element.children;
-        
-        if (children.length === 0) {
-          // If no children, animate the element itself
-          gsap.set(element, { opacity: 0, y: 30 });
-          gsap.to(element, {
-            opacity: 1,
-            y: 0,
-            duration: 1.5,
-            ease: "power3.out",
-            stagger: 0.25,
-            scrollTrigger: {
-              trigger: element,
-              start: "top 95%",
-              toggleActions: "play none none none", // Play once and stay
-            },
-          });
-        } else {
-          // Animate children individually with stagger
-          gsap.set(children, { opacity: 0, y: 30 });
-          gsap.to(children, {
-            opacity: 1,
-            y: 0,
-            duration: 1.5,
-            stagger: 0.25,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: element,
-              start: "top 95%",
-              toggleActions: "play none none none", // Play once and stay
-            },
-          });
-        }
-      };
+        elementsToAnimate = children.length > 0 ? Array.from(children) : [element];
+      }
 
-      // Run immediately
-      runFadeIn();
+      if (elementsToAnimate.length === 0) return;
+
+      // Set initial state for all elements
+      gsap.set(elementsToAnimate, { opacity: 0, y: 30 });
+
+      // Animate all elements with stagger
+      gsap.to(elementsToAnimate, {
+        opacity: 1,
+        y: 0,
+        duration: 1.5,
+        stagger: 0.15,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: elementsToAnimate[0] as Element,
+          start: "top 95%",
+          toggleActions: "play none none none", // Play once and stay
+        },
+      });
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [selector] }
   );
 
   return containerRef;

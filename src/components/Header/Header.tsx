@@ -7,7 +7,10 @@ import { useModal } from "../LeadFormModal/ModalContext";
 import { CALENDLY_URL, MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
 import CustomButton from "../CustomButton";
+import {useScramble} from "../../Hooks/useScramble";
+import {useFadeIn} from "../../Hooks/useFadeIn";
 import MaskedLines from "../MaskedLines/MaskedLines";
+
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -19,7 +22,8 @@ export default function Header() {
   const headerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const toggleMenu = () => setShowMenu(!showMenu);
-
+  const scrambleRef = useScramble("CWS", 0.1);
+  const fadeInRef = useFadeIn();
  
 
   return (
@@ -34,16 +38,11 @@ export default function Header() {
       <div className="flex w-full p-6 justify-between items-center">
         {/* Desktop Header */}
         <Link to="/" className="no-underline">
-          <MaskedLines
-            as="h1"
-            className={`text-orange-500 font-semibold tracking-tight transition-all duration-300 ${
-              isFloating 
-                ? "text-2xl md:text-3xl text-orange-500" 
-                : "text-4xl md:text-6xl text-orange-500"
-            }`}
-          >
-            CWS
-          </MaskedLines>
+          <div ref={fadeInRef}>
+         <h1 ref={scrambleRef} className="text-orange-500 font-semibold tracking-tight transition-all duration-300">
+          CWS
+         </h1>
+          </div>
         </Link>
         <div className="space-x-8 hidden font-secondary items-center md:flex text-xs tracking-tight">
           {MENU_ITEM.map((nav, index) => (
@@ -104,26 +103,35 @@ export default function Header() {
                 </button>
               </div>
 
-              <div className="flex-col p-4 mb-6 text-left justify-end items-center text-xl font-semibold">
+              <div ref={fadeInRef} className="flex-col p-4 mb-6 text-left justify-end items-center text-xl font-semibold">
                 {MENU_ITEM.map((navMobile, index) => (
+                  <div key={index}>
                   <Link
                     to={navMobile.url}
-                    key={index}
-                    className={`${navMobile.class} block py-2 text-lg tracking-tight ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
+                    
+                    className={`${navMobile.class} block py-2 text-xl tracking-tight font-semibold text-orange-100 ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
                     onClick={toggleMenu}
-                  >
-                    {navMobile.name}
-                  </Link>
+                    >
+                      {navMobile.name}
+                    </Link>
+                  </div>
                 ))}
               </div>
             </div>
+            <div ref={fadeInRef}>
             <a
+              ref={fadeInRef as unknown as React.RefObject<HTMLAnchorElement>}
               href={CALENDLY_URL}
               className="block p-4 rounded-full text-white border-2 font-main font-semibold text-xl text-center transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
             >
               Book My Consultation!
             </a>
+            </div>
+            <div ref={fadeInRef}>
+              
+            </div>
             <button
+              ref={fadeInRef as unknown as React.RefObject<HTMLButtonElement>}
               onClick={openLeadForm}
               className="mt-6 w-full btn-bounce text-lg tracking-tight"
             >

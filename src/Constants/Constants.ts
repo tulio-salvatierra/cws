@@ -23,34 +23,34 @@ export const MENU_ITEM = [
     name: "HOME",
     url: HOME_URL,
     class:
-      "text-white mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-orange-100 mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
   {
     id: 2,
     name: "SERVICES",
     url: SERICES_URL,
     class:
-      "text-white mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-orange-100 mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
   {
     id: 3,
     name: "ABOUT",
     url: ABOUT_URL,
     class:
-      "text-white mr-2 justify-center text-main relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-orange-100 mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
   {
     id: 4,
     name: "POLICIES",
     url: POLICY_URL,
     class:
-      "text-white mr-2 justify-center text-main relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-orange-100 mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
   {
     id: 5,
     name: "BLOG",
     url: BLOG_URL,
     class:
-      "text-white mr-2 text-main relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+      "text-orange-100 mr-2 justify-center text-orange-500 relative text-md block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
 ];

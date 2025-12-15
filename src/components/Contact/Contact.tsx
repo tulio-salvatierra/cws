@@ -9,18 +9,19 @@ import {
   PHONE,
 } from "../../Constants/Constants";
 import { MeshGradient } from "@paper-design/shaders-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import CustomButton from "../CustomButton/CustomButton";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { useScramble } from "../../Hooks/useScramble";
 
+import { useScramble } from "../../Hooks/useScramble";
+import MaskedLines from "../MaskedLines/MaskedLines";
+import { useFadeIn } from "../../Hooks/useFadeIn";
 export default function Contact() {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
   const scrambleRef = useScramble("GET IN TOUCH", 0.1);
-
-
+  const fadeInRef = useFadeIn();
+  const imageRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
+
     const updateDimensions = () => {
       setDimensions({
         width: window.innerWidth,
@@ -69,8 +70,9 @@ export default function Contact() {
           {/* Profile Picture Section */}
           <div className="flex-shrink-0 text-center lg:text-left">
             <div className="relative inline-block">
-              <div className="flex justify-center items-end mx-auto shadow-2xl">
+              <div ref={fadeInRef} className="flex justify-center items-end mx-auto shadow-2xl">
                 <img
+                  ref={imageRef}
                   src="/images/tulio.png"
                   alt="Tulio Salvatierra"
                   className=" object-cover rounded-md"
@@ -78,31 +80,36 @@ export default function Contact() {
               </div>
               
             </div>
-            <h3 className="text-xl md:text-2xl font-main font-bold text-white mt-6">
+            <h3 ref={fadeInRef} className="text-xl md:text-2xl font-main font-bold text-white mt-6">
               Tulio Salvatierra
             </h3>
-            <p className="text-zinc-100 text-sm md:text-base font-secondary">
+            <p ref={fadeInRef} className="text-zinc-100 text-sm md:text-base font-secondary">
               Founder & Developer
             </p>
             {/* Email address */}
             <div className="flex flex-col gap-4 items-start justify-start mt-4">
-              <p className="text-left">
-                I am available for call or emails. Let's talk about your
-                project.
-              </p>
-              <div className="flex sm:flex-row flex-col gap-4 items-center justify-start mt-4">
+              <MaskedLines
+                as="p"
+                scroll
+                scrollStart="top 85%"
+                className="font-secondary text-zinc-100 text-lg w-100 font-secondary"
+              >
+                I am available for call or emails. Let's talk about your project.
+              </MaskedLines>
+              
+              <div ref={fadeInRef} className="flex sm:flex-row flex-col gap-4 items-center justify-start mt-4">
                 <CustomButton label="Email Us" href={`mailto:${EMAIL}`} />
                 <CustomButton label="Call Us" href={`tel:+1${PHONE}`} />
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-4 items-center justify-center">
-            <h3 className="text-xl font-main font-bold sm:text-2xl text-left md:text-xl lg:text-2xl xl:text-3xl text-black hover:text-orange-400 transition-colors duration-200 block mb-2">
+            <h3 ref={scrambleRef}  className="text-xl font-main font-bold sm:text-2xl text-left md:text-xl lg:text-2xl xl:text-3xl text-black hover:text-orange-400 transition-colors duration-200 block mb-2">
               SOCIAL
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-zinc-300">
-              <div className="w-fit">
+              <div ref={fadeInRef} className="w-fit">
                 <a
                   className="text-zinc-100 font-secondary font-semibold"
                   href={INSTAGRAM_URL}
@@ -112,7 +119,7 @@ export default function Contact() {
                   INSTAGRAM
                 </a>
               </div>
-              <div className="w-fit">
+              <div ref={fadeInRef} className="w-fit">
                 <a
                   className="text-zinc-100 text-left font-secondary font-semibold"
                   href={YOUTUBE_URL}
@@ -122,7 +129,7 @@ export default function Contact() {
                   YOUTUBE
                 </a>
               </div>
-              <div className="w-fit">
+              <div ref={fadeInRef} className="w-fit">
                 <a
                   className="text-zinc-100 font-secondary font-semibold"
                   href={FACEBOOK_URL}
@@ -132,7 +139,7 @@ export default function Contact() {
                   FACEBOOK
                 </a>
               </div>
-              <div className="w-fit">
+              <div ref={fadeInRef} className="w-fit">
                 <a
                   className="text-zinc-100 font-secondary font-semibold"
                   href={TWITTER_URL}
@@ -142,7 +149,7 @@ export default function Contact() {
                   TWITTER
                 </a>
               </div>
-              <div className="w-fit">
+              <div ref={fadeInRef} className="w-fit">
                 <a
                   className="text-zinc-100 font-secondary font-semibold"
                   href={PINTEREST_URL}
@@ -152,7 +159,7 @@ export default function Contact() {
                   PINTEREST
                 </a>
               </div>
-              <div className="w-fit">
+              <div ref={fadeInRef} className="w-fit">
                 <a
                   className="text-zinc-100 font-secondary font-semibold"
                   href={LINKEDIN_URL}
@@ -163,7 +170,7 @@ export default function Contact() {
                 </a>
               </div>
             </div>
-            <div className="w-full mt-8 rounded-xl overflow-hidden">
+            <div ref={fadeInRef} className="w-full mt-8 rounded-xl overflow-hidden">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d252.5880090363163!2d-87.7509307390869!3d41.95077474768748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880fcde85586be3d%3A0x88f84b57cb03f35b!2sCicero%20Web%20Studio!5e1!3m2!1sen!2sus!4v1761046047715!5m2!1sen!2sus"
             width="100%"

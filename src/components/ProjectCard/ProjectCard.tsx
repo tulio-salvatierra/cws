@@ -1,6 +1,7 @@
 
 import { useRef } from "react";
 import { useFadeIn } from "../../Hooks/useFadeIn";
+import MaskedLines from "../MaskedLines/MaskedLines";
 
 interface ProjectCardProps {
   title: string;
@@ -64,7 +65,15 @@ export default function ProjectCard({ title, images, alt, description, link }: P
         <h3 ref={fadeInRef} className="text-xl font-main font-semibold text-orange-700">
           {title}
         </h3>
-        <p className="mt-2 text-white text-sm">{description}</p>
+        <MaskedLines
+          as="p"
+          scroll
+          scrollStart="top 85%"
+          className="font-secondary text-zinc-400 text-lg w-100 font-secondary"
+        >
+          {description}
+        </MaskedLines>
+        <div ref={fadeInRef}>
         <a
           href={link}
           target="_blank"
@@ -73,6 +82,7 @@ export default function ProjectCard({ title, images, alt, description, link }: P
         >
           View Project →
         </a>
+        </div>
       </div>
     </div>
   );

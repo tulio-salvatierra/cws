@@ -1,5 +1,6 @@
 import { servicesData } from "./servicesCardData";
 import { useFadeIn } from "../../Hooks/useFadeIn";
+import MaskedLines from "../MaskedLines/MaskedLines";
 export default function ServicesCard() {
   const fadeInRef = useFadeIn();
   return (
@@ -10,18 +11,22 @@ export default function ServicesCard() {
           className="grid hover:bg-zinc-800 transition-all duration-200 bg-zinc-100/5 p-2 rounded-md my-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 items-start mx-auto w-full "
         >
           <div className="col-span-1 flex items-start justify-start">
-            <span className="text-orange-500/80 font-bold font-main text-xl">
+            <span ref={fadeInRef} className="text-orange-500/80 font-bold font-main text-xl">
               {`[0${data.id}]`}
             </span>
           </div>
           <div className="sm:col-span-1 lg:col-span-2 flex flex-col justify-start gap-6 h-full">
-            <h2 className="text-orange-500/80 font-main text-2xl sm:text-3xl lg:text-4xl">
+            <h2 ref={fadeInRef} className="text-orange-500/80 font-main text-2xl sm:text-3xl lg:text-4xl">
               {data.title}
             </h2>
-            <p className="text-zinc-400 text-lg w-100 font-secondary">
+            <MaskedLines
+              as="p"
+              scroll
+              scrollStart="top 85%"
+              className="font-secondary text-zinc-400 text-lg w-100 font-secondary"
+            >
               {data.description}
-            </p>
-            
+            </MaskedLines>
           </div>
           <div className="sm:col-span-1 lg:col-span-2 flex items-start justify-center h-full">
             {data.image && (
