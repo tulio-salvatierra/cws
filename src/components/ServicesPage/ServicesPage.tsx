@@ -1,3 +1,5 @@
+import { useFadeIn } from '@/Hooks/useFadeIn';
+import { useScramble } from '@/Hooks/useScramble';
 import React from 'react';
 
 export default function ServicesPage() {
@@ -112,16 +114,19 @@ export default function ServicesPage() {
     }
   ];
 
+  const scrambleRef = useScramble("SERVICES", 0.1);
+  const fadeInRef = useFadeIn();
+
   return (
-    <section className="relative w-full min-h-screen bg-zinc-900/10 py-20 px-4">
+    <section className="relative w-full min-h-screen bg-zinc-900/10 py-20 px-4 mt-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
+          <h1 ref={scrambleRef} className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
             SERVICES
           </h1>
           <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-            Comprehensive digital solutions to help your business thrive in the modern world
+            Solutions to help your business <strong>STAND OUT</strong>
           </p>
         </div>
 
