@@ -1,5 +1,6 @@
 import { useFadeIn } from '@/Hooks/useFadeIn';
 import { useScramble } from '@/Hooks/useScramble';
+import MaskedLines from '../MaskedLines/MaskedLines';
 
 
 export default function ServicesPage() {
@@ -13,14 +14,10 @@ export default function ServicesPage() {
       icon: "/images/Palette.png",
       description: "Custom-built websites from scratch or refreshed to look modern, fast, and conversion-focused",
       details: [
-        "Fully custom website design (no templates)",
-        "Website rebuilds or visual refreshes",
-        "Mobile-first and responsive layouts",
-        "Clear structure and user-friendly navigation",
-        "Custom animations and interactive elements",
-        "SEO-ready page structure and content layout",
-        "Performance optimization and fast load times",
-        "Easy-to-manage CMS or admin setup"
+        "Custom website from scratch or full refresh",
+        "Mobile-first, responsive layout and clean navigation",
+        "Performance + SEO-ready structure (fast load, best practices)",
+        "Optional animations + interactive sections"
       ],
       technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP"],
       pricing: "Starting from $2,500"
@@ -31,14 +28,10 @@ export default function ServicesPage() {
       icon: "/images/video.png",
       description: "Original photo and video content tailored for websites, branding, and local marketing",
       details: [
-        "On-location or studio photo sessions",
-        "Short-form video for websites and social media",
-        "Hero images and background video sections",
-        "Brand-focused visuals (people, space, products)",
-        "Content designed specifically for web layouts",
-        "Professional editing and color grading",
-        "Optimized media for fast website performance",
-        "Assets ready for web, Google Business, and social"
+        "On-location photo/video tailored to your brand",
+        "Short-form clips for website + social",
+        "Professional edit + color grade",
+        "Optimized files for fast web performance"
       ],
       technologies: ["Sony A7 Series", "Final Cut Pro", "Canva", "OBS"],
       pricing: "Starting from $500"
@@ -49,14 +42,10 @@ export default function ServicesPage() {
       icon: "/images/Arrow.png",
       description: "SEO strategies designed to help local customers find your business online",
       details: [
-        "On-page SEO optimization",
-        "Local keyword strategy and targeting",
-        "Google Business Profile setup and optimization",
-        "SEO-friendly site structure and metadata",
-        "Image optimization for search and performance",
-        "Basic analytics and traffic tracking",
-        "Conversion-focused page improvements",
-        "SEO foundation for long-term growth"
+        "On-page SEO (titles, headings, metadata)",
+        "Local SEO targeting for Chicago neighborhoods",
+        "Google Business Profile setup/optimization",
+        "Analytics setup + performance tracking basics"
       ],
       technologies: ["Google Analytics", "Google Search Console", "Google Business Profile"],
       pricing: "Starting from $500"
@@ -67,14 +56,10 @@ export default function ServicesPage() {
       icon: "/images/Puzzle.png",
       description: "Everything you need to launch strong online — website, visuals, and visibility working together",
       details: [
-        "Custom website design or full refresh",
-        "Professional photo and video content",
-        "SEO-ready structure and local optimization",
-        "Google Business Profile setup",
-        "Conversion-focused layout and messaging",
-        "Optimized images and performance tuning",
-        "Launch-ready site with real marketing assets",
-        "Priority delivery and bundled savings"
+        "Custom website + modern refresh",
+        "Pro photo/video content included",
+        "Local SEO + Google Business optimization",
+        "Bundled savings + priority delivery"
       ],
       technologies: ["Next.js", "Tailwind CSS", "GSAP", "Google Analytics"],
       pricing: "Bundle pricing from $3,500"
@@ -100,7 +85,7 @@ export default function ServicesPage() {
             <div ref={fadeInRef2} key={service.id} className="bg-zinc-800/10 grid grid-cols-1 md:grid-cols-2 gap-8 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
               {/* Service Header */}
               <div className="flex-col mb-6">
-                <h2 ref={fadeInRef} className="text-4xl font-main font-bold text-orange-500 text-center mb-2">
+                <h2 ref={fadeInRef} className="text-4xl md:text-7xl font-main font-bold text-orange-500 text-center mb-2">
                   {service.title}
                 </h2>
                 <img ref={fadeInRef} src={service.icon} alt={service.title} className="w-full h-auto mx-auto object-cover mr-4" />
@@ -108,16 +93,32 @@ export default function ServicesPage() {
               </div>
 
               {/* Service Details */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-3">What's Included:</h3>
-                <ul className="space-y-2 text-zinc-300">
+              <div className="mb-6 grid place-items-center">
+                <div>
+                <h3 className="sm:text-6xl text-4xl mx-auto font-bold tracking-relaxed text-white mb-3">What's Included?</h3>
+                <ul className="space-y-2 text-zinc-300 w-full">
                   {service.details.map((detail, index) => (
-                    <li key={index} className="flex items-start">
-                      <span ref={fadeInRef} className="text-orange-500 mr-2 mt-1">•</span>
-                      {detail}
+                    <li key={index} className="flex items-start text-md sm:text-3xl w-full my-4 ">
+                      <MaskedLines
+                        as="span"
+                        scroll
+                        scrollStart="top 85%"
+                        className="text-orange-500"
+                      >
+                        •
+                      </MaskedLines>
+                      <MaskedLines
+                        as="span"
+                        scroll
+                        scrollStart="top 85%"
+                        className="text-zinc-300/80 leading-none tracking-tight"
+                      >
+                        {detail}
+                      </MaskedLines>
                     </li>
                   ))}
-                </ul>
+                  </ul>
+                  </div>
               </div>
 
               {/* Technologies */}
