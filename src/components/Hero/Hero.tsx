@@ -42,6 +42,7 @@ export default function Hero() {
         className="relative hero-bg z-10 w-screen flex-col items-center justify-center text-center bottom-0 sm:mt-[-150px] mt-[-310px] grid grid-cols-1 md:grid-cols-2 gap-1"
       >
         <div className="hero-anim">
+          <h1 className="sr-only">Cicero Web Studio - Modern Web Solutions for Small Businesses</h1>
           <MaskedLines
             as="p"
             once={true}

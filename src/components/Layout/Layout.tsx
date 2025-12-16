@@ -4,11 +4,21 @@ import Header from '../Header/Header';
 import Breadcrumbs from '../Breadcrumbs';
 import { ModalProvider } from '../LeadFormModal/ModalContext';
 import Footer from '../Footer/Footer';
+import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
 
 export default function Layout() {
- 
-
- 
+  // Add Organization schema to all pages
+  useEffect(() => {
+    const orgSchema = generateOrganizationSchema();
+    addJsonLd(orgSchema, 'organization');
+    
+    return () => {
+      const existing = document.querySelector('script[data-jsonld-id="organization"]');
+      if (existing) {
+        existing.remove();
+      }
+    };
+  }, []);
 
   return (
     <ModalProvider>

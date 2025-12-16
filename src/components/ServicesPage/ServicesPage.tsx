@@ -95,10 +95,10 @@ export default function ServicesPage() {
               {/* Service Details */}
               <div className="mb-6 grid place-items-center">
                 <div>
-                <h3 className="sm:text-6xl text-4xl mx-auto font-bold tracking-relaxed text-white mb-3">What's Included?</h3>
+                <h3 className="sm:text-6xl text-4xl mx-auto font-bold tracking-relaxed text-white mb-8">What's Included?</h3>
                 <ul className="space-y-2 text-zinc-300 w-full">
                   {service.details.map((detail, index) => (
-                    <li key={index} className="flex items-start text-md sm:text-3xl w-full my-4 ">
+                    <li key={index} className="flex items-start text-md sm:text-3xl w-full">
                       <MaskedLines
                         as="span"
                         scroll

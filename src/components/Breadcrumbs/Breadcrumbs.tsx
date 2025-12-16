@@ -1,6 +1,8 @@
 import { Link, useLocation, matchPath } from 'react-router-dom';
+import { useEffect } from 'react';
 import { getArticleBySlug } from '../../data/articles';
 import { getLandingPageData } from '../../data/landingPagesData';
+import { generateBreadcrumbSchema, addJsonLd } from '../../lib/seo';
 
 export default function Breadcrumbs() {
   const location = useLocation();
@@ -32,6 +34,26 @@ export default function Breadcrumbs() {
     };
     return { href, label: staticLabels[seg] || seg.replace(/-/g, ' ') };
   });
+
+  // Add breadcrumb structured data
+  useEffect(() => {
+    const breadcrumbItems = [
+      { name: 'Home', url: '/' },
+      ...parts.map(part => ({ name: part.label, url: part.href }))
+    ];
+    
+    if (breadcrumbItems.length > 1) {
+      const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems);
+      addJsonLd(breadcrumbSchema, 'breadcrumbs');
+    }
+
+    return () => {
+      const existing = document.querySelector('script[data-jsonld-id="breadcrumbs"]');
+      if (existing) {
+        existing.remove();
+      }
+    };
+  }, [location.pathname, parts]);
 
   return (
     <nav aria-label="Breadcrumb" className="w-full px-6 py-3 text-sm">
