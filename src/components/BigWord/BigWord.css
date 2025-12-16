@@ -1,0 +1,41 @@
+.bigword-container {
+    height: auto;
+    padding: 0.25em;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    user-select: none;
+    margin-bottom: 8vw;
+    position: relative;
+    font-family: 'Clash', sans-serif;
+    left: 0;
+    right: 0;
+    margin-bottom: 8vw;
+    text-align: center;
+    font-weight: 800; /* font-extrabold */
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+    color: rgba(250, 118, 3); /* text-black/10 */
+    font-size: 22vw;
+  
+    /* Mask gradient (igual que inline styles) */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(250, 112, 0, 0.5),
+      rgba(255, 255, 255, 0.5)
+    );
+    mask-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0. 5));
+  }
+  
+  /* responsive versions */
+  @media (min-width: 768px) {
+    .bigword-container {
+      font-size: 18vw;  
+      color: rgba(250, 118, 3, 0.5); /* text-black/15 */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .bigword-container {
+      font-size: 16vw;
+    }
+  }

@@ -3,20 +3,21 @@ import { useLenis } from "../../Hooks/lenis";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { MENU_ITEM } from "../../Constants/Constants";
+import BigWord from "../BigWord/BigWord";
 
 export default function Footer() {
   const lenisRef = useRef<any>(null);
-  
+
   // Get the Lenis instance
   useLenis();
-  
+
   useEffect(() => {
     // Get the Lenis instance from the window object
     if (typeof window !== 'undefined') {
       lenisRef.current = (window as any).lenis;
     }
   }, []);
-  
+
   const scrollToTop = () => {
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { duration: 2 });
@@ -31,7 +32,7 @@ export default function Footer() {
         {/* Top Section: Navigation and Back to Top */}
         <div className="flex flex-col sm:flex-row justify-between items-center pb-8">
           <nav className="flex space-x-6 text-sm font-medium uppercase tracking-wider mb-4 sm:mb-0">
-          
+
             {MENU_ITEM.map((nav, index) => (
               <Link
                 key={nav.id}
@@ -50,10 +51,9 @@ export default function Footer() {
 
         {/* Middle Section: Large FOCAL text */}
         <div className="grid items-end justify-center sm:justify-start py-4">
-          <h1 className="mx-auto text-[6rem] md:text-[10rem] lg:text-[17rem] xl:text-[20rem] leading-none font-extrabold text-orange-500">
-            CICERO WEB STUDIO
-          </h1>
-       
+          <BigWord text="CICERO WEB STUDIO" className="mx-auto text-[8rem] md:text-[12rem] lg:text-[19rem] xl:text-[22rem] leading-none font-extrabold text-orange-900" />
+
+
         </div>
 
         {/* Bottom Section: Copyright and Design Credits */}
