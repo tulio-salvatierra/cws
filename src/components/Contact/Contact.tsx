@@ -18,6 +18,7 @@ import { useFadeIn } from "../../Hooks/useFadeIn";
 export default function Contact() {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
   const scrambleRef = useScramble("GET IN TOUCH", 0.1);
+  const scrambleRef2 = useScramble("SOCIAL", 0.1);
   const fadeInRef = useFadeIn();
   const imageRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
@@ -66,7 +67,7 @@ export default function Contact() {
         </div>
 
         {/* Main content area with profile and contact info */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 flex-col lg:flex-row items-center lg:items-start gap-12 lg:gap-16">
+        <div className="grid grid-cols-2 sm:grid-cols-2 flex-col lg:flex-row items-center lg:items-start gap-12 lg:gap-16">
           {/* Profile Picture Section */}
           <div className="flex-shrink-0 text-center lg:text-left">
             <div className="relative inline-block">
@@ -75,7 +76,7 @@ export default function Contact() {
                   ref={imageRef}
                   src="/images/tulio.png"
                   alt="Tulio Salvatierra"
-                  className=" object-cover rounded-md"
+                  className=" object-cover w-full h-64 rounded-md"
                 />
               </div>
               
@@ -92,7 +93,7 @@ export default function Contact() {
                 as="p"
                 scroll
                 scrollStart="top 85%"
-                className="font-secondary text-zinc-100 text-lg w-100 font-secondary"
+                className="font-secondary leading-none text-zinc-100 text-lg w-100 font-secondary"
               >
                 I am available for call or emails. Let's talk about your project.
               </MaskedLines>
@@ -104,14 +105,14 @@ export default function Contact() {
             </div>
           </div>
           <div className="flex flex-col gap-4 items-center justify-center">
-            <h3 ref={scrambleRef}  className="text-xl font-main font-bold sm:text-2xl text-left md:text-xl lg:text-2xl xl:text-3xl text-black hover:text-orange-400 transition-colors duration-200 block mb-2">
+            <h3 ref={scrambleRef2}  className="text-xl font-main font-bold sm:text-2xl text-left md:text-xl lg:text-2xl xl:text-3xl text-black hover:text-orange-400 transition-colors duration-200 block mb-2">
               SOCIAL
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-zinc-300">
               <div ref={fadeInRef} className="w-fit">
                 <a
-                  className="text-zinc-100 font-secondary font-semibold"
+                  className="text-zinc-100 leading-none font-secondary font-semibold"
                   href={INSTAGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -174,7 +175,7 @@ export default function Contact() {
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d252.5880090363163!2d-87.7509307390869!3d41.95077474768748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880fcde85586be3d%3A0x88f84b57cb03f35b!2sCicero%20Web%20Studio!5e1!3m2!1sen!2sus!4v1761046047715!5m2!1sen!2sus"
             width="100%"
-            height="auto"
+            height="100%"
             style={{ border: 0 }}
             allowFullScreen={true}
             loading="lazy"
