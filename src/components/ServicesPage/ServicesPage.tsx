@@ -5,127 +5,91 @@ import { useScramble } from '@/Hooks/useScramble';
 export default function ServicesPage() {
   const scrambleRef= useScramble("SERVICES", 0.1);
   const fadeInRef = useFadeIn();
-
+  const fadeInRef2 = useFadeIn();
   const services = [
     {
       id: 1,
-      title: "Web Design & Development",
+      title: "Custom Website Design & Development",
       icon: "/images/Palette.png",
-      description: "Custom websites that combine stunning design with powerful functionality",
+      description: "Custom-built websites from scratch or refreshed to look modern, fast, and conversion-focused",
       details: [
-        "Responsive design for all devices and screen sizes",
-        "Modern UI/UX with intuitive navigation",
+        "Fully custom website design (no templates)",
+        "Website rebuilds or visual refreshes",
+        "Mobile-first and responsive layouts",
+        "Clear structure and user-friendly navigation",
         "Custom animations and interactive elements",
-        "SEO-optimized structure and content",
-        "Fast loading times and performance optimization",
-        "Content Management System (CMS) integration",
-        "E-commerce functionality and payment processing",
-        "Multi-language support and internationalization"
+        "SEO-ready page structure and content layout",
+        "Performance optimization and fast load times",
+        "Easy-to-manage CMS or admin setup"
       ],
-      technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP", "Framer Motion"],
+      technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP"],
       pricing: "Starting from $2,500"
     },
     {
       id: 2,
-      title: "E-commerce Solutions",
-      icon: "/images/Basket.png",
-      description: "Complete online store solutions to grow your business",
+      title: "Custom Photo & Video Content",
+      icon: "/images/video.png",
+      description: "Original photo and video content tailored for websites, branding, and local marketing",
       details: [
-        "Custom e-commerce platform development",
-        "Product catalog and inventory management",
-        "Secure payment gateway integration",
-        "Order processing and fulfillment systems",
-        "Customer account and loyalty programs",
-        "Analytics and reporting dashboards",
-        "Mobile-optimized shopping experience",
-        "Multi-vendor marketplace capabilities"
+        "On-location or studio photo sessions",
+        "Short-form video for websites and social media",
+        "Hero images and background video sections",
+        "Brand-focused visuals (people, space, products)",
+        "Content designed specifically for web layouts",
+        "Professional editing and color grading",
+        "Optimized media for fast website performance",
+        "Assets ready for web, Google Business, and social"
       ],
-      technologies: ["Shopify", "WooCommerce", "Stripe", "PayPal", "Node.js", "MongoDB"],
-      pricing: "Starting from $4,000"
+      technologies: ["Sony A7 Series", "Final Cut Pro", "Canva", "OBS"],
+      pricing: "Starting from $500"
     },
     {
       id: 3,
-      title: "Mobile App Development",
-      icon: "📱",
-      description: "Native and cross-platform mobile applications",
+      title: "SEO & Local Visibility",
+      icon: "/images/Arrow.png",
+      description: "SEO strategies designed to help local customers find your business online",
       details: [
-        "iOS and Android app development",
-        "Cross-platform solutions with React Native",
-        "Progressive Web Apps (PWA)",
-        "Push notifications and real-time updates",
-        "Offline functionality and data synchronization",
-        "App store optimization and deployment",
-        "User authentication and security",
-        "Performance monitoring and analytics"
+        "On-page SEO optimization",
+        "Local keyword strategy and targeting",
+        "Google Business Profile setup and optimization",
+        "SEO-friendly site structure and metadata",
+        "Image optimization for search and performance",
+        "Basic analytics and traffic tracking",
+        "Conversion-focused page improvements",
+        "SEO foundation for long-term growth"
       ],
-      technologies: ["React Native", "Flutter", "Swift", "Kotlin", "Firebase", "AWS"],
-      pricing: "Starting from $8,000"
+      technologies: ["Google Analytics", "Google Search Console", "Google Business Profile"],
+      pricing: "Starting from $500"
     },
     {
       id: 4,
-      title: "Business Automation",
-      icon: "⚙️",
-      description: "Streamline operations with intelligent automation solutions",
+      title: "Website Growth Bundle",
+      icon: "/images/Puzzle.png",
+      description: "Everything you need to launch strong online — website, visuals, and visibility working together",
       details: [
-        "Custom workflow automation systems",
-        "API integration and data synchronization",
-        "Customer relationship management (CRM)",
-        "Inventory and supply chain management",
-        "Automated reporting and analytics",
-        "Email marketing automation",
-        "Lead generation and nurturing systems",
-        "Process optimization and efficiency tools"
+        "Custom website design or full refresh",
+        "Professional photo and video content",
+        "SEO-ready structure and local optimization",
+        "Google Business Profile setup",
+        "Conversion-focused layout and messaging",
+        "Optimized images and performance tuning",
+        "Launch-ready site with real marketing assets",
+        "Priority delivery and bundled savings"
       ],
-      technologies: ["Python", "Node.js", "Zapier", "Airtable", "Salesforce", "HubSpot"],
-      pricing: "Starting from $3,500"
-    },
-    {
-      id: 5,
-      title: "IT Support & Consulting",
-      icon: "🛠️",
-      description: "Expert guidance and ongoing technical support",
-      details: [
-        "Technology strategy and planning",
-        "Infrastructure optimization and migration",
-        "Security audits and implementation",
-        "Performance monitoring and maintenance",
-        "24/7 technical support and troubleshooting",
-        "Staff training and documentation",
-        "Disaster recovery and backup solutions",
-        "Compliance and regulatory guidance"
-      ],
-      technologies: ["AWS", "Azure", "Docker", "Kubernetes", "Linux", "Windows Server"],
-      pricing: "Starting from $150/hour"
-    },
-    {
-      id: 6,
-      title: "Digital Marketing & SEO",
-      icon: "📈",
-      description: "Drive traffic and grow your online presence",
-      details: [
-        "Search Engine Optimization (SEO)",
-        "Pay-per-click (PPC) advertising campaigns",
-        "Social media marketing and management",
-        "Content marketing and strategy",
-        "Email marketing and automation",
-        "Analytics and performance tracking",
-        "Conversion rate optimization",
-        "Brand development and positioning"
-      ],
-      technologies: ["Google Analytics", "Google Ads", "Facebook Ads", "Mailchimp", "SEMrush", "Ahrefs"],
-      pricing: "Starting from $1,500/month"
+      technologies: ["Next.js", "Tailwind CSS", "GSAP", "Google Analytics"],
+      pricing: "Bundle pricing from $3,500"
     }
-  ];
+  ]
 
   return (
     <section className="relative w-full min-h-screen bg-zinc-900/10 py-20 px-4 mt-20">
-      <div className="max-w-7xl mx-auto">
+      <div ref={fadeInRef} className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 ref={scrambleRef} className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
             SERVICES
           </h1>
-          <p ref={fadeInRef} className="text-xl text-zinc-400 max-w-3xl mx-auto">
+          <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
             Solutions to help your business <strong>STAND OUT</strong>
           </p>
         </div>
@@ -133,7 +97,7 @@ export default function ServicesPage() {
         {/* Services Grid */}
         <div className="grid items-center justify-center gap-8 mb-16">
           {services.map((service) => (
-            <div key={service.id} className="bg-zinc-800/10 grid grid-cols-1 md:grid-cols-2 gap-8 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
+            <div ref={fadeInRef2} key={service.id} className="bg-zinc-800/10 grid grid-cols-1 md:grid-cols-2 gap-8 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
               {/* Service Header */}
               <div className="flex-col mb-6">
                 <h2 ref={fadeInRef} className="text-4xl font-main font-bold text-orange-500 text-center mb-2">
