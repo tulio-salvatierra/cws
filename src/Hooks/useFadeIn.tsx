@@ -1,12 +1,12 @@
 import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import React, { useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export function useFadeIn(selector?: string) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
@@ -46,5 +46,5 @@ export function useFadeIn(selector?: string) {
     { scope: containerRef, dependencies: [selector] }
   );
 
-  return containerRef;
+  return containerRef as React.RefObject<any>;
 }

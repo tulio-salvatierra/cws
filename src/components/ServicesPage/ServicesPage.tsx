@@ -1,13 +1,16 @@
 import { useFadeIn } from '@/Hooks/useFadeIn';
 import { useScramble } from '@/Hooks/useScramble';
-import React from 'react';
+
 
 export default function ServicesPage() {
+  const scrambleRef= useScramble("SERVICES", 0.1);
+  const fadeInRef = useFadeIn();
+
   const services = [
     {
       id: 1,
       title: "Web Design & Development",
-      icon: "🎨",
+      icon: "/images/Palette.png",
       description: "Custom websites that combine stunning design with powerful functionality",
       details: [
         "Responsive design for all devices and screen sizes",
@@ -25,7 +28,7 @@ export default function ServicesPage() {
     {
       id: 2,
       title: "E-commerce Solutions",
-      icon: "🛒",
+      icon: "/images/Basket.png",
       description: "Complete online store solutions to grow your business",
       details: [
         "Custom e-commerce platform development",
@@ -114,9 +117,6 @@ export default function ServicesPage() {
     }
   ];
 
-  const scrambleRef = useScramble("SERVICES", 0.1);
-  const fadeInRef = useFadeIn();
-
   return (
     <section className="relative w-full min-h-screen bg-zinc-900/10 py-20 px-4 mt-20">
       <div className="max-w-7xl mx-auto">
@@ -125,29 +125,22 @@ export default function ServicesPage() {
           <h1 ref={scrambleRef} className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
             SERVICES
           </h1>
-          <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+          <p ref={fadeInRef} className="text-xl text-zinc-400 max-w-3xl mx-auto">
             Solutions to help your business <strong>STAND OUT</strong>
           </p>
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <div className="grid items-center justify-center gap-8 mb-16">
           {services.map((service) => (
-            <div key={service.id} className="bg-zinc-800/01 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
+            <div key={service.id} className="bg-zinc-800/10 grid grid-cols-1 md:grid-cols-2 gap-8 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
               {/* Service Header */}
-              <div className="flex items-start mb-6">
-                <span className="text-4xl mr-4">{service.icon}</span>
-                <div>
-                  <h2 className="text-2xl font-main font-bold text-white mb-2">
-                    {service.title}
-                  </h2>
-                  <p className="text-zinc-400 mb-4">
-                    {service.description}
-                  </p>
-                  <div className="text-orange-500 font-semibold">
-                    {service.pricing}
-                  </div>
-                </div>
+              <div className="flex-col mb-6">
+                <h2 ref={fadeInRef} className="text-4xl font-main font-bold text-orange-500 text-center mb-2">
+                  {service.title}
+                </h2>
+                <img ref={fadeInRef} src={service.icon} alt={service.title} className="w-full h-auto mx-auto object-cover mr-4" />
+                
               </div>
 
               {/* Service Details */}
@@ -156,7 +149,7 @@ export default function ServicesPage() {
                 <ul className="space-y-2 text-zinc-300">
                   {service.details.map((detail, index) => (
                     <li key={index} className="flex items-start">
-                      <span className="text-orange-500 mr-2 mt-1">•</span>
+                      <span ref={fadeInRef} className="text-orange-500 mr-2 mt-1">•</span>
                       {detail}
                     </li>
                   ))}
@@ -166,9 +159,9 @@ export default function ServicesPage() {
               {/* Technologies */}
               <div>
                 <h3 className="text-lg font-semibold text-white mb-3">Technologies:</h3>
-                <div className="flex flex-wrap gap-2">
+                <div ref={fadeInRef} className="flex flex-wrap gap-2">
                   {service.technologies.map((tech, index) => (
-                    <span 
+                    <span ref={fadeInRef}
                       key={index}
                       className="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full text-sm border border-orange-500/30"
                     >
