@@ -10,7 +10,7 @@ export default function ServicesPage() {
   const services = [
     {
       id: 1,
-      title: "Custom Website Design & Development",
+      title: "Custom Websitest",
       icon: "/images/Palette.png",
       description: "Custom-built websites from scratch or refreshed to look modern, fast, and conversion-focused",
       details: [
@@ -24,7 +24,7 @@ export default function ServicesPage() {
     },
     {
       id: 2,
-      title: "Custom Photo & Video Content",
+      title: "Photo & Video Content",
       icon: "/images/video.png",
       description: "Original photo and video content tailored for websites, branding, and local marketing",
       details: [
@@ -38,7 +38,7 @@ export default function ServicesPage() {
     },
     {
       id: 3,
-      title: "SEO & Local Visibility",
+      title: "Local SEO & Visibility",
       icon: "/images/Arrow.png",
       description: "SEO strategies designed to help local customers find your business online",
       details: [
