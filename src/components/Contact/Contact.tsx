@@ -8,7 +8,7 @@ import {
   EMAIL,
   PHONE,
 } from "../../Constants/Constants";
-import { MeshGradient } from "@paper-design/shaders-react";
+
 import { useEffect, useState, useRef } from "react";
 import CustomButton from "../CustomButton/CustomButton";
 
@@ -18,8 +18,8 @@ import { useFadeIn } from "../../Hooks/useFadeIn";
 import Infinite3DScroll from "../InfiniteScroll/InfiniteScroll";
 export default function Contact() {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
-  const scrambleRef = useScramble("GET IN TOUCH", 0.1);
-  const scrambleRef2 = useScramble("SOCIAL", 0.1);
+  
+  const scrambleRef2 = useScramble("SOCIAL", 0.15);
   const fadeInRef = useFadeIn();
   const imageRef = useRef<HTMLImageElement>(null);
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function Contact() {
         {/* Header with brand name */}
         <div className="text-center mb-12">
           <h2 
-            ref={scrambleRef}
+            
             className="text-6xl text-left md:text-8xl lg:text-9xl text-orange-500 font-main font-black mb-4"
           >
             GET IN TOUCH

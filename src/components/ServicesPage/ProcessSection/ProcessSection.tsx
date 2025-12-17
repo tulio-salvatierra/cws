@@ -1,0 +1,54 @@
+import { ProcessStep } from '../types';
+
+interface ProcessSectionProps {
+  title?: string;
+  steps?: ProcessStep[];
+}
+
+const defaultSteps: ProcessStep[] = [
+  {
+    number: "1",
+    title: "Discovery",
+    description: "Understanding your needs, goals, and requirements through detailed consultation"
+  },
+  {
+    number: "2",
+    title: "Planning",
+    description: "Creating detailed project plans, timelines, and technical architecture"
+  },
+  {
+    number: "3",
+    title: "Development",
+    description: "Building your solution with regular updates and milestone reviews"
+  },
+  {
+    number: "4",
+    title: "Launch",
+    description: "Deployment, testing, and ongoing support to ensure success"
+  }
+];
+
+export default function ProcessSection({
+  title = "Our Development Process",
+  steps = defaultSteps
+}: ProcessSectionProps) {
+  return (
+    <div className=" rounded-2xl p-8 mb-16 mx-8">
+      <h2 className="text-3xl font-main font-semibold text-orange-500 mb-8 text-center">
+        {title}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+        {steps.map((step) => (
+          <div key={step.number} className="text-left bg-zinc-800/30 rounded-2xl sm:p-8 p-2">
+            <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-center text-2xl font-bold text-white">{step.number}</span>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">{step.title}</h3>
+            <p className="text-zinc-400 text-left">{step.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+

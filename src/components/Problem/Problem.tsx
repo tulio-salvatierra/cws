@@ -19,14 +19,15 @@ export default function Problem() {
   useGSAP(() => {
 
     gsap.from(".video-background", {
-      duration: 3,
-      opacity: 0.15,
+      duration: 10,
+      opacity: 0.1,
+      borderRadius: "600px 600px 600px 600px",
       ease: "power2.out",
       scrollTrigger: {
         trigger: ".video-background-container",
-        start: "top top",
-        end: "top top+=1",
-        scrub: 4
+        start: "top 100%",
+        end: "top 0%",
+        scrub: 4,
       }
     });
   }, []);
@@ -50,7 +51,8 @@ export default function Problem() {
         </MaskedLines>
       </div>
 
-      <div className="flex justify-center items-start h-auto w-full mb-8">
+      <div className="flex justify-center items-start h-auto w-full mb-8 ">
+      
         <div className="grid grid-cols-1 sm:grid-cols-2 sm:[grid-template-rows:1fr] mb-28 gap-28 h-auto w-full">
           <MaskedLines
             as="p"
@@ -95,7 +97,7 @@ export default function Problem() {
           preload="auto"
           disablePictureInPicture
           disableRemotePlayback
-          className="video-background rounded-tl-[300px] rounded-tr-[300px] rounded-br-[300px] rounded-bl-[300px] w-full video-anim h-50 object-cover transition-transform duration-300 group-hover:scale-25"
+          className="video-background rounded-tl-[6px] rounded-tr-[600px] rounded-br-[6px] rounded-bl-[600px] w-full video-anim h-50 object-cover transition-transform duration-300 group-hover:scale-25"
           onEnded={(e) => {
             e.currentTarget.currentTime = 0;
             e.currentTarget.play();

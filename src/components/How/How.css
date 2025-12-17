@@ -1,0 +1,72 @@
+
+.mwg_effect015 {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8vw;
+    width: 100%;
+   
+    box-sizing: border-box;
+}
+.mwg_effect015 .scroll {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+}
+.mwg_effect015 .text {
+    width: 34vw;
+    max-width: 90%;
+    font: 500 normal clamp(12px, 0.9vw, 100px) / normal 'IBM Plex Mono';
+    text-transform: uppercase;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+.mwg_effect015 .container {
+    width: 100%;
+    max-width: 90vw;
+    position: relative;
+    z-index: 1;
+}
+.mwg_effect015 .container p {
+    text-align: center;
+    font: 500 normal 8vw/0.9 'Inter', sans-serif;
+    letter-spacing: -0.05em;
+}
+.mwg_effect015 p span {
+    display: inline-block;
+}
+.mwg_effect015 .word {
+    line-height: 0.8;
+    position: relative;
+    text-transform: uppercase;
+    clip-path: polygon(0 2%, 0 98%, 100% 98%, 100% 2%); /* Depends on the font */
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+.mwg_effect015 .word-hidden {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    transform: translate(0, -100%); /* Translate it -100% of its height on the y-axis */
+}
+.mwg_effect015 .word-visible {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+.mwg_effect015 .media {
+    width: 18vw;
+    max-width: 100%;
+    display: block;
+    border-radius: 0.6em;
+    position: relative;
+    z-index: 1;
+}
