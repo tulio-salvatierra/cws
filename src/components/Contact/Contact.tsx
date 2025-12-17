@@ -15,6 +15,7 @@ import CustomButton from "../CustomButton/CustomButton";
 import { useScramble } from "../../Hooks/useScramble";
 import MaskedLines from "../MaskedLines/MaskedLines";
 import { useFadeIn } from "../../Hooks/useFadeIn";
+import Infinite3DScroll from "../InfiniteScroll/InfiniteScroll";
 export default function Contact() {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
   const scrambleRef = useScramble("GET IN TOUCH", 0.1);
@@ -37,8 +38,10 @@ export default function Contact() {
 
   return (
     <section className="relative mt-10 w-full min-h-screen flex flex-col items-center justify-center p-4 gap-8 overflow-hidden contact-container animate-in fade-in-0 fade-out-0 duration-300 ">
-      {/* MeshGradient Background */}
-   
+      {/* InfiniteScroll Background */}
+      <div className="absolute inset-0 w-full h-full z-0">
+        <Infinite3DScroll />
+      </div>
 
       {/* Main content block */}
       <div className="relative z-10 text-white w-full rounded-2xl p-4 bg-zinc-800/01 backdrop-blur-xs">
