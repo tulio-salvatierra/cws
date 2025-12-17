@@ -1,0 +1,74 @@
+# Cicero Web Studio
+
+> A web design and development studio specializing in custom websites, digital marketing, and local SEO services for small businesses in Chicago, Cicero, and surrounding Chicagoland areas.
+
+Cicero Web Studio provides affordable, high-quality web design and development services with a focus on mobile-first design, performance optimization, and local SEO. We help small businesses establish a strong online presence with custom websites, photo/video content, and digital marketing solutions.
+
+## Core Pages
+
+- [Home](https://cicerowebstudio.xyz/): Main landing page featuring services, portfolio, and company information
+- [About](https://cicerowebstudio.xyz/about): Information about Cicero Web Studio, our mission, and team
+- [Services](https://cicerowebstudio.xyz/services): Detailed service offerings including custom websites, photo/video content, local SEO, and growth bundles
+- [Contact](https://cicerowebstudio.xyz/contact): Contact information, social media links, and location details
+- [Policy](https://cicerowebstudio.xyz/policy): Privacy policy and terms of service
+
+## Blog & Resources
+
+- [Blog Home](https://cicerowebstudio.xyz/blog): Latest articles on web development, SEO, and digital marketing
+- [Future of Web Development: AI-Powered Tools](https://cicerowebstudio.xyz/blog/future-of-web-development-ai-tools): Article about AI in web development
+- [Mobile-First Website Design](https://cicerowebstudio.xyz/blog/mobile-first-website-design-why-it-matters): Why mobile-first design matters for businesses
+- [SEO Strategies That Work](https://cicerowebstudio.xyz/blog/seo-strategies-that-work-2024): Effective SEO strategies for 2024
+- [Scalable E-commerce Solutions](https://cicerowebstudio.xyz/blog/scalable-ecommerce-lessons): Building scalable e-commerce stores
+- [Choosing Web Design Packages](https://cicerowebstudio.xyz/blog/choose-right-web-design-package): Guide to selecting the right web design package
+- [Lead Capture Forms](https://cicerowebstudio.xyz/blog/why-lead-capture-forms-high-performing-website-chicago): Importance of lead capture forms for high-performing websites
+
+## Service Landing Pages
+
+- [Cicero Web Design](https://cicerowebstudio.xyz/cicero-web-design): Affordable web design services for Cicero and Chicago small businesses
+- [Chicago Digital Marketing](https://cicerowebstudio.xyz/chicago-digital-marketing): Digital marketing solutions for Chicago businesses
+- [Oak Park SEO](https://cicerowebstudio.xyz/oak-park-seo): Local SEO services for Oak Park businesses
+- [Elmwood Park Maintenance](https://cicerowebstudio.xyz/elmwood-park-maintenance): Website maintenance services for Elmwood Park
+- [Website Refresh & Redesign](https://cicerowebstudio.xyz/website-refresh-redesign): Website redesign and refresh services
+
+## Site Structure
+
+- **Sitemap**: [https://cicerowebstudio.xyz/sitemap.xml](https://cicerowebstudio.xyz/sitemap.xml)
+- **Robots.txt**: [https://cicerowebstudio.xyz/robots.txt](https://cicerowebstudio.xyz/robots.txt)
+
+## Services Offered
+
+1. **Custom Websites**: Custom-built websites from scratch or refreshed to look modern, fast, and conversion-focused. Technologies: React, Next.js, TypeScript, Tailwind CSS, GSAP. Starting from $2,500.
+
+2. **Photo & Video Content**: Original photo and video content tailored for websites, branding, and local marketing. Technologies: Sony A7 Series, Final Cut Pro, Canva, OBS. Starting from $500.
+
+3. **Local SEO & Visibility**: SEO strategies designed to help local customers find your business online. Technologies: Google Analytics, Google Search Console, Google Business Profile. Starting from $500.
+
+4. **Website Growth Bundle**: Everything you need to launch strong online — website, visuals, and visibility working together. Bundle pricing from $3,500.
+
+## Service Areas
+
+Cicero Web Studio serves businesses in:
+- Cicero, Illinois
+- Chicago, Illinois
+- Garfield Ridge
+- Clearing
+- Oak Park
+- Elmwood Park
+- Portage Park
+- Chicagoland area
+
+## Contact Information
+
+- **Email**: info@cicerowebstudio.xyz
+- **Phone**: +1 (786) 314-6121
+- **Location**: Cicero, Illinois
+
+## Social Media
+
+- Instagram
+- YouTube
+- Facebook
+- Twitter/X
+- Pinterest
+- LinkedIn
+
