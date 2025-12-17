@@ -17,7 +17,7 @@ export default function About() {
 
   return (
     <>
-      <section id="about" className="relative w-full min-h-screen bg-zinc-900/50 py-20 px-4">
+      <section id="about" className="relative w-full min-h-screen bg-zinc-900/50 py-20 px-4 mt-20">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">

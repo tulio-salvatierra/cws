@@ -10,7 +10,7 @@ export default function ServicesPage() {
   const services = [
     {
       id: 1,
-      title: "Custom Websitest",
+      title: "Custom Websites",
       icon: "/images/Palette.png",
       description: "Custom-built websites from scratch or refreshed to look modern, fast, and conversion-focused",
       details: [
