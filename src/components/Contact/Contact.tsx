@@ -38,21 +38,7 @@ export default function Contact() {
   return (
     <section className="relative mt-10 w-full min-h-screen flex flex-col items-center justify-center p-4 gap-8 overflow-hidden contact-container animate-in fade-in-0 fade-out-0 duration-300 ">
       {/* MeshGradient Background */}
-      <div className="absolute inset-0 w-full h-screen z-0">
-        <MeshGradient
-          width={dimensions.width}
-          height={dimensions.height}
-          colors={["#8f9299", "#ff9900", "#000000", "#fa9600"]}
-          distortion={0}
-          swirl={0}
-          grainMixer={1}
-          grainOverlay={1}
-          speed={1.52}
-          scale={1.08}
-          rotation={248}
-          offsetX={-0.1}
-        />
-      </div>
+   
 
       {/* Main content block */}
       <div className="relative z-10 text-white w-full rounded-2xl p-4 bg-zinc-800/01 backdrop-blur-xs">
@@ -105,7 +91,7 @@ export default function Contact() {
             </div>
           </div>
           <div className="flex flex-col gap-4 items-center justify-center">
-            <h3 ref={scrambleRef2}  className="text-xl font-main font-bold sm:text-2xl text-left md:text-xl lg:text-2xl xl:text-3xl text-black hover:text-orange-400 transition-colors duration-200 block mb-2">
+            <h3 ref={scrambleRef2}  className="text-xl font-main font-bold sm:text-2xl text-left md:text-xl lg:text-2xl xl:text-3xl text-orange-500 hover:text-orange-900 transition-colors duration-200 block mb-2">
               SOCIAL
             </h3>
 
