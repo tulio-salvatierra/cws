@@ -43,25 +43,25 @@ export default function Hero() {
       >
         <div className="hero-anim">
           <h1 className="sr-only">Cicero Web Studio - Modern Web Solutions for Small Businesses digital marketing
-search results
-search engines
-seo services
-businesses in cicero il
-business owners
-seo strategy
-web design
-cicero business
-local customers
-online presence
-website design
-cicero illinois
-optimization seo
-designs in cicero il
-online visibility
-friendly websites
-local seo
-enhance user experience
-small businesses</h1>
+            search results
+            search engines
+            seo services
+            businesses in cicero il
+            business owners
+            seo strategy
+            web design
+            cicero business
+            local customers
+            online presence
+            website design
+            cicero illinois
+            optimization seo
+            designs in cicero il
+            online visibility
+            friendly websites
+            local seo
+            enhance user experience
+            small businesses</h1>
           <MaskedLines
             as="p"
             once={true}

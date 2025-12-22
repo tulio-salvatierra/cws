@@ -1,41 +1,86 @@
-.bigword-container {
-    height: auto;
-    padding: 0.25em;
-    background: rgba(0, 0, 0, 0.5);
-    pointer-events: none;
-    user-select: none;
-    margin-bottom: 8vw;
+.mwg_effect044 .root {
+    display: grid;
+    place-items: center;
     position: relative;
-    font-family: 'Clash', sans-serif;
-    left: 0;
-    right: 0;
-    margin-bottom: 8vw;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0;
+}
+.mwg_effect044 .header,
+.mwg_effect044 .footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 25px 0;
+}
+.mwg_effect044 .header p,
+.mwg_effect044 .footer p {
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    font-size: 16px;
+}
+.mwg_effect044 .footer {
+    position: relative;
+    border-top: 1px solid rgb(95, 95, 95);
+    margin: calc(2 * 25px) 0 0;
+}
+.mwg_effect044 .footer p {
+    color: rgb(95, 95, 95)
+}
+.mwg_effect044 .duplicate .footer p {
+    color: var(--white);
+}
+.mwg_effect044 .line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.mwg_effect044 .line p {
+    font: 500 normal 18.5vw / 0.9 'Clash', sans-serif;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    margin-left: auto;
+    margin-right: auto;
     text-align: center;
-    font-weight: 800; /* font-extrabold */
-    line-height: 0.8;
-    letter-spacing: -0.04em;
-    color: rgba(250, 118, 3); /* text-black/10 */
-    font-size: 22vw;
-  
-    /* Mask gradient (igual que inline styles) */
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      rgba(250, 112, 0, 0.5),
-      rgba(255, 255, 255, 0.5)
-    );
-    mask-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0. 5));
-  }
-  
-  /* responsive versions */
-  @media (min-width: 768px) {
-    .bigword-container {
-      font-size: 18vw;  
-      color: rgba(250, 118, 3, 0.5); /* text-black/15 */
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    .bigword-container {
-      font-size: 16vw;
-    }
-  }
+    font-weight: 700;
+}
+.mwg_effect044 .line p:first-child {
+    margin: 0 0 0 -0.07em;
+}
+.mwg_effect044 .photo {
+    width: 11.2vw;
+    height: max-content;
+    aspect-ratio: 1.5;
+    object-fit: cover;
+    transform: translate(0, -5%);
+    border-radius: 0.5vw;
+}
+.mwg_effect044 .icon {
+    width: 7.8vw;
+    height: auto;
+}
+.mwg_effect044 .containers {
+    position: relative;
+    pointer-events: none;
+}
+.mwg_effect044 .container {
+    position: relative;
+    padding: 0 25px;
+    height: 100vh;
+}
+.mwg_effect044 .duplicate {
+    --xpercent: 50%;
+    --ypercent: 50%;
+    mask-image: radial-gradient(circle at var(--xpercent) var(--ypercent), #000 20%, transparent 25%); 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: #e0d9d0;
+}
+.mwg_effect044 .duplicate .header {
+    color: #C9FE6E;
+}
