@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useModal } from '../LeadFormModal/ModalContext';
 import { LandingPageProps } from '../../types/landingPage';
 import CustomButton from '../CustomButton/CustomButton';
@@ -113,7 +114,7 @@ export default function LandingPage({ data }: LandingPageProps) {
               {data.problemStatement.title}
             </h2>
             <p className="text-xl text-zinc-700 max-w-3xl mx-auto leading-relaxed">
-              {data.problemStatement.description}
+              {data.problemStatement.description} Learn more about our <Link to="/services" className="text-orange-500 hover:text-orange-600 underline">SEO services</Link> and how we can help improve your search engine visibility.
             </p>
           </div>
           
@@ -151,6 +152,11 @@ export default function LandingPage({ data }: LandingPageProps) {
                 <p className="text-lg text-zinc-700">{feature}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-8 text-center">
+            <p className="text-zinc-600">
+              Want to learn more about our approach? <Link to="/about" className="text-orange-500 hover:text-orange-600 underline">See how we work</Link> and what makes our digital marketing strategies effective.
+            </p>
           </div>
         </div>
       </section>
@@ -220,12 +226,20 @@ export default function LandingPage({ data }: LandingPageProps) {
           <p className="text-xl text-zinc-700 mb-8 leading-relaxed">
             {data.localHook.description}
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
             {data.localHook.areas.map((area, index) => (
               <span key={index} className="bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium">
                 {area}
               </span>
             ))}
+          </div>
+          <div className="text-center">
+            <p className="text-zinc-600 mb-4">
+              Ready to get started? <Link to="/contact" className="text-orange-500 hover:text-orange-600 underline">Contact us</Link> for a free consultation on your digital marketing needs.
+            </p>
+            <p className="text-zinc-600">
+              Learn more about digital marketing strategies on our <Link to="/blog" className="text-orange-500 hover:text-orange-600 underline">blog</Link>, where we share insights on SEO, PPC, social media marketing, and content marketing.
+            </p>
           </div>
         </div>
       </section>

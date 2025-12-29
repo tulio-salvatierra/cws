@@ -82,28 +82,30 @@ export const landingPagesData: LandingPageData[] = [
   },
   {
     id: 'chicago-digital-marketing',
-    headline: 'Digital Marketing Solutions for Chicago Businesses',
-    subtext: 'Boost your online presence with our proven digital marketing strategies that drive traffic and increase sales.',
+    headline: 'Chicago Digital Marketing Services | Expert Solutions for Local Businesses',
+    subtext: 'Boost your online presence with our proven digital marketing strategies that drive traffic, increase brand awareness, and reach your target audiences.',
     ctaText: 'Start Your Campaign',
     localKeyword: 'Chicago digital marketing',
     serviceType: 'Digital Marketing',
     location: 'Chicago',
     problemStatement: {
       title: 'Struggling to Get Found Online?',
-      description: 'Poor online visibility, low website traffic, and ineffective marketing campaigns are holding your business back.',
+      description: 'Poor online visibility in search engines, low website traffic, and ineffective online marketing campaigns are holding your business back. Your target audiences can\'t find you, and your brand awareness is suffering.',
       painPoints: [
-        'Your business doesn\'t show up in Google searches',
-        'Low website traffic and poor conversion rates',
-        'Wasting money on marketing that doesn\'t work'
+        'Your business doesn\'t show up in Google searches or search engine results pages (SERP)',
+        'Low website traffic and poor conversion rates from potential customers',
+        'Wasting money on marketing that doesn\'t work or reach the right audiences'
       ]
     },
     solution: {
       title: 'Our Digital Marketing Package',
       features: [
-        'Local SEO optimization for Chicago market',
-        'Social media management & content creation',
-        'Google Ads & Facebook advertising campaigns',
-        'Monthly reporting and strategy adjustments'
+        'Search engine optimization (SEO) for improved SERP rankings and search engine visibility',
+        'Pay-per-click (PPC) campaigns including Google Ads for immediate results',
+        'Social media marketing across multiple platforms to build brand awareness',
+        'Content marketing strategy for long-term growth and engagement with target audiences',
+        'Digital marketing channels optimization including affiliate marketing and influencer marketing',
+        'Monthly reporting and strategy adjustments to maximize your digital marketing efforts'
       ],
       startingPrice: 'Starting at $899+'
     },
@@ -137,13 +139,13 @@ export const landingPagesData: LandingPageData[] = [
     },
     localHook: {
       title: 'Proudly Serving Our Local Community',
-      description: 'We help small businesses compete online without breaking the budget.',
+      description: 'We help small businesses compete online without breaking the budget. Our digital marketing campaigns reach potential customers through multiple digital marketing channels, including search engine optimization (SEO), pay-per-click (PPC), social media platforms, and content marketing. Our marketing efforts focus on long-term growth and building brand awareness for Chicago businesses.',
       areas: ['Chicago', 'Cicero', 'Garfield Ridge']
     },
     meta: {
-      title: 'Digital Marketing Services in Chicago | Cicero Web Studio',
-      description: 'Expert digital marketing services for Chicago businesses. SEO, social media, and PPC campaigns that deliver results.',
-      keywords: ['digital marketing', 'Chicago', 'SEO', 'social media', 'PPC', 'online marketing']
+      title: 'Chicago Digital Marketing Services | SEO, PPC & Social Media | Cicero Web Studio',
+      description: 'Expert Chicago digital marketing services including SEO, PPC, social media marketing, and content marketing. Drive traffic, increase brand awareness, and reach your target audiences with proven digital marketing strategies.',
+      keywords: ['digital marketing', 'Chicago', 'SEO', 'social media', 'PPC', 'online marketing', 'search engine optimization', 'digital marketing channels', 'content marketing strategy', 'brand awareness', 'target audiences', 'search engines', 'google ads', 'digital marketing campaign']
     },
     itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/digital-marketing.png',
