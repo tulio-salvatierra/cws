@@ -38,9 +38,9 @@ export default function Projects() {
         </div>
       </div>
 
-      <div className="columns-1 sm:columns-2 lg:columns-4 gap-8 mt-10 mx-auto">
+      <div className="columns-1 sm:columns-2 lg:columns-4 gap-16 mt-10 mx-auto">
         {projects.map((project, index) => (
-          <div key={index} className="mb-6 break-inside-avoid">
+          <div key={index} className="mb-6 h-auto break-inside-avoid">
             <ProjectCard
               title={project.title}
               images={project.image}
