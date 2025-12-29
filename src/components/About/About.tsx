@@ -21,9 +21,9 @@ export default function About() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
+            <h1 className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
               ABOUT
-            </h2>
+            </h1>
             <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
               Crafting digital experiences that blend creativity with cutting-edge technology
             </p>
@@ -69,7 +69,14 @@ export default function About() {
                 <p>
                   My approach combines technical expertise with creative problem-solving. I don't 
                   just build websites—I create digital solutions that help businesses grow, connect 
-                  with their audience, and achieve their goals.
+                  with their audience, and achieve their goals. Whether you need a <a href="/services" className="text-orange-500 hover:text-orange-400 underline">custom website</a>, 
+                  <a href="/services" className="text-orange-500 hover:text-orange-400 underline"> local SEO services</a>, or a complete <a href="/services" className="text-orange-500 hover:text-orange-400 underline">digital marketing solution</a>, 
+                  I'm here to help your business succeed online.
+                </p>
+                <p>
+                  When I'm not coding, you can find me exploring Chicago's vibrant neighborhoods, 
+                  working with local businesses in Cicero, Portage Park, and surrounding areas, 
+                  or sharing insights on our <a href="/blog" className="text-orange-500 hover:text-orange-400 underline">blog</a> about web development, SEO, and digital marketing trends.
                 </p>
               </div>
               
@@ -124,7 +131,7 @@ export default function About() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    SEO-optimized for better search rankings
+                    SEO-optimized for better search rankings — learn more about our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">SEO services</a>
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
@@ -136,9 +143,12 @@ export default function About() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Ongoing support and maintenance
+                    Ongoing support and maintenance — <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to learn more
                   </li>
                 </ul>
+                <p className="text-zinc-400 text-sm mt-4">
+                  Ready to get started? <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">Get in touch</a> or explore our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">service offerings</a>.
+                </p>
               </div>
             </div>
           </div>

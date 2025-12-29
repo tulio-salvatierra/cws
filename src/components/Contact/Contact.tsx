@@ -47,12 +47,12 @@ export default function Contact() {
       <div className="relative z-10 text-white w-full rounded-2xl p-4 bg-zinc-800/01 backdrop-blur-xs">
         {/* Header with brand name */}
         <div className="text-center mb-12">
-          <h2 
+          <h1 
             
             className="text-6xl text-left md:text-8xl lg:text-9xl text-orange-500 font-main font-black mb-4"
           >
             GET IN TOUCH
-          </h2>
+          </h1>
         </div>
 
         {/* Main content area with profile and contact info */}

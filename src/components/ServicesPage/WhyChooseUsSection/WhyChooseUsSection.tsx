@@ -41,6 +41,11 @@ export default function WhyChooseUsSection({
           </div>
         ))}
       </div>
+      <div className="mt-8 text-center">
+        <p className="text-zinc-300 mb-4">
+          Ready to see what we can do for your business? <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">Contact us</a> for a free consultation, or explore our <a href="/about" className="text-orange-500 hover:text-orange-400 underline">about page</a> to learn more about our process and expertise.
+        </p>
+      </div>
     </div>
   );
 }

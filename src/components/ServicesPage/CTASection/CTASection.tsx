@@ -21,7 +21,7 @@ export default function CTASection({
         {title}
       </h2>
       <p className="text-orange-100 mb-6 max-w-2xl mx-auto">
-        {description}
+        {description} Learn more about our <a href="/about" className="text-white underline hover:text-orange-200">team and approach</a>, or check out our <a href="/blog" className="text-white underline hover:text-orange-200">blog</a> for insights on web development and digital marketing.
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <a 
