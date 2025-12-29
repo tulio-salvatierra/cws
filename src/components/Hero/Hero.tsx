@@ -25,31 +25,32 @@ export default function Hero() {
   );
 
   return (
-    <section className="relative w-full h-screen overflow-hidden">
+    <section className="relative mt-[50px] w-full h-screen overflow-hidden">
       {/* Background scene */}
       <UnicornScene
         projectId="HVejgNImevGuTqdsIEo9"
-        width="100%"
-        height="100%"
-        className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+        
+        className="absolute top-0 left-0 w-full h-screen object-cover -z-10"
         lazyLoad
         production={true}
       />
 
+      
+
       {/* Foreground content */}
       <div
         ref={heroRef}
-        className="relative hero-bg z-10 w-screen flex-col items-center justify-center text-center bottom-0 sm:mt-[-150px] mt-[-310px] grid grid-cols-1 md:grid-cols-2 gap-1"
+        className="p-2 relative hero-bg z-10 w-screen flex-col items-center justify-center text-center bottom-0 sm:mt-[-470px] mt-[-500px] sm:p-2 p-1 grid grid-cols-1 md:grid-cols-2 gap-1"
       >
         <div className="hero-anim">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-main font-black text-orange-500 text-left mb-6 leading-tight">
+          <h1 className="text-4xl font-main font-black text-white text-left mb-6 leading-tight">
             Custom Web Design for Chicago Small Businesses
           </h1>
           <MaskedLines
             as="p"
             once={true}
             scrollStart="false"
-            className="p-2 text-zinc-400 text-lg text-left font-light sm:w-1/2 w-full"
+            className="text-zinc-400 text-lg text-left font-normal leading-5 sm:w-2/3 w-full"
           >
             Creative Web, Photo, Video to make incredible experience, your best
             partner in taking your business to the next level. Take the lead,

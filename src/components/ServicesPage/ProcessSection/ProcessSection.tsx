@@ -1,4 +1,5 @@
 import { ProcessStep } from '../types';
+import { useFadeIn } from '../../../Hooks/useFadeIn';
 
 interface ProcessSectionProps {
   title?: string;
@@ -32,14 +33,15 @@ export default function ProcessSection({
   title = "Our Development Process",
   steps = defaultSteps
 }: ProcessSectionProps) {
+  const fadeInRef = useFadeIn();
   return (
     <div className=" rounded-2xl p-8 mb-16 mx-8">
-      <h2 className="text-3xl font-main font-semibold text-orange-500 mb-8 text-center">
+      <h2 ref={fadeInRef} className="text-3xl font-main font-semibold text-orange-500 mb-8 text-center">
         {title}
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      <div ref={fadeInRef} className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {steps.map((step) => (
-          <div key={step.number} className="text-left bg-zinc-800/30 rounded-2xl sm:p-8 p-2">
+          <div key={step.number}  className="text-left bg-zinc-800/30 rounded-2xl sm:p-8 p-2">
             <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-center text-2xl font-bold text-white">{step.number}</span>
             </div>
@@ -48,7 +50,7 @@ export default function ProcessSection({
           </div>
         ))}
       </div>
-      <div className="mt-8 text-center text-zinc-300">
+      <div ref={fadeInRef} className="mt-8 text-center text-zinc-300">
         <p className="mb-4">
           Our process is designed to ensure transparency, quality, and results. We work closely with businesses in Chicago, Cicero, and surrounding areas to deliver solutions that drive growth. 
         </p>
