@@ -5,12 +5,13 @@ export const servicesData: Service[] = [
     id: 1,
     title: "Custom Websites",
     icon: "/images/Palette.png",
-    description: "Custom-built websites from scratch or refreshed to look modern, fast, and conversion-focused",
+    description: "Custom web design and website development services for Chicago and Cicero small businesses. Modern, fast, mobile-first responsive websites optimized for search engines and local SEO.",
     details: [
-      "Custom website from scratch or full refresh",
-      "Mobile-first, responsive layout and clean navigation",
-      "Performance + SEO-ready structure (fast load, best practices)",
-      "Optional animations + interactive sections"
+      "Custom website design and development from scratch or full website refresh",
+      "Mobile-first responsive design and clean navigation for enhanced user experience",
+      "Performance optimization + SEO-ready structure with fast load times and best practices",
+      "Local SEO integration for Cicero and Chicago businesses to improve search results",
+      "Optional animations and interactive sections to engage visitors and boost conversions"
     ],
     technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "GSAP"],
     pricing: "Starting from $2,500"
@@ -19,12 +20,13 @@ export const servicesData: Service[] = [
     id: 2,
     title: "Photo & Video Content",
     icon: "/images/video.png",
-    description: "Original photo and video content tailored for websites, branding, and local marketing",
+    description: "Professional photo and video content creation for websites, branding, and local marketing campaigns. High-quality visual content that enhances your online presence and brand awareness.",
     details: [
-      "On-location photo/video tailored to your brand",
-      "Short-form clips for website + social",
-      "Professional edit + color grade",
-      "Optimized files for fast web performance"
+      "On-location photo and video production tailored to your brand and business",
+      "Short-form video clips optimized for website and social media platforms",
+      "Professional video editing and color grading for polished results",
+      "Optimized image and video files for fast web performance and SEO",
+      "Content creation for local marketing and digital marketing campaigns"
     ],
     technologies: ["Sony A7 Series", "Final Cut Pro", "Canva", "OBS"],
     pricing: "Starting from $500"
@@ -33,12 +35,13 @@ export const servicesData: Service[] = [
     id: 3,
     title: "Local SEO & Visibility",
     icon: "/images/Arrow.png",
-    description: "SEO strategies designed to help local customers find your business online",
+    description: "Local SEO services and search engine optimization strategies designed to help local customers in Cicero, Chicago, and surrounding areas find your business online through search engines.",
     details: [
-      "On-page SEO (titles, headings, metadata)",
-      "Local SEO targeting for Chicago neighborhoods",
-      "Google Business Profile setup/optimization",
-      "Analytics setup + performance tracking basics"
+      "On-page SEO optimization including titles, headings, and metadata for search engines",
+      "Local SEO targeting for Chicago neighborhoods, Cicero, and Chicagoland areas",
+      "Google Business Profile setup and optimization to improve local search visibility",
+      "Search engine results page (SERP) optimization and ranking improvements",
+      "Google Analytics and Search Console setup with performance tracking and reporting"
     ],
     technologies: ["Google Analytics", "Google Search Console", "Google Business Profile"],
     pricing: "Starting from $500"
@@ -47,12 +50,13 @@ export const servicesData: Service[] = [
     id: 4,
     title: "Website Growth Bundle",
     icon: "/images/Puzzle.png",
-    description: "Everything you need to launch strong online — website, visuals, and visibility working together",
+    description: "Complete web design and digital marketing package for small businesses. Custom website, professional visuals, and local SEO services working together to boost your online presence and reach local customers.",
     details: [
-      "Custom website + modern refresh",
-      "Pro photo/video content included",
-      "Local SEO + Google Business optimization",
-      "Bundled savings + priority delivery"
+      "Custom website design and development with modern refresh and responsive layout",
+      "Professional photo and video content creation included for branding",
+      "Local SEO services + Google Business Profile optimization for search visibility",
+      "Search engine optimization (SEO) to improve rankings and online visibility",
+      "Bundled savings with priority delivery and ongoing support for long-term growth"
     ],
     technologies: ["Next.js", "Tailwind CSS", "GSAP", "Google Analytics"],
     pricing: "Bundle pricing from $3,500"
