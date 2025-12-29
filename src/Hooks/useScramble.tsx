@@ -1,11 +1,58 @@
 
 import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
 
 export function useScramble(text: string, duration: number = 1) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Set initial text and preserve width to prevent layout shifts
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    const element = containerRef.current;
+    
+    // Set initial text
+    element.textContent = text;
+    
+    // Store original styles for cleanup
+    const originalWhiteSpace = element.style.whiteSpace;
+    const originalMinWidth = element.style.minWidth;
+    const originalDisplay = element.style.display;
+    
+    // Create a temporary span to measure the exact width of the final text
+    const tempSpan = document.createElement('span');
+    tempSpan.style.position = 'absolute';
+    tempSpan.style.visibility = 'hidden';
+    tempSpan.style.whiteSpace = 'nowrap';
+    tempSpan.style.fontSize = window.getComputedStyle(element).fontSize;
+    tempSpan.style.fontFamily = window.getComputedStyle(element).fontFamily;
+    tempSpan.style.fontWeight = window.getComputedStyle(element).fontWeight;
+    tempSpan.style.letterSpacing = window.getComputedStyle(element).letterSpacing;
+    tempSpan.textContent = text;
+    
+    document.body.appendChild(tempSpan);
+    const measuredWidth = tempSpan.offsetWidth;
+    document.body.removeChild(tempSpan);
+    
+    // Set styles to prevent layout shifts
+    element.style.whiteSpace = 'nowrap';
+    element.style.minWidth = `${measuredWidth}px`;
+    
+    // Only change display if it's not already a block-level element
+    const computedDisplay = window.getComputedStyle(element).display;
+    if (computedDisplay === 'inline') {
+      element.style.display = 'inline-block';
+    }
+    
+    return () => {
+      // Cleanup: restore original styles
+      element.style.whiteSpace = originalWhiteSpace || '';
+      element.style.minWidth = originalMinWidth || '';
+      element.style.display = originalDisplay || '';
+    };
+  }, [text]);
 
   useGSAP(() => {
     if (!containerRef.current) return;
@@ -48,7 +95,10 @@ export function useScramble(text: string, duration: number = 1) {
             if (revealedIndices.has(index)) {
               return targetText[index]; // Show correct character if revealed
             }
-            return chars[Math.floor(Math.random() * chars.length)]; // Random char for unrevealed
+            // Use characters with similar width to prevent layout shifts
+            // Prefer uppercase letters and numbers which are more consistent in width
+            const similarWidthChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return similarWidthChars[Math.floor(Math.random() * similarWidthChars.length)];
           })
           .join("");
 

@@ -51,10 +51,10 @@ export default function ProcessSection({
         ))}
       </div>
       <div ref={fadeInRef} className="mt-8 text-center text-zinc-300">
-        <p className="mb-4">
+        <p className="mb-4 text-left">
           Our process is designed to ensure transparency, quality, and results. We work closely with businesses in Chicago, Cicero, and surrounding areas to deliver solutions that drive growth. 
         </p>
-        <p>
+        <p className="text-left">
           Want to learn more? Check out our <a href="/about" className="text-orange-500 hover:text-orange-400 underline">about page</a> to see our approach, or <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to discuss your project.
         </p>
       </div>
