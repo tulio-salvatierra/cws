@@ -9,17 +9,17 @@ const defaultItems: WhyChooseItem[] = [
   {
     icon: "🚀",
     title: "Fast Delivery",
-    description: "Quick turnaround times without compromising quality or attention to detail"
+    description: "Quick turnaround for mobile-first responsive websites and custom web design projects without compromising quality or performance optimization"
   },
   {
     icon: "💎",
     title: "Premium Quality",
-    description: "High-end solutions built with modern technologies and best practices"
+    description: "High-end custom websites built with React, Next.js, and modern web development technologies following SEO best practices"
   },
   {
-    icon: "🤝",
+    icon: <img src="/images/Lifering.png" alt="Ongoing Support" className="w-10 h-10" />,
     title: "Ongoing Support",
-    description: "Continuous support and maintenance to keep your solution running smoothly"
+    description: "Continuous website maintenance, local SEO updates, and technical support to keep your Chicago small business website running smoothly"
   }
 ];
 
@@ -35,7 +35,13 @@ export default function WhyChooseUsSection({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {items.map((item, index) => (
           <div key={index} className="text-center">
-            <div className="text-4xl mb-4">{item.icon}</div>
+            <div className="flex justify-center items-center mb-4">
+              {typeof item.icon === 'string' ? (
+                <span className="text-4xl">{item.icon}</span>
+              ) : (
+                item.icon
+              )}
+            </div>
             <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
             <p className="text-zinc-400">{item.description}</p>
           </div>
@@ -43,7 +49,7 @@ export default function WhyChooseUsSection({
       </div>
       <div className="mt-8 text-center">
         <p className="text-zinc-300 mb-4">
-          Ready to see what we can do for your business? <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">Contact us</a> for a free consultation, or explore our <a href="/about" className="text-orange-500 hover:text-orange-400 underline">about page</a> to learn more about our process and expertise.
+          Ready to boost your online presence with custom web design and local SEO services? <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">Contact us</a> for a free consultation on affordable website solutions for Chicago, Cicero, and Chicagoland businesses. Explore our <a href="/about" className="text-orange-500 hover:text-orange-400 underline">web development process</a> and see how we help small businesses drive leads and improve search rankings.
         </p>
       </div>
     </div>

@@ -8,20 +8,20 @@ interface CTASectionProps {
 }
 
 export default function CTASection({
-  title = "Ready to Get Started?",
-  description = "Let's discuss your project and create something amazing together. Get in touch for a free consultation and quote.",
-  primaryButtonText = "Start Your Project",
+  title = "Ready to Launch Your Chicago Small Business Website?",
+  description = "Get a free consultation for custom web design, mobile-first responsive websites, and local SEO services for Chicago, Cicero, and Chicagoland businesses. Affordable solutions that drive leads and boost online visibility.",
+  primaryButtonText = "Get Free Quote",
   primaryButtonHref = "mailto:info@cicerowebstudio.xyz",
   secondaryButtonText = "Call Us Now",
   secondaryButtonHref = "tel:+17863146121"
 }: CTASectionProps) {
   return (
-    <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-8 text-center">
-      <h2 className="text-3xl font-main font-bold text-white mb-4">
+    <div className="bg-gradient-to-r from-orange-500/5 to-orange-600/5 rounded-2xl p-8 text-center">
+      <h2 className="text-3xl font-main font-bold text-orange-500 mb-4">
         {title}
       </h2>
       <p className="text-orange-100 mb-6 max-w-2xl mx-auto">
-        {description} Learn more about our <a href="/about" className="text-white underline hover:text-orange-200">team and approach</a>, or check out our <a href="/blog" className="text-white underline hover:text-orange-200">blog</a> for insights on web development and digital marketing.
+        {description} Learn more about our <a href="/about" className="text-white underline hover:text-orange-200">web design process</a> and <a href="/blog" className="text-white underline hover:text-orange-200">SEO strategies</a> for Chicago small businesses.
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <a 

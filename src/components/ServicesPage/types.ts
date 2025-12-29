@@ -14,8 +14,10 @@ export interface ProcessStep {
   description: string;
 }
 
+import { ReactNode } from 'react';
+
 export interface WhyChooseItem {
-  icon: string;
+  icon: string | ReactNode;
   title: string;
   description: string;
 }
