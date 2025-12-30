@@ -6,7 +6,7 @@ import Projects from '../Projects/Projects';
 import Contact from '../Contact';
 import Banner from '../Banner/Banner';
 import How from '../How/How';
-import { generateOrganizationSchema, addJsonLd } from '../lib/seo';
+import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
 
 export default function Home() {
   useEffect(() => {
