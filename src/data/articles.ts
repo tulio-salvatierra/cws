@@ -14,7 +14,7 @@ export type Article = {
 export const articles: Article[] = [
   {
     slug: 'future-of-web-development-ai-tools',
-    title: 'The Future of Web Development: AI-Powered Tools and What They Mean for Your Business',
+    title: 'AI Web Development Tools: The Future of Web Development for Your Business',
     excerpt: 'Discover how artificial intelligence is revolutionizing web development and creating new opportunities for businesses to build better, faster, and more intelligent digital experiences.',
     content: `# The Future of Web Development: AI-Powered Tools and What They Mean for Your Business
 
@@ -89,7 +89,7 @@ Embrace AI in your web development strategy to stay ahead in 2025 and beyond. Fo
   },
   {
     slug: 'mobile-first-website-design-why-it-matters',
-    title: 'Why Your Business Needs a Mobile-First Website Design',
+    title: 'Mobile-First Website Design: Why Your Business Needs It',
     excerpt: "With over 60% of web traffic coming from mobile devices, having a mobile-first approach isn't just recommended—it's essential for business success.",
     content: `# Why Your Business Needs a Mobile-First Website Design in 2025
 
@@ -162,7 +162,7 @@ A mobile-first website is no longer optional; it’s essential for growth in **C
   },
   {
     slug: 'seo-strategies-that-work-2024',
-    title: 'SEO Strategies That Actually Work in 2024',
+    title: 'SEO Strategies for Small Businesses That Actually Work',
     excerpt: "Google's algorithm updates have changed the SEO landscape. Learn the strategies that are driving real results this year.",
     content: `# SEO Strategies That Actually Work in 2025
 
@@ -238,7 +238,7 @@ Effective SEO in 2025 requires a local focus and continuous adaptation. For busi
   },
   {
     slug: 'scalable-ecommerce-lessons',
-    title: 'Building Scalable E-commerce Solutions: Lessons from Successful Online Stores',
+    title: 'Ecommerce Scalability: Building Scalable E-commerce Solutions for Growth',
     excerpt: 'What separates successful e-commerce businesses from the rest? Discover the technical and strategic foundations that drive growth.',
     content: `# Building Scalable E-commerce Solutions in 2025: Lessons from Successful Online Stores
 
@@ -310,7 +310,7 @@ Building a scalable e-commerce store means combining technology with customer-ce
   },
   {
     slug: 'choose-right-web-design-package',
-    title: 'How to Choose the Right Web Design Package for Your Small Business',
+    title: 'Website Redesign Checklist: How to Choose the Right Web Design Package',
     excerpt: 'From basic landing pages to fully custom sites—learn how to pick the package that fits your goals and budget without overpaying.',
     content: `# How to Choose the Right Web Design Package for Your Small Business in 2025
 

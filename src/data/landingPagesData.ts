@@ -3,8 +3,8 @@ import { LandingPageData } from '../types/landingPage';
 export const landingPagesData: LandingPageData[] = [
   {
     id: 'cicero-web-design',
-    headline: 'Affordable Web Design for Cicero & Chicago Small Businesses',
-    subtext: 'Launch a fast, mobile-friendly website that attracts local customers and grows with your business.',
+    headline: 'Cicero Web Design | Affordable Web Design for Small Businesses',
+    subtext: 'Cicero web design services for small businesses. Launch a fast, mobile-friendly website that attracts local customers and grows with your business. Affordable web design Cicero solutions.',
     ctaText: 'Get a Free Quote',
     localKeyword: 'Cicero web design',
     serviceType: 'Web Design',
@@ -62,9 +62,9 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Cicero', 'Garfield Ridge', 'Clearing', 'Chicagoland']
     },
     meta: {
-      title: 'Affordable Web Design in Cicero & Chicago | Cicero Web Studio',
-      description: 'Small‑business web design focused on speed, mobile UX, and local SEO. Serving Cicero, Garfield Ridge, and Chicagoland. Get a free quote today.',
-      keywords: ['web design', 'Cicero web designer', 'Chicago small business websites', 'responsive design', 'local SEO', 'Core Web Vitals', 'affordable websites']
+      title: 'Cicero Web Design | Affordable Web Design Cicero | Cicero Web Studio',
+      description: 'Cicero web design services for small businesses. Affordable web design Cicero with fast, mobile-friendly websites. Cicero small business websites that attract local customers. Get a free quote today.',
+      keywords: ['Cicero web design', 'affordable web design Cicero', 'Cicero small business websites', 'web design', 'Cicero web designer', 'responsive design', 'local SEO']
     },
     itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/cicero-web-design.png',
@@ -82,8 +82,8 @@ export const landingPagesData: LandingPageData[] = [
   },
   {
     id: 'chicago-digital-marketing',
-    headline: 'Chicago Digital Marketing Services | Expert Solutions for Local Businesses',
-    subtext: 'Boost your online presence with our proven digital marketing strategies that drive traffic, increase brand awareness, and reach your target audiences.',
+    headline: 'Digital Marketing Chicago | Expert Digital Marketing Services',
+    subtext: 'Digital marketing Chicago services to boost your online presence. Proven strategies including local SEO services Chicago and Google Business Profile optimization that drive traffic and increase brand awareness.',
     ctaText: 'Start Your Campaign',
     localKeyword: 'Chicago digital marketing',
     serviceType: 'Digital Marketing',
@@ -143,9 +143,9 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Chicago', 'Cicero', 'Garfield Ridge']
     },
     meta: {
-      title: 'Chicago Digital Marketing Services | SEO, PPC & Social Media | Cicero Web Studio',
-      description: 'Expert Chicago digital marketing services including SEO, PPC, social media marketing, and content marketing. Drive traffic, increase brand awareness, and reach your target audiences with proven digital marketing strategies.',
-      keywords: ['digital marketing', 'Chicago', 'SEO', 'social media', 'PPC', 'online marketing', 'search engine optimization', 'digital marketing channels', 'content marketing strategy', 'brand awareness', 'target audiences', 'search engines', 'google ads', 'digital marketing campaign']
+      title: 'Digital Marketing Chicago | Local SEO & PPC Services | Cicero Web Studio',
+      description: 'Digital marketing Chicago services including local SEO services Chicago and Google Business Profile optimization. Expert SEO, PPC, and social media marketing that drives traffic and increases brand awareness.',
+      keywords: ['digital marketing Chicago', 'local SEO services Chicago', 'Google Business Profile optimization', 'digital marketing', 'Chicago', 'SEO', 'PPC', 'social media marketing']
     },
     itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/digital-marketing.png',
@@ -163,8 +163,8 @@ export const landingPagesData: LandingPageData[] = [
   },
   {
     id: 'berwyn-ecommerce',
-    headline: 'E-commerce Websites for Berwyn & Suburban Chicago Businesses',
-    subtext: 'Launch your online store with a professional e-commerce website that converts visitors into customers.',
+    headline: 'Berwyn Ecommerce Website | Professional Online Store Development',
+    subtext: 'Berwyn ecommerce website development services. Launch your online store with professional ecommerce website development that converts visitors into customers.',
     ctaText: 'Launch My Store',
     localKeyword: 'Berwyn e-commerce',
     serviceType: 'E-commerce Development',
@@ -222,9 +222,9 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Berwyn', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'E-commerce Website Development in Berwyn & Chicago | Cicero Web Studio',
-      description: 'Professional e-commerce website development for businesses in Berwyn and Chicago. Online stores that drive sales and grow your business.',
-      keywords: ['e-commerce', 'online store', 'Berwyn', 'Chicago', 'web development', 'online shopping']
+      title: 'Berwyn Ecommerce Website | Ecommerce Website Development | Cicero Web Studio',
+      description: 'Berwyn ecommerce website development services. Professional ecommerce website development for businesses in Berwyn. Online stores that drive sales and grow your business.',
+      keywords: ['Berwyn ecommerce website', 'ecommerce website development', 'e-commerce', 'online store', 'Berwyn', 'web development']
     },
     itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/ecommerce-development.png',
@@ -242,8 +242,8 @@ export const landingPagesData: LandingPageData[] = [
   },
   {
     id: 'oak-park-seo',
-    headline: 'Local SEO Services for Oak Park & Chicago Area Businesses',
-    subtext: 'Dominate local search results and attract more customers in your area with our proven SEO strategies.',
+    headline: 'Oak Park SEO Services | Local SEO for Oak Park Businesses',
+    subtext: 'Oak Park SEO services to dominate local search results. On-page SEO services and local SEO strategies that attract more customers in Oak Park.',
     ctaText: 'Boost My Rankings',
     localKeyword: 'Oak Park SEO',
     serviceType: 'Local SEO',
@@ -260,8 +260,9 @@ export const landingPagesData: LandingPageData[] = [
     solution: {
       title: 'Our Local SEO Package',
       features: [
+        'On-page SEO services including titles, headings, and metadata optimization',
         'Google My Business optimization',
-        'Local keyword research and targeting',
+        'Local keyword research and targeting for Oak Park',
         'Citation building and directory submissions',
         'Monthly ranking reports and adjustments'
       ],
@@ -301,9 +302,9 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Oak Park', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'Local SEO Services in Oak Park & Chicago | Cicero Web Studio',
-      description: 'Expert local SEO services for Oak Park and Chicago businesses. Get found by customers searching in your area.',
-      keywords: ['local SEO', 'Oak Park', 'Chicago', 'search engine optimization', 'local marketing', 'Google rankings']
+      title: 'Oak Park SEO Services | On-Page SEO Services | Cicero Web Studio',
+      description: 'Oak Park SEO services for local businesses. Expert on-page SEO services and local SEO strategies to get found by customers searching in Oak Park.',
+      keywords: ['Oak Park SEO services', 'on-page SEO services', 'local SEO', 'Oak Park', 'search engine optimization', 'Google rankings']
     },
     itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/local-seo.png',
@@ -321,8 +322,8 @@ export const landingPagesData: LandingPageData[] = [
   },
   {
     id: 'elmwood-park-maintenance',
-    headline: 'Website Maintenance & Support for Elmwood Park Businesses',
-    subtext: 'Keep your website running smoothly with our reliable maintenance and support services.',
+    headline: 'Elmwood Park Website Maintenance | Professional Website Support',
+    subtext: 'Elmwood Park website maintenance services to keep your website running smoothly. Professional website maintenance services including security updates, performance optimization, and 24/7 support.',
     ctaText: 'Get Support',
     localKeyword: 'Elmwood Park web maintenance',
     serviceType: 'Website Maintenance',
@@ -380,9 +381,9 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Elmwood Park', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'Website Maintenance Services in Elmwood Park | Cicero Web Studio',
-      description: 'Professional website maintenance and support services for Elmwood Park businesses. Keep your site secure, fast, and up-to-date.',
-      keywords: ['website maintenance', 'Elmwood Park', 'web support', 'website updates', 'security', 'performance']
+      title: 'Elmwood Park Website Maintenance | Website Maintenance Services | Cicero Web Studio',
+      description: 'Elmwood Park website maintenance services for businesses. Professional website maintenance services including security updates, performance optimization, and ongoing support. Keep your site secure, fast, and up-to-date.',
+      keywords: ['Elmwood Park website maintenance', 'website maintenance services', 'website maintenance', 'Elmwood Park', 'web support', 'website updates']
     },
     itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/website-maintenance.png',
@@ -400,8 +401,8 @@ export const landingPagesData: LandingPageData[] = [
   },
   {
     id: 'website-refresh-redesign',
-    headline: 'Give Your Website a Fresh Look That Brings in More Customers',
-    subtext: 'Fast, modern, and optimized for mobile — we redesign your site so it works harder for your business.',
+    headline: 'Website Refresh Services | Professional Website Redesign Chicago',
+    subtext: 'Website refresh services to give your site a fresh look. Professional website redesign Chicago services that are fast, modern, and optimized for mobile.',
     ctaText: 'Request a Redesign Quote',
     localKeyword: 'website redesign',
     serviceType: 'Website Refresh & Redesign',
@@ -459,9 +460,9 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Chicago', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'Website Refresh & Redesign Services in Chicago | Cicero Web Studio',
-      description: 'Modern, mobile-friendly website redesigns for Chicago businesses. Improve performance, SEO, and customer experience.',
-      keywords: ['website redesign', 'Chicago website refresh', 'modern website design', 'mobile-friendly redesign']
+      title: 'Website Refresh Services | Website Redesign Chicago | Cicero Web Studio',
+      description: 'Website refresh services for Chicago businesses. Professional website redesign Chicago services that are modern, mobile-friendly, and improve performance, SEO, and customer experience.',
+      keywords: ['website refresh services', 'website redesign Chicago', 'website redesign', 'Chicago website refresh', 'modern website design']
     },
     itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/website-redesign.png',

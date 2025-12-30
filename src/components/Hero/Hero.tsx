@@ -44,7 +44,7 @@ export default function Hero() {
       >
         <div className="hero-anim">
           <h1 className="text-4xl font-main font-black text-white text-left mb-6 leading-tight">
-            Local SEO Web Design Cicero | Custom Websites for Chicago Small Businesses
+            Custom Web Design in Chicago for Small Businesses
           </h1>
           <MaskedLines
             as="p"
@@ -52,7 +52,7 @@ export default function Hero() {
             scrollStart="false"
             className="text-zinc-400 text-lg text-left font-normal leading-5 sm:w-2/3 w-full"
           >
-            Expert local SEO and web design services for businesses in Cicero, IL. We provide custom website design, search engine optimization (SEO), and digital marketing solutions. Our SEO strategy helps small businesses improve online visibility, reach local customers, and appear in search results. Business owners trust us to enhance their online presence and drive growth through effective website design and local SEO services.
+            Expert custom web design Chicago services for small businesses. Professional web design agency creating modern, conversion-focused websites. Chicago web design studio trusted by local businesses to enhance their online presence and drive growth. Explore our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">professional web design services</a> or learn about <a href="/landing/cicero-web-design" className="text-orange-500 hover:text-orange-400 underline">affordable web design in Cicero</a>.
           </MaskedLines>
         </div>
 

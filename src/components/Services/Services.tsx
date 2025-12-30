@@ -23,7 +23,7 @@ export default function Services() {
           >
             Our mission is to deliver tailored websites and software solutions
             that solve real problems and drive meaningful growth. We offer a
-            wide range of services to help you achieve your goals.
+            wide range of services to help you achieve your goals. From <a href="/landing/cicero-web-design" className="text-orange-500 hover:text-orange-400 underline">Cicero web design</a> to <a href="/landing/chicago-digital-marketing" className="text-orange-500 hover:text-orange-400 underline">Chicago digital marketing</a> and <a href="/landing/oak-park-seo" className="text-orange-500 hover:text-orange-400 underline">Oak Park SEO services</a>, we help small businesses succeed online.
           </MaskedLines>
         </div>
         <ul className="flex flex-col">

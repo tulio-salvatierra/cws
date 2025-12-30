@@ -114,7 +114,7 @@ export default function LandingPage({ data }: LandingPageProps) {
               {data.problemStatement.title}
             </h2>
             <p className="text-xl text-zinc-700 max-w-3xl mx-auto leading-relaxed">
-              {data.problemStatement.description} Learn more about our <Link to="/services" className="text-orange-500 hover:text-orange-600 underline">SEO services</Link> and how we can help improve your search engine visibility.
+              {data.problemStatement.description} Learn more about our <Link to="/services" className="text-orange-500 hover:text-orange-600 underline">web design services</Link> and <Link to="/about" className="text-orange-500 hover:text-orange-600 underline">how we work</Link> to help improve your online presence.
             </p>
           </div>
           
@@ -155,7 +155,7 @@ export default function LandingPage({ data }: LandingPageProps) {
           </div>
           <div className="mt-8 text-center">
             <p className="text-zinc-600">
-              Want to learn more about our approach? <Link to="/about" className="text-orange-500 hover:text-orange-600 underline">See how we work</Link> and what makes our digital marketing strategies effective.
+              Want to learn more about our approach? <Link to="/about" className="text-orange-500 hover:text-orange-600 underline">See how we work</Link> and what makes our strategies effective. Ready to get started? <Link to="/contact" className="text-orange-500 hover:text-orange-600 underline">Contact us</Link> for a free consultation.
             </p>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function LandingPage({ data }: LandingPageProps) {
             {data.localHook.title}
           </h2>
           <p className="text-xl text-zinc-700 mb-8 leading-relaxed">
-            {data.localHook.description}
+            {data.localHook.description} Explore our <Link to="/services" className="text-orange-500 hover:text-orange-600 underline">full range of services</Link> for Chicago businesses.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             {data.localHook.areas.map((area, index) => (

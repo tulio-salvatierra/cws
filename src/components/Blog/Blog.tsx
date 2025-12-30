@@ -12,10 +12,10 @@ export default function Blog() {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
-            BLOG
+            Web Design Insights for Small Businesses
           </h1>
           <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-            Insights, tips, and thoughts on web development, design, and digital business
+            Expert web design insights for small businesses. Latest web design trends 2025, SEO strategies for small businesses, and actionable tips to grow your online presence.
           </p>
         </div>
 

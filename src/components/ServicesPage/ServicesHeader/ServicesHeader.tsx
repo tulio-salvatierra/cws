@@ -6,8 +6,8 @@ interface ServicesHeaderProps {
 }
 
 export default function ServicesHeader({
-  title = "SERVICES",
-  description = "Solutions to help your business STAND OUT"
+  title = "Professional Web Design Services",
+  description = "Professional web design services in Chicago including website redesign, responsive web design, and conversion-focused web design for small businesses."
 }: ServicesHeaderProps) {
   const scrambleRef = useScramble(title, 0.1);
 

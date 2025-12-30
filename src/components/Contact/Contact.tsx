@@ -51,8 +51,11 @@ export default function Contact() {
             
             className="text-6xl text-left md:text-8xl lg:text-9xl text-orange-500 font-main font-black mb-4"
           >
-            GET IN TOUCH
+            Web Design Consultation | Get in Touch
           </h1>
+          <p className="text-xl text-zinc-300 mt-6 max-w-2xl mx-auto">
+            Schedule a free web design consultation with a local web designer Chicago. Let's discuss your project and create something amazing together.
+          </p>
         </div>
 
         {/* Main content area with profile and contact info */}

@@ -22,10 +22,10 @@ export default function About() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
-              ABOUT
+              About Cicero Web Studio | Chicago Web Design Studio
             </h1>
             <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-              Expert web design and local SEO services for Chicago and Cicero small businesses. Crafting custom websites that blend creativity with cutting-edge technology to boost online presence and search engine visibility.
+              Cicero Web Studio is a Chicago web design studio and local digital marketing agency. We craft custom websites that blend creativity with cutting-edge technology to help small businesses succeed online.
             </p>
           </div>
 
