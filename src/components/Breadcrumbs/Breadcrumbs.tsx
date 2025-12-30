@@ -18,10 +18,16 @@ export default function Breadcrumbs() {
       return { href, label: article?.title || blogMatch.params.slug };
     }
 
-    // Dynamic landing page
-    if (idx === 0) {
-      const lp = getLandingPageData(seg);
+    // Dynamic landing page - check for /landing/:id pattern
+    const landingMatch = matchPath({ path: '/landing/:id' }, href);
+    if (landingMatch && landingMatch.params.id) {
+      const lp = getLandingPageData(landingMatch.params.id);
       if (lp) return { href, label: lp.meta.title };
+    }
+    
+    // Handle "landing" segment separately
+    if (seg === 'landing' && idx === 0) {
+      return { href, label: 'Landing Pages' };
     }
 
     // Static labels

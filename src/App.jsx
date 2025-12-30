@@ -87,7 +87,7 @@ function App() {
             <Route path="contact" element={<Contact />} />
             {/* Dynamic landing page routes inside layout so providers apply */}
             <Route 
-              path=":id" 
+              path="landing/:id" 
               element={<LandingPageWrapper />} 
             />
           </Route>
