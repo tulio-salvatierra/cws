@@ -25,7 +25,7 @@ export default function About() {
               ABOUT
             </h1>
             <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-              Crafting digital experiences that blend creativity with cutting-edge technology
+              Expert web design and local SEO services for Chicago and Cicero small businesses. Crafting custom websites that blend creativity with cutting-edge technology to boost online presence and search engine visibility.
             </p>
           </div>
 
@@ -56,27 +56,28 @@ export default function About() {
               </h3>
               <div className="space-y-6 text-zinc-300 leading-relaxed">
                 <p>
-                  Hi, I'm Tulio Salvatierra, a passionate web developer and designer based in Chicago. 
-                  I specialize in creating modern, high-performance websites that not only look stunning 
-                  but also deliver exceptional user experiences.
+                  Hi, I'm Tulio Salvatierra, a passionate web developer and web designer based in Chicago, Illinois. 
+                  I specialize in creating modern, high-performance custom websites and providing local SEO services 
+                  that not only look stunning but also deliver exceptional user experiences and improve search engine rankings.
                 </p>
                 <p>
-                  With over 5 years of experience in the digital space, I've worked with businesses 
-                  of all sizes to bring their visions to life. From small local businesses to 
-                  international brands, I believe every project deserves the same level of attention 
-                  to detail and commitment to excellence.
+                  With over 5 years of experience in web design and search engine optimization, I've worked with small businesses 
+                  in Cicero, Chicago, and surrounding Chicagoland areas to bring their visions to life. From local small businesses 
+                  to established brands, I believe every project deserves the same level of attention to detail and commitment to 
+                  excellence in website design and online visibility.
                 </p>
                 <p>
-                  My approach combines technical expertise with creative problem-solving. I don't 
-                  just build websites—I create digital solutions that help businesses grow, connect 
-                  with their audience, and achieve their goals. Whether you need a <a href="/services" className="text-orange-500 hover:text-orange-400 underline">custom website</a>, 
+                  My approach combines technical expertise in web development with creative problem-solving and local SEO strategies. 
+                  I don't just build websites—I create digital solutions that help businesses grow, connect with local customers, 
+                  and achieve their goals through improved online presence and search engine visibility. Whether you need a <a href="/services" className="text-orange-500 hover:text-orange-400 underline">custom website</a>, 
                   <a href="/services" className="text-orange-500 hover:text-orange-400 underline"> local SEO services</a>, or a complete <a href="/services" className="text-orange-500 hover:text-orange-400 underline">digital marketing solution</a>, 
-                  I'm here to help your business succeed online.
+                  I'm here to help your business succeed online and reach more customers in Chicago and Cicero.
                 </p>
                 <p>
                   When I'm not coding, you can find me exploring Chicago's vibrant neighborhoods, 
-                  working with local businesses in Cicero, Portage Park, and surrounding areas, 
-                  or sharing insights on our <a href="/blog" className="text-orange-500 hover:text-orange-400 underline">blog</a> about web development, SEO, and digital marketing trends.
+                  working with local businesses in Cicero, Portage Park, Garfield Ridge, and surrounding areas, 
+                  or sharing insights on our <a href="/blog" className="text-orange-500 hover:text-orange-400 underline">blog</a> about web development, SEO strategies, local SEO, and digital marketing trends 
+                  for small businesses.
                 </p>
               </div>
               
@@ -127,23 +128,27 @@ export default function About() {
                 <ul className="space-y-3 text-zinc-300">
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Responsive design that works on all devices
+                    Mobile-first responsive web design that works on all devices for enhanced user experience
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    SEO-optimized for better search rankings — learn more about our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">SEO services</a>
+                    Search engine optimization (SEO) and local SEO services for better search rankings and online visibility — learn more about our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">SEO services</a>
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Fast loading times and performance optimization
+                    Fast loading times and performance optimization to improve search engine results and user experience
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Modern animations and interactive elements
+                    Modern website design with animations and interactive elements to engage visitors
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Ongoing support and maintenance — <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to learn more
+                    Ongoing website maintenance and support for Chicago and Cicero businesses — <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to learn more
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-orange-500 mr-3">✓</span>
+                    Custom website development tailored to small business needs with local SEO integration
                   </li>
                 </ul>
                 <p className="text-zinc-400 text-sm mt-4">
