@@ -43,7 +43,7 @@ export default function Hero() {
         className="p-2 relative hero-bg z-10 w-screen flex-col items-center justify-center text-center bottom-0 sm:mt-[-470px] mt-[-500px] sm:p-2 p-1 grid grid-cols-1 md:grid-cols-2 gap-1"
       >
         <div className="hero-anim">
-          <h1 className="text-4xl font-main font-black text-white text-left mb-6 leading-tight">
+          <h1 className="text-4xl font-main font-black text-white text-left mb-6 leading-none text-center sm:text-left">
             Custom Web Design in Chicago for Small Businesses
           </h1>
           <MaskedLines
