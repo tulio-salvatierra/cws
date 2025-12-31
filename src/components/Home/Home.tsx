@@ -7,6 +7,7 @@ import Contact from '../Contact';
 import Banner from '../Banner/Banner';
 import How from '../How/How';
 import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
+import Reviews from '../Reviews/Reviews';
 
 export default function Home() {
   useEffect(() => {
@@ -42,6 +43,9 @@ export default function Home() {
       <div className="h-auto">
         <Projects />
       </div>        
+      <div>
+        <Reviews />
+      </div>
       <div>
         <Contact />
       </div>

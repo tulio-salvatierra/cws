@@ -7,10 +7,10 @@ interface SolutionSectionProps {
 
 export default function SolutionSection({ data }: SolutionSectionProps) {
   return (
-    <section className="py-20 bg-zinc-50">
+    <section className="py-20 ">
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-main font-black text-black mb-6">
+          <h2 className="text-3xl md:text-4xl font-main font-black text-orange-500 mb-6">
             {data.solution.title}
           </h2>
           <div className="text-2xl font-bold text-orange-500 mb-8">
@@ -22,7 +22,7 @@ export default function SolutionSection({ data }: SolutionSectionProps) {
           {data.solution.features.map((feature, index) => (
             <div key={index} className="flex items-start gap-4">
               <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                <span className="text-white text-sm font-bold">✓</span>
+                <span className="text-orange-500 text-sm font-bold">✓</span>
               </div>
               <p className="text-lg text-zinc-700">{feature}</p>
             </div>

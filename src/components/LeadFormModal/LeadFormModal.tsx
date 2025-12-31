@@ -35,20 +35,45 @@ export default function LeadFormModal({ isOpen, onClose, onSubmit }: LeadFormMod
     onClose();
   };
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-      role={isOpen ? 'dialog' : undefined}
-      aria-modal={isOpen || undefined}
+      className="fixed inset-0 z-[100] flex items-center justify-center"
+      role="dialog"
+      aria-modal={true}
       aria-labelledby="lead-form-title"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
     >
       <div 
-        className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`} 
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm z-[101]" 
         onClick={onClose} 
       />
       <div 
         ref={dialogRef}
-        className={`relative z-10 w-full max-w-md mx-4 rounded-2xl bg-zinc-900 border border-zinc-700 p-6 text-white shadow-2xl transform transition-transform duration-300 ease-out ${isOpen ? 'translate-y-0 scale-100' : '-translate-y-2 scale-95'}`}
+        className="relative z-[102] w-full max-w-md mx-4 rounded-2xl bg-zinc-900 border border-zinc-700 p-6 text-white shadow-2xl"
+        style={{ maxHeight: '90vh', overflowY: 'auto' }}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <div>

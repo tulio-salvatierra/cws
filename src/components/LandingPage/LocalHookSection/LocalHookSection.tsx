@@ -7,9 +7,9 @@ interface LocalHookSectionProps {
 
 export default function LocalHookSection({ data }: LocalHookSectionProps) {
   return (
-    <section className="py-20 bg-zinc-50">
+    <section className="py-20 text-black">
       <div className="max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-main font-black text-black mb-6">
+        <h2 className="text-3xl md:text-4xl font-main font-black text-orange-500 mb-6">
           {data.localHook.title}
         </h2>
         <p className="text-xl text-zinc-700 mb-8 leading-relaxed">

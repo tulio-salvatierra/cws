@@ -14,7 +14,7 @@ export default function ServiceCard({ service }: ServiceCardProps) {
     <div ref={fadeInRef2} className="bg-zinc-800/10 grid grid-cols-1 md:grid-cols-2 gap-8 rounded-2xl p-8 hover:bg-zinc-800/70 transition-all duration-300">
       {/* Service Header */}
       <div className="flex-col mb-6">
-        <h2 ref={fadeInRef} className="text-4xl md:text-7xl font-main font-bold text-orange-500 text-center mb-2">
+        <h2 ref={fadeInRef} className="text-4xl md:text-6xl font-main font-bold text-orange-500 text-center mb-2">
           {service.title}
         </h2>
         <img ref={fadeInRef} src={service.icon} alt={service.title} className="w-full h-auto mx-auto object-cover mr-4" />

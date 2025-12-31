@@ -16,7 +16,7 @@ export default function ServicesPage() {
         
         {/* Location Reinforcement */}
         <div className="text-center mb-12">
-          <h2 className="text-2xl font-main font-semibold text-orange-500 mb-4">
+          <h2 className="text-xl font-main font-semibold text-orange-500 mb-4">
             Professional Web Design Services in Chicago
           </h2>
           <p className="text-zinc-300 max-w-3xl mx-auto">

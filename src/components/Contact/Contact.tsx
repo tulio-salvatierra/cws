@@ -49,7 +49,7 @@ export default function Contact() {
         <div className="text-center mb-12">
           <h1 
             
-            className="text-6xl text-left md:text-8xl lg:text-9xl text-orange-500 font-main font-black mb-4"
+            className="text-4xl text-left md:text-6xl lg:text-7xl text-orange-500 font-main font-black mb-4"
           >
             Web Design Consultation | Get in Touch
           </h1>

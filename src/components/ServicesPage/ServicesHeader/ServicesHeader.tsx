@@ -13,7 +13,7 @@ export default function ServicesHeader({
 
   return (
     <div className="text-center mb-16">
-      <h1 ref={scrambleRef} className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
+      <h1 ref={scrambleRef} className="text-4xl md:text-6xl font-main font-black text-orange-500 mb-4">
         {title}
       </h1>
       <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
