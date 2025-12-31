@@ -11,20 +11,32 @@ export default function LandingPageHero({ data, onCTAClick }: LandingPageHeroPro
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Video Background */}
       <video
+        src={heroVideo}
         autoPlay
         muted
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover -z-10"
-      >
-        <source src={heroVideo} type="video/mp4" />
-      </video>
+        preload="auto"
+        disablePictureInPicture
+        disableRemotePlayback
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        onCanPlay={(e) => {
+          e.currentTarget.play().catch(() => {
+            // Silent fallback if autoplay fails
+          });
+        }}
+        onLoadStart={(e) => {
+          e.currentTarget.play().catch(() => {
+            // Fallback if autoplay fails
+          });
+        }}
+      />
       
       {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/60"></div>
+      <div className="absolute inset-0 bg-black/50 z-[1]"></div>
       
       {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      <div className="relative z-[2] max-w-5xl mx-auto px-6 text-center">
         <div className="mb-12">
           {/* Main Headline with clear benefit + local keyword */}
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-main font-black text-orange-500 mb-6 leading-tight">
@@ -59,9 +71,9 @@ export default function LandingPageHero({ data, onCTAClick }: LandingPageHeroPro
       </div>
 
       {/* Decorative elements */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/10 rounded-full blur-xl"></div>
-      <div className="absolute bottom-20 right-10 w-48 h-48 bg-orange-500/5 rounded-full blur-2xl"></div>
-      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-orange-500/5 rounded-full blur-lg"></div>
+      <div className="absolute top-20 left-10 w-32 h-32 bg-orange-500/10 rounded-full blur-xl z-[1]"></div>
+      <div className="absolute bottom-20 right-10 w-48 h-48 bg-orange-500/5 rounded-full blur-2xl z-[1]"></div>
+      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-orange-500/5 rounded-full blur-lg z-[1]"></div>
     </section>
   );
 }
