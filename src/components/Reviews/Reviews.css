@@ -1,6 +1,6 @@
 
 .mwg_effect025 {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,9 +35,58 @@
     justify-content: space-between;
     padding: 25px;
 }
+@media (max-width: 768px) {
+    .mwg_effect025 {
+        padding: 1rem;
+        height: auto;
+        min-height: auto;
+    }
+    .mwg_effect025 .container {
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+    }
+    .mwg_effect025 .card {
+        width: 90vw;
+        max-width: 500px;
+        height: auto;
+        min-height: 400px;
+        aspect-ratio: 0.9;
+        margin: 0 !important;
+    }
+    .mwg_effect025 .card .content {
+        height: 100%;
+        min-height: 400px;
+    }
+    .mwg_effect025 .card .content {
+        padding: 1rem;
+    }
+    .mwg_effect025 .card .content .top {
+        font-size: 1.25rem;
+        line-height: 1.5;
+        font-weight: 500;
+    }
+    .mwg_effect025 .card .content .bottom {
+        font-size: 1rem;
+        line-height: 1.4;
+        font-weight: 500;
+    }
+    .mwg_effect025 .card .content .job {
+        font-size: 0.875rem;
+        line-height: 1.3;
+        font-weight: 500;
+    }
+}
 .mwg_effect025 .card .content .top {
     font: 500 normal 1.9vw / 0.9 'Clash', sans-serif;
     letter-spacing: -0.03em;
+}
+
+@media (max-width: 768px) {
+    .mwg_effect025 .card .content .top {
+        font-size: 1.2rem;
+        line-height: 1.4;
+    }
 }
 .mwg_effect025 .card .content .bottom {
     display: flex;
@@ -47,6 +96,13 @@
     letter-spacing: -0.03em;
     border-top: 1px dashed #000;
     padding: 25px 0 0;
+}
+
+@media (max-width: 768px) {
+    .mwg_effect025 .card .content .bottom {
+        font-size: 1rem;
+        line-height: 1.3;
+    }
 }
 .mwg_effect025 .card .content .bubble {
     width: 3.3vw;
@@ -65,6 +121,12 @@
     font: 500 normal 0.9vw / normal 'Clash', sans-serif;
     text-transform: uppercase;
     color: #000;
+}
+
+@media (max-width: 768px) {
+    .mwg_effect025 .card .content .job {
+        font-size: 0.875rem;
+    }
 }
 .mwg_effect025 .card:nth-child(1) {
     z-index: 3;
