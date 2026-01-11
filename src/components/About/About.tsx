@@ -22,10 +22,13 @@ export default function About() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
-              About Cicero Web Studio | Chicago Web Design Studio
+              About Cicero Web Studio...
             </h1>
-            <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-              Cicero Web Studio is a Chicago web design studio and local digital marketing agency. We craft custom websites that blend creativity with cutting-edge technology to help small businesses succeed online.
+            <h2 className="text-3xl font-main font-bold text-white mb-6"> 
+              Chicago Web Design Studio and Local Digital Marketing Partner
+            </h2>
+            <p className="text-2xl text-zinc-400 max-w-3xl mx-auto">
+              Cicero Web Studio is a Chicago web design studio and local digital marketing partner. We craft custom websites that blend creativity with cutting-edge technology to help small businesses succeed online. I started this studio to serve small businesses in Chicago and surrounding areas who need more leads, more bookings, and a stronger online presence—without the corporate agency price tag.
             </p>
           </div>
 
@@ -56,20 +59,19 @@ export default function About() {
               </h3>
               <div className="space-y-6 text-zinc-300 leading-relaxed">
                 <p>
-                  Hi, I'm Tulio Salvatierra, a passionate web developer and web designer based in Chicago, Illinois. 
-                  I specialize in creating modern, high-performance custom websites and providing local SEO services 
-                  that not only look stunning but also deliver exceptional user experiences and improve search engine rankings.
+                  Hi, I'm Tulio Salvatierra. After years in operations and logistics, I discovered my passion for web design and development. 
+                  I saw how many small businesses in Chicago and Cicero struggled with outdated websites or couldn't afford the big agencies. 
+                  That's when I decided to combine my problem-solving background with my love for creating beautiful, effective websites.
                 </p>
                 <p>
-                  With over 5 years of experience in web design and search engine optimization, I've worked with small businesses 
-                  in Cicero, Chicago, and surrounding Chicagoland areas to bring their visions to life. From local small businesses 
-                  to established brands, I believe every project deserves the same level of attention to detail and commitment to 
-                  excellence in website design and online visibility.
+                  Today, I specialize in creating modern, high-performance custom websites and providing local SEO services for small businesses. 
+                  What drives me is seeing local businesses grow—like the spa that doubled their online bookings after our redesign, or the 
+                  community center that saw a 50% increase in search traffic. These aren't just websites; they're tools that help real 
+                  businesses connect with their communities and thrive.
                 </p>
                 <p>
-                  My approach combines technical expertise in web development with creative problem-solving and local SEO strategies. 
-                  I don't just build websites—I create digital solutions that help businesses grow, connect with local customers, 
-                  and achieve their goals through improved online presence and search engine visibility. Whether you need a <a href="/services" className="text-orange-500 hover:text-orange-400 underline">custom website</a>, 
+                  My approach blends technical expertise with creative problem-solving and local SEO strategies. I work shoulder-to-shoulder 
+                  with business owners who value quality, transparency, and results. Whether you need a <a href="/services" className="text-orange-500 hover:text-orange-400 underline">custom website</a>, 
                   <a href="/services" className="text-orange-500 hover:text-orange-400 underline"> local SEO services</a>, or a complete <a href="/services" className="text-orange-500 hover:text-orange-400 underline">digital marketing solution</a>, 
                   I'm here to help your business succeed online and reach more customers in Chicago and Cicero.
                 </p>
@@ -103,21 +105,25 @@ export default function About() {
               <h3 className="text-3xl font-main font-bold text-white mb-6">
                 Skills & Technologies
               </h3>
-              <div className="space-y-6">
-                {skills.map((skill, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-300 font-medium">{skill.name}</span>
-                      <span className="text-orange-500 text-sm font-medium">{skill.level}%</span>
-                    </div>
-                    <div className="w-full bg-zinc-800 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all duration-1000 ease-out"
-                        style={{ width: `${skill.level}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
+              <p className="text-zinc-300 mb-6 leading-relaxed">
+                I work with a modern tech stack that ensures your website is fast, scalable, and future-proof. React and Next.js power 
+                lightning-fast, SEO-friendly sites that rank well and convert visitors. TypeScript and Tailwind CSS keep code clean and 
+                maintainable, while GSAP brings your brand to life with smooth animations that engage users.
+              </p>
+              <div className="bg-zinc-800/50 rounded-2xl p-6">
+                <h4 className="text-xl font-main font-semibold text-white mb-4">
+                  Core Technologies
+                </h4>
+                <div className="flex flex-wrap gap-3">
+                  {skills.slice(0, 6).map((skill, index) => (
+                    <span key={index} className="bg-orange-500/20 text-orange-400 px-4 py-2 rounded-full text-sm border border-orange-500/30">
+                      {skill.name}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-zinc-400 text-sm mt-4">
+                  Plus: GSAP, Three.js, Figma, Git, and more
+                </p>
               </div>
 
               {/* Additional Info */}
@@ -128,31 +134,32 @@ export default function About() {
                 <ul className="space-y-3 text-zinc-300">
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Mobile-first responsive web design that works on all devices for enhanced user experience
+                    Mobile-first responsive design = better user experience and higher SEO rankings
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Search engine optimization (SEO) and local SEO services for better search rankings and online visibility — learn more about our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">SEO services</a>
+                    Fast loading sites = better search rankings and lower bounce rates — learn more about our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">SEO services</a>
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Fast loading times and performance optimization to improve search engine results and user experience
+                    Local SEO optimization = more foot traffic, phone calls, and online enquiries from your neighborhood
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Modern website design with animations and interactive elements to engage visitors
+                    Modern design with animations = engaged visitors who stay longer and convert more
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Ongoing website maintenance and support for Chicago and Cicero businesses — <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to learn more
+                    Ongoing support = peace of mind for busy business owners — <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to learn more
                   </li>
                   <li className="flex items-center">
                     <span className="text-orange-500 mr-3">✓</span>
-                    Custom website development tailored to small business needs with local SEO integration
+                    Custom development = a website that truly reflects your brand and grows with your business
                   </li>
                 </ul>
-                <p className="text-zinc-400 text-sm mt-4">
-                  Ready to get started? <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">Get in touch</a> or explore our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">service offerings</a>.
+                <p className="text-zinc-400 text-sm mt-6">
+                  Let's talk about your goals and how a strategic website can help you reach them. Book a free 30-minute session with me, Tulio. 
+                  <a href="/contact" className="text-orange-500 hover:text-orange-400 underline ml-1">Get in touch</a> or explore our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">service offerings</a>.
                 </p>
               </div>
             </div>
