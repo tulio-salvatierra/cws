@@ -12,23 +12,23 @@ import IT from '/images/Lifering.png';
 export const servicesData = [
     {
       id: 1,
-      title: "Custom Websites That Stand Out",
+      title: "Custom Websites That Convert",
       description:
-        "Modern, fast, and crafted for small-business growth.",
+        "Modern, fast designs built to grow your business. We create websites that reflect your brand, rank on Google and turn visitors into customers.",
         image:Web
     },
     {
       id: 2,
-      title: "Local SEO & Visibility Boosting",
+      title: "Local SEO & Visibility",
       description:
-        "Streamline Get found in Chicago — Maps, Search, and everywhere that matters.",
+        "Search‑engine optimization and content strategies to boost your presence in Chicago and Cicero. We help the right people find you.",
         image:Business
     },
     {
       id: 3,
-      title: "Ongoing Support & Digital Enhancements",
+      title: "Maintenance & Ongoing Support",
       description:
-        "Real partnership, updates, content, and strategy whenever you need it.",
+        "Keep your site secure and up to date. We provide continued improvements and consulting so your investment keeps delivering results.",
         image:IT
     },
   ];

@@ -44,7 +44,7 @@ export default function Hero() {
       >
         <div className="hero-anim">
           <h1 className="text-4xl font-main font-black text-white text-left mb-6 leading-none text-center sm:text-left">
-            Custom Web Design in Chicago for Small Businesses
+            Your Business Deserves a Website That Sells
           </h1>
           <MaskedLines
             as="p"
@@ -52,13 +52,13 @@ export default function Hero() {
             scrollStart="false"
             className="text-zinc-400 text-lg text-left font-normal leading-5 sm:w-2/3 w-full"
           >
-            Expert custom web design Chicago services for small businesses. Professional web design agency creating modern, conversion-focused websites. Chicago web design studio trusted by local businesses to enhance their online presence and drive growth. Explore our <a href="/services" className="text-orange-500 hover:text-orange-400 underline">professional web design services</a> or learn about <a href="/landing/cicero-web-design" className="text-orange-500 hover:text-orange-400 underline">affordable web design in Cicero</a>.
+            We design custom websites in Chicago for small businesses seeking more bookings, more calls and more trust online. Cicero Web Studio blends creativity and strategy to drive your growth.
           </MaskedLines>
         </div>
 
         <div className="hero-anim flex flex-col md:flex-row gap-4 md:justify-end md:items-end p-2">
-          <CustomButton href="#" label="WORKS" />
-          <CustomButton href={CALENDLY_URL} label="BOOK MY CONSULTATION" />
+          <CustomButton href="#projects" label="Explore Our Work" />
+          <CustomButton href="#contact" label="Book a Free Consultation" />
         </div>
       </div>
     </section>

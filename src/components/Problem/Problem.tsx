@@ -69,10 +69,7 @@ export default function Problem() {
             <div ref={fadeInRef} className="flex flex-col text-start w-full text-white paragraph">
               <h2 ref={scrambleRef} className="font-secondary text-orange-400 text-2xl sm:text-4xl text-start paragraph tracking-10">What makes us different?</h2>
               <p className="font-secondary text-zinc-400 text-lg text-start paragraph tracking-10">
-                <strong className="text-orange-900">Partnership approach:</strong> <br /> Your wins are our wins.
-                Problem-solving mindset with a can-do attitude. Elegant design
-                meets relentless execution. We go the extra mile, every single
-                time.
+                At Cicero Web Studio, your success is our success. We're a local studio that pairs Tulio's years of operations and logistics experience with his passion for web design and development. We work shoulder‑to‑shoulder with you to create elegant, effective solutions—always with a can‑do attitude and the dedication to go the extra mile.
               </p>
             </div>
 

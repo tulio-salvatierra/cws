@@ -37,7 +37,7 @@ export default function Contact() {
   }, []);
 
   return (
-    <section className="relative mt-10 w-full min-h-screen flex flex-col items-center justify-center p-4 gap-8 overflow-hidden contact-container animate-in fade-in-0 fade-out-0 duration-300 ">
+    <section id="contact" className="relative mt-10 w-full min-h-screen flex flex-col items-center justify-center p-4 gap-8 overflow-hidden contact-container animate-in fade-in-0 fade-out-0 duration-300 ">
       {/* InfiniteScroll Background */}
       <div className="absolute inset-0 w-full h-full z-0">
         <Infinite3DScroll />
@@ -51,10 +51,10 @@ export default function Contact() {
             
             className="text-4xl text-left md:text-6xl lg:text-7xl text-orange-500 font-main font-black mb-4"
           >
-            Web Design Consultation | Get in Touch
+            Ready to Grow? Let's Talk
           </h1>
           <p className="text-xl text-zinc-300 mt-6 max-w-2xl mx-auto">
-            Schedule a free web design consultation with a local web designer Chicago. Let's discuss your project and create something amazing together.
+            Schedule a free consultation to discuss your goals and discover how a strategic website can boost your business. As a local Chicago studio, we understand our community's needs and love helping neighbors like you.
           </p>
         </div>
 
@@ -91,8 +91,8 @@ export default function Contact() {
               </MaskedLines>
               
               <div ref={fadeInRef} className="flex sm:flex-row flex-col gap-4 items-center justify-start mt-4">
-                <CustomButton label="Email Us" href={`mailto:${EMAIL}`} />
-                <CustomButton label="Call Us" href={`tel:+1${PHONE}`} />
+                <CustomButton label="Send Us a Message" href={`mailto:${EMAIL}`} />
+                <CustomButton label="Call Us Now" href={`tel:+1${PHONE}`} />
               </div>
             </div>
           </div>

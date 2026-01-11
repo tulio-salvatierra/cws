@@ -10,27 +10,27 @@ const defaultSteps: ProcessStep[] = [
   {
     number: "1",
     title: "Discovery",
-    description: "Understanding your needs, goals, and requirements through detailed consultation"
+    description: "We learn about your goals, audience and challenges."
   },
   {
     number: "2",
     title: "Planning",
-    description: "Creating detailed project plans, timelines, and technical architecture"
+    description: "We define strategy, design, features and timelines."
   },
   {
     number: "3",
     title: "Development",
-    description: "Building your solution with regular updates and milestone reviews"
+    description: "We build your solution with frequent updates and joint reviews."
   },
   {
     number: "4",
-    title: "Launch",
-    description: "Deployment, testing, and ongoing support to ensure success"
+    title: "Launch & Beyond",
+    description: "We deploy, test and provide ongoing support."
   }
 ];
 
 export default function ProcessSection({
-  title = "Our Development Process",
+  title = "How We Work Together",
   steps = defaultSteps
 }: ProcessSectionProps) {
   const fadeInRef = useFadeIn();
@@ -52,7 +52,7 @@ export default function ProcessSection({
       </div>
       <div ref={fadeInRef} className="mt-8 text-center text-zinc-300">
         <p className="mb-4 text-left">
-          Our process is designed to ensure transparency, quality, and results. We work closely with businesses in Chicago, Cicero, and surrounding areas to deliver solutions that drive growth. 
+          Our process ensures transparency, quality and results. Each stage is designed so you know what's happening and why.
         </p>
         <p className="text-left">
           Want to learn more? Check out our <a href="/about" className="text-orange-500 hover:text-orange-400 underline">about page</a> to see our approach, or <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to discuss your project.
