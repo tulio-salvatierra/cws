@@ -18,7 +18,6 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Header() {
   const { openLeadForm } = useModal();
   const [showMenu, setShowMenu] = useState(false);
-  const [isFloating, setIsFloating] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const toggleMenu = () => setShowMenu(!showMenu);
@@ -28,12 +27,8 @@ export default function Header() {
 
   return (
     <div 
- 
-      className={`bg-zinc-800/90 backdrop-blur-md flex p-3 w-full content-center fixed top-0 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 ${
-        isFloating 
-          ? 'bg-zinc-800/90 backdrop-blur-md border-b border-zinc-400/20 shadow-lg' 
-          : 'bg-transparent'
-      }`}
+      ref={headerRef}
+      className="bg-zinc-800/90 backdrop-blur-md flex p-3 w-full content-center fixed top-0 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
     >
       <div className="flex w-full p-6 justify-between items-center">
         {/* Desktop Header */}

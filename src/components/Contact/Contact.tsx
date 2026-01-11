@@ -92,7 +92,7 @@ export default function Contact() {
               
               <div ref={fadeInRef} className="flex sm:flex-row flex-col gap-4 items-center justify-start mt-4">
                 <CustomButton label="Send Us a Message" href={`mailto:${EMAIL}`} />
-                <CustomButton label="Call Us Now" href={`tel:+1${PHONE}`} />
+                <CustomButton label="Call Us Now" href={`tel:+1${PHONE}`} secondary={true} />
               </div>
             </div>
           </div>
