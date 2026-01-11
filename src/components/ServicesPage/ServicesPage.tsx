@@ -31,6 +31,27 @@ export default function ServicesPage() {
           ))}
         </div>
 
+        {/* Social Proof Section */}
+        <div className="bg-zinc-800/30 rounded-2xl p-8 mb-16 text-center">
+          <h2 className="text-3xl font-main font-bold text-orange-500 mb-6">
+            Real Results for Chicago Businesses
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="bg-zinc-900/50 rounded-xl p-6">
+              <p className="text-4xl font-bold text-orange-500 mb-2">40%</p>
+              <p className="text-zinc-300">
+                Increase in bookings for a local spa after our website redesign—achieved in just three months.
+              </p>
+            </div>
+            <div className="bg-zinc-900/50 rounded-xl p-6">
+              <p className="text-4xl font-bold text-orange-500 mb-2">2.5x</p>
+              <p className="text-zinc-300">
+                More phone calls and online enquiries for a Cicero restaurant after implementing our local SEO strategy.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <ProcessSection />
 
         <WhyChooseUsSection />

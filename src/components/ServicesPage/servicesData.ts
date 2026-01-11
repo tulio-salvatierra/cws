@@ -5,7 +5,7 @@ export const servicesData: Service[] = [
     id: 1,
     title: "Custom Websites",
     icon: "/images/Palette.png",
-    description: "Custom web design and website development services for Chicago and Cicero small businesses. Modern, fast, mobile-first responsive websites optimized for search engines and local SEO.",
+    description: "We build fast, SEO‑ready sites that reflect your brand and turn visitors into customers. Mobile‑first design ensures your clients can book appointments or make purchases from any device.",
     details: [
       "Custom website design and development from scratch or full website refresh",
       "Mobile-first responsive design and clean navigation for enhanced user experience",
@@ -20,7 +20,7 @@ export const servicesData: Service[] = [
     id: 2,
     title: "Photo & Video Content",
     icon: "/images/video.png",
-    description: "Professional photo and video content creation for websites, branding, and local marketing campaigns. High-quality visual content that enhances your online presence and brand awareness.",
+    description: "High‑impact photos and videos tailored to your brand that boost engagement on your website and social media, helping you attract and retain more clients.",
     details: [
       "On-location photo and video production tailored to your brand and business",
       "Short-form video clips optimized for website and social media platforms",
@@ -35,7 +35,7 @@ export const servicesData: Service[] = [
     id: 3,
     title: "Local SEO & Visibility",
     icon: "/images/Arrow.png",
-    description: "Local SEO services and search engine optimization strategies designed to help local customers in Cicero, Chicago, and surrounding areas find your business online through search engines.",
+    description: "We help Chicago and Cicero businesses rise to the top of local search results—driving foot traffic, phone calls and online enquiries.",
     details: [
       "On-page SEO optimization including titles, headings, and metadata for search engines",
       "Local SEO targeting for Chicago neighborhoods, Cicero, and Chicagoland areas",
@@ -50,7 +50,7 @@ export const servicesData: Service[] = [
     id: 4,
     title: "Website Growth Bundle",
     icon: "/images/Puzzle.png",
-    description: "Complete web design and digital marketing package for small businesses. Custom website, professional visuals, and local SEO services working together to boost your online presence and reach local customers.",
+    description: "Everything you need to grow online in one package: custom website, professional visuals, and local SEO services working together to boost your online presence and reach local customers.",
     details: [
       "Custom website design and development with modern refresh and responsive layout",
       "Professional photo and video content creation included for branding",

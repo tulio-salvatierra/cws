@@ -55,7 +55,7 @@ export default function ProcessSection({
           Our process ensures transparency, quality and results. Each stage is designed so you know what's happening and why.
         </p>
         <p className="text-left">
-          Want to learn more? Check out our <a href="/about" className="text-orange-500 hover:text-orange-400 underline">about page</a> to see our approach, or <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">contact us</a> to discuss your project.
+          <a href="/about" className="text-orange-500 hover:text-orange-400 underline font-semibold">Learn more about our complete process →</a>
         </p>
       </div>
     </div>

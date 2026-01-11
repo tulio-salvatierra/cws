@@ -9,7 +9,7 @@ interface CTASectionProps {
 
 export default function CTASection({
   title = "Ready to Launch Your Chicago Small Business Website?",
-  description = "Get a free consultation for custom web design, mobile-first responsive websites, and local SEO services for Chicago, Cicero, and Chicagoland businesses. Affordable solutions that drive leads and boost online visibility.",
+  description = "Schedule a free 30-minute strategy session to discuss your goals and discover how a strategic website can boost your business. No obligation—just honest advice tailored to your needs.",
   primaryButtonText = "Get Free Quote",
   primaryButtonHref = "mailto:info@cicerowebstudio.xyz",
   secondaryButtonText = "Call Us Now",
