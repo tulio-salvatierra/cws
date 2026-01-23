@@ -78,37 +78,37 @@
 
   <!-- Dynamic landing pages -->
   <url>
-    <loc>https://cicerowebstudio.xyz/cicero-web-design</loc>
+    <loc>https://cicerowebstudio.xyz/landing/cicero-web-design</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/chicago-digital-marketing</loc>
+    <loc>https://cicerowebstudio.xyz/landing/chicago-digital-marketing</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/berwyn-ecommerce</loc>
+    <loc>https://cicerowebstudio.xyz/landing/berwyn-ecommerce</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/oak-park-seo</loc>
+    <loc>https://cicerowebstudio.xyz/landing/oak-park-seo</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/elmwood-park-maintenance</loc>
+    <loc>https://cicerowebstudio.xyz/landing/elmwood-park-maintenance</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/website-refresh-redesign</loc>
+    <loc>https://cicerowebstudio.xyz/landing/website-refresh-redesign</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

@@ -19,11 +19,9 @@ export default function Services() {
             as="p"
             scroll
             scrollStart="top 85%"
-            className="font-secondary text-zinc-400 text-lg sm:text-md text-start w--50 sm:w-3/4"
+            className="font-secondary text-zinc-300 text-lg md:text-xl sm:text-md text-start w--50 sm:w-3/4 leading-relaxed"
           >
-            Our mission is to deliver tailored websites and software solutions
-            that solve real problems and drive meaningful growth. We offer a
-            wide range of services to help you achieve your goals. From <a href="/landing/cicero-web-design" className="text-orange-500 hover:text-orange-400 underline">Cicero web design</a> to <a href="/landing/chicago-digital-marketing" className="text-orange-500 hover:text-orange-400 underline">Chicago digital marketing</a> and <a href="/landing/oak-park-seo" className="text-orange-500 hover:text-orange-400 underline">Oak Park SEO services</a>, we help small businesses succeed online.
+            We build Chicago websites that actually bring in customers. No fluff, just results: more bookings, calls, and sales. From <a href="/landing/cicero-web-design" className="text-orange-500 hover:text-orange-400 underline">Cicero web design</a> to <a href="/landing/chicago-digital-marketing" className="text-orange-500 hover:text-orange-400 underline">Chicago digital marketing</a> and <a href="/landing/oak-park-seo" className="text-orange-500 hover:text-orange-400 underline">Oak Park SEO services</a>, we help small businesses in Humboldt Park, Portage Park & greater Chicago succeed online.
           </MaskedLines>
         </div>
         <ul className="flex flex-col">

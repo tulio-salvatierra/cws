@@ -43,22 +43,22 @@ export default function Hero() {
         className="p-2 relative hero-bg z-10 w-screen flex-col items-center justify-center text-center bottom-0 sm:mt-[-470px] mt-[-500px] sm:p-2 p-1 grid grid-cols-1 md:grid-cols-2 gap-1"
       >
         <div className="hero-anim">
-          <h1 className="text-4xl font-main font-black text-white text-left mb-6 leading-none text-center sm:text-left">
-            Your Business Deserves a Website That Sells
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-main font-black text-white text-left mb-6 leading-tight text-center sm:text-left">
+            Chicago Websites That Actually Bring in Customers
           </h1>
           <MaskedLines
             as="p"
             once={true}
             scrollStart="false"
-            className="text-zinc-400 text-lg text-left font-normal leading-5 sm:w-2/3 w-full"
+            className="text-zinc-300 text-xl md:text-2xl text-left font-normal leading-relaxed sm:w-4/5 w-full mb-8"
           >
-            We design custom websites in Chicago for small businesses seeking more bookings, more calls and more trust online. Cicero Web Studio blends creativity and strategy to drive your growth.
+            I'm Tulio — ex-logistics pro turned web dev — building modern, fast sites for small businesses in Humboldt Park, Portage Park & greater Chicago. No fluff, just results: more bookings, calls, and sales.
           </MaskedLines>
         </div>
 
-        <div className="hero-anim flex flex-col md:flex-row gap-4 md:justify-end md:items-end p-2">
-          <CustomButton href="#projects" label="Explore Our Work" />
-          <CustomButton href="#contact" label="Book a Free Consultation" />
+        <div className="hero-anim flex flex-col md:flex-row gap-4 md:justify-start md:items-start p-2">
+          <CustomButton href={CALENDLY_URL} label="Book Free 15-Min Site Audit →" newTab={true} />
+          <CustomButton href="#projects" label="See Recent Work ↓" secondary={true} />
         </div>
       </div>
     </section>

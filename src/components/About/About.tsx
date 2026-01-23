@@ -27,8 +27,8 @@ export default function About() {
             <h2 className="text-3xl font-main font-bold text-white mb-6"> 
               Chicago Web Design Studio and Local Digital Marketing Partner
             </h2>
-            <p className="text-2xl text-zinc-400 max-w-3xl mx-auto">
-              Cicero Web Studio is a Chicago web design studio and local digital marketing partner. We craft custom websites that blend creativity with cutting-edge technology to help small businesses succeed online. I started this studio to serve small businesses in Chicago and surrounding areas who need more leads, more bookings, and a stronger online presence—without the corporate agency price tag.
+            <p className="text-xl md:text-2xl text-zinc-300 max-w-3xl mx-auto leading-relaxed">
+              I'm Tulio — ex-logistics pro turned web dev, building modern websites for small businesses in Humboldt Park, Portage Park & greater Chicago. Cicero Web Studio crafts custom websites that blend creativity with cutting-edge technology to help small businesses succeed online. I started this studio to serve small businesses in Chicago and surrounding areas who need more leads, more bookings, and a stronger online presence—without the corporate agency price tag. No fluff, just results: more bookings, calls, and sales.
             </p>
           </div>
 

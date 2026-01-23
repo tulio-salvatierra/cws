@@ -7,13 +7,15 @@ interface CTASectionProps {
   secondaryButtonHref?: string;
 }
 
+import { CALENDLY_URL } from '../../../Constants/Constants';
+
 export default function CTASection({
   title = "Ready to Launch Your Chicago Small Business Website?",
-  description = "Schedule a free 30-minute strategy session to discuss your goals and discover how a strategic website can boost your business. No obligation—just honest advice tailored to your needs.",
-  primaryButtonText = "Get Free Quote",
-  primaryButtonHref = "mailto:info@cicerowebstudio.xyz",
-  secondaryButtonText = "Call Us Now",
-  secondaryButtonHref = "tel:+17863146121"
+  description = "I'm Tulio — ex-logistics pro turned web dev, building modern websites for small businesses in Humboldt Park, Portage Park & greater Chicago. Schedule a free 15-minute site audit to discover how a strategic website can boost your business. No fluff, just results: more bookings, calls, and sales.",
+  primaryButtonText = "Book Free 15-Min Site Audit →",
+  primaryButtonHref = CALENDLY_URL,
+  secondaryButtonText = "See Recent Work",
+  secondaryButtonHref = "/#projects"
 }: CTASectionProps) {
   return (
     <div className="bg-gradient-to-r from-orange-500/5 to-orange-600/5 rounded-2xl p-8 text-center">
@@ -26,6 +28,8 @@ export default function CTASection({
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <a 
           href={primaryButtonHref} 
+          target="_blank"
+          rel="noopener noreferrer"
           className="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors duration-200"
         >
           {primaryButtonText}

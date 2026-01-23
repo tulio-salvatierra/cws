@@ -14,7 +14,7 @@ export default function Projects() {
       <div className="flex flex-col mb-10">
         <strong className="text-white text-left">[PROJECTS]</strong>
         <h2 ref={scrambleRef} className="font-main text-left font-black sm:text-[6rem] text-[3rem] text-orange-500 w-100 leading-tight">
-          What we do
+          Recent Work
         </h2>
       </div>
       <div className="grid gap-40 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
@@ -23,12 +23,9 @@ export default function Projects() {
             as="p"
             scroll
             scrollStart="top 85%"
-            className="font-secondary text-zinc-400 text-lg w-100 font-secondary"
+            className="font-secondary text-zinc-300 text-lg md:text-xl w-100 font-secondary leading-relaxed"
           >
-            At Cicero Web Studio, every project is built with one goal in mind:
-            helping businesses stand out online. From sleek, high-converting
-            websites to interactive, custom-built applications, our work blends
-            style, speed, and smart technology.
+            Real results for Chicago businesses. Every project is built with one goal: websites that actually bring in customers. From sleek, high-converting sites to interactive applications, our work blends style, speed, and smart technology—delivering more bookings, calls, and sales.
           </MaskedLines>
         </div>
         <div></div>

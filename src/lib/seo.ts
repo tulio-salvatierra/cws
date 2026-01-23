@@ -95,7 +95,7 @@ export function generateOrganizationSchema() {
     url: BASE_URL,
     logo: `${BASE_URL}/logo.png`,
     image: `${BASE_URL}/logo.png`,
-    description: 'Modern web solutions for small businesses. Custom websites, digital marketing, and ongoing support.',
+    description: 'I\'m Tulio — ex-logistics pro turned web dev — building modern, fast sites for small businesses in Humboldt Park, Portage Park & greater Chicago. No fluff, just results: more bookings, calls, and sales.',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Cicero',

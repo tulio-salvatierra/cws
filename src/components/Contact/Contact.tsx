@@ -7,6 +7,7 @@ import {
   TWITTER_URL,
   EMAIL,
   PHONE,
+  CALENDLY_URL,
 } from "../../Constants/Constants";
 
 import { useEffect, useState, useRef } from "react";
@@ -53,8 +54,8 @@ export default function Contact() {
           >
             Ready to Grow? Let's Talk
           </h1>
-          <p className="text-xl text-zinc-300 mt-6 max-w-2xl mx-auto">
-            Schedule a free consultation to discuss your goals and discover how a strategic website can boost your business. As a local Chicago studio, we understand our community's needs and love helping neighbors like you.
+          <p className="text-xl md:text-2xl text-zinc-300 mt-6 max-w-2xl mx-auto leading-relaxed">
+            I'm Tulio — ex-logistics pro turned web dev, building modern websites for small businesses in Humboldt Park, Portage Park & greater Chicago. Schedule a free 15-minute site audit to discover how a strategic website can boost your business. As a local Chicago studio, we understand our community's needs and love helping neighbors like you.
           </p>
         </div>
 
@@ -91,7 +92,8 @@ export default function Contact() {
               </MaskedLines>
               
               <div ref={fadeInRef} className="flex sm:flex-row flex-col gap-4 items-center justify-start mt-4">
-                <CustomButton label="Send Us a Message" href={`mailto:${EMAIL}`} />
+                <CustomButton label="Book Free 15-Min Site Audit →" href={CALENDLY_URL} newTab={true} />
+                <CustomButton label="Send Us a Message" href={`mailto:${EMAIL}`} secondary={true} />
                 <CustomButton label="Call Us Now" href={`tel:+1${PHONE}`} secondary={true} />
               </div>
             </div>

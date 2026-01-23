@@ -6,6 +6,7 @@ import gsap from "gsap";
 import "./video.css";
 import { useFadeIn } from "../../Hooks/useFadeIn";
 import { useScramble } from "../../Hooks/useScramble";
+import { CALENDLY_URL } from "../../Constants/Constants";
   
 
 
@@ -58,27 +59,24 @@ export default function Problem() {
             as="p"
             scroll
             scrollStart="top 85%"
-            className="font-secondary text-zinc-400 text-lg text-start paragraph tracking-10"
+            className="font-secondary text-zinc-300 text-xl md:text-2xl text-start paragraph tracking-10 leading-relaxed"
           >
-            We're your digital growth partners. Based in Chicago, we combine
-            beautiful design with dedication to deliver solutions that move the
-            needle for your business.
+            I'm Tulio — ex-logistics pro turned web dev. After years running operations, I now build modern, fast websites for small businesses in Humboldt Park, Portage Park & greater Chicago. No fluff, just results: more bookings, calls, and sales.
           </MaskedLines>
 
           <div>
             <div ref={fadeInRef} className="flex flex-col text-start w-full text-white paragraph">
-              <h2 ref={scrambleRef} className="font-secondary text-orange-400 text-2xl sm:text-4xl text-start paragraph tracking-10">What makes us different?</h2>
-              <p className="font-secondary text-zinc-400 text-lg text-start paragraph tracking-10">
-                At Cicero Web Studio, your success is our success. We're a local studio that pairs Tulio's years of operations and logistics experience with his passion for web design and development. We work shoulder‑to‑shoulder with you to create elegant, effective solutions—always with a can‑do attitude and the dedication to go the extra mile.
+              <h2 ref={scrambleRef} className="font-secondary text-orange-400 text-2xl sm:text-4xl text-start paragraph tracking-10 mb-4">What makes us different?</h2>
+              <p className="font-secondary text-zinc-300 text-lg md:text-xl text-start paragraph tracking-10 leading-relaxed">
+                At Cicero Web Studio, your success is our success. We're a local studio that pairs Tulio's years of operations and logistics experience with his passion for web design and development. We work shoulder‑to‑shoulder with you to create elegant, effective solutions—always with a can‑do attitude and the dedication to go the extra mile. Based right here in 60641, we understand what Chicago businesses need: websites that actually bring in customers.
               </p>
             </div>
 
             <div
-
               className="flex flex-col sm:flex-row gap-4 mt-8"
             >
-              <CustomButton href="/contact" label="Let's talk" />
-              <CustomButton href="/works" label="See our works" />
+              <CustomButton href={CALENDLY_URL} label="Book Free 15-Min Site Audit →" newTab={true} />
+              <CustomButton href="#projects" label="See Recent Work ↓" secondary={true} />
             </div>
           </div>
         </div>
