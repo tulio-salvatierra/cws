@@ -42,15 +42,15 @@ export default function Hero() {
         ref={heroRef}
         className="p-2 relative hero-bg z-10 w-screen flex-col items-center justify-center text-center bottom-0 sm:mt-[-470px] mt-[-500px] sm:p-2 p-1 grid grid-cols-1 md:grid-cols-2 gap-1"
       >
-        <div className="hero-anim">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-main font-black text-white text-left mb-6 leading-tight text-center sm:text-left">
+        <div className="hero-anim w-1/2">
+          <h1 className="text-4xl md:text-5xl lg:text-5xl font-main font-black text-white text-left mb-6 leading-tight text-center sm:text-left">
             Chicago Websites That Actually Bring in Customers
           </h1>
           <MaskedLines
             as="p"
             once={true}
             scrollStart="false"
-            className="text-zinc-300 text-xl md:text-2xl text-left font-normal leading-relaxed sm:w-4/5 w-full mb-8"
+            className="text-zinc-300 text-xl md:text-xl text-left font-normal leading-relaxed sm:w-4/5 w-full mb-8"
           >
             I'm Tulio — ex-logistics pro turned web dev — building modern, fast sites for small businesses in Humboldt Park, Portage Park & greater Chicago. No fluff, just results: more bookings, calls, and sales.
           </MaskedLines>
