@@ -34,8 +34,8 @@
 }
 
 .btn-bounce-bg.is--secondary {
-  background-color: #55db9c26;
-  border: 1px solid #55db9c40;
+  background-color: #00000026;
+  border: 1px solid #2d312f40;
 }
 
 .btn-bounce-text {
@@ -45,8 +45,8 @@
 }
 
 .btn-bounce-text__wrap {
-  padding-top: 1.25em;
-  padding-bottom: 1.25em;
+  padding-top: 1.2em;
+  padding-bottom: 1.2em;
   overflow: hidden;
 }
 
