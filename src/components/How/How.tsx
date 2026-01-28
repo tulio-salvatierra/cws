@@ -64,7 +64,11 @@ export default function How({
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="mwg_effect015 my-20">      
+    <section
+      id="how-it-works"
+      ref={sectionRef}
+      className="mwg_effect015 my-20"
+    >      
       <div className="container">
         <p className="homepage-title">
           <span className="word font-main text-8xl font-semibold">

@@ -35,6 +35,7 @@ export default function Problem() {
 
   return (
     <section
+      id="about"
       className="p-5 h-auto flex flex-col w-full justify-evenly mt-80 overflow-x-hidden"
     >
       <div className="flex flex-col mb-10">

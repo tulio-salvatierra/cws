@@ -8,7 +8,10 @@ export default function Services() {
   const fadeInRef = useFadeIn();
   return (
     <>
-      <section className="flex flex-col w-full h-auto justify-evenly px-5 py-8 overflow-x-hidden">
+      <section
+        id="services"
+        className="flex flex-col w-full h-auto justify-evenly px-5 py-8 overflow-x-hidden"
+      >
         <strong className="text-white">[WHAT WE DO]</strong>
         
         <h2 ref={scrambleRef} className="font-main font-semibold sm:text-[6rem] text-lg text-orange-500 w-100 leading-tight">

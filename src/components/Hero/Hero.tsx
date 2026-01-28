@@ -25,7 +25,10 @@ export default function Hero() {
   );
 
   return (
-    <section className="relative mt-[50px] w-full h-screen overflow-hidden">
+    <section
+      id="hero"
+      className="relative mt-[50px] w-full h-screen overflow-hidden"
+    >
       {/* Background scene */}
       <UnicornScene
         projectId="HVejgNImevGuTqdsIEo9"
