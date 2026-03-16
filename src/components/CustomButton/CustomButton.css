@@ -12,7 +12,7 @@
 }
 
 .btn-bounce {
-  color: #fff;
+  color: #000000;
   padding-left: 2em;
   padding-right: 2em;
   font-size: 1em;
@@ -27,7 +27,8 @@
 
 .btn-bounce-bg {
   z-index: 0;
-  background-color: #f97316;
+  color: black;
+  background-color: #f1d9c1;
   border-radius: 100em;
   position: absolute;
   inset: 0%;
@@ -35,7 +36,8 @@
 
 .btn-bounce-bg.is--secondary {
   background-color: #00000026;
-  border: 1px solid #2d312f40;
+  color: #ffffff;
+  border: 1px solid #ffffff;
 }
 
 .btn-bounce-text {

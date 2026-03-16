@@ -183,9 +183,9 @@ export default function Reviews() {
   return (
     <section
       id="reviews"
-      className="mwg_effect025 my-20 flex flex-col items-center justify-center h-screen"
+      className="mwg_effect025 flex flex-col items-center justify-center p-1"
     >   
-      <h3 ref={fadeInRef} className="text-center mb-20 text-4xl md:text-6xl font-main font-bold text-orange-500">What Our Clients Say</h3>
+      <h3 ref={fadeInRef} className="text-center mb-20 text-[4rem] sm:text-[6rem] font-main font-bold text-orange-500">What Our Clients Say</h3>
       <div ref={fadeInRef2} className="container">
         {reviewsData.map((review) => (
           <div key={review.id} className="card">

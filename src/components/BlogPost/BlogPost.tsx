@@ -8,7 +8,7 @@ export default function BlogPost() {
 
   if (!article) {
     return (
-      <section className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+      <section className="min-h-screen text-white flex items-center justify-center p-6">
         <div className="text-center">
           <h1 className="text-4xl font-main font-black text-orange-500 mb-4">Article Not Found</h1>
           <p className="text-zinc-300 mb-6">We couldn't find the article you're looking for.</p>
@@ -24,7 +24,7 @@ export default function BlogPost() {
   }
 
   return (
-    <section className="relative w-full min-h-screen bg-zinc-900/50 py-20 px-4">
+    <section className="relative w-full min-h-screen py-20 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3 text-sm text-zinc-400 mb-2">

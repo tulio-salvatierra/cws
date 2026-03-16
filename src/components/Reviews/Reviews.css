@@ -19,7 +19,7 @@
     letter-spacing: -0.03em;
 }
 .mwg_effect025 .card {
-    width: 20vw;
+    width: 50vw;
     aspect-ratio: 0.8;
 }
 .mwg_effect025 .card:not(:first-child) {
@@ -48,7 +48,7 @@
     }
     .mwg_effect025 .card {
         width: 90vw;
-        max-width: 500px;
+        max-width: 100vw;
         height: auto;
         min-height: 400px;
         aspect-ratio: 0.9;

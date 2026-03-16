@@ -28,23 +28,23 @@ export default function Header() {
   return (
     <div 
       ref={headerRef}
-      className="bg-zinc-800/90 backdrop-blur-md flex p-3 w-full content-center fixed top-0 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
+      className="bg-zinc-800/70 mt-4 fixed backdrop-blur-md flex w-[85%] mx-auto rounded-full content-center top-6 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
     >
       <div className="flex w-full p-6 justify-between items-center">
         {/* Desktop Header */}
         <Link to="/" className="no-underline">
           <div ref={fadeInRef}>
-         <h1 ref={scrambleRef} className="text-orange-500 font-semibold tracking-tight transition-all duration-300">
-          CWS
+         <h1 ref={scrambleRef} className="text-orange-200 font-semibold tracking-tight transition-all duration-300">
+          [CWS]
          </h1>
           </div>
         </Link>
-        <div className="space-x-8 hidden font-secondary items-center md:flex text-xs tracking-tight">
+        <div className="space-x-6 hidden font-secondary items-center md:flex text-xs tracking-tight">
           {MENU_ITEM.map((nav, index) => (
             <Link
               to={nav.url}
               key={index}
-              className={`${nav.class} ${location.pathname === nav.url ? 'text-orange-500' : ''}`}
+              className={`${nav.class} ${location.pathname === nav.url ? 'hover:text-orange-100 transition-colors duration-300' : ''}`}
               onClick={toggleMenu}
             >
               {nav.name}
@@ -85,7 +85,7 @@ export default function Header() {
               <div className="flex justify-between items-center">
                 <MaskedLines
                   as="p"
-                  className="font-semibold text-3xl text-orange-500 p-2"
+                  className="font-semibold text-3xl text-orange-100 p-2"
                 >
                   [CWS]
                 </MaskedLines>
@@ -104,7 +104,7 @@ export default function Header() {
                   <Link
                     to={navMobile.url}
                     
-                    className={`${navMobile.class} block py-2 text-xl tracking-tight font-semibold text-orange-100 ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
+                    className={`${navMobile.class} block py-2 text-xl tracking-tight font-main text-orange-100 ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
                     onClick={toggleMenu}
                     >
                       {navMobile.name}
@@ -142,7 +142,7 @@ export default function Header() {
                   as="p"
                   scroll
                   scrollStart="top 90%"
-                  className="text-zinc-300 text-left max-w-md font-second text-lg tracking-tight"
+                  className="text-zinc-300 text-left max-w-md font-main text-lg tracking-tight"
                 >
                   Our mission is to deliver tailored websites and software
                   solutions that solve real problems and drive meaningful

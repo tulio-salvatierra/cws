@@ -30,14 +30,14 @@ export default function Footer() {
     <footer className="bg-transparent text-gray-200 py-12 px-4">
       <div className="mx-auto">
         {/* Top Section: Navigation and Back to Top */}
-        <div className="flex flex-col sm:flex-row justify-between items-center pb-8">
-          <nav className="flex space-x-6 text-sm font-medium uppercase tracking-wider mb-4 sm:mb-0">
+        <div className="flex flex-col flex-wrap sm:flex-row justify-evenly items-center pb-8">
+          <nav className="flex flex-wrap space-x-6 text-sm font-main tracking-wider mb-4 sm:mb-0">
 
             {MENU_ITEM.map((nav, index) => (
               <Link
                 key={nav.id}
                 to={nav.url}
-                className="hover:text-white transition-colors"
+                className="font-bold text-black text-2xl sm:text-2xl"
               >
                 {nav.name}
               </Link>
@@ -50,8 +50,8 @@ export default function Footer() {
         <div className="border-t border-dashed border-gray-700 my-8"></div>
 
         {/* Middle Section: Large FOCAL text */}
-        <div className="grid items-end justify-center sm:justify-start py-4">
-          <BigWord text="CICERO WEB STUDIO" className="mx-auto text-[8rem] md:text-[12rem] lg:text-[19rem] xl:text-[22rem] leading-none font-extrabold text-orange-900" />
+        <div className="grid items-center justify-center sm:justify-start py-4">
+          <BigWord text="CICERO WEB STUDIO" className="mx-auto text-[8rem] md:text-[12rem] lg:text-[19rem] xl:text-[22rem] leading-none font-extrabold text-orange-500" />
 
 
         </div>

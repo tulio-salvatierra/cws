@@ -1,6 +1,6 @@
 
 .mwg_effect013 {
-    height: 25dvh;
+    height: auto;
     overflow: hidden;
 }
 .mwg_effect013 .header {
@@ -13,7 +13,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 25px;
-    font: 500 normal clamp(12px, 0.9vw, 100px) / normal 'IBM Plex Mono';
+    
     text-transform: uppercase;
 }
 .mwg_effect013 .header .left {
@@ -42,9 +42,8 @@
 }
 .mwg_effect013 .banner-container {
     display: flex;
-    gap: 4vw;
+    gap: 1vw;
     width: max-content;
-    font-family: Grapevine;
     white-space: nowrap;
     overflow: visible;
 }

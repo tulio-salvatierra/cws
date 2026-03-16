@@ -13,7 +13,7 @@ export default function Banner() {
   // creates a seamless infinite loop.
   //
   // 🔧 To tweak:
-  // - Change `1.2` in `total -= 1.2 + wheelDelta` to adjust base scroll speed.
+  // - Change `4` in `total -= 4 + wheelDelta * 1` to adjust base scroll speed (higher = faster).
   // - Change `wheelDelta += e.deltaY * 0.02` to modify scroll sensitivity.
   // - Update `phraseRef` content or image (`BF`) to customize visuals.
   // - Use `phraseWidth` to control how many repetitions to render in the phrase.
@@ -44,7 +44,7 @@ export default function Banner() {
       const wrap = gsap.utils.wrap(-phraseWidth, 0);
 
       const xTo = gsap.quickTo(content, "x", {
-        duration: 1,
+        duration: 0.5,
         ease: "none",
         modifiers: {
           x: gsap.utils.unitize(wrap),
@@ -53,15 +53,15 @@ export default function Banner() {
 
       const tick = () => {
         if (!content) return; // Safety check
-        total -= 8 + wheelDelta * 1;
+        total -= 4 + wheelDelta * 1;
         xTo(total);
 
-        wheelDelta *= 0.9;
+        wheelDelta *= 0.1;
         if (Math.abs(wheelDelta) < 0.01) wheelDelta = 0;
       };
 
       const handleWheel = (e: { deltaY: number }) => {
-        wheelDelta += e.deltaY * 0.08;
+        wheelDelta += e.deltaY * 0.04;
       };
 
       gsap.ticker.add(tick);
@@ -113,9 +113,9 @@ export default function Banner() {
             <p
               className="phrase flex"
               ref={phraseRef}
-              style={{ height: "500px" }}
+              
             >
-              {Array.from({ length: 100 }).map((_, index) => (
+              {Array.from({ length: 50 }).map((_, index) => (
                 <span key={index} className="phrase-item">
                   <img 
                     src={BF} 

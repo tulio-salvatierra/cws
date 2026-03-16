@@ -7,7 +7,7 @@ interface LandingPageContactFormProps {
 
 export default function LandingPageContactForm({ data }: LandingPageContactFormProps) {
   return (
-    <section id="contact-form" className="py-20 bg-zinc-900">
+    <section id="contact-form" className="py-20">
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-main font-black text-orange-500 mb-4">

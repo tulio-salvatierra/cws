@@ -21,7 +21,7 @@ function LandingPageWrapper() {
 
   if (!landingPageData) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-main font-black text-orange-500 mb-4">
             Page Not Found

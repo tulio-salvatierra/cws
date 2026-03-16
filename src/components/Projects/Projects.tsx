@@ -4,40 +4,36 @@ import { useFadeIn } from "../../Hooks/useFadeIn";
 import { useScramble } from "../../Hooks/useScramble";
 import MaskedLines from "../MaskedLines/MaskedLines";
 export default function Projects() {
-  const scrambleRef = useScramble("PROJECTS", 0.1);
+  const scrambleRef = useScramble("RECENT WORK", 0.1);
   const fadeInRef = useFadeIn();
   return (
     <section
       id="projects"
-      className="flex flex-col w-full h-auto justify-evenly px-5"
+      className="flex flex-col w-full h-auto justify-evenly p-1"
     >
       <div className="flex flex-col mb-10">
-        <strong className="text-white text-left">[PROJECTS]</strong>
-        <h2 ref={scrambleRef} className="font-main text-left font-black sm:text-[6rem] text-[3rem] text-orange-500 w-100 leading-tight">
+        <strong className="text-black text-left">[RECENT WORK]</strong>
+        <h2 ref={scrambleRef} className="font-main text-left font-bold sm:text-[6rem] text-[3rem] text-black w-100 leading-tight">
           Recent Work
         </h2>
       </div>
-      <div className="grid gap-40 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+      <div className="grid gap-40">
         <div>
           <MaskedLines
             as="p"
             scroll
-            scrollStart="top 85%"
-            className="font-secondary text-zinc-300 text-lg md:text-xl w-100 font-secondary leading-relaxed"
+            scrollStart="top 85%" 
+            className="font-main text-2xl sm:text-3xl text-black w-100 leading-tight"
           >
             Real results for Chicago businesses. Every project is built with one goal: websites that actually bring in customers. From sleek, high-converting sites to interactive applications, our work blends style, speed, and smart technology—delivering more bookings, calls, and sales.
           </MaskedLines>
         </div>
-        <div></div>
-        <div></div>
-        <div>
-         
-        </div>
+    
       </div>
 
-      <div className="columns-1 sm:columns-2 lg:columns-4 gap-16 mt-10 mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 w-full mx-auto">
         {projects.map((project, index) => (
-          <div key={index} className="mb-6 h-auto break-inside-avoid">
+          <div key={project.title} className="min-h-[320px] h-full">
             <ProjectCard
               title={project.title}
               images={project.image}

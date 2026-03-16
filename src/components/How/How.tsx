@@ -3,8 +3,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./How.css";
-import ProcessSection from "../ServicesPage/ProcessSection/ProcessSection";
-
+import ScrewDriver from "../../assets/images/sd.png";
 gsap.registerPlugin(ScrollTrigger);
 
 interface HowProps {
@@ -67,33 +66,43 @@ export default function How({
     <section
       id="how-it-works"
       ref={sectionRef}
-      className="mwg_effect015 my-20"
-    >      
-      <div className="container">
+      style={{ minHeight: '100vh' }}
+      className="mwg_effect015 bg-gradient-to-b from-orange-500 to-white p-1 bg-orange-500 overflow-visible relative"
+    >
+      <div
+        className="how-bg-image inset-0 w-full h-full"
+        style={{
+          backgroundImage: `url(${ScrewDriver})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+        aria-hidden
+      />
+      <div className="container mt-[300px]">
         <p className="homepage-title">
-          <span className="word font-main text-8xl font-semibold">
+          <span className="word font-main sm:text-[10rem] text-[6rem] font-semibold">
             <span className="word-hidden text-white">HOW</span>
-            <span className="word-visible text-orange-500">HOW</span>
+            <span className="word-visible text-zinc-800">HOW</span>
           </span>
           <br />
-          <span className="word font-main text-8xl italic font-bold">
-            <span className="word-hidden text-orange-500 text-center">DOES</span>
+          <span className="word font-main sm:text-[10rem] text-[6rem] italic font-bold">
+            <span className="word-hidden text-orange-300 text-center">DOES</span>
             <span className="word-visible text-center text-white">DOES</span>
           </span>
           <br />
-          <span className="word font-main text-8xl font-normal">
+          <span className="word font-main sm:text-[10rem] text-[6rem] font-normal">
             <span className="word-hidden text-center text-white">IT</span>
-            <span className="word-visible text-center text-orange-500">IT</span>
+            <span className="word-visible text-center text-orange-300">IT</span>
           </span>
           <br />
-          <span className="word font-main font-8xl">
-            <span className="word-hidden text-center text-orange-500">WORK</span>
-            <span className="word-visible text-center text-white">WORK</span>
+          <span className="word font-main sm:text-[10rem] text-[6rem]">
+            <span className="word-hidden text-center text-orange-100">WORK</span>
+            <span className="word-visible text-center text-zinc-800">WORK</span>
           </span>
         </p> 
       </div>
-
-      <ProcessSection />
+    
     </section>
   );
 }

@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import Problem from '../Problem';
 import Hero from '../Hero';
 import Services from '../Services';
+import ProcessSection from "../ServicesPage/ProcessSection/ProcessSection";
 import Projects from '../Projects/Projects';
 import Contact from '../Contact';
-import Banner from '../Banner/Banner';
 import How from '../How/How';
 import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
 import Reviews from '../Reviews/Reviews';
@@ -38,7 +38,10 @@ export default function Home() {
         <Services />
       </div>
       <div>
-        <How />
+      <div className="bg-gradient-to-b from-orange-500 to-white">
+        <How /><ProcessSection />
+      </div>
+        
       </div>
       <div className="h-auto">
         <Projects />

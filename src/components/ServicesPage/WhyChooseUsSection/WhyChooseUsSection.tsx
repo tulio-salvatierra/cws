@@ -29,7 +29,7 @@ export default function WhyChooseUsSection({
 }: WhyChooseUsSectionProps) {
   return (
     <div className="bg-zinc-800/50 rounded-2xl p-8 mb-16">
-      <h2 className="text-3xl font-main font-bold text-orange-500 mb-8 text-center">
+      <h2 className="text-4xl font-main font-bold text-white mb-8 text-center">
         {title}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -42,13 +42,13 @@ export default function WhyChooseUsSection({
                 item.icon
               )}
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
-            <p className="text-zinc-400">{item.description}</p>
+            <h3 className="text-4xl font-semibold font-main text-orange-500 mb-2">{item.title}</h3>
+            <p className="text-zinc-100 font-main text-xl">{item.description}</p>
           </div>
         ))}
       </div>
-      <div className="mt-8 text-center">
-        <p className="text-zinc-300 mb-4">
+      <div className="mt-8 text-center text-xl">
+        <p className="text-white font-main mb-4 text-xl">
           Ready to boost your online presence with custom web design and local SEO services? <a href="/contact" className="text-orange-500 hover:text-orange-400 underline">Contact us</a> for a free consultation on affordable website solutions for Chicago, Cicero, and Chicagoland businesses. Explore our <a href="/about" className="text-orange-500 hover:text-orange-400 underline">web development process</a> and see how we help small businesses drive leads and improve search rankings.
         </p>
       </div>

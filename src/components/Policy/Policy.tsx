@@ -5,7 +5,7 @@ export default function Policy() {
   return (
     <section
       id="policy"
-      className="relative w-full min-h-screen bg-zinc-900/50 py-20 px-4 mt-20"
+      className="relative w-full min-h-screen py-20 px-4 mt-20"
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}

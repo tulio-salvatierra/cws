@@ -9,7 +9,7 @@ export default function Blog() {
   return (
     <section
       id="blog"
-      className="relative w-full min-h-screen bg-zinc-900/50 py-20 px-4 mt-20"
+      className="relative w-full min-h-screen py-20 px-4 mt-20"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}

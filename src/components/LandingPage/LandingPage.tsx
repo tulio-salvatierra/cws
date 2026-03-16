@@ -40,7 +40,7 @@ export default function LandingPage({ data }: LandingPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen text-white">
       <LandingPageHero data={data} onCTAClick={scrollToContact} />
       <ProblemStatementSection data={data} />
       <SolutionSection data={data} />

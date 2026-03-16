@@ -1,3 +1,4 @@
+import MaskedLines from '@/components/MaskedLines/MaskedLines';
 import { useScramble } from '@/Hooks/useScramble';
 
 interface ServicesHeaderProps {
@@ -13,10 +14,10 @@ export default function ServicesHeader({
 
   return (
     <div className="text-center mb-16">
-      <h1 ref={scrambleRef} className="text-4xl md:text-6xl font-main font-black text-orange-500 mb-4">
+      <MaskedLines as="h1" scroll scrollStart="top 85%" className="text-4xl md:text-6xl font-main font-black text-orange-100 mb-4">
         {title}
-      </h1>
-      <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
+      </MaskedLines>
+      <p className="text-xl font-main text-zinc-900 max-w-3xl mx-auto">
         {description}
       </p>
     </div>

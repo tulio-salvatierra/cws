@@ -12,6 +12,7 @@ export interface ProcessStep {
   number: string;
   title: string;
   description: string;
+  image?: string;
 }
 
 import { ReactNode } from 'react';

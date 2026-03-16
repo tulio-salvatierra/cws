@@ -55,7 +55,7 @@ export default function BigWord({ text, className = "" }: BigWordProps) {
 
   return (
     <section ref={sectionRef} className={`mwg_effect044 ${className}`}>
-      <div className="root">
+      <div className="root-footer">
         <div className="containers">
           <div className="container">
             
@@ -71,6 +71,11 @@ export default function BigWord({ text, className = "" }: BigWordProps) {
             </div>
           </div>
         </div>
+      </div>
+      <div className="h-auto">
+        <h2 className="text-8xl font-main font-bold text-black mb-4 z-100">
+          Pretty Cool, Right?
+        </h2>
       </div>
     </section>
   );

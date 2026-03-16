@@ -1,13 +1,10 @@
-.mwg_effect044 .root {
+.mwg_effect044 .root-footer {
     display: grid;
+    
     place-items: center;
     position: relative;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 0;
+    width: auto;
+    min-height: 50vh;
 }
 .mwg_effect044 .header,
 .mwg_effect044 .footer {

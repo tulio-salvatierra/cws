@@ -162,10 +162,6 @@ article a:hover {
 .gradient{
   color: linear-gradient(to bottom, #FE7018 0%, #4D433D 46%, #000000 70%)
 }
-:root {
-  background-image: url("./assets/app_bg/wavey-fingerprint.svg");
-  background-size: fill;
-}
 
 /* Tablet */
 @media screen and (max-width: 991px) {
@@ -203,14 +199,29 @@ article a:hover {
   src: url('./assets/fonts/clash.woff2') format('woff2'),
 }
 
-body {
-  font-family: 'Archivo', sans-serif;
-  overflow-x: hidden;
-}
-
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
+  background: transparent !important;
+}
+
+body {
+  font-family: 'Archivo', sans-serif;
+  overflow-x: hidden;
+  background: transparent !important;
+}
+
+/* Single app background: MeshGradient in Layout. Keep these transparent so it shows through. */
+#root,
+#root .app-shell,
+.App,
+main {
+  background-color: transparent !important;
+}
+
+/* Sections without an explicit bg-* stay transparent so the mesh gradient is visible in different sections (layered effect). */
+main section:not([class*="bg-"]) {
+  background-color: transparent !important;
 }
 
 h1 {

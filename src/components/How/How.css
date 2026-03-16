@@ -6,8 +6,19 @@
     align-items: center;
     gap: 8vw;
     width: 100%;
-   
     box-sizing: border-box;
+}
+.mwg_effect015 .how-bg-image {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 125%;
+    height: 125%;
+    min-width: 125%;
+    min-height: 125%;
+    pointer-events: none;
+    z-index: 0;
 }
 .mwg_effect015 .scroll {
     position: absolute;
@@ -18,7 +29,7 @@
     pointer-events: none;
 }
 .mwg_effect015 .text {
-    width: 34vw;
+    width: 50vw;
     max-width: 90%;
     font: 500 normal clamp(12px, 0.9vw, 100px) / normal 'IBM Plex Mono';
     text-transform: uppercase;
