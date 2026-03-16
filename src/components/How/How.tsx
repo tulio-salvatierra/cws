@@ -3,7 +3,6 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./How.css";
-import ScrewDriver from "../../assets/images/sd.png";
 gsap.registerPlugin(ScrollTrigger);
 
 interface HowProps {
@@ -72,7 +71,7 @@ export default function How({
       <div
         className="how-bg-image inset-0 w-full h-full"
         style={{
-          backgroundImage: `url(${ScrewDriver})`,
+          backgroundImage: "url(/images/sd.png)",
           backgroundSize: 'contain',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
