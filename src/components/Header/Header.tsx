@@ -50,7 +50,7 @@ export default function Header() {
               {nav.name}
             </Link>
           ))}
-          <CustomButton href={CALENDLY_URL} label="BOOK MY CONSULTATION" />
+          <CustomButton href={CALENDLY_URL} label="Book Site Audit" />
         </div>
         <div className="md:hidden">
           <button
@@ -119,7 +119,7 @@ export default function Header() {
               href={CALENDLY_URL}
               className="block p-4 rounded-full text-white border-2 font-main font-semibold text-xl text-center transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
             >
-              Book My Consultation!
+              Book Site Audit
             </a>
             </div>
             <div ref={fadeInRef}>

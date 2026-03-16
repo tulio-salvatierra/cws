@@ -49,8 +49,8 @@ export default function Hero() {
         </div>
 
         <div className="hero-anim flex flex-col md:flex-row gap-4 md:justify-end md:items-end p-2">
-          <CustomButton href={CALENDLY_URL} label="Book Free 15-Min Site Audit →" newTab={true} />
-          <CustomButton href="#projects" label="See Recent Work ↓" secondary={true} />
+          <CustomButton href={CALENDLY_URL} label="Book Site Audit →" newTab={true} />
+          <CustomButton href="#projects" label="Recent Work" secondary={true} />
         </div>
       </div>
     </section>
