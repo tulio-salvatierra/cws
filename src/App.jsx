@@ -13,6 +13,10 @@ import BlogPost from "./components/BlogPost";
 import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
 import { getLandingPageData } from "./data/landingPagesData";
+import LoginPage from "./pages/admin/LoginPage";
+import AdminPage from "./pages/admin/AdminPage";
+import AdminGuard from "./components/admin/AdminGuard";
+import ContentQueue from "./components/admin/ContentQueue";
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -91,7 +95,14 @@ function App() {
               element={<LandingPageWrapper />} 
             />
           </Route>
-        </Routes>
+          <Route path="/admin/login" element={<LoginPage />} />
+        <Route
+          path="/admin"
+          element={<AdminGuard><AdminPage /></AdminGuard>}
+        >
+          <Route index element={<ContentQueue />} />
+        </Route>
+      </Routes>
       </Router>
       {loading && <Loader onComplete={handleLoaderComplete} />}
     </div>
