@@ -17,6 +17,7 @@ import LoginPage from "./pages/admin/LoginPage";
 import AdminPage from "./pages/admin/AdminPage";
 import AdminGuard from "./components/admin/AdminGuard";
 import ContentQueue from "./components/admin/ContentQueue";
+import KeywordsPage from "./pages/admin/KeywordsPage";
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -101,6 +102,7 @@ function App() {
           element={<AdminGuard><AdminPage /></AdminGuard>}
         >
           <Route index element={<ContentQueue />} />
+          <Route path="keywords" element={<KeywordsPage />} />
         </Route>
       </Routes>
       </Router>

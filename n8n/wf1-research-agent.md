@@ -4,7 +4,7 @@
 
 | Name | Type | Value |
 |---|---|---|
-| Perplexity | Header Auth | Name: `Authorization` Value: `Bearer YOUR_KEY` |
+| OpenAI     | Header Auth | Name: `Authorization` Value: `Bearer YOUR_OPENAI_KEY` |
 | Anthropic  | Header Auth | Name: `x-api-key` Value: `YOUR_KEY` |
 | Supabase   | Header Auth | Name: `apikey` Value: `YOUR_SERVICE_ROLE_KEY` |
 
@@ -14,23 +14,20 @@
 - Type: Schedule Trigger
 - Cron expression: `0 6 * * 1-5` (6am Mon–Fri)
 
-### Node 2 — Perplexity Research (HTTP Request)
-- URL: `https://api.perplexity.ai/chat/completions`
+### Node 2 — GPT-4o Research (HTTP Request)
+- URL: `https://api.openai.com/v1/responses`
 - Method: POST
-- Auth: Perplexity credential
+- Auth: OpenAI credential
+- Additional headers: `Content-Type: application/json`
 - Body (JSON):
 ```json
 {
-  "model": "llama-3.1-sonar-large-128k-online",
-  "messages": [
-    {
-      "role": "user",
-      "content": "What are today's top 5 trending topics in web design, web development, and small business websites relevant to Chicago businesses? Return only a plain numbered list of topic titles, no explanation."
-    }
-  ]
+  "model": "gpt-4o",
+  "tools": [{ "type": "web_search_preview" }],
+  "input": "What are today's top 5 trending topics in web design, web development, and small business websites relevant to Chicago businesses? Return only a plain numbered list of topic titles, no explanation."
 }
 ```
-- Extract from response: `{{ $json.choices[0].message.content }}`
+- Extract from response: `{{ $json.output[1].content[0].text }}`
 
 ### Node 3 — Claude Topic Extraction (HTTP Request)
 - URL: `https://api.anthropic.com/v1/messages`
@@ -45,7 +42,7 @@
   "messages": [
     {
       "role": "user",
-      "content": "Given these trending topics:\n\n{{ $node['Perplexity Research'].json.choices[0].message.content }}\n\nReturn a JSON array of exactly 5 objects. Each object: { \"topic\": \"post topic title\", \"keywords\": [\"kw1\", \"kw2\", \"kw3\"] }. Topics must be relevant to web development services for Chicago businesses. Return only the JSON array, no other text."
+      "content": "Given these trending topics:\n\n{{ $node['GPT-4o Research'].json.output[1].content[0].text }}\n\nReturn a JSON array of exactly 5 objects. Each object: { \"topic\": \"post topic title\", \"keywords\": [\"kw1\", \"kw2\", \"kw3\"] }. Topics must be relevant to web development services for Chicago businesses. Return only the JSON array, no other text."
     }
   ]
 }
