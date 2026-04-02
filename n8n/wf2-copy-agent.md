@@ -18,6 +18,7 @@ Used in each Claude API call. Replace `[TOPIC]` and `[KEYWORDS]` with n8n expres
 | LinkedIn  | "Write a LinkedIn post. 600–1200 chars. Insight-first. Business value framing. Professional but not stiff. No hashtag spam." |
 | Pinterest | "Write a Pinterest pin description. 200–500 chars. Keyword-dense. Instructional tone. Written for search." |
 | WhatsApp  | "Write a WhatsApp broadcast message. 100–200 chars. Casual and direct. 1–2 emojis. Clear CTA." |
+| YouTube   | "Write YouTube video metadata as JSON with three keys: title (max 60 chars, SEO-optimized), description (300–500 chars with [00:00] Intro timestamp placeholder and CTA to cicerowebstudio.xyz), tags (10–15 comma-separated tags). Return only the JSON object, no other text." |
 
 ## Workflow Nodes
 
@@ -84,6 +85,34 @@ Build an array of 6 objects from the 6 Claude nodes, then loop and insert each:
 - Method: PATCH
 - Body: `{ "used": true }`
 
+### Node 15 — Claude YouTube Copy (HTTP Request)
+Same configuration as Nodes 5–10. Use the YouTube prompt from the table above.
+- Body:
+```json
+{
+  "model": "claude-sonnet-4-6",
+  "max_tokens": 512,
+  "messages": [{
+    "role": "user",
+    "content": "Topic: {{ $('Loop Over Topics').item.json.topic }}\nKeywords: {{ $('Loop Over Topics').item.json.keywords.join(', ') }}\n\nWrite YouTube video metadata as JSON with three keys: title (max 60 chars, SEO-optimized), description (300–500 chars with [00:00] Intro timestamp placeholder and CTA to cicerowebstudio.xyz), tags (10–15 comma-separated tags). Return only the JSON object, no other text."
+  }]
+}
+```
+- Extract: `{{ $json.content[0].text }}`
+
+### Node 16 — Save YouTube platform_post (HTTP Request → Supabase)
+- URL: `https://YOUR_PROJECT.supabase.co/rest/v1/platform_posts`
+- Method: POST
+- Body:
+```json
+{
+  "draft_id": "{{ $node['Save content_draft'].json[0].id }}",
+  "platform": "youtube",
+  "copy": "{{ $node['Claude YouTube Copy'].json.content[0].text }}",
+  "status": "pending"
+}
+```
+
 ### Node 14 — Trigger WF3 (HTTP Request)
 - URL: `https://YOUR_N8N_WORKSPACE.app.n8n.cloud/webhook/wf3-image-agent`
 - Method: POST
@@ -93,4 +122,4 @@ Build an array of 6 objects from the 6 Claude nodes, then loop and insert each:
 1. Make sure WF1 has run (research_topics rows exist with used=false)
 2. POST to the webhook URL manually from n8n
 3. Check Supabase: `select * from content_drafts order by created_at desc limit 1;`
-4. Check: `select * from platform_posts where draft_id = 'THE_DRAFT_ID';` — should show 6 rows
+4. Check: `select * from platform_posts where draft_id = 'THE_DRAFT_ID';` — should show 7 rows (including youtube)
