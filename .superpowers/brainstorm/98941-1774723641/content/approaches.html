@@ -1,0 +1,52 @@
+<h2>WF4 Publisher — 3 Approaches</h2>
+<p class="subtitle">How should the publishing workflow be structured in n8n?</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Single workflow, all 6 platforms ⭐ Recommended</h3>
+      <p>One WF4 workflow handles everything: receives the approval webhook, then posts to all 6 platforms in sequence. Each platform node has "Continue on Fail" so if Instagram fails, it still posts to X, LinkedIn, etc.</p>
+      <div style="margin-top:12px; font-family:monospace; font-size:11px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px; color:#94a3b8">
+        Approve → <span style="color:#818cf8">WF4 webhook</span> → Get Draft → Post IG → Post FB → Post WA → Post X → Post LI → Post PIN → Update DB ✓
+      </div>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Simplest to build</li><li>Easy to debug</li><li>Matches WF1–3 style</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Platforms run one at a time</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Orchestrator + 6 sub-workflows</h3>
+      <p>WF4 is a "router" that fires 6 child webhooks in parallel — one per platform. Each platform lives in its own mini-workflow you can turn on/off independently.</p>
+      <div style="margin-top:12px; font-family:monospace; font-size:11px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px; color:#94a3b8">
+        Approve → WF4 → <span style="color:#818cf8">WF4a</span>(IG) + <span style="color:#818cf8">WF4b</span>(FB) + <span style="color:#818cf8">WF4c</span>(X) … (parallel)
+      </div>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Platforms run in parallel</li><li>Toggle platforms on/off</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>7 workflows to maintain</li><li>Complex for a first setup</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Phased — Meta first, then expand</h3>
+      <p>Build WF4 with only Meta platforms first (IG + FB + WhatsApp — one set of API credentials). Then add X, LinkedIn, Pinterest as you get their credentials set up.</p>
+      <div style="margin-top:12px; font-family:monospace; font-size:11px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:12px; color:#94a3b8">
+        Phase 1: Approve → WF4 → Post IG + FB + WA<br>
+        Phase 2: + Post X + LI + PIN (add nodes later)
+      </div>
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pros</h4><ul><li>Get something working fast</li><li>Less credential setup upfront</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Still rewrite WF4 later</li><li>Slower to full coverage</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

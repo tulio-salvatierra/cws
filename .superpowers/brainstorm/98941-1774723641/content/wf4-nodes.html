@@ -1,0 +1,133 @@
+<h2>WF4 — Workflow Nodes</h2>
+<p class="subtitle">What you'll build inside n8n Cloud, node by node</p>
+
+<div style="max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
+
+  <!-- Node list -->
+  <div style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:20px">
+
+    <!-- Node 1 -->
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+      <div style="width:32px;height:32px;border-radius:8px;background:#1e293b;border:1px solid #334155;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="color:#a5b4fc;font-size:11px;font-weight:700">1</span>
+      </div>
+      <div>
+        <p style="color:#e2e8f0;font-size:13px;font-weight:600;margin:0">Webhook Trigger</p>
+        <p style="color:#64748b;font-size:12px;margin:4px 0 0">Receives <code style="color:#a5b4fc">{ "draft_id": "uuid" }</code> from approveDraft() in the dashboard</p>
+      </div>
+    </div>
+    <div style="width:1px;height:12px;background:#1e293b;margin-left:16px;margin-bottom:12px"></div>
+
+    <!-- Node 2 -->
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+      <div style="width:32px;height:32px;border-radius:8px;background:#1e293b;border:1px solid #334155;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="color:#a5b4fc;font-size:11px;font-weight:700">2</span>
+      </div>
+      <div>
+        <p style="color:#e2e8f0;font-size:13px;font-weight:600;margin:0">Get Draft + Platform Posts (Supabase)</p>
+        <p style="color:#64748b;font-size:12px;margin:4px 0 0">Fetches content_draft and all 6 platform_posts (copy + image_url per platform)</p>
+      </div>
+    </div>
+    <div style="width:1px;height:12px;background:#1e293b;margin-left:16px;margin-bottom:12px"></div>
+
+    <!-- Nodes 3-8 -->
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+      <div style="width:32px;border-radius:8px;display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+        <div style="height:32px;background:#172554;border:1px solid #1d4ed8;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#93c5fd;font-size:10px;font-weight:700">3</span></div>
+        <div style="height:32px;background:#172554;border:1px solid #1d4ed8;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#93c5fd;font-size:10px;font-weight:700">4</span></div>
+        <div style="height:32px;background:#14532d;border:1px solid #16a34a;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#86efac;font-size:10px;font-weight:700">5</span></div>
+        <div style="height:32px;background:#1c1917;border:1px solid #44403c;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#d6d3d1;font-size:10px;font-weight:700">6</span></div>
+        <div style="height:32px;background:#172554;border:1px solid #0284c7;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#7dd3fc;font-size:10px;font-weight:700">7</span></div>
+        <div style="height:32px;background:#4c0519;border:1px solid #be185d;border-radius:8px;display:flex;align-items:center;justify-content:center"><span style="color:#f9a8d4;font-size:10px;font-weight:700">8</span></div>
+      </div>
+      <div style="flex:1">
+        <div style="background:#1e293b;border-radius:8px;padding:10px 14px">
+          <p style="color:#94a3b8;font-size:12px;font-weight:600;margin:0 0 8px">6 platform publishing nodes — each with <span style="color:#fbbf24">Continue on Fail ✓</span></p>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:#93c5fd;font-size:12px">3 · Instagram</span>
+              <span style="color:#475569;font-size:11px">Meta Graph API — /media + /media_publish</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:#93c5fd;font-size:12px">4 · Facebook</span>
+              <span style="color:#475569;font-size:11px">Meta Graph API — /feed</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:#86efac;font-size:12px">5 · WhatsApp</span>
+              <span style="color:#475569;font-size:11px">Meta Cloud API — /messages (broadcast)</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:#d6d3d1;font-size:12px">6 · X (Twitter)</span>
+              <span style="color:#475569;font-size:11px">X API v2 — /tweets (OAuth 2.0)</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:#7dd3fc;font-size:12px">7 · LinkedIn</span>
+              <span style="color:#475569;font-size:11px">LinkedIn API — /ugcPosts</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:#f9a8d4;font-size:12px">8 · Pinterest</span>
+              <span style="color:#475569;font-size:11px">Pinterest API v5 — /pins</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:1px;height:12px;background:#1e293b;margin-left:16px;margin-bottom:12px"></div>
+
+    <!-- Node 9 -->
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+      <div style="width:32px;height:32px;border-radius:8px;background:#1e293b;border:1px solid #334155;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="color:#a5b4fc;font-size:11px;font-weight:700">9</span>
+      </div>
+      <div>
+        <p style="color:#e2e8f0;font-size:13px;font-weight:600;margin:0">Update platform_posts status (Code + Supabase)</p>
+        <p style="color:#64748b;font-size:12px;margin:4px 0 0">Sets each row to <code style="color:#86efac">published</code> or <code style="color:#fca5a5">failed</code> based on each node's result, saves posted_at</p>
+      </div>
+    </div>
+    <div style="width:1px;height:12px;background:#1e293b;margin-left:16px;margin-bottom:12px"></div>
+
+    <!-- Node 10 -->
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <div style="width:32px;height:32px;border-radius:8px;background:#14532d;border:1px solid #16a34a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <span style="color:#86efac;font-size:11px;font-weight:700">10</span>
+      </div>
+      <div>
+        <p style="color:#e2e8f0;font-size:13px;font-weight:600;margin:0">Mark draft published (Supabase)</p>
+        <p style="color:#64748b;font-size:12px;margin:4px 0 0">content_drafts status → <code style="color:#86efac">published</code> — triggers Realtime → dashboard moves card to Published tab</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Credential summary -->
+  <div style="background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:20px">
+    <p class="label" style="margin-bottom:12px">Credentials you'll need to create</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:#1e293b;border-radius:8px;padding:10px">
+        <p style="color:#e2e8f0;font-size:12px;font-weight:600;margin:0">Meta for Developers</p>
+        <p style="color:#64748b;font-size:11px;margin:4px 0 0">One app covers IG + FB + WA</p>
+        <p style="color:#475569;font-size:11px;margin:4px 0 0">Needs: Business account + Page</p>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px">
+        <p style="color:#e2e8f0;font-size:12px;font-weight:600;margin:0">X Developer Portal</p>
+        <p style="color:#64748b;font-size:11px;margin:4px 0 0">Free tier works for posting</p>
+        <p style="color:#475569;font-size:11px;margin:4px 0 0">Needs: developer.twitter.com app</p>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px">
+        <p style="color:#e2e8f0;font-size:12px;font-weight:600;margin:0">LinkedIn Developer</p>
+        <p style="color:#64748b;font-size:11px;margin:4px 0 0">Needs company page posting</p>
+        <p style="color:#475569;font-size:11px;margin:4px 0 0">Needs: linkedin.com/developers app</p>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px">
+        <p style="color:#e2e8f0;font-size:12px;font-weight:600;margin:0">Pinterest Developer</p>
+        <p style="color:#64748b;font-size:11px;margin:4px 0 0">Business account required</p>
+        <p style="color:#475569;font-size:11px;margin:4px 0 0">Needs: developers.pinterest.com app</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;margin-top:20px">
+  <p style="color:#64748b;font-size:13px">Does this node structure look right? Reply in the terminal.</p>
+</div>

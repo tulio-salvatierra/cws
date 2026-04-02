@@ -1,0 +1,77 @@
+<h2>After clicking Approve — what does the dashboard show?</h2>
+<p class="subtitle">WF4 runs in the background (takes ~10–20 seconds to post to all platforms)</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Card disappears immediately</h3>
+      <p>Same as today. Approve → card gone. WF4 fires in the background silently. You'll know it worked when you see posts appear on your social accounts.</p>
+      <div class="mockup" style="margin-top:10px">
+        <div class="mockup-header">Content Queue</div>
+        <div class="mockup-body" style="padding:12px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:space-between">
+            <span style="color:#94a3b8;font-size:12px">✓ Approved — no more cards visible</span>
+          </div>
+          <div style="background:#111827;border:1px dashed #1f2937;border-radius:8px;padding:10px;text-align:center">
+            <span style="color:#374151;font-size:12px">No drafts pending review.</span>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#64748b">Simplest — no new UI needed</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Brief "Publishing…" state then disappears ⭐</h3>
+      <p>Card stays briefly with a publishing indicator while WF4 fires, then fades out. Gives visual confirmation the webhook was triggered.</p>
+      <div class="mockup" style="margin-top:10px">
+        <div class="mockup-header">Content Queue</div>
+        <div class="mockup-body" style="padding:12px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:space-between;opacity:0.7">
+            <div>
+              <span style="color:#e2e8f0;font-size:12px;font-weight:600">5 Reasons Your Business Needs a Website</span>
+              <div style="display:flex;gap:4px;margin-top:4px">
+                <span style="background:#312e81;color:#a5b4fc;font-size:10px;padding:2px 6px;border-radius:4px">⚡ Publishing to 6 platforms…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#64748b">Light feedback — card fades after 3s</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Card moves to a "Published" tab</h3>
+      <p>The queue gets two tabs: <strong>Pending Review</strong> and <strong>Published</strong>. Approved posts move to the Published tab with platform status indicators.</p>
+      <div class="mockup" style="margin-top:10px">
+        <div class="mockup-header">Content Queue</div>
+        <div class="mockup-body" style="padding:12px">
+          <div style="display:flex;gap:8px;margin-bottom:12px;border-bottom:1px solid #1f2937;padding-bottom:8px">
+            <span style="background:#1f2937;color:#64748b;font-size:11px;padding:4px 10px;border-radius:6px">Pending (0)</span>
+            <span style="background:#312e81;color:#a5b4fc;font-size:11px;padding:4px 10px;border-radius:6px;font-weight:600">Published (3)</span>
+          </div>
+          <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px">
+            <span style="color:#e2e8f0;font-size:12px;font-weight:600">5 Reasons Your Business Needs a Website</span>
+            <div style="display:flex;gap:4px;margin-top:6px">
+              <span style="background:#14532d;color:#86efac;font-size:10px;padding:2px 5px;border-radius:4px">IG ✓</span>
+              <span style="background:#14532d;color:#86efac;font-size:10px;padding:2px 5px;border-radius:4px">FB ✓</span>
+              <span style="background:#14532d;color:#86efac;font-size:10px;padding:2px 5px;border-radius:4px">X ✓</span>
+              <span style="background:#14532d;color:#86efac;font-size:10px;padding:2px 5px;border-radius:4px">LI ✓</span>
+              <span style="background:#7c2d12;color:#fca5a5;font-size:10px;padding:2px 5px;border-radius:4px">PIN ✗</span>
+              <span style="background:#14532d;color:#86efac;font-size:10px;padding:2px 5px;border-radius:4px">WA ✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#64748b">Most visibility — but more UI to build</p>
+    </div>
+  </div>
+
+</div>
