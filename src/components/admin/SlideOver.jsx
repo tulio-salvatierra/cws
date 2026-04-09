@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import PlatformBadge from './PlatformBadge'
 
 export default function SlideOver({ draft, onClose, onApprove, onReject }) {
   const [activeTab, setActiveTab] = useState(draft.platform_posts?.[0]?.platform ?? 'instagram')

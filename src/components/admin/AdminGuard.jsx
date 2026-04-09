@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from '../../Hooks/useAuth'
 
 export default function AdminGuard({ children }) {
   const { session, loading } = useAuth()

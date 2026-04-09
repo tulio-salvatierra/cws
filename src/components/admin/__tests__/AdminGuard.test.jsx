@@ -2,11 +2,11 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-vi.mock('../../../hooks/useAuth', () => ({
+vi.mock('../../../Hooks/useAuth', () => ({
   useAuth: vi.fn(),
 }))
 
-import { useAuth } from '../../../hooks/useAuth'
+import { useAuth } from '../../../Hooks/useAuth'
 import AdminGuard from '../AdminGuard'
 
 describe('AdminGuard', () => {

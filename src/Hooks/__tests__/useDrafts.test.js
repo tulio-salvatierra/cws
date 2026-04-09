@@ -34,7 +34,7 @@ vi.mock('../../lib/supabase', () => {
   }
 })
 
-import { useDrafts } from '../../hooks/useDrafts.js'
+import { useDrafts } from '../useDrafts.js'
 
 describe('useDrafts', () => {
   it('returns loading true initially', () => {

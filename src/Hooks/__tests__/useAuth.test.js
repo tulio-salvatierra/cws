@@ -20,7 +20,7 @@ vi.mock('../../lib/supabase', () => ({
   },
 }))
 
-import { useAuth } from '../../hooks/useAuth.js'
+import { useAuth } from '../useAuth.js'
 
 describe('useAuth', () => {
   beforeEach(() => {

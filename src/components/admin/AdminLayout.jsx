@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from '../../Hooks/useAuth'
 
 const NAV = [
   { to: '/admin', label: '📋 Queue', end: true },
