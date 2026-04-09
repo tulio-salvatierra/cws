@@ -1,7 +1,7 @@
 import PlatformBadge from './PlatformBadge'
 
 export default function DraftCard({ draft, onApprove, onReject, onExpand }) {
-  const imageUrl = draft.platform_posts?.[0]?.image_url
+  const imageUrl = draft.image_url
 
   return (
     <div className="flex items-center gap-4 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 hover:border-gray-700 transition-colors">

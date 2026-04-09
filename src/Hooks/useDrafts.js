@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-export function useDrafts(statusFilter = 'pending_review') {
+export function useDrafts(statusFilter = 'review_pending') {
   const [drafts, setDrafts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -22,21 +22,14 @@ export function useDrafts(statusFilter = 'pending_review') {
     setLoading(false)
   }
 
-  async function approveDraft(id, scheduledAt) {
+  async function approveDraft(id) {
     const { error } = await supabase
       .from('content_drafts')
-      .update({ status: 'approved', scheduled_at: scheduledAt })
+      .update({ status: 'approved' })
       .eq('id', id)
     if (!error) {
       setDrafts(prev => prev.filter(d => d.id !== id))
-      const webhookUrl = import.meta.env.VITE_N8N_WF4_WEBHOOK_URL
-      if (webhookUrl) {
-        fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ draft_id: id }),
-        }).catch(() => {})
-      }
+      // WF5 scheduler cron (weekdays 7am) picks up 'approved' drafts automatically
     }
     return { error }
   }
@@ -78,7 +71,7 @@ export function useYouTubeDrafts() {
       .from('content_drafts')
       .select('*, platform_posts!inner(*)')
       .eq('platform_posts.platform', 'youtube')
-      .eq('platform_posts.status', 'youtube_ready')
+      .eq('platform_posts.status', 'scheduled')
       .order('created_at', { ascending: false })
 
     if (error) {

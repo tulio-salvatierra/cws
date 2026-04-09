@@ -19,6 +19,14 @@ export default defineConfig({
   server: {
     port: 5174,
     strictPort: true,
+    proxy: {
+      // Proxy n8n webhook calls in dev to avoid CORS (browser → n8n.cloud cross-origin)
+      '/webhook': {
+        target: 'https://ciceroweb.app.n8n.cloud',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
   },
   preview: {
     port: 5174,

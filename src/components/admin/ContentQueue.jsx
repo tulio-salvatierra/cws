@@ -10,7 +10,7 @@ export default function ContentQueue() {
   const [activeTab, setActiveTab] = useState('pending')
   const [expandedDraft, setExpandedDraft] = useState(null)
 
-  const pending = useDrafts('pending_review')
+  const pending = useDrafts('review_pending')
   const published = useDrafts('published')
   const youtube = useYouTubeDrafts()
 
@@ -65,7 +65,7 @@ export default function ContentQueue() {
               <DraftCard
                 key={draft.id}
                 draft={draft}
-                onApprove={id => pending.approveDraft(id, null)}
+                onApprove={id => pending.approveDraft(id)}
                 onReject={pending.rejectDraft}
                 onExpand={setExpandedDraft}
               />
@@ -115,7 +115,7 @@ export default function ContentQueue() {
         <SlideOver
           draft={expandedDraft}
           onClose={() => setExpandedDraft(null)}
-          onApprove={id => { pending.approveDraft(id, null); setExpandedDraft(null) }}
+          onApprove={id => { pending.approveDraft(id); setExpandedDraft(null) }}
           onReject={id => { pending.rejectDraft(id); setExpandedDraft(null) }}
         />
       )}
