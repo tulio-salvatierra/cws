@@ -38,7 +38,7 @@ export default function KeywordsPage() {
           )}
         </div>
         {suggested.length === 0 ? (
-          <p className="text-gray-500 text-sm">No suggestions pending — WF5 runs every Monday.</p>
+          <p className="text-gray-500 text-sm">No AI suggestions yet. Keywords can be added manually below.</p>
         ) : (
           <div className="flex flex-col gap-2">
             {suggested.map(kw => (

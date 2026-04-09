@@ -18,15 +18,9 @@ import AdminPage from "./pages/admin/AdminPage";
 import AdminGuard from "./components/admin/AdminGuard";
 import ContentQueue from "./components/admin/ContentQueue";
 import KeywordsPage from "./pages/admin/KeywordsPage";
-
-// Stub for admin pages not yet built
-function ComingSoon({ label }) {
-  return (
-    <div className="p-6">
-      <p className="text-gray-500 text-sm">{label} — coming soon.</p>
-    </div>
-  )
-}
+import CalendarPage from "./pages/admin/CalendarPage";
+import AnalyticsPage from "./pages/admin/AnalyticsPage";
+import SettingsPage from "./pages/admin/SettingsPage";
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -112,9 +106,9 @@ function App() {
         >
           <Route index element={<ContentQueue />} />
           <Route path="keywords" element={<KeywordsPage />} />
-          <Route path="calendar"  element={<ComingSoon label="📅 Calendar" />} />
-          <Route path="analytics" element={<ComingSoon label="📊 Analytics" />} />
-          <Route path="settings"  element={<ComingSoon label="⚙️ Settings" />} />
+          <Route path="calendar"  element={<CalendarPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="settings"  element={<SettingsPage />} />
         </Route>
       </Routes>
       </Router>

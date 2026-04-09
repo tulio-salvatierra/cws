@@ -19,9 +19,9 @@ function StatusBadge({ platform, status }) {
       </span>
     )
   }
-  if (status === 'youtube_ready') {
+  if (status === 'scheduled') {
     return (
-      <span className="bg-purple-900 text-purple-300 text-xs font-semibold px-2 py-0.5 rounded">
+      <span className="bg-indigo-900 text-indigo-300 text-xs font-semibold px-2 py-0.5 rounded">
         {label} ⏳
       </span>
     )
@@ -34,7 +34,7 @@ function StatusBadge({ platform, status }) {
 }
 
 export default function PublishedCard({ draft }) {
-  const imageUrl = draft.platform_posts?.find(pp => pp.image_url)?.image_url
+  const imageUrl = draft.image_url
   const formattedDate = new Date(draft.updated_at).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',

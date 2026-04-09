@@ -40,10 +40,10 @@ export default function SlideOver({ draft, onClose, onApprove, onReject }) {
 
         {/* Platform content */}
         <div className="flex-1 p-6 flex flex-col gap-4">
-          {/* Image preview */}
-          {activePost?.image_url ? (
+          {/* Image preview — image_url lives on content_drafts, shared across all platforms */}
+          {draft.image_url ? (
             <img
-              src={activePost.image_url}
+              src={draft.image_url}
               alt="Post visual"
               className="rounded-xl w-full object-cover max-h-48"
             />
