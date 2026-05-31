@@ -18,33 +18,41 @@
   position: absolute;
   top: 0;
   left: 0;
+  will-change: transform;
+  padding: clamp(1.5rem, 5vw, 3rem);
 }
 
-.loading-words {
-  grid-column-gap: 2em;
-  grid-row-gap: 2em;
-  align-items: center;
+.loading-content {
   display: flex;
-  opacity: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(94vw, 72rem);
+  gap: clamp(1.25rem, 3vh, 2rem);
 }
 
-.loading-words__dot {
-  font-family: 'Archivo', sans-serif;
-  background-color: #fff;
-  border-radius: 50%;
-  width: .75em;
-  height: .75em;
+.loading-logo {
+  display: block;
+  width: 100%;
+  max-width: 1696px;
+  height: auto;
+  aspect-ratio: 1696 / 1101;
+  object-fit: contain;
+  will-change: transform, opacity;
 }
 
-.loading-words__word {
-  font-size: 5.5em;
+.loading-count {
+  font-size: clamp(0.875rem, 2vw, 1.125rem);
   font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   line-height: 1;
   margin: 0;
+  color: rgb(0 0 0 / 0.55);
+  font-variant-numeric: tabular-nums;
 }
 
-@media screen and (max-width: 767px) {
-  .loading-words {
-    font-size: 2.75vw;
-  }
+.loading-count::after {
+  content: "%";
+  margin-left: 0.06em;
 }

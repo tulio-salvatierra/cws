@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Loader from "./components/Loader";
 import { useLenis } from "./Hooks/lenis";
 import Layout from "./components/Layout/Layout";
@@ -57,63 +57,48 @@ function LandingPageWrapper() {
 function App() {
   useLenis(); // Custom hook for smooth scrolling
 
-  // Show loader only once per session
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem("hasLoaded") !== "true";
-    }
-    return true;
-  });
-  const [appVisible, setAppVisible] = useState(false);
-
-  useEffect(() => {
-    if (!loading) {
-      const revealTimer = setTimeout(() => setAppVisible(true), 150);
-      return () => clearTimeout(revealTimer);
-    }
-    setAppVisible(false);
-  }, [loading]);
+  const [loading, setLoading] = useState(true);
 
   const handleLoaderComplete = useCallback(() => {
     setLoading(false);
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("hasLoaded", "true");
-    }
   }, []);
 
   return (
-    <div className={`app-shell ${appVisible ? "app-shell--visible" : "app-shell--hidden"}`}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="services" element={<ServicesPage />} />
-            <Route path="about" element={<About />} />
-            <Route path="policy" element={<Policy />} />
-            <Route path="blog" element={<Blog />} />
-            <Route path="blog/:slug" element={<BlogPost />} />
-            <Route path="contact" element={<Contact />} />
-            {/* Dynamic landing page routes inside layout so providers apply */}
-            <Route 
-              path="landing/:id" 
-              element={<LandingPageWrapper />} 
-            />
-          </Route>
-          <Route path="/admin/login" element={<LoginPage />} />
-        <Route
-          path="/admin"
-          element={<AdminGuard><AdminPage /></AdminGuard>}
-        >
-          <Route index element={<ContentQueue />} />
-          <Route path="keywords" element={<KeywordsPage />} />
-          <Route path="calendar"  element={<CalendarPage />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
-          <Route path="settings"  element={<SettingsPage />} />
-        </Route>
-      </Routes>
-      </Router>
+    <>
+      <div className={`app-shell ${loading ? "app-shell--loading" : ""}`}>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="services" element={<ServicesPage />} />
+              <Route path="about" element={<About />} />
+              <Route path="policy" element={<Policy />} />
+              <Route path="blog" element={<Blog />} />
+              <Route path="blog/:slug" element={<BlogPost />} />
+              <Route path="contact" element={<Contact />} />
+              {/* Dynamic landing page routes inside layout so providers apply */}
+              <Route path="landing/:id" element={<LandingPageWrapper />} />
+            </Route>
+            <Route path="/admin/login" element={<LoginPage />} />
+            <Route
+              path="/admin"
+              element={
+                <AdminGuard>
+                  <AdminPage />
+                </AdminGuard>
+              }
+            >
+              <Route index element={<ContentQueue />} />
+              <Route path="keywords" element={<KeywordsPage />} />
+              <Route path="calendar" element={<CalendarPage />} />
+              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+          </Routes>
+        </Router>
+      </div>
       {loading && <Loader onComplete={handleLoaderComplete} />}
-    </div>
+    </>
   );
 }
 

@@ -202,13 +202,14 @@ article a:hover {
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
-  background: transparent !important;
+  /* Matches MeshGradient base so nothing flashes white behind the loader */
+  background: #f5f4f4 !important;
 }
 
 body {
   font-family: 'Archivo', sans-serif;
   overflow-x: hidden;
-  background: transparent !important;
+  background: #f5f4f4 !important;
 }
 
 /* Single app background: MeshGradient in Layout. Keep these transparent so it shows through. */

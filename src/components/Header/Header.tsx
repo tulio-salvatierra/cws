@@ -10,6 +10,7 @@ import CustomButton from "../CustomButton";
 import {useScramble} from "../../Hooks/useScramble";
 import {useFadeIn} from "../../Hooks/useFadeIn";
 import MaskedLines from "../MaskedLines/MaskedLines";
+import { useGSAP } from "@gsap/react";  
 
 
 // Register ScrollTrigger plugin
@@ -23,18 +24,38 @@ export default function Header() {
   const toggleMenu = () => setShowMenu(!showMenu);
   const scrambleRef = useScramble("CWS", 0.1);
   const fadeInRef = useFadeIn();
+
+  useGSAP(
+    () => {
+      gsap.from(".header-anim", {
+        opacity: 0,
+        y: 10,
+        stagger: 0.22,
+        ease: "power2.out",
+        duration: 1,
+      });
+      gsap.from(".header-anim-text", {
+        opacity: 0,
+        y: 10,
+        stagger: 0.22,
+        ease: "power2.out",
+        duration: 1,
+      });
+    },
+    { scope: headerRef },
+  );
  
 
   return (
     <div 
       ref={headerRef}
-      className="bg-zinc-800/70 mt-4 fixed backdrop-blur-md flex w-[85%] mx-auto rounded-full content-center top-6 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
+      className="bg-zinc-800/70 mt-4 fixed backdrop-blur-md flex w-[85%] mx-auto rounded-md content-center top-6 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
     >
-      <div className="flex w-full p-6 justify-between items-center">
+      <div className="flex w-full p-6 justify-between items-center header-anim">
         {/* Desktop Header */}
         <Link to="/" className="no-underline">
           <div ref={fadeInRef}>
-         <h1 ref={scrambleRef} className="text-orange-200 font-semibold tracking-tight transition-all duration-300">
+         <h1 ref={scrambleRef} className="text-orange-500 font-semibold tracking-tight transition-all duration-300 header-anim-text">
           [CWS]
          </h1>
           </div>
@@ -44,7 +65,7 @@ export default function Header() {
             <Link
               to={nav.url}
               key={index}
-              className={`${nav.class} ${location.pathname === nav.url ? 'hover:text-orange-100 transition-colors duration-300' : ''}`}
+              className={`${nav.class} ${location.pathname === nav.url ? 'hover:text-orange-500 transition-colors duration-700 ease-in-out header-anim-text hover:text-orange-500 hover:scale-105' : ''}`}
               onClick={toggleMenu}
             >
               {nav.name}
@@ -104,7 +125,7 @@ export default function Header() {
                   <Link
                     to={navMobile.url}
                     
-                    className={`${navMobile.class} block py-2 text-xl tracking-tight font-main text-orange-100 ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
+                    className={`${navMobile.class} block py-2 text-xl tracking-tight font-main text-orange-100 hover:text-orange-500 transition-colors duration-300 ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
                     onClick={toggleMenu}
                     >
                       {navMobile.name}
@@ -117,7 +138,7 @@ export default function Header() {
             <a
               ref={fadeInRef as unknown as React.RefObject<HTMLAnchorElement>}
               href={CALENDLY_URL}
-              className="block p-4 rounded-full text-white border-2 font-main font-semibold text-xl text-center transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
+              className="block p-4 text-white border-2 font-main font-semibold text-xl text-center transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
             >
               Book Site Audit
             </a>
