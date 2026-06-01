@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useLoaderAnimation } from "@/Hooks/Loader";
-import logoSrc from "@/assets/images/Frame13.svg";
+import logoSrc from "@/assets/Images/Frame13.svg";
 import "./Loader.css";
 
 /** Native dimensions from Frame13.svg — keeps aspect ratio when scaling */

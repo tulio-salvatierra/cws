@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { MeshGradient } from "@paper-design/shaders-react";
 import CustomButton from "../CustomButton";
 import Logo from "./../../assets/video/hero.mp4";
-import introBg from "../../assets/images/intro.jpg";
+import introBg from "../../assets/Images/intro.jpg";
 import MaskedLines from "./../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
