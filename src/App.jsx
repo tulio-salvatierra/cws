@@ -1,7 +1,11 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Loader from "./components/Loader";
+import {
+  LoaderContext,
+  HERO_ANIMATION_DELAY_MS,
+} from "./context/LoaderContext";
 import { useLenis } from "./Hooks/lenis";
 import Layout from "./components/Layout/Layout";
 import Home from "./components/Home/Home";
@@ -21,6 +25,8 @@ import KeywordsPage from "./pages/admin/KeywordsPage";
 import CalendarPage from "./pages/admin/CalendarPage";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -55,16 +61,30 @@ function LandingPageWrapper() {
 }
 
 function App() {
+  const appRef = useRef<HTMLDivElement>(null);
   useLenis(); // Custom hook for smooth scrolling
 
   const [loading, setLoading] = useState(true);
+  const [heroReady, setHeroReady] = useState(false);
+  const heroDelayTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (heroDelayTimerRef.current) {
+        clearTimeout(heroDelayTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleLoaderComplete = useCallback(() => {
     setLoading(false);
+    heroDelayTimerRef.current = window.setTimeout(() => {
+      setHeroReady(true);
+    }, HERO_ANIMATION_DELAY_MS);
   }, []);
 
   return (
-    <>
+    <LoaderContext.Provider value={{ heroReady }}>
       <div className={`app-shell ${loading ? "app-shell--loading" : ""}`}>
         <Router>
           <Routes>
@@ -98,7 +118,7 @@ function App() {
         </Router>
       </div>
       {loading && <Loader onComplete={handleLoaderComplete} />}
-    </>
+    </LoaderContext.Provider>
   );
 }
 

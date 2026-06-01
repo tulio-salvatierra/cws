@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MeshGradient } from "@paper-design/shaders-react";
 import CustomButton from "../CustomButton";
 import Logo from "./../../assets/video/hero.mp4";
+import introBg from "../../assets/images/intro.jpg";
 import MaskedLines from "./../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -13,6 +14,7 @@ import UnicornScenePage from "../USS/UnicornScene";
 import BannerPartner from "../BannerPartner";
 
 export default function Problem() {
+  const problemRef = useRef<HTMLDivElement>(null);
   const scrambleRef = useScramble("WHAT MAKES US DIFFERENT?", 0.1);
   const fadeInRef = useFadeIn();
   const [size, setSize] = useState({ width: 1280, height: 720 });
@@ -27,71 +29,80 @@ export default function Problem() {
 
   useGSAP(() => {
     gsap.from(".video-background", {
-      duration: 6,
-      borderRadius: "800px",
-      width: "50%",
-      ease: "power1.out",
+      duration: 3.5,
+      borderRadius: "800px 0 800px 0",
+      width: "70%",
+      ease: "power3.inOut",
+      yPercent: -100,
       scrollTrigger: {
         trigger: ".video-background-container",
-        start: "top 35%",
+        start: "top 50%",
         end: "bottom bottom",
-        scrub: 2,
+        scrub: 4,
       },
     });
   }, []);
 
   return (
-    <section className="p-5 flex flex-col w-full justify-evenly overflow-x-hidden bg-[#f97316]">
-      
-        
-        <MaskedLines
-          as="h1"
-          scroll
-          className="font-main text-left font-semibold text-black sm:text-[9rem] text-[2rem] w-100 leading-none tracking-normal"
-        >
-          CICERO WEB STUDIO
-        </MaskedLines>
-      
-
-      <div className="flex justify-center items-start h-auto w-100">
-        <div className="grid items-center w-100 mb-28 gap-2 h-auto p-1">
-        <strong className="text-white text-left">
-          <MaskedLines scroll scrollStart="top 85%" className="text-white text-left p-1">[INTRODUCING]</MaskedLines>
-        </strong>
+    <section
+      ref={problemRef}
+      id="problem"
+      className="flex flex-col w-full overflow-x-hidden"
+    >
+      <div
+        className="problem-intro relative w-full bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${introBg})` }}
+      >
+        <div
+          className="absolute inset-0 bg-[#f97316]/55"
+          aria-hidden
+        />
+        <div className="relative z-10 p-5 flex flex-col w-full justify-between min-h-[min(100vh,960px)]">
           <MaskedLines
-            as="p"
+            as="h1"
             scroll
-            scrollStart="top 85%"
-            className="p-6 mx-auto font-main text-zinc-900 text-2xl xl md:text-5xl text-start paragraph tracking-10 leading-none w-screen p-1"
+            className="font-main text-center font-semibold text-black sm:text-[9rem] text-[2rem] w-100 leading-none tracking-normal"
           >
-            I'm Tulio, truck driver turned web developer. I reached all my goals while driving across the country and always had a passion technology and it's power to do amazing thing and changes people's lives. As an entrepreneur, I want to work with small businesses in Chicago to help them grow, reach their goals and succeed by being a partner in their process and using tools (or build them) to help them achieve their goals.
+            CICERO WEB STUDIO
           </MaskedLines>
 
-          <div>
-            <div className="w-screen relative left-1/2 -translate-x-1/2 mb-4 z-10 shrink-0" style={{ height: "50dvh" }}>
-              <UnicornScenePage />
-            </div>
-            <div
-              ref={fadeInRef}
-              className="flex flex-col text-start w-screen text-white paragraph"
-            >
-              <MaskedLines as="p" className="font-main extralight text-zinc-900 text-2xl xl md:text-5xl text-start paragraph tracking-10 leading-tight w-screen p-6">
-                I'm a local entrepreneur with a passion for web design and development. I have years of operations and logistics
-                experience and I understand what Chicago businesses need: websites that actually bring in customers. I work shoulder to shoulder with you to create elegant, effective solutions—always with a can‑do attitude and the dedication to go the extra mile.
-              </MaskedLines>
-            </div>
+          <div className="flex justify-center items-start h-auto w-100">
+            <div className="grid items-center w-100 mb-28 gap-2 h-auto p-1">
+              <span className="fromBelow text-white text-left p-6">
+                <MaskedLines
+                  scroll
+                  scrollStart="top 85%"
+                  className="text-white text-left font-light text-sm"
+                >
+                  [INTRO]
+                </MaskedLines>
+              </span>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-8 p-6 w-auto">
-              <CustomButton
-                href={CALENDLY_URL}
-                label="Book Free 15-Min Site Audit →"
-                newTab={true}
-              />
-              <CustomButton
-                href="#projects"
-                label="See Recent Work ↓"
-                secondary={true}
-              />
+              <MaskedLines
+                as="p"
+                scroll
+                scrollStart="top 85%"
+                className="p-6 mx-auto font-main text-zinc-900 text-2xl xl md:text-5xl text-start paragraph tracking-10 leading-none w-screen p-1"
+              >
+                I'm Tulio and I am a local entrepreneur with a passion for web design, development, music and all things creative and technology. My goal is to help small businesses in Chicago (and ChicagoLand by extension) meet their goals. Either building their website from scratch or helping them with their existing website to make it more effective, to create media assets video and photo to match their brand and marketing goals. As an added I can also help business automate processes by delivering custom agents that deliver time and cost savings results!
+              </MaskedLines>
+
+              <div>
+               
+
+                <div className="flex flex-col sm:flex-row gap-4 mt-8 p-6 w-auto">
+                  <CustomButton
+                    href={CALENDLY_URL}
+                    label="Book Free 15-Min Site Audit →"
+                    newTab={true}
+                  />
+                  <CustomButton
+                    href="#projects"
+                    label="See Recent Work ↓"
+                    secondary={true}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -109,7 +120,7 @@ export default function Problem() {
           preload="auto"
           disablePictureInPicture
           disableRemotePlayback
-          className="video-background relative z-10 w-screen video-anim h-full object-cover mx-auto"
+          className="video-background relative z-10 w-screen video-anim h-full object-cover mx-auto shadow-2xl"
           onEnded={(e) => {
             e.currentTarget.currentTime = 0;
             e.currentTarget.play();

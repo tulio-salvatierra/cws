@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Problem from '../Problem';
 import Hero from '../Hero';
 import Services from '../Services';
@@ -10,6 +10,7 @@ import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
 import Reviews from '../Reviews/Reviews';
 
 export default function Home() {
+  const homeRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // Add LocalBusiness schema with aggregate rating for homepage
     const schema = generateOrganizationSchema();

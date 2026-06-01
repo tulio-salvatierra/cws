@@ -14,7 +14,7 @@ import { useGSAP } from "@gsap/react";
 
 
 // Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+
 
 export default function Header() {
   const { openLeadForm } = useModal();
@@ -22,40 +22,33 @@ export default function Header() {
   const headerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const toggleMenu = () => setShowMenu(!showMenu);
-  const scrambleRef = useScramble("CWS", 0.1);
   const fadeInRef = useFadeIn();
 
   useGSAP(
     () => {
-      gsap.from(".header-anim", {
-        opacity: 0,
-        y: 10,
-        stagger: 0.22,
-        ease: "power2.out",
-        duration: 1,
-      });
-      gsap.from(".header-anim-text", {
-        opacity: 0,
-        y: 10,
-        stagger: 0.22,
-        ease: "power2.out",
-        duration: 1,
-      });
+     gsap.from(".header-anim", {
+      
+      y: -2200,
+      opacity: .25,
+      ease: "power3.inOut",
+      duration: 3.5,
+     });
     },
     { scope: headerRef },
   );
  
 
   return (
+    <div ref={headerRef} className="header-container">
     <div 
-      ref={headerRef}
-      className="bg-zinc-800/70 mt-4 fixed backdrop-blur-md flex w-[85%] mx-auto rounded-md content-center top-6 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
+    
+      className="bg-zinc-800/70 header-anim  mt-4 fixed backdrop-blur-md flex w-[85%] mx-auto rounded-md content-center top-6 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
     >
-      <div className="flex w-full p-6 justify-between items-center header-anim">
+      <div className="flex w-full p-6 justify-between items-center ">
         {/* Desktop Header */}
         <Link to="/" className="no-underline">
           <div ref={fadeInRef}>
-         <h1 ref={scrambleRef} className="text-orange-500 font-semibold tracking-tight transition-all duration-300 header-anim-text">
+         <h1 className="text-orange-500 font-semibold tracking-tight transition-all duration-300 header-anim-text">
           [CWS]
          </h1>
           </div>
@@ -176,6 +169,7 @@ export default function Header() {
         document.body
         )}
       </div>
+    </div>
     </div>
   );
 }
