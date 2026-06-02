@@ -1,19 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link, useLocation } from "react-router-dom";
 import { useModal } from "../LeadFormModal/ModalContext";
 import { CALENDLY_URL, MENU_ITEM } from "../../Constants/Constants";
 import Burger from "../../assets/icons/burger.svg";
 import CustomButton from "../CustomButton";
-import {useScramble} from "../../Hooks/useScramble";
 import {useFadeIn} from "../../Hooks/useFadeIn";
 import MaskedLines from "../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";  
-
-
-// Register ScrollTrigger plugin
 
 
 export default function Header() {
@@ -26,13 +21,14 @@ export default function Header() {
 
   useGSAP(
     () => {
-     gsap.from(".header-anim", {
-      
-      y: -2200,
-      opacity: .25,
-      ease: "power3.inOut",
-      duration: 3.5,
-     });
+      // Keep this subtle so the header doesn't appear "missing" on mobile.
+      gsap.from(".header-anim", {
+        y: -80,
+        opacity: 0,
+        ease: "power3.out",
+        duration: 1.2,
+        clearProps: "transform",
+      });
     },
     { scope: headerRef },
   );
