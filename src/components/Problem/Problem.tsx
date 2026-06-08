@@ -145,5 +145,6 @@ export default function Problem() {
         />
       </div>
     </section>
+    </section>
   );
 }
