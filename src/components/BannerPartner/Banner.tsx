@@ -106,7 +106,7 @@ export default function StepsBanner() {
   }, []);
 
   return (
-    <section className="mwg_effect013 h-screen flex items-center justify-center bg-white mb-10">
+    <section className="mwg_effect013 h-screen flex items-center justify-center bg-white shadow-lg">
       <div className="banner-wrapper">
         <div className="inner">
           <div className="banner-container" ref={containerRef}>

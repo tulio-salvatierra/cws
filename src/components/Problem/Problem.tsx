@@ -49,19 +49,20 @@ export default function Problem() {
       id="problem"
       className="flex flex-col w-full overflow-x-hidden"
     >
+      <section className="relative z-10 h-screen problem-intro-container">
       <div
-        className="problem-intro relative w-full bg-cover bg-center bg-no-repeat"
+        className="problem-intro relative h-screen w-full bg-cover sm:bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${introBg})` }}
       >
         <div
-          className="absolute inset-0 bg-[#f97316]/55"
+          className="absolute inset-0 bg-black/45"
           aria-hidden
         />
         <div className="relative z-10 p-5 flex flex-col w-full justify-between min-h-[min(100vh,960px)]">
           <MaskedLines
             as="h1"
             scroll
-            className="font-main text-center font-semibold text-black sm:text-[9rem] text-[2rem] w-100 leading-none tracking-normal"
+            className="font-main text-center font-semibold text-white sm:text-[10rem] text-[3rem] w-100 leading-none tracking-normal"
           >
             CICERO WEB STUDIO
           </MaskedLines>
@@ -72,7 +73,7 @@ export default function Problem() {
                 <MaskedLines
                   scroll
                   scrollStart="top 85%"
-                  className="text-white text-left font-light text-sm"
+                  className="text-orange-500 text-left font-light text-sm"
                 >
                   [INTRO]
                 </MaskedLines>
@@ -82,7 +83,7 @@ export default function Problem() {
                 as="p"
                 scroll
                 scrollStart="top 85%"
-                className="p-6 mx-auto font-main text-zinc-900 text-2xl xl md:text-5xl text-start paragraph tracking-10 leading-none w-screen p-1"
+                className="p-6 mx-auto font-main text-white text-2xl xl md:text-5xl text-start paragraph tracking-10 leading-none w-screen p-1"
               >
                 I'm Tulio and I am a local entrepreneur with a passion for web design, development, music and all things creative and technology. My goal is to help small businesses in Chicago (and ChicagoLand by extension) meet their goals. Either building their website from scratch or helping them with their existing website to make it more effective, to create media assets video and photo to match their brand and marketing goals. As an added I can also help business automate processes by delivering custom agents that deliver time and cost savings results!
               </MaskedLines>
@@ -108,6 +109,7 @@ export default function Problem() {
         </div>
       </div>
       <BannerPartner /> 
+      </section>
       <div className="video-background-container relative w-full overflow-hidden">
         {/* Mesh gradient background behind the video */}
         

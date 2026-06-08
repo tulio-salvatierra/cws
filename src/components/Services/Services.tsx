@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+
 import { MeshGradient } from "@paper-design/shaders-react";
 import ServicesCard from "../ServicesCard";
 import TileMask from "../TileMask/TileMask";
-import { useScramble } from "../../Hooks/useScramble";
+
 import { useFadeIn } from "../../Hooks/useFadeIn";
 import MaskedLines from "../MaskedLines/MaskedLines";
 
 export default function Services() {
-  const scrambleRef = useScramble("SERVICES", 0.1);
+ 
   const fadeInRef = useFadeIn();
 
   return (
@@ -23,10 +23,10 @@ export default function Services() {
           <div className="bg-[#f97316] px-5 py-6 z-10">
             <strong className="text-white">[WHAT WE DO]</strong>
             <h2
-              ref={scrambleRef}
-              className="font-main font-semibold sm:text-[6rem] text-6xl text-black w-100 leading-tight"
+              
+              className="font-main font-semibold sm:text-[10rem] text-[4rem] text-white w-100 leading-tight"
             >
-              <TileMask text="Services" />
+              SERVICES
             </h2>
             <MaskedLines
               as="p"
@@ -34,11 +34,7 @@ export default function Services() {
               scrollStart="top 85%"
               className="font-main text-zinc-900 text-2xl sm:text-3xl w-full text-start leading-relaxed"
             >
-              We build Chicago websites that actually bring in customers. No
-              fluff, just results: more bookings, calls, and sales. From Cicero
-              web design and Chicago digital marketing to Oak Park SEO services,
-              we help small businesses in Humboldt Park, Portage Park & greater
-              Chicago succeed online.
+              I help small businesses in Chicago (and ChicagoLand by extension) meet their goals. Either building their website from scratch or helping them with their existing website to make it more effective, to create media assets video and photo to match their brand and marketing goals. As an added I can also help business automate processes by delivering custom agents that deliver time and cost savings results!
             </MaskedLines>
           </div>
           <ul className="flex flex-col">
