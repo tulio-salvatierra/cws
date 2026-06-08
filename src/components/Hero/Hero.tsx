@@ -80,19 +80,19 @@ export default function Hero() {
         <div
           className="w-full h-full flex flex-col justify-end items-start"
         >
-        <span className="text-black font-main font-light text-sm text-left mb-6 leading-tight text-center sm:text-left">
+        <span className="text-black font-main font-light text-sm mb-6 tracking-tighter text-center sm:text-left">
           [CICERO WEB STUDIO]
         </span>
-          <h1 className="h1 fromBelow text-5xl md:text-8xl font-main font-semibold text-orange-300 text-left mb-6 leading-none tracking-tight text-center sm:text-left">
+          <h1 className="h1 fromBelow text-5xl md:text-6xl font-main font-semibold text-orange-300  mb-6 leading-[1.1] tracking-none text-center sm:text-left">
             Don't let the daily google traffic search miss your business
           </h1>
           <p
-            className="p text-zinc-900 text-2xl md:text-3xl text-left font-main leading-none w-full mb-8"
+            className="p text-zinc-900 text-2xl md:text-2xl text-left font-main leading-none w-full mb-8"
           >
             By building a website that is optimized for search engines, you can
             increase your visibility and attract more customers by buidling trust!
           </p>
-          <span className="text-black font-main font-light text-sm text-left mb-6 leading-tight text-center sm:text-left">[HABLAMOS ESPAÑOL]</span>
+          <span className="text-black font-main font-light text-sm mb-6 leading-tight text-center sm:text-left">[HABLAMOS ESPAÑOL]</span>
         </div>
 
         <div
