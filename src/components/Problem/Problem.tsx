@@ -50,13 +50,10 @@ export default function Problem() {
       className="flex flex-col w-full overflow-x-hidden"
     >
       <div
-        className="problem-intro relative w-full bg-cover bg-center bg-no-repeat"
+        className="problem-intro relative w-full bg-cover sm:bg-center bg-left bg-no-repeat"
         style={{ backgroundImage: `url(${introBg})` }}
       >
-        <div
-          className="absolute inset-0 bg-[#f97316]/55"
-          aria-hidden
-        />
+        <div className="absolute inset-0 bg-[#f97316]/55" aria-hidden />
         <div className="relative z-10 p-5 flex flex-col w-full justify-between min-h-[min(100vh,960px)]">
           <MaskedLines
             as="h1"
@@ -82,14 +79,20 @@ export default function Problem() {
                 as="p"
                 scroll
                 scrollStart="top 85%"
-                className="p-6 mx-auto font-main text-zinc-900 text-2xl xl md:text-5xl text-start paragraph tracking-10 leading-none w-screen p-1"
+                className="mx-auto font-main text-zinc-900 text-2xl xl md:text-4xl text-start paragraph tracking-10 leading-none w-screen p-1"
               >
-                I'm Tulio and I am a local entrepreneur with a passion for web design, development, music and all things creative and technology. My goal is to help small businesses in Chicago (and ChicagoLand by extension) meet their goals. Either building their website from scratch or helping them with their existing website to make it more effective, to create media assets video and photo to match their brand and marketing goals. As an added I can also help business automate processes by delivering custom agents that deliver time and cost savings results!
+                I’m Tulio, a local entrepreneur with a passion for web design,
+                development, music, creativity, and technology. I help small
+                businesses in Chicago and the Chicagoland area create a stronger
+                online presence and use digital tools more effectively. Whether
+                you need a website built from scratch, improvements to an
+                existing site, branded photo and video content, or custom AI
+                automation to save time and reduce costs, my goal is to help
+                your business look more professional, work more efficiently, and
+                grow with confidence.
               </MaskedLines>
 
               <div>
-               
-
                 <div className="flex flex-col sm:flex-row gap-4 mt-8 p-6 w-auto">
                   <CustomButton
                     href={CALENDLY_URL}
@@ -107,10 +110,10 @@ export default function Problem() {
           </div>
         </div>
       </div>
-      <BannerPartner /> 
+      <BannerPartner />
       <div className="video-background-container relative w-full overflow-hidden">
         {/* Mesh gradient background behind the video */}
-        
+
         <video
           src={Logo}
           autoPlay
