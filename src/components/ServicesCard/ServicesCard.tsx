@@ -1,7 +1,5 @@
 import { servicesData } from "./servicesCardData";
 import { useFadeIn } from "../../Hooks/useFadeIn";
-import MaskedLines from "../MaskedLines/MaskedLines";
-import { MeshGradient } from "@paper-design/shaders-react";
 import { useEffect, useState } from "react";
 import LottieAnimation from "./lotties/Lottie";
 import CustomButton from "../CustomButton/CustomButton";

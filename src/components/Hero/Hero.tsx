@@ -5,8 +5,9 @@ import CustomButton from "./../CustomButton";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/SplitText";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./Hero.css";
-gsap.registerPlugin(SplitText);
+gsap.registerPlugin(SplitText, ScrollTrigger  );
 
 
 export default function Hero() {
@@ -55,7 +56,28 @@ export default function Hero() {
         delay: 1,
         duration: 1,
         ease: "expo.out",
+       
       });
+
+      // ref on <section id="hero" ref={heroRef}>
+gsap.fromTo(
+  heroRef.current,
+  {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  {
+    borderBottomLeftRadius: 80,  // tune this
+    borderBottomRightRadius: 80,
+    ease: "none",
+    scrollTrigger: {
+      trigger: heroRef.current,
+      start: "top top",
+      end: "bottom top",   // rounds as hero leaves viewport
+      scrub: true,
+    },
+  }
+);
 
       return () => {
         h1.revert();
@@ -69,7 +91,7 @@ export default function Hero() {
     <section 
       id="hero"
       ref={heroRef}
-      className="relative z-10 w-[90vw] mx-auto h-screen overflow-hidden grid items-center"
+      className="relative z-10 w-[90vw] mx-auto h-screen grid items-center "
     >
       {/* Foreground content: on top of the scene */}
       <div
