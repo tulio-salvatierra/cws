@@ -42,6 +42,17 @@
     max-width: 90vw;
     position: relative;
     z-index: 1;
+    min-height: 50vh;
+}
+.mwg_effect015 .how-canvas {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(28rem, 70vw);
+    height: min(28rem, 40vh);
+    z-index: 2;
+    pointer-events: none;
 }
 .mwg_effect015 .container p {
     text-align: center;

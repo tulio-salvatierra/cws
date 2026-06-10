@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import HowCanvas from "./Three/HowCanvas";
 import "./How.css";
 gsap.registerPlugin(ScrollTrigger);
 
@@ -79,10 +80,11 @@ export default function How({
         aria-hidden
       />
       <div className="container mt-[300px]">
+        <HowCanvas />
         <p className="homepage-title">
           <span className="word font-main sm:text-[10rem] text-[6rem] font-semibold">
             <span className="word-hidden text-white">HOW</span>
-            <span className="word-visible text-zinc-800">HOW</span>
+            <span className="word-visible text-zinc-800 italic">HOW</span>
           </span>
           <br />
           <span className="word font-main sm:text-[10rem] text-[6rem] italic font-bold">
@@ -92,11 +94,11 @@ export default function How({
           <br />
           <span className="word font-main sm:text-[10rem] text-[6rem] font-normal">
             <span className="word-hidden text-center text-white">IT</span>
-            <span className="word-visible text-center text-orange-300">IT</span>
+            <span className="word-visible text-center text-orange-900">IT</span>
           </span>
           <br />
           <span className="word font-main sm:text-[10rem] text-[6rem]">
-            <span className="word-hidden text-center text-orange-100">WORK</span>
+            <span className="word-hidden text-center text-orange-900">WORK</span>
             <span className="word-visible text-center text-zinc-800">WORK</span>
           </span>
         </p> 
