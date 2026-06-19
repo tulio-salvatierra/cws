@@ -7,7 +7,6 @@ export const ABOUT_URL = "/about";
 export const POLICY_URL = "/policy";
 export const CONTACT_URL = "#contact";
 export const BLOG_URL = "/blog";
-export const CLIENT_PORTAL_URL = "/client-portal";
 
 // Social Media URLs
 export const PINTEREST_URL = "https://www.pinterest.com/Cicero_Web_Studio/";
@@ -44,13 +43,6 @@ export const MENU_ITEM = [
     id: 5,
     name: "BLOG",
     url: BLOG_URL,
-    class:
-      "font-main text-orange-100 font-bold mr-1 justify-center relative text-md sm:text-lg block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
-  },
-  {
-    id: 6,
-    name: "PORTAL",
-    url: CLIENT_PORTAL_URL,
     class:
       "font-main text-orange-100 font-bold mr-1 justify-center relative text-md sm:text-lg block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
   },
