@@ -1,3 +1,5 @@
+/* global process */
+
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -6,6 +8,17 @@ import { fileURLToPath } from 'url'
 // In ESM, __dirname is not defined. Recreate it from import.meta.url
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+const LOCAL_SERVERLESS_HANDLERS = [
+  {
+    route: '/api/client-portal-notify',
+    handlerUrl: new URL('./api/client-portal-notify.js', import.meta.url).href,
+  },
+  {
+    route: '/api/lead-outreach',
+    handlerUrl: new URL('./api/lead-outreach.js', import.meta.url).href,
+  },
+]
 
 function clientPortalApiPlugin(env) {
   return {
@@ -54,6 +67,10 @@ function clientPortalApiPlugin(env) {
           })
         }
       })
+
+      LOCAL_SERVERLESS_HANDLERS.forEach(({ route, handlerUrl }) => {
+        mountServerlessHandler(server, route, handlerUrl, env)
+      })
     },
   }
 }
@@ -81,6 +98,61 @@ function sendJson(res, statusCode, payload) {
   res.statusCode = statusCode
   res.setHeader('Content-Type', 'application/json')
   res.end(JSON.stringify(payload))
+}
+
+function mountServerlessHandler(server, route, handlerUrl, env) {
+  server.middlewares.use(route, async (req, res) => {
+    try {
+      applyLocalServerEnv(env)
+      const body = await readJsonBody(req)
+      const { default: handler } = await import(`${handlerUrl}?t=${Date.now()}`)
+      let statusCode = 200
+      let responseSent = false
+
+      const apiRes = {
+        status(code) {
+          statusCode = code
+          return this
+        },
+        json(payload) {
+          if (!responseSent) {
+            responseSent = true
+            sendJson(res, statusCode, payload)
+          }
+          return this
+        },
+      }
+
+      await handler(
+        {
+          method: req.method,
+          headers: req.headers,
+          body,
+        },
+        apiRes,
+      )
+    } catch (error) {
+      sendJson(res, 500, {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Local API route failed',
+      })
+    }
+  })
+}
+
+function applyLocalServerEnv(env) {
+  ;[
+    'RESEND_API_KEY',
+    'ADMIN_NOTIFY_EMAIL',
+    'RESEND_FROM_EMAIL',
+    'BUSINESS_POSTAL_ADDRESS',
+    'LEAD_REPLY_TO_EMAIL',
+    'LEAD_UNSUBSCRIBE_URL',
+  ].forEach((key) => {
+    if (env[key]) {
+      process.env[key] = env[key]
+    }
+  })
 }
 
 // https://vite.dev/config/
