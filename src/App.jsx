@@ -16,6 +16,7 @@ import Blog from "./components/Blog";
 import BlogPost from "./components/BlogPost";
 import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
+import ClientPortalPage from "./pages/clientPortal/ClientPortalPage";
 import { getLandingPageData } from "./data/landingPagesData";
 import LoginPage from "./pages/admin/LoginPage";
 import AdminPage from "./pages/admin/AdminPage";
@@ -25,8 +26,7 @@ import KeywordsPage from "./pages/admin/KeywordsPage";
 import CalendarPage from "./pages/admin/CalendarPage";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import ClientsPage from "./pages/admin/ClientsPage";
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -61,7 +61,6 @@ function LandingPageWrapper() {
 }
 
 function App() {
-  const appRef = useRef<HTMLDivElement>(null);
   useLenis(); // Custom hook for smooth scrolling
 
   const [loading, setLoading] = useState(true);
@@ -96,6 +95,7 @@ function App() {
               <Route path="blog" element={<Blog />} />
               <Route path="blog/:slug" element={<BlogPost />} />
               <Route path="contact" element={<Contact />} />
+              <Route path="client-portal" element={<ClientPortalPage />} />
               {/* Dynamic landing page routes inside layout so providers apply */}
               <Route path="landing/:id" element={<LandingPageWrapper />} />
             </Route>
@@ -112,6 +112,7 @@ function App() {
               <Route path="keywords" element={<KeywordsPage />} />
               <Route path="calendar" element={<CalendarPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="clients" element={<ClientsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
           </Routes>

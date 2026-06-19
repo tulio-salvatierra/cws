@@ -44,7 +44,6 @@ export default function Loader({ onComplete }: LoaderProps) {
             width={LOGO_WIDTH}
             height={LOGO_HEIGHT}
             className="loading-logo"
-            fetchPriority="high"
             loading="eager"
             decoding="sync"
           />
