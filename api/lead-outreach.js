@@ -74,7 +74,6 @@ function buildOutreachEmail({ lead, type, personalNote }) {
   const followUpText = buildFollowUpText(lead, personalNote)
   const message = type === 'intro' ? introText : followUpText
   const replyTo = process.env.LEAD_REPLY_TO_EMAIL || process.env.ADMIN_NOTIFY_EMAIL || ''
-  const leadId = lead.id || lead.email
 
   return {
     from: getFromEmail(),
@@ -83,8 +82,19 @@ function buildOutreachEmail({ lead, type, personalNote }) {
     subject,
     text: message.text,
     html: message.html,
-    ...(type === 'intro' ? { idempotencyKey: `lead-intro/${leadId}` } : {}),
+    idempotencyKey: buildOutreachIdempotencyKey(type, lead),
   }
+}
+
+function buildOutreachIdempotencyKey(type, lead) {
+  const leadId = lead.id || lead.email
+
+  if (type === 'intro') {
+    return `lead-intro/${leadId}`
+  }
+
+  const followUpSlot = lead.nextFollowUpDate || lead.lastContacted || 'initial'
+  return `lead-follow-up/${leadId}/${followUpSlot}`
 }
 
 function buildIntroText(lead, personalNote) {

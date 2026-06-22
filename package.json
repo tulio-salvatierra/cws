@@ -13,6 +13,7 @@
     "coverage": "vitest run --coverage",
     "env:setup": "node scripts/env-setup.mjs",
     "env:check": "node scripts/env-check.mjs",
+    "env:example-check": "node scripts/env-example-check.mjs",
     "env:pull": "vercel env pull .env"
   },
   "dependencies": {
