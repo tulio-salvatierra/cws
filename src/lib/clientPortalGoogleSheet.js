@@ -160,7 +160,7 @@ export async function syncClientUpdateToGoogleSheet(clientRecord, changes) {
 
 function buildClientOverviewRow(clientRecord) {
   return {
-    'Client Name': clientRecord.clientName || '',
+    'Client Name': getSheetClientName(clientRecord),
     'Business Name': clientRecord.businessName || '',
     'Contact Name': clientRecord.contactName || clientRecord.clientName || '',
     Email: clientRecord.email || '',
@@ -180,7 +180,7 @@ function buildClientOverviewRow(clientRecord) {
 
 function buildIntakeResponsesRow(clientRecord) {
   return {
-    'Client Name': clientRecord.clientName || '',
+    'Client Name': getSheetClientName(clientRecord),
     'Business Description': clientRecord.businessDescription || '',
     'Services Offered': clientRecord.servicesOffered || '',
     'Service Area': clientRecord.serviceArea || '',

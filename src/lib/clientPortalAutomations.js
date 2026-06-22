@@ -39,8 +39,8 @@ export async function addRowToGoogleSheet(clientRecord) {
 }
 
 export async function sendConfirmationEmail(clientRecord) {
-  // Future: send the client a branded confirmation email after intake submission.
-  return { clientId: clientRecord.id, sent: false }
+  await postClientPortalNotification('confirmation', clientRecord)
+  return { clientId: clientRecord.id, sent: true }
 }
 
 export async function sendProjectStatusUpdate(clientRecord, nextStatus) {
@@ -60,8 +60,8 @@ export async function sendClientPortalUpdate(clientRecord, changes = {}) {
 }
 
 export async function notifyAdminWhenClientSubmitsForm(clientRecord) {
-  // Future: notify Cicero Web Studio by email, Slack, or an n8n workflow.
-  return { clientId: clientRecord.id, notified: false }
+  await postClientPortalNotification('admin-notify', clientRecord)
+  return { clientId: clientRecord.id, sent: true }
 }
 
 export async function notifyClientWhenReportIsReady(clientRecord, reportUrl) {
@@ -82,4 +82,19 @@ async function safelyRunSheetSync(runSync) {
       error: error instanceof Error ? error.message : 'Google Sheet sync failed',
     }
   }
+}
+
+async function postClientPortalNotification(type, clientRecord) {
+  const response = await fetch('/api/client-portal-notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, clientRecord }),
+  })
+
+  if (!response.ok) {
+    const result = await response.json().catch(() => null)
+    throw new Error(result?.error || `Client portal notification failed with status ${response.status}`)
+  }
+
+  return response.json()
 }
