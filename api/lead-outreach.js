@@ -1,6 +1,7 @@
 /* global process */
 
-const RESEND_EMAILS_URL = 'https://api.resend.com/emails'
+import { getFromEmail, sendResendEmail } from './lib/resend.js'
+
 const OUTREACH_TYPES = ['intro', 'followUp']
 
 export default async function handler(req, res) {
@@ -33,26 +34,16 @@ export default async function handler(req, res) {
   }
 
   const emailPayload = buildOutreachEmail({ lead, type, personalNote })
-  const response = await fetch(RESEND_EMAILS_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-      'User-Agent': 'cicero-lead-outreach/1.0',
-    },
-    body: JSON.stringify(emailPayload),
-  })
+  const { data, error } = await sendResendEmail(emailPayload)
 
-  const result = await response.json().catch(() => null)
-
-  if (!response.ok) {
+  if (error) {
     return res.status(502).json({
       ok: false,
-      error: result?.message || result?.error || 'Resend outreach failed.',
+      error: error.message || 'Resend outreach failed.',
     })
   }
 
-  return res.status(200).json({ ok: true, result })
+  return res.status(200).json({ ok: true, result: data })
 }
 
 function getMissingEnv() {
@@ -83,14 +74,16 @@ function buildOutreachEmail({ lead, type, personalNote }) {
   const followUpText = buildFollowUpText(lead, personalNote)
   const message = type === 'intro' ? introText : followUpText
   const replyTo = process.env.LEAD_REPLY_TO_EMAIL || process.env.ADMIN_NOTIFY_EMAIL || ''
+  const leadId = lead.id || lead.email
 
   return {
-    from: process.env.RESEND_FROM_EMAIL,
+    from: getFromEmail(),
     to: [lead.email],
-    ...(replyTo ? { reply_to: [replyTo] } : {}),
+    ...(replyTo ? { replyTo: [replyTo] } : {}),
     subject,
     text: message.text,
     html: message.html,
+    ...(type === 'intro' ? { idempotencyKey: `lead-intro/${leadId}` } : {}),
   }
 }
 

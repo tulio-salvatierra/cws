@@ -22,4 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets — single .env for local dev; sync with Vercel via npm run env:pull
+.env
 .env.local
+.env.production
+.env.*.local

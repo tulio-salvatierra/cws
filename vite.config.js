@@ -4,6 +4,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { SERVER_ENV_KEYS } from './env.keys.js'
 
 // In ESM, __dirname is not defined. Recreate it from import.meta.url
 const __filename = fileURLToPath(import.meta.url)
@@ -141,14 +142,7 @@ function mountServerlessHandler(server, route, handlerUrl, env) {
 }
 
 function applyLocalServerEnv(env) {
-  ;[
-    'RESEND_API_KEY',
-    'ADMIN_NOTIFY_EMAIL',
-    'RESEND_FROM_EMAIL',
-    'BUSINESS_POSTAL_ADDRESS',
-    'LEAD_REPLY_TO_EMAIL',
-    'LEAD_UNSUBSCRIBE_URL',
-  ].forEach((key) => {
+  SERVER_ENV_KEYS.forEach((key) => {
     if (env[key]) {
       process.env[key] = env[key]
     }

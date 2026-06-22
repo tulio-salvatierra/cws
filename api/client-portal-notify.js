@@ -1,17 +1,18 @@
 /* global process */
 
-const RESEND_EMAILS_URL = 'https://api.resend.com/emails'
-const FROM_EMAIL = 'Cicero Web Studio <onboarding@resend.dev>'
+import { getFromEmail, sendResendEmail } from './lib/resend.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' })
   }
 
-  if (!process.env.RESEND_API_KEY) {
+  const missingEnv = getMissingEnv()
+
+  if (missingEnv.length) {
     return res.status(500).json({
       ok: false,
-      error: 'Missing Resend API key.',
+      error: `Missing notification environment variables: ${missingEnv.join(', ')}`,
     })
   }
 
@@ -41,26 +42,20 @@ export default async function handler(req, res) {
     })
   }
 
-  const response = await fetch(RESEND_EMAILS_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-      'User-Agent': 'cicero-client-portal/1.0',
-    },
-    body: JSON.stringify(emailPayload),
-  })
+  const { data, error } = await sendResendEmail(emailPayload)
 
-  const result = await response.json().catch(() => null)
-
-  if (!response.ok) {
+  if (error) {
     return res.status(502).json({
       ok: false,
-      error: result?.message || result?.error || 'Resend notification failed.',
+      error: error.message || 'Resend notification failed.',
     })
   }
 
-  return res.status(200).json({ ok: true, result })
+  return res.status(200).json({ ok: true, result: data })
+}
+
+function getMissingEnv() {
+  return ['RESEND_API_KEY', 'RESEND_FROM_EMAIL'].filter((key) => !process.env[key])
 }
 
 function parseRequestBody(body) {
@@ -86,9 +81,10 @@ function buildEmailPayload(type, clientRecord) {
 
 function buildConfirmationEmail(clientRecord) {
   const businessName = getBusinessName(clientRecord)
+  const clientId = clientRecord.id || clientRecord.email || 'unknown'
 
   return {
-    from: FROM_EMAIL,
+    from: getFromEmail(),
     to: [clientRecord.email].filter(Boolean),
     subject: `We received your Cicero Web Studio intake for ${businessName}`,
     text: [
@@ -106,14 +102,16 @@ function buildConfirmationEmail(clientRecord) {
       '<p><strong>Next step:</strong> Cicero Web Studio will follow up with your project status and any clarifying questions.</p>',
       '<p>Cicero Web Studio</p>',
     ].join(''),
+    idempotencyKey: `client-intake-confirmation/${clientId}`,
   }
 }
 
 function buildAdminNotificationEmail(clientRecord) {
   const businessName = getBusinessName(clientRecord)
+  const clientId = clientRecord.id || clientRecord.email || 'unknown'
 
   return {
-    from: FROM_EMAIL,
+    from: getFromEmail(),
     to: [process.env.ADMIN_NOTIFY_EMAIL].filter(Boolean),
     subject: `New client intake: ${businessName}`,
     text: [
@@ -133,6 +131,7 @@ function buildAdminNotificationEmail(clientRecord) {
       `<li><strong>Project type:</strong> ${escapeHtml(clientRecord.projectType || 'Not provided')}</li>`,
       '</ul>',
     ].join(''),
+    idempotencyKey: `client-intake-admin/${clientId}`,
   }
 }
 
