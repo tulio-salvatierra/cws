@@ -1,83 +1,57 @@
 import { useRef } from "react";
-import { CALENDLY_URL } from "./../../Constants/Constants";
-import CustomButton from "./../CustomButton";
+import { Link } from "react-router-dom";
+import { PHONE } from "../../Constants/Constants";
 
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SplitText } from "gsap/SplitText";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./Hero.css";
-gsap.registerPlugin(SplitText, ScrollTrigger  );
 
+gsap.registerPlugin(SplitText);
 
 export default function Hero() {
-  const heroRef = useRef<HTMLDivElement | null>(null);
-  const heroAnimRef = useRef<HTMLDivElement | null>(null);
-  
+  const heroRef = useRef<HTMLElement | null>(null);
 
   useGSAP(
     () => {
-      const h1 = new SplitText(".h1", {
+      const h1 = new SplitText(".hero-headline", {
         type: "chars, words",
         charsClass: "char-js",
         wordsClass: "word-js",
-        linesClass: "word-js",
-      });
-      const chars1 = h1.chars;
-      gsap.from(chars1, {
-        yPercent: 100,
-        opacity: 0,
-        duration: 5,
-        stagger: 0.03,
-        ease: "expo.out",
       });
 
-      const pwords = new SplitText(".p", {
+      gsap.from(h1.chars, {
+        yPercent: 110,
+        opacity: 0,
+        duration: 1.2,
+        stagger: 0.02,
+        ease: "expo.out",
+        delay: 0.4,
+      });
+
+      const pwords = new SplitText(".hero-subcopy", {
         type: "words, lines",
         wordsClass: "word-js",
         linesClass: "line-js",
       });
-      const words = pwords.words;
-      const lines = pwords.lines;
-      gsap.from([words, lines], {
-        yPercent: 100,
-        xPercent: -80,
-        rotateY: 90,
-        opacity: 0,
-          duration: 5,
-          stagger: 0.06,
-          ease: "expo.out",
-        },
-      );
 
-      gsap.from(".heroScale", {
-        scale: 1.8,
+      gsap.from(pwords.words, {
+        yPercent: 100,
         opacity: 0,
-        delay: 1,
         duration: 1,
+        stagger: 0.04,
         ease: "expo.out",
-       
+        delay: 0.7,
       });
 
-      // ref on <section id="hero" ref={heroRef}>
-gsap.fromTo(
-  heroRef.current,
-  {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-  },
-  {
-    borderBottomLeftRadius: 80,  // tune this
-    borderBottomRightRadius: 80,
-    ease: "none",
-    scrollTrigger: {
-      trigger: heroRef.current,
-      start: "top top",
-      end: "bottom top",   // rounds as hero leaves viewport
-      scrub: true,
-    },
-  }
-);
+      gsap.from(".hero-cta", {
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.12,
+        ease: "expo.out",
+        delay: 0.9,
+      });
 
       return () => {
         h1.revert();
@@ -88,44 +62,34 @@ gsap.fromTo(
   );
 
   return (
-    <section 
-      id="hero"
-      ref={heroRef}
-      className="relative z-10 w-[90vw] mx-auto h-screen grid items-center "
-    >
-      {/* Foreground content: on top of the scene */}
-      <div
-        ref={heroAnimRef}
-        className="relative z-20 p-1 w-full sm:min-h-screen items-end justify-center text-center p-1 grid grid-cols-1 md:grid-cols-2 gap-1 heroScale"
-      >
-        
-        <div
-          className="w-full h-full flex flex-col justify-end items-start"
-        >
-        <span className="text-black font-main font-light text-sm mb-6 tracking-tighter text-center sm:text-left">
-          [CICERO WEB STUDIO]
-        </span>
-          <h1 className="h1 fromBelow text-5xl md:text-6xl font-main font-semibold text-orange-300  mb-6 leading-[1.1] tracking-none text-center sm:text-left">
-            Don't let the daily google traffic search miss your business
+    <section id="hero" ref={heroRef} className="hero-section">
+      <div className="hero-footer">
+        <div className="hero-intro">
+          <h1 className="hero-headline">
+            Presence that <span className="hero-headline__works">works</span>
           </h1>
-          <p
-            className="p text-zinc-900 text-2xl md:text-2xl text-left font-main leading-none w-full mb-8"
-          >
-            By building a website that is optimized for search engines, you can
-            increase your visibility and attract more customers by buidling trust!
+          <p className="hero-subcopy">
+            I build website that engage the user, sparks curiosity and keep
+            visitors engaged
           </p>
-          <span className="text-black font-main font-light text-sm mb-6 leading-tight text-center sm:text-left">[HABLAMOS ESPAÑOL]</span>
         </div>
 
-        <div
-          className="hero-anim grid grid-cols-2 items-start gap-4 justify-top items-top p-2"
-        >
-          <CustomButton
-            href={CALENDLY_URL}
-            label="Book Site Audit →"
-            newTab={true}
-          />
-          <CustomButton href="#projects" label="Recent Work" secondary={true} />
+        <div className="hero-actions">
+          <a
+            href={`tel:+1${PHONE}`}
+            className="hero-cta hero-cta--primary hero-cta--desktop"
+          >
+            Call now!
+          </a>
+          <Link
+            to="/#contact"
+            className="hero-cta hero-cta--primary hero-cta--mobile"
+          >
+            Contact
+          </Link>
+          <Link to="/#projects" className="hero-cta hero-cta--secondary">
+            Work
+          </Link>
         </div>
       </div>
     </section>

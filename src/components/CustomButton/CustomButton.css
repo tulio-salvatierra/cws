@@ -1,80 +1,114 @@
-:root{
-  --ease-elastic: linear(0, 0.55 7.5%, 0.85 12%, 0.95 14%, 1.03 16.5%, 1.09 20%, 1.13 22%, 1.14 23%, 1.15 24.5%, 1.15 26%, 1.13 28%, 1.11 31%, 1.05 39%, 1.02 43%, 0.99 47%, 0.98 52%, 0.97 59%, 1.002 81%, 1);
-}
-
-.btn-group {
-  grid-column-gap: 3em;
-  grid-row-gap: 3em;
+.custom-btn {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  display: flex;
-  overflow: hidden;
+  min-width: clamp(10rem, 23vw, 21.375rem);
+  height: clamp(3.5rem, 7vw, 6.25rem);
+  padding: 0 clamp(1.5rem, 3vw, 2rem);
+  border: 0;
+  border-radius: 3.75rem;
+  background: #f5892f;
+  color: #000;
+  font-family: "Clash", sans-serif;
+  font-size: clamp(0.95rem, 1.25vw, 1.125rem);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
+.custom-btn:hover {
+  transform: scale(0.97);
+}
+
+.custom-btn--secondary {
+  background: rgba(90, 84, 84, 0.8);
+  color: #fff;
+}
+
+.custom-btn--light {
+  background: #d9d9d9;
+  color: #000;
+}
+
+.custom-btn--full {
+  width: 100%;
+  min-width: 0;
+}
+
+.custom-btn__label {
+  display: block;
+  white-space: nowrap;
+}
+
+/* Legacy btn-bounce markup — same visual system for older call sites */
 .btn-bounce {
-  color: #000000;
-  padding-left: 2em;
-  padding-right: 2em;
-  font-size: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(10rem, 23vw, 21.375rem);
+  height: clamp(3.5rem, 7vw, 6.25rem);
+  padding: 0 clamp(1.5rem, 3vw, 2rem);
+  border: 0;
+  border-radius: 3.75rem;
+  background: #f5892f;
+  color: #000;
+  font-family: "Clash", sans-serif;
+  font-size: clamp(0.95rem, 1.25vw, 1.125rem);
+  font-weight: 600;
+  line-height: 1;
   text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
   position: relative;
-  display: inline-block;
+  overflow: hidden;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.btn-bounce:hover {
+  transform: scale(0.97);
 }
 
 .btn-bounce.is--secondary {
+  background: rgba(90, 84, 84, 0.8);
   color: #fff;
 }
 
 .btn-bounce-bg {
-  z-index: 0;
-  color: black;
-  background-color: #f1d9c1;
-  border-radius: 100em;
-  position: absolute;
-  inset: 0%;
-}
-
-.btn-bounce-bg.is--secondary {
-  background-color: #00000026;
-  color: #ffffff;
-  border: 1px solid #ffffff;
-}
-
-.btn-bounce-text {
-  z-index: 1;
-  display: block;
-  position: relative;
+  display: none;
 }
 
 .btn-bounce-text__wrap {
-  padding-top: 1.2em;
-  padding-bottom: 1.2em;
-  overflow: hidden;
+  padding: 0;
+  overflow: visible;
 }
 
-/* Only apply hover animations if they are actually not supported */
-@media (hover:hover) and (pointer:fine){
+.btn-bounce-text {
+  display: block;
+  position: relative;
+  z-index: 1;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-shadow: none;
+}
 
-  .btn-bounce,
-  .btn-bounce-text,
-  .btn-bounce-text__wrap{
-    transition: transform 0.65s var(--ease-elastic);
+@media (max-width: 991px) {
+  .custom-btn,
+  .btn-bounce {
+    min-width: 0;
+    height: 4.25rem;
   }
-  
-  /* Fake a duplicate text element using text shadow without blur  */
-  /* We save the distance in a variable for easy use in the CSS animation */
-  .btn-bounce-text{
-    --text-duplicate-distance: 3em;
-    text-shadow: 0px var(--text-duplicate-distance) currentColor;
-  }
-  
-  /* Scale down the button and rotate it slightly */
-  .btn-bounce:hover { transform: scale(0.92) rotate(-3deg); }
-  
-  /* Rotate the text wrapper in the opposite direction so it appears straight */
-  .btn-bounce:hover .btn-bounce-text__wrap{ transform: rotate(3deg); }
-  
-  /* Move up the text span to reveal its text-shadow */
-  .btn-bounce:hover .btn-bounce-text{ transform: translate(0px, calc(-1 * var(--text-duplicate-distance))); }
 
+  .custom-btn--full,
+  .btn-bounce.w-full,
+  .w-full.btn-bounce {
+    width: 100%;
+  }
 }

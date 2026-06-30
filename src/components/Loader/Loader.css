@@ -8,8 +8,8 @@
 
 .loading-screen {
   pointer-events: auto;
-  color: #fff;
-  background-color: rgb(249 115 22 / var(--tw-text-opacity, 1));
+  color: #000;
+  background-color: #ffffff;
   justify-content: center;
   align-items: center;
   width: 100%;

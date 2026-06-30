@@ -1,74 +1,161 @@
-import CustomButton from "../CustomButton";
-import { useLenis } from "../../Hooks/lenis";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { MENU_ITEM } from "../../Constants/Constants";
-import BigWord from "../BigWord/BigWord";
+import {
+  ABOUT_URL,
+  CONTACT_URL,
+  EMAIL,
+  HOME_URL,
+  LINKEDIN_URL,
+  PHONE,
+  SERICES_URL,
+} from "../../Constants/Constants";
+import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
+import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
+import linkedinIcon from "../../assets/images/footer/linkedin.svg";
+import arrowUpIcon from "../../assets/images/footer/arrow-up.svg";
+import "./Footer.css";
+
+const FOOTER_NAV = [
+  { label: "About", url: ABOUT_URL },
+  { label: "Works", url: "/#projects" },
+  { label: "Services", url: SERICES_URL },
+  { label: "Process", url: "/#process" },
+  { label: "Contact", url: CONTACT_URL },
+] as const;
+
+function formatPhone(phone: number) {
+  const digits = String(phone);
+  return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+function formatFooterDate(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
 
 export default function Footer() {
-  const lenisRef = useRef<any>(null);
-
-  // Get the Lenis instance
-  useLenis();
+  const lenisRef = useRef<{ scrollTo: (target: number, options?: { duration?: number }) => void } | null>(null);
+  const footerDate = formatFooterDate(new Date());
 
   useEffect(() => {
-    // Get the Lenis instance from the window object
-    if (typeof window !== 'undefined') {
-      lenisRef.current = (window as any).lenis;
+    if (typeof window !== "undefined") {
+      lenisRef.current = (window as Window & { lenis?: typeof lenisRef.current }).lenis ?? null;
     }
   }, []);
 
   const scrollToTop = () => {
     if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { duration: 2 });
-    } else {
-      // Fallback to regular smooth scroll if Lenis is not available
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lenisRef.current.scrollTo(0, { duration: 1.5 });
+      return;
     }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   return (
-    <footer className="bg-transparent text-gray-200 py-12 px-4">
-      <div className="mx-auto">
-        {/* Top Section: Navigation and Back to Top */}
-        <div className="flex flex-col flex-wrap sm:flex-row justify-evenly items-center pb-8">
-          <nav className="flex flex-wrap space-x-6 text-sm font-main tracking-wider mb-4 sm:mb-0">
+    <footer className="site-footer">
+      <div className="site-footer__decorative" aria-hidden>
+        <img
+          src={ciceroWebStudio}
+          alt=""
+          className="site-footer__decorative-image"
+          draggable={false}
+        />
+      </div>
 
-            {MENU_ITEM.map((nav, index) => (
-              <Link
-                key={nav.id}
-                to={nav.url}
-                className="font-bold text-black text-2xl sm:text-2xl"
+      <div className="site-footer__inner">
+        <div className="site-footer__columns">
+          <div className="site-footer__column site-footer__column--navigate">
+            <h2 className="site-footer__column-heading">
+              <img
+                src={navigateIcon}
+                alt=""
+                className="site-footer__column-icon"
+                width={24}
+                height={23}
+              />
+              Navigate
+            </h2>
+            <nav className="site-footer__nav" aria-label="Footer navigation">
+              {FOOTER_NAV.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.url}
+                  className="site-footer__nav-link"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div className="site-footer__column site-footer__column--contact">
+            <h2 className="site-footer__column-heading">Contact</h2>
+            <div className="site-footer__contact">
+              <a
+                href={`mailto:${EMAIL}`}
+                className="site-footer__contact-pill site-footer__contact-pill--email"
               >
-                {nav.name}
-              </Link>
-            ))}
-          </nav>
-          <CustomButton label="Back to Top" onClick={scrollToTop} secondary={true} />
+                {EMAIL}
+              </a>
+              <a
+                href={`tel:+1${PHONE}`}
+                className="site-footer__contact-pill site-footer__contact-pill--phone"
+              >
+                {formatPhone(PHONE)}
+              </a>
+            </div>
+          </div>
+
+          <div className="site-footer__column site-footer__column--socials">
+            <h2 className="site-footer__column-heading">Socials</h2>
+            <div className="site-footer__socials">
+              <a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-footer__social-link"
+                aria-label="LinkedIn"
+              >
+                <img
+                  src={linkedinIcon}
+                  alt=""
+                  className="site-footer__social-icon"
+                  width={55}
+                  height={50}
+                />
+              </a>
+            </div>
+          </div>
         </div>
 
-        {/* Dotted Line Separator */}
-        <div className="border-t border-dashed border-gray-700 my-8"></div>
+        <div className="site-footer__bottom">
+          <div className="site-footer__meta">
+            <p>Chicago, IL. 60641</p>
+            <p>{footerDate}</p>
+          </div>
 
-        {/* Middle Section: Large FOCAL text */}
-        <div className="grid items-center justify-center sm:justify-start py-4">
-          <BigWord text="CICERO WEB STUDIO" className="mx-auto text-[8rem] md:text-[12rem] lg:text-[19rem] xl:text-[22rem] leading-none font-extrabold text-orange-500" />
+          <button
+            type="button"
+            className="site-footer__back-to-top"
+            onClick={scrollToTop}
+          >
+            Back to Top
+            <img
+              src={arrowUpIcon}
+              alt=""
+              className="site-footer__back-to-top-icon"
+              width={21}
+              height={21}
+            />
+          </button>
 
-
-        </div>
-
-        {/* Bottom Section: Copyright and Design Credits */}
-        <div className="flex flex-col sm:flex-row justify-between items-center pt-8 text-xs text-gray-400">
-          <p className="mb-2 sm:mb-0">
-            &copy; {new Date().getFullYear()} CICERO WEB STUDIO{" "}
-          </p>
-          <p>
-            DEVELOPMENT & DESIGN BY{" "}
-            <a
-              href="https://www.tuliosalvatierra.com"
-              className="underline hover:text-white transition-colors"
-            >
-              Tulio Salvatierra
-            </a>
+          <p className="site-footer__brand">
+            <Link to={HOME_URL}>Cicero Web Studio</Link>
           </p>
         </div>
       </div>

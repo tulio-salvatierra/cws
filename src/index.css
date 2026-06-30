@@ -3,48 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.grain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  z-index: 300;
-  transform: translateZ(0);
-  
-  &:before {
-    content: "";
-    top: -10rem;
-    left: -10rem;
-    width: calc(100% + 20rem);
-    height: calc(100% + 20rem);
-    z-index: 9999;
-    position: fixed;
-    background-image: url(https://upload.wikimedia.org/wikipedia/commons/5/5c/Image_gaussian_noise_example.png);
-    opacity: 0.15;
-    pointer-events: none;
-    -webkit-animation: noise 1s steps(2) infinite;
-    animation: noise 1s steps(2) infinite;
-  }
 
-  @-webkit-keyframes noise {
-    to { transform: translate3d(-7rem,0,0) }
-  }
-
-  @keyframes noise {
-    0% { transform: translate3d(0,9rem,0) }
-    10% { transform: translate3d(-1rem,-4rem,0) }
-    20% { transform: translate3d(-8rem,2rem,0) }
-    30% { transform: translate3d(9rem,-9rem,0) }
-    40% { transform: translate3d(-2rem,7rem,0) }
-    50% { transform: translate3d(-9rem,-4rem,0) }
-    60% { transform: translate3d(2rem,6rem,0) }
-    70% { transform: translate3d(7rem,-8rem,0) }
-    80% { transform: translate3d(-9rem,1rem,0) }
-    90% { transform: translate3d(6rem,-5rem,0) }
-    to { transform: translate3d(-7rem,0,0) }
-  }
-}
 
 /* ------------------------- Scaling System by Osmo [https://osmo.supply/] -------------------------  */
 
@@ -66,9 +25,9 @@ body {
 /* Desktop */
 :root {
   --size-unit: 16; /* body font-size in design - no px */
-  --size-container-ideal: 1440; /* screen-size in design - no px */
-  --size-container-min: 992px;
-  --size-container-max: 1920px;
+  --size-container-ideal: 95dvw; /* screen-size in design - no px */
+  --size-container-min: 95dvw;
+  --size-container-max: 95dvw;
   --size-container: clamp(var(--size-container-min), 100vw, var(--size-container-max));
   --size-font: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
 }
@@ -76,27 +35,27 @@ body {
 /* Tablet */
 @media screen and (max-width: 991px) {
   :root {
-    --size-container-ideal: 834; /* screen-size in design - no px */
-    --size-container-min: 768px;
-    --size-container-max: 991px;
+    --size-container-ideal: 95dvw; /* screen-size in design - no px */
+    --size-container-min: 95dvw;
+    --size-container-max: 95dvw;
   }
 }
 
 /* Mobile Landscape */
 @media screen and (max-width: 767px) {
   :root {
-    --size-container-ideal: 550; /* screen-size in design - no px */
-    --size-container-min: 480px;
-    --size-container-max: 767px;
+    --size-container-ideal: 95dvw; /* screen-size in design - no px */
+    --size-container-min: 95dvw;
+    --size-container-max: 95dvw;
   }
 }
 
 /* Mobile Portrait */
 @media screen and (max-width: 479px) {
   :root {
-    --size-container-ideal: 390; /* screen-size in design - no px */
-    --size-container-min: 320px;
-    --size-container-max: 479px;
+    --size-container-ideal: 95dvw; /* screen-size in design - no px */
+    --size-container-min: 95dvw;
+    --size-container-max: 95dvw;
   }
 }
 
@@ -245,17 +204,17 @@ article a:hover {
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
-  /* Matches MeshGradient base so nothing flashes white behind the loader */
-  background: #f5f4f4 !important;
+  /* Matches loader + app background so nothing flashes behind the loader */
+  background: #ffffff !important;
 }
 
 body {
   font-family: 'Archivo', sans-serif;
   overflow-x: hidden;
-  background: #f5f4f4 !important;
+  background: #000000 !important;
 }
 
-/* Single app background: MeshGradient in Layout. Keep these transparent so it shows through. */
+/* Single app background: Unicorn Studio scene in Layout. Keep these transparent so it shows through. */
 #root,
 #root .app-shell,
 .App,

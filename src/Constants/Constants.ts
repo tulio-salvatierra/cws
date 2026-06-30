@@ -8,6 +8,11 @@ export const POLICY_URL = "/policy";
 export const CONTACT_URL = "#contact";
 export const BLOG_URL = "/blog";
 
+export const HOME_SECTION_URL = "/";
+export const ABOUT_SECTION_URL = "/#problem";
+export const SERVICES_SECTION_URL = "/#services";
+export const WORK_SECTION_URL = "/#projects";
+
 // Social Media URLs
 export const PINTEREST_URL = "https://www.pinterest.com/Cicero_Web_Studio/";
 export const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61579967843859";
@@ -21,29 +26,21 @@ export const MENU_ITEM = [
   {
     id: 1,
     name: "HOME",
-    url: HOME_URL,
-    class:
-      "font-main text-black font-bold mr-2 justify-center relative text-md sm:text-lg block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+    url: HOME_SECTION_URL,
   },
   {
     id: 2,
-    name: "SERVICES",
-    url: SERICES_URL,
-    class:
-      "font-main text-orange-100 font-bold mr-1 justify-center relative text-md sm:text-lg block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+    name: "ABOUT",
+    url: ABOUT_SECTION_URL,
   },
   {
     id: 3,
-    name: "ABOUT",
-    url: ABOUT_URL,
-    class:
-      "font-main text-orange-100 font-bold mr-1 justify-center relative text-md sm:text-lg block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
-  },  
+    name: "SERVICES",
+    url: SERVICES_SECTION_URL,
+  },
   {
-    id: 5,
-    name: "BLOG",
-    url: BLOG_URL,
-    class:
-      "font-main text-orange-100 font-bold mr-1 justify-center relative text-md sm:text-lg block after:block after:content-[''] after:absolute after:h-[3px] after:bg-lightGreen after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center",
+    id: 4,
+    name: "WORK",
+    url: WORK_SECTION_URL,
   },
 ];

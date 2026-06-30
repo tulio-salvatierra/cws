@@ -1,6 +1,7 @@
 export interface ServiceItem {
   id: number;
   title: string;
+  label: string;
   description: string;
   image?: Record<string, unknown>;
 }
@@ -12,24 +13,42 @@ import IT from "./lotties/AI.json";
 export const servicesData: ServiceItem[] = [
   {
     id: 1,
-    title: "Custom Websites That Convert",
+    label: "Design",
+    title: "Website Design",
     description:
       "Modern, fast designs built to grow your business. We create websites that reflect your brand, rank on Google and turn visitors into customers.",
     image: Web,
   },
   {
     id: 2,
-    title: "Photo & Video Content",
+    label: "Development",
+    title: "Website Development",
     description:
-      "We create high-impact photos and videos tailored to your brand that boost engagement on your website and social media, helping you attract and retain more clients.",
-    image: Business,
+      "Custom-built sites with clean code, fast load times, and the integrations your business needs to run smoothly online.",
+    image: Web,
   },
   {
     id: 3,
-    title: "AI AGENTS",
+    label: "Strategy",
+    title: "Website Strategy",
     description:
-      "We create custom AI agents that automate repetitive tasks, improve efficiency and save you time and money.",
+      "Conversion-focused planning so every page has a purpose — clearer messaging, stronger CTAs, and a site that supports your goals.",
     image: IT,
   },
-
+  {
+    id: 4,
+    label: "Media",
+    title: "Photo & Video",
+    description:
+      "High-impact photos and videos tailored to your brand that boost engagement on your website and social media.",
+    image: Business,
+  },
+  {
+    id: 5,
+    label: "3D",
+    title: "3D Development",
+    description:
+      "Interactive 3D visuals and experiences that help your brand stand out and keep visitors engaged longer.",
+    image: IT,
+  },
 ];

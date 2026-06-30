@@ -1,0 +1,36 @@
+.section-intro {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(6rem, 12vw, 8rem) clamp(1.25rem, 3vw, 2rem)
+    clamp(2rem, 4vw, 3rem);
+  background: transparent;
+}
+
+.section-intro__title {
+  margin: 0;
+  max-width: 12ch;
+  font-family: "Clash", sans-serif;
+  font-size: clamp(4.5rem, 18vw, 10rem);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: #fff1f1;
+  text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 991px) {
+  .section-intro {
+    min-height: clamp(28rem, 92vh, 40rem);
+  }
+
+  .section-intro__title {
+    font-size: clamp(3.5rem, 16vw, 5.5rem);
+  }
+}

@@ -1,0 +1,95 @@
+.cta-section {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: clamp(2rem, 5vw, 3rem) 0 clamp(3rem, 8vw, 5rem);
+  background: transparent;
+}
+
+.cta-section__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  width: 100%;
+  min-height: clamp(28rem, 72vh, 49rem);
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 6rem) clamp(1.25rem, 4vw, 2.5rem);
+  background: #d9d9d9;
+  text-align: center;
+}
+
+.cta-section__title {
+  margin: 0;
+  max-width: 43rem;
+  font-family: "Clash", sans-serif;
+  font-size: clamp(2.25rem, 9vw, 7.5rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: #000;
+  text-shadow: none;
+}
+
+.cta-section__description {
+  margin: 0;
+  max-width: 43rem;
+  font-family: "Clash", sans-serif;
+  font-size: clamp(0.9375rem, 1.35vw, 1rem);
+  font-weight: 600;
+  line-height: 1.55;
+  color: #000;
+}
+
+.cta-section__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: min(100%, 28.75rem);
+  height: clamp(4.25rem, 10vw, 6.25rem);
+  margin-top: clamp(0.5rem, 2vw, 1.5rem);
+  padding: 0 2.5rem;
+  border-radius: 3.75rem;
+  background: #f5892f;
+  color: #000;
+  font-family: "Clash", sans-serif;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.cta-section__button:hover {
+  transform: scale(0.98);
+}
+
+.cta-section__button-label--mobile {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .cta-section__panel {
+    min-height: clamp(24rem, 78vh, 43rem);
+    align-items: center;
+  }
+
+  .cta-section__title {
+    font-size: clamp(1.75rem, 9vw, 2.25rem);
+    line-height: 1.1;
+  }
+
+  .cta-section__button {
+    width: 100%;
+    max-width: 22.325rem;
+    height: 4.285rem;
+  }
+
+  .cta-section__button-label--desktop {
+    display: none;
+  }
+
+  .cta-section__button-label--mobile {
+    display: inline;
+  }
+}

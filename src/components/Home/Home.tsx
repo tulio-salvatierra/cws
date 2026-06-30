@@ -2,12 +2,10 @@ import { useEffect, useRef } from 'react';
 import Problem from '../Problem';
 import Hero from '../Hero';
 import Services from '../Services';
-import ProcessSection from "../ServicesPage/ProcessSection/ProcessSection";
+import Process from '../Process';
 import Projects from '../Projects/Projects';
-import Contact from '../Contact';
-import How from '../How/How';
+import CtaSection from '../CtaSection';
 import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
-import Reviews from '../Reviews/Reviews';
 
 export default function Home() {
   const homeRef = useRef<HTMLDivElement>(null);
@@ -38,20 +36,14 @@ export default function Home() {
       <div className="h-auto">
         <Services />
       </div>
-      <div>
-      <div className="bg-gradient-to-b from-orange-500 to-white">
-        <How /><ProcessSection />
-      </div>
-        
-      </div>
       <div className="h-auto">
         <Projects />
-      </div>        
-      <div>
-        <Reviews />
       </div>
       <div>
-        <Contact />
+        <Process />
+      </div>
+      <div>
+        <CtaSection />
       </div>
     </>
   );

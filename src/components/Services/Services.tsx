@@ -1,72 +1,158 @@
+import { useRef, useState, useCallback } from "react";
+import { servicesData } from "../ServicesCard/servicesCardData";
+import LottieAnimation from "../ServicesCard/lotties/Lottie";
+import SectionIntro from "../SectionIntro/SectionIntro";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import "./Services.css";
 
-import { MeshGradient } from "@paper-design/shaders-react";
-import ServicesCard from "../ServicesCard";
-import TileMask from "../TileMask/TileMask";
+gsap.registerPlugin(ScrollTrigger);
 
-import { useFadeIn } from "../../Hooks/useFadeIn";
-import MaskedLines from "../MaskedLines/MaskedLines";
+/** Scroll distance per service step while pinned (fraction of viewport height). */
+const STEP_SCROLL_VH = 0.14;
 
 export default function Services() {
- 
-  const fadeInRef = useFadeIn();
+  const total = servicesData.length;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+
+  const setActive = useCallback((index: number) => {
+    const next = Math.max(0, Math.min(total - 1, index));
+    setActiveIndex((current) => (current === next ? current : next));
+  }, [total]);
+
+  useGSAP(
+    () => {
+      const track = trackRef.current;
+      const pin = pinRef.current;
+      if (!track || !pin) return;
+
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 992px)", () => {
+        const lenis = (window as typeof window & { lenis?: { on: (event: string, cb: () => void) => void; off: (event: string, cb: () => void) => void } }).lenis;
+        const syncScroll = () => ScrollTrigger.update();
+
+        if (lenis) {
+          lenis.on("scroll", syncScroll);
+        }
+
+        const stepCount = Math.max(1, total - 1);
+        const pinScrollDistance = stepCount * window.innerHeight * STEP_SCROLL_VH;
+
+        const st = ScrollTrigger.create({
+          trigger: track,
+          start: "top top",
+          end: () => `+=${pinScrollDistance}`,
+          pin,
+          pinSpacing: true,
+          scrub: 0.35,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          snap:
+            stepCount > 1
+              ? {
+                  snapTo: 1 / stepCount,
+                  duration: { min: 0.12, max: 0.28 },
+                  delay: 0,
+                }
+              : false,
+          onUpdate: (self) => {
+            const index = Math.round(self.progress * stepCount);
+            setActive(index);
+          },
+        });
+
+        ScrollTrigger.refresh();
+
+        return () => {
+          if (lenis) {
+            lenis.off("scroll", syncScroll);
+          }
+          st.kill();
+        };
+      });
+
+      mm.add("(max-width: 991px)", () => {
+        const items = gsap.utils.toArray<HTMLElement>(
+          ".services-section__list-button",
+          pin,
+        );
+
+        const triggers = items.map((item, index) =>
+          ScrollTrigger.create({
+            trigger: item,
+            start: "top 55%",
+            end: "bottom 45%",
+            onEnter: () => setActive(index),
+            onEnterBack: () => setActive(index),
+          }),
+        );
+
+        return () => triggers.forEach((trigger) => trigger.kill());
+      });
+
+      return () => mm.revert();
+    },
+    { scope: sectionRef, dependencies: [total, setActive] },
+  );
 
   return (
-    <>
-      <section
-        id="services"
-        className="relative flex flex-col w-full h-auto justify-evenly overflow-x-hidden bg-orange-500 z-10"
-      >
-        {/* Mesh gradient: full section bg, revealed when card white slides on hover */}
+    <section id="services" ref={sectionRef} className="services-section">
+      <SectionIntro title="SERVICES" id="services-intro" />
 
-        <div className="relative z-10">
-          {/* White block: header + intro only; cards area has gradient behind */}
-          <div className="bg-[#f97316] px-5 py-6 z-10">
-            <strong className="text-white">[WHAT WE DO]</strong>
-            <h2
-              
-              className="font-main font-semibold sm:text-[10rem] text-[4rem] text-white w-100 leading-tight"
-            >
-              SERVICES
-            </h2>
-            <MaskedLines
-              as="p"
-              scroll
-              scrollStart="top 85%"
-              className="font-main text-zinc-900 text-2xl sm:text-3xl w-full text-start leading-relaxed"
-            >
-              I help small businesses in Chicago (and ChicagoLand by extension) meet their goals. Either building their website from scratch or helping them with their existing website to make it more effective, to create media assets video and photo to match their brand and marketing goals. As an added I can also help business automate processes by delivering custom agents that deliver time and cost savings results!
-            </MaskedLines>
+      <div ref={trackRef} className="services-section__track">
+        <div ref={pinRef} className="services-section__pin">
+          <div className="services-section__inner">
+            <div className="services-section__header">
+              <span className="services-section__icon" aria-hidden="true" />
+              <p className="services-section__eyebrow">What we do</p>
+            </div>
+
+            <div className="services-section__body">
+              <ul className="services-section__list" aria-label="Services">
+                {servicesData.map((service, index) => (
+                  <li key={service.id} className="services-section__list-item">
+                    <button
+                      type="button"
+                      className={`services-section__list-button${
+                        index === activeIndex ? " is-active" : ""
+                      }`}
+                      onMouseEnter={() => setActive(index)}
+                      onFocus={() => setActive(index)}
+                      onClick={() => setActive(index)}
+                      aria-current={index === activeIndex ? "true" : undefined}
+                    >
+                      {service.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="services-section__preview" aria-live="polite">
+                {servicesData.map((service, index) => (
+                  <div
+                    key={service.id}
+                    className={`services-section__preview-pane${
+                      index === activeIndex ? " is-active" : ""
+                    }`}
+                    aria-hidden={index !== activeIndex}
+                  >
+                    {service.image ? (
+                      <LottieAnimation path={service.image} />
+                    ) : (
+                      <div className="services-section__preview-fallback" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <ul className="flex flex-col">
-            <li className="relative">
-              <div className="absolute inset-0 z-0 overflow-hidden bottom-0 h-full">
-                <MeshGradient
-                  width={1280}
-                  height={2000}
-                  colors={[
-                    "#000000",
-                    "#bda8a8",
-                    "#cc7528",
-                    "#000000",
-                    "#000000",
-                    "#000000",
-                  ]}
-                  distortion={1}
-                  swirl={0}
-                  grainMixer={1}
-                  grainOverlay={0.08}
-                  speed={0.16}
-                  scale={1.12}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              </div>
-              <div className="relative z-10">
-                <ServicesCard />
-              </div>
-            </li>
-          </ul>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

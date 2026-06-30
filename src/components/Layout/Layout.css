@@ -1,0 +1,77 @@
+.app-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  pointer-events: none;
+  background: #000;
+}
+
+.app-background__gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(to right, #434343, #000000);
+}
+
+.app-background__unicorn {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.app-background__unicorn-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -44%);
+  pointer-events: none;
+}
+
+.app-background__unicorn-frame .hero-unicorn-scene {
+  display: block;
+  max-width: none;
+}
+
+.app-background__unicorn-frame canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+}
+
+.app-background__decorative {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.app-background__decorative-image {
+  display: block;
+  width: 115%;
+  height: 115%;
+  object-fit: contain;
+  object-position: center center;
+  transform: rotate(-30deg);
+  transform-origin: center center;
+  opacity: 0.35;
+}
+
+@media (max-width: 991px) {
+  .app-background__decorative-image {
+    width: 140%;
+    height: 140%;
+    opacity: 0.28;
+  }
+}

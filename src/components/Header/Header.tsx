@@ -1,171 +1,230 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useModal } from "../LeadFormModal/ModalContext";
-import { CALENDLY_URL, MENU_ITEM } from "../../Constants/Constants";
+import { MENU_ITEM, PHONE } from "../../Constants/Constants";
+import { scrollToSection } from "../../lib/scrollToSection";
 import Burger from "../../assets/icons/burger.svg";
+import cwsLogo from "../../assets/images/header/cws-logo.svg";
 import CustomButton from "../CustomButton";
-import {useFadeIn} from "../../Hooks/useFadeIn";
-import MaskedLines from "../MaskedLines/MaskedLines";
-import { useGSAP } from "@gsap/react";  
+import { useGSAP } from "@gsap/react";
+import "./Header.css";
 
+function CwsLogo() {
+  return (
+    <img
+      src={cwsLogo}
+      alt="Cicero Web Studio"
+      className="site-header__logo-image"
+      width={94}
+      height={37}
+      draggable={false}
+    />
+  );
+}
+
+function isNavActive(pathname: string, hash: string, url: string) {
+  if (url === "/") {
+    return pathname === "/" && (!hash || hash === "#hero");
+  }
+
+  if (url.startsWith("/#")) {
+    return pathname === "/" && hash === url.slice(1);
+  }
+
+  return pathname === url;
+}
+
+function getSectionIdFromUrl(url: string) {
+  if (url.startsWith("/#")) {
+    return url.slice(2);
+  }
+
+  if (url === "/") {
+    return "hero";
+  }
+
+  return null;
+}
 
 export default function Header() {
   const { openLeadForm } = useModal();
   const [showMenu, setShowMenu] = useState(false);
-  const headerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
   const location = useLocation();
-  const toggleMenu = () => setShowMenu(!showMenu);
-  const fadeInRef = useFadeIn();
+  const navigate = useNavigate();
+  const toggleMenu = () => setShowMenu((open) => !open);
+
+  useEffect(() => {
+    document.body.style.overflow = showMenu ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showMenu]);
+
+  useEffect(() => {
+    if (location.pathname !== "/" || !location.hash) return;
+
+    const sectionId = location.hash.slice(1);
+    const timer = window.setTimeout(() => {
+      scrollToSection(sectionId);
+    }, 150);
+
+    return () => window.clearTimeout(timer);
+  }, [location.pathname, location.hash]);
+
+  const handleNavClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    url: string,
+  ) => {
+    setShowMenu(false);
+
+    const sectionId = getSectionIdFromUrl(url);
+    if (!sectionId) return;
+
+    event.preventDefault();
+
+    if (location.pathname !== "/") {
+      navigate({ pathname: "/", hash: sectionId });
+      return;
+    }
+
+    const nextUrl = sectionId === "hero" ? "/" : `/#${sectionId}`;
+    window.history.pushState(null, "", nextUrl);
+    scrollToSection(sectionId);
+  };
 
   useGSAP(
     () => {
-      // Keep this subtle so the header doesn't appear "missing" on mobile.
-      gsap.from(".header-anim", {
+      gsap.from(".site-header__bar", {
         y: -80,
         opacity: 0,
         ease: "power3.out",
         duration: 1.2,
-        clearProps: "transform",
+        clearProps: "transform,opacity",
       });
     },
     { scope: headerRef },
   );
- 
 
   return (
-    <div ref={headerRef} className="header-container">
-    <div 
-    
-      className="bg-zinc-800/70 header-anim  mt-4 fixed backdrop-blur-md flex w-[85%] mx-auto rounded-md content-center top-6 left-0 right-0 z-50 overflow-x-hidden transition-all duration-300 border-b border-zinc-400/20 shadow-lg"
-    >
-      <div className="flex w-full p-6 justify-between items-center ">
-        {/* Desktop Header */}
-        <Link to="/" className="no-underline">
-          <div ref={fadeInRef}>
-         <h1 className="text-orange-500 font-semibold tracking-tight transition-all duration-300 header-anim-text">
-          [CWS]
-         </h1>
-          </div>
+    <header ref={headerRef} className="site-header header-container">
+      <div className="site-header__bar header-anim">
+        <Link
+          to="/"
+          className="site-header__logo"
+          onClick={() => setShowMenu(false)}
+        >
+          <CwsLogo />
         </Link>
-        <div className="space-x-6 hidden font-secondary items-center md:flex text-xs tracking-tight">
-          {MENU_ITEM.map((nav, index) => (
+
+        <nav className="site-header__nav" aria-label="Main navigation">
+          {MENU_ITEM.map((nav) => (
             <Link
+              key={nav.id}
               to={nav.url}
-              key={index}
-              className={`${nav.class} ${location.pathname === nav.url ? 'hover:text-orange-500 transition-colors duration-700 ease-in-out header-anim-text hover:text-orange-500 hover:scale-105' : ''}`}
-              onClick={toggleMenu}
+              onClick={(event) => handleNavClick(event, nav.url)}
+              className={`site-header__nav-link header-anim-text ${
+                isNavActive(location.pathname, location.hash, nav.url)
+                  ? "site-header__nav-link--active"
+                  : ""
+              }`}
             >
               {nav.name}
             </Link>
           ))}
-          <CustomButton href={CALENDLY_URL} label="Book Site Audit" />
-        </div>
-        <div className="md:hidden">
-          <button
-            aria-label="Toggle menu"
-            aria-expanded={showMenu}
-            aria-controls="mobile-menu"
-            onClick={toggleMenu}
-            className="w-10 h-10 cursor-pointer grid place-items-center"
-          >
-            <img src={Burger} alt="Menu" className="w-8 h-8" />
-          </button>
-        </div>
+        </nav>
 
-        {/* Mobile Menu - rendered via portal to escape stacking context */}
-        {typeof window !== 'undefined' && createPortal(
+        <a
+          href={`tel:+1${PHONE}`}
+          className="site-header__cta header-anim-text"
+        >
+          Call now!
+        </a>
+
+        <button
+          type="button"
+          aria-label="Toggle menu"
+          aria-expanded={showMenu}
+          aria-controls="mobile-menu"
+          onClick={toggleMenu}
+          className="site-header__menu-toggle"
+        >
+          <img src={Burger} alt="" />
+        </button>
+      </div>
+
+      {typeof window !== "undefined" &&
+        createPortal(
           <div
             id="mobile-menu"
-            className={`md:hidden fixed inset-0 z-[9999] ${showMenu ? 'pointer-events-auto' : 'pointer-events-none'}`}
+            className={`site-header__mobile-root ${
+              showMenu ? "site-header__mobile-root--open" : ""
+            }`}
             aria-hidden={!showMenu}
           >
-            {/* Backdrop with blur */}
             <div
               onClick={toggleMenu}
-              className={`absolute inset-0 z-0 bg-black/60 backdrop-blur-md transition-all duration-300 ease-out ${showMenu ? 'opacity-100' : 'opacity-0'}`}
+              className="site-header__mobile-backdrop"
+              aria-hidden="true"
             />
 
-            {/* Panel */}
             <nav
-              className={`absolute top-0 left-0 z-10 w-full max-h-auto overflow-y-auto bg-zinc-800/95 backdrop-blur-md border-b border-zinc-400/20 p-4 shadow-2xl transform transition-transform duration-300 ease-out ${showMenu ? 'translate-y-0' : '-translate-y-full'}`}
+              className="site-header__mobile-panel"
+              aria-label="Mobile navigation"
             >
-            <div className="content-top flex flex-col text-left gap-3">
-              <div className="flex justify-between items-center">
-                <MaskedLines
-                  as="p"
-                  className="font-semibold text-3xl text-orange-100 p-2"
-                >
-                  [CWS]
-                </MaskedLines>
+              <div className="site-header__mobile-top">
+                <Link to="/" onClick={toggleMenu}>
+                  <CwsLogo />
+                </Link>
                 <button
+                  type="button"
                   aria-label="Close menu"
                   onClick={toggleMenu}
-                  className="text-main text-orange-500 text-3xl font-black px-3 py-1"
+                  className="site-header__mobile-close"
                 >
                   ×
                 </button>
               </div>
 
-              <div ref={fadeInRef} className="flex-col p-4 mb-6 text-left justify-end items-center text-xl font-semibold">
-                {MENU_ITEM.map((navMobile, index) => (
-                  <div key={index}>
+              <div className="site-header__mobile-links">
+                {MENU_ITEM.map((nav) => (
                   <Link
-                    to={navMobile.url}
-                    
-                    className={`${navMobile.class} block py-2 text-xl tracking-tight font-main text-orange-100 hover:text-orange-500 transition-colors duration-300 ${location.pathname === navMobile.url ? 'text-orange-500' : ''}`}
-                    onClick={toggleMenu}
-                    >
-                      {navMobile.name}
-                    </Link>
-                  </div>
+                    key={nav.id}
+                    to={nav.url}
+                    onClick={(event) => handleNavClick(event, nav.url)}
+                    className={`site-header__mobile-link ${
+                      isNavActive(location.pathname, location.hash, nav.url)
+                        ? "site-header__mobile-link--active"
+                        : ""
+                    }`}
+                  >
+                    {nav.name}
+                  </Link>
                 ))}
               </div>
-            </div>
-            <div ref={fadeInRef}>
-            <a
-              ref={fadeInRef as unknown as React.RefObject<HTMLAnchorElement>}
-              href={CALENDLY_URL}
-              className="block p-4 text-white border-2 font-main font-semibold text-xl text-center transition ease-in-out delay-50 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-100"
-            >
-              Book Site Audit
-            </a>
-            </div>
-            <div ref={fadeInRef}>
-              
-            </div>
-            <button
-              ref={fadeInRef as unknown as React.RefObject<HTMLButtonElement>}
-              onClick={openLeadForm}
-              className="mt-6 w-full btn-bounce text-lg tracking-tight"
-            >
-              <div className="btn-bounce-bg"></div>
-              <div className="btn-bounce-text__wrap">
-                <span className="btn-bounce-text">Get a Quote</span>
-              </div>
-            </button>
-            <footer className="p-4 mt-10">
-              <div className="flex flex-col items-start gap-2">
-                
-                <MaskedLines
-                  as="p"
-                  scroll
-                  scrollStart="top 90%"
-                  className="text-zinc-300 text-left max-w-md font-main text-lg tracking-tight"
-                >
-                  Our mission is to deliver tailored websites and software
-                  solutions that solve real problems and drive meaningful
-                  growth.
-                </MaskedLines>
-              </div>
-            </footer>
-          </nav>
-        </div>,
-        document.body
+
+              <a
+                href={`tel:+1${PHONE}`}
+                className="site-header__mobile-cta"
+                onClick={toggleMenu}
+              >
+                Call now!
+              </a>
+
+              <CustomButton
+                label="Get a Quote"
+                fullWidth
+                onClick={() => {
+                  toggleMenu();
+                  openLeadForm();
+                }}
+              />
+            </nav>
+          </div>,
+          document.body,
         )}
-      </div>
-    </div>
-    </div>
+    </header>
   );
 }
