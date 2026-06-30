@@ -54,12 +54,12 @@ export default function Problem() {
         className="problem-intro relative w-full bg-cover sm:bg-center bg-left bg-no-repeat"
         style={{ backgroundImage: `url(${introBg})` }}
       >
-        <div className="absolute inset-0 bg-[#f97316]/55" aria-hidden />
+        <div className="absolute inset-0 bg-black/50" aria-hidden />
         <div className="relative z-10 p-5 flex flex-col w-full justify-between min-h-[min(100vh,960px)]">
           <MaskedLines
             as="h1"
             scroll
-            className="font-main text-center font-semibold text-white sm:text-[10rem] text-[3rem] w-100 leading-none tracking-normal"
+            className="font-main text-center font-semibold text-white sm:text-[6rem] text-[3rem] w-100 leading-none tracking-normal"
           >
             CICERO WEB STUDIO
           </MaskedLines>
@@ -124,7 +124,7 @@ export default function Problem() {
           preload="auto"
           disablePictureInPicture
           disableRemotePlayback
-          className="video-background relative z-10 w-screen video-anim h-full object-cover mx-auto shadow-2xl"
+          className="video-background grain relative z-10 w-screen video-anim h-full object-cover mx-auto shadow-2xl"
           onEnded={(e) => {
             e.currentTarget.currentTime = 0;
             e.currentTarget.play();
