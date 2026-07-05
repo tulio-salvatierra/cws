@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { PHONE } from "../../Constants/Constants";
+import { useLoaderReady } from "../../context/LoaderContext";
+import { waitForAppFonts } from "../../lib/waitForAppFonts";
 
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -11,54 +13,69 @@ gsap.registerPlugin(SplitText);
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement | null>(null);
+  const { heroReady } = useLoaderReady();
 
   useGSAP(
     () => {
-      const h1 = new SplitText(".hero-headline", {
-        type: "chars, words",
-        charsClass: "char-js",
-        wordsClass: "word-js",
-      });
+      if (!heroReady) return;
 
-      gsap.from(h1.chars, {
-        yPercent: 110,
-        opacity: 0,
-        duration: 1.2,
-        stagger: 0.02,
-        ease: "expo.out",
-        delay: 0.4,
-      });
+      let cancelled = false;
+      let headlineSplit: SplitText | null = null;
+      let subcopySplit: SplitText | null = null;
 
-      const pwords = new SplitText(".hero-subcopy", {
-        type: "words, lines",
-        wordsClass: "word-js",
-        linesClass: "line-js",
-      });
+      const runAnimations = () => {
+        headlineSplit = new SplitText(".hero-headline", {
+          type: "chars, words",
+          charsClass: "char-js",
+          wordsClass: "word-js",
+        });
 
-      gsap.from(pwords.words, {
-        yPercent: 100,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.04,
-        ease: "expo.out",
-        delay: 0.7,
-      });
+        gsap.from(headlineSplit.chars, {
+          yPercent: 110,
+          opacity: 0,
+          duration: 1.2,
+          stagger: 0.02,
+          ease: "expo.out",
+          delay: 0.4,
+        });
 
-      gsap.from(".hero-cta", {
-        y: 40,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.12,
-        ease: "expo.out",
-        delay: 0.9,
+        subcopySplit = new SplitText(".hero-subcopy", {
+          type: "words, lines",
+          wordsClass: "word-js",
+          linesClass: "line-js",
+        });
+
+        gsap.from(subcopySplit.words, {
+          yPercent: 100,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.04,
+          ease: "expo.out",
+          delay: 0.7,
+        });
+
+        gsap.from(".hero-cta", {
+          y: 40,
+          opacity: 0,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: "expo.out",
+          delay: 0.9,
+        });
+      };
+
+      void waitForAppFonts().then(() => {
+        if (cancelled) return;
+        runAnimations();
       });
 
       return () => {
-        h1.revert();
-        pwords.revert();
+        cancelled = true;
+        headlineSplit?.revert();
+        subcopySplit?.revert();
       };
     },
-    { scope: heroRef },
+    { scope: heroRef, dependencies: [heroReady] },
   );
 
   return (

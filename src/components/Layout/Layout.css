@@ -28,10 +28,21 @@
 }
 
 .app-background__unicorn-frame {
+  --unicorn-base-width: 1440;
+  --unicorn-base-height: 900;
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -44%);
+  width: calc(var(--unicorn-base-width) * 1px);
+  height: calc(var(--unicorn-base-height) * 1px);
+  transform: translate(-50%, -44%)
+    scale(
+      max(
+        calc(100vw / var(--unicorn-base-width)),
+        calc(100dvh / var(--unicorn-base-height))
+      )
+    );
+  transform-origin: center center;
   pointer-events: none;
 }
 
