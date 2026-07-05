@@ -14,6 +14,9 @@ function HeroBackground() {
       scale={1}
       dpi={1.5}
       sdkUrl={HERO_UNICORN_SDK_URL}
+      lazyLoad={false}
+      showPlaceholderWhileLoading={false}
+      showPlaceholderOnError
       ariaLabel="Hero background animation"
       className="hero-unicorn-scene"
     />
