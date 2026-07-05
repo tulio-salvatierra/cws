@@ -28,4 +28,6 @@ dist-ssr
 .env.local
 .env.production
 .env.*.local
-.env.example
+
+# Separate local projects — not part of this repo
+ayuda-terremoto-venezuela/
