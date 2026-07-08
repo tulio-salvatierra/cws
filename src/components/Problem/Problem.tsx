@@ -4,8 +4,6 @@ import MaskedLines from "../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import logoCicero from "../../assets/images/problem/cicero.svg";
-import logoWeb from "../../assets/images/problem/web.svg";
-import logoStudio from "../../assets/images/problem/studio.svg";
 import problemDivider from "../../assets/images/problem/divider.svg";
 import workspacePhoto from "../../assets/images/problem/workspace.jpg";
 import "./Problem.css";
@@ -110,12 +108,10 @@ export default function Problem() {
         <div className="problem-section__main">
           <div className="problem-section__brand">
             <div
-              className="problem-section__logo w-full h-auto flex items-center justify-center"
+              className="problem-section__logo"
               aria-label="Cicero Web Studio"
             >
-              <img className="max-w-1/3 max-h-1/3 w-auto h-auto" src={logoCicero} alt="Cicero" />
-              <img className="max-w-1/3 max-h-1/3 w-auto h-auto" src={logoWeb} alt="Web" />
-              <img className="max-w-1/3 max-h-1/3 w-auto h-auto" src={logoStudio} alt="Studio" />
+              <img src={logoCicero} alt="Cicero Web Studio" />
             </div>
 
             <div className="problem-section__es" aria-hidden="true">
@@ -156,7 +152,7 @@ export default function Problem() {
           <img
             src={workspacePhoto}
             alt="Tulio Salvatierra in his workspace"
-            className="problem-section__showcase-image"
+            className="problem-section__showcase-image grain"
           />
           <div className="problem-section__showcase-overlay" aria-hidden="true" />
 

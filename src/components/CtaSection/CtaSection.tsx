@@ -8,7 +8,7 @@ function formatPhone(phone: number) {
 
 export default function CtaSection() {
   return (
-    <section id="contact" className="cta-section">
+    <section id="contact" className="cta-section pb-0 mb-0">
       <div className="cta-section__panel">
         <h2 className="cta-section__title">We uncover your story</h2>
         <p className="cta-section__description">

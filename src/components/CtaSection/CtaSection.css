@@ -2,8 +2,8 @@
   position: relative;
   z-index: 10;
   width: 100%;
-  padding: clamp(2rem, 5vw, 3rem) 0 clamp(3rem, 8vw, 5rem);
   background: transparent;
+  margin-bottom: 0rem;
 }
 
 .cta-section__panel {
