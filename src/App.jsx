@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Loader from "./components/Loader";
 import {
   LoaderContext,
@@ -18,15 +18,16 @@ import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
 import ClientPortalPage from "./pages/clientPortal/ClientPortalPage";
 import { getLandingPageData } from "./data/landingPagesData";
-import LoginPage from "./pages/admin/LoginPage";
-import AdminPage from "./pages/admin/AdminPage";
-import AdminGuard from "./components/admin/AdminGuard";
-import ContentQueue from "./components/admin/ContentQueue";
-import KeywordsPage from "./pages/admin/KeywordsPage";
-import CalendarPage from "./pages/admin/CalendarPage";
-import AnalyticsPage from "./pages/admin/AnalyticsPage";
-import SettingsPage from "./pages/admin/SettingsPage";
-import ClientsPage from "./pages/admin/ClientsPage";
+
+const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
+const AdminPage = lazy(() => import("./pages/admin/AdminPage"));
+const AdminGuard = lazy(() => import("./components/admin/AdminGuard"));
+const ContentQueue = lazy(() => import("./components/admin/ContentQueue"));
+const KeywordsPage = lazy(() => import("./pages/admin/KeywordsPage"));
+const CalendarPage = lazy(() => import("./pages/admin/CalendarPage"));
+const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage"));
+const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
+const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -85,7 +86,7 @@ function App() {
   return (
     <LoaderContext.Provider value={{ heroReady }}>
       <div className={`app-shell ${loading ? "app-shell--loading" : ""}`}>
-        <Router>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
@@ -99,13 +100,19 @@ function App() {
               {/* Dynamic landing page routes inside layout so providers apply */}
               <Route path="landing/:id" element={<LandingPageWrapper />} />
             </Route>
-            <Route path="/admin/login" element={<LoginPage />} />
+            <Route path="/admin/login" element={
+              <Suspense fallback={null}>
+                <LoginPage />
+              </Suspense>
+            } />
             <Route
               path="/admin"
               element={
-                <AdminGuard>
-                  <AdminPage />
-                </AdminGuard>
+                <Suspense fallback={null}>
+                  <AdminGuard>
+                    <AdminPage />
+                  </AdminGuard>
+                </Suspense>
               }
             >
               <Route index element={<ContentQueue />} />

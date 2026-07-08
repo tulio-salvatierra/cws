@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { SERVER_ENV_KEYS } from './env.keys.js'
+import validateProductionClientEnv from './scripts/validate-production-client-env.mjs'
 
 // In ESM, __dirname is not defined. Recreate it from import.meta.url
 const __filename = fileURLToPath(import.meta.url)
@@ -152,9 +153,10 @@ function applyLocalServerEnv(env) {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '')
+  const productionEnvPlugin = validateProductionClientEnv(mode, env)
 
   return {
-    plugins: [react(), clientPortalApiPlugin(env)],
+    plugins: [react(), productionEnvPlugin, clientPortalApiPlugin(env)].filter(Boolean),
     assetsInclude: ['**/*.glb'],
     resolve: {
       alias: {

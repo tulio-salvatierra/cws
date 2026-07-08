@@ -192,13 +192,15 @@ article a:hover {
   }
 }
 @font-face {
-  font-family : 'Archivo';
-  src: url('./assets/fonts/archivo.woff2') format('woff2'),
+  font-family: 'Archivo';
+  src: url('./assets/fonts/archivo.woff2') format('woff2');
+  font-display: swap;
 }
 
 @font-face {
-  font-family : 'Clash';
-  src: url('./assets/fonts/clash.woff2') format('woff2'),
+  font-family: 'Clash';
+  src: url('./assets/fonts/clash.woff2') format('woff2');
+  font-display: swap;
 }
 
 html {
