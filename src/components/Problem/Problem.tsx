@@ -110,12 +110,12 @@ export default function Problem() {
         <div className="problem-section__main">
           <div className="problem-section__brand">
             <div
-              className="problem-section__logo"
+              className="problem-section__logo w-full h-auto flex items-center justify-center"
               aria-label="Cicero Web Studio"
             >
-              <img className="w-inherit h-inherit" src={logoCicero} alt="Cicero" />
-              <img className="w-inherit h-inherit" src={logoWeb} alt="Web" />
-              <img className="w-inherit h-inherit" src={logoStudio} alt="Studio" />
+              <img className="max-w-1/3 max-h-1/3 w-auto h-auto" src={logoCicero} alt="Cicero" />
+              <img className="max-w-1/3 max-h-1/3 w-auto h-auto" src={logoWeb} alt="Web" />
+              <img className="max-w-1/3 max-h-1/3 w-auto h-auto" src={logoStudio} alt="Studio" />
             </div>
 
             <div className="problem-section__es" aria-hidden="true">

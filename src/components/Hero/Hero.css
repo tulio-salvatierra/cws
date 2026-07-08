@@ -45,14 +45,18 @@
   overflow: hidden;
 }
 
-.hero-headline__works {
+/* SplitText rewraps the word into nested .word-js/.char-js divs that inherit
+   the transparent text-fill but not the gradient background — so the gradient
+   and clip must be re-applied to those children or the word renders invisible. */
+.hero-headline__works,
+.hero-headline__works .word-js,
+.hero-headline__works .char-js {
   display: inline-block;
   background: linear-gradient(
     135deg,
     #7ec8e3 0%,
-    #ffffff 35%,
-    #f5892f 70%,
-    #5a5454 100%
+    #ffffff 40%,
+    #f5892f 100%
   );
   background-size: 200% 200%;
   -webkit-background-clip: text;
