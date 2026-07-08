@@ -8,7 +8,7 @@
 
 .loading-screen {
   pointer-events: auto;
-  color: #000;
+  color: #f5f5f5;
   background-color: #393333;
   background-image: linear-gradient(
     180deg,
@@ -45,6 +45,8 @@
   aspect-ratio: 1696 / 1101;
   object-fit: contain;
   will-change: transform, opacity;
+  /* Frame13.svg paths are solid black; render white on the dark loader bg */
+  filter: brightness(0) invert(1);
 }
 
 .loading-count {
@@ -54,7 +56,7 @@
   text-transform: uppercase;
   line-height: 1;
   margin: 0;
-  color: rgb(0 0 0 / 0.55);
+  color: rgb(255 255 255 / 0.7);
   font-variant-numeric: tabular-nums;
 }
 
