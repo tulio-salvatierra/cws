@@ -59,19 +59,20 @@
 
 .app-background__decorative-image {
   display: block;
-  width: 115%;
-  height: 115%;
+  width: 90%;
+  height: auto;
+  max-height: 80%;
   object-fit: contain;
   object-position: center center;
-  transform: rotate(-30deg);
-  transform-origin: center center;
   opacity: 0.35;
+  /* Frame13.svg paths are solid black; render white so it shows on the dark bg */
+  filter: brightness(0) invert(1);
 }
 
 @media (max-width: 991px) {
   .app-background__decorative-image {
-    width: 140%;
-    height: 140%;
+    width: 92%;
+    max-height: 60%;
     opacity: 0.28;
   }
 }
