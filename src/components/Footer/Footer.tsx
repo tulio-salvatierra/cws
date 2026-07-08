@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
-  ABOUT_URL,
-  CONTACT_URL,
+  ABOUT_SECTION_URL,
   EMAIL,
   HOME_URL,
   LINKEDIN_URL,
   PHONE,
-  SERICES_URL,
+  SERVICES_SECTION_URL,
+  WORK_SECTION_URL,
 } from "../../Constants/Constants";
 import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
 import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
@@ -16,11 +16,11 @@ import arrowUpIcon from "../../assets/images/footer/arrow-up.svg";
 import "./Footer.css";
 
 const FOOTER_NAV = [
-  { label: "About", url: ABOUT_URL },
-  { label: "Works", url: "/#projects" },
-  { label: "Services", url: SERICES_URL },
+  { label: "About", url: ABOUT_SECTION_URL },
+  { label: "Works", url: WORK_SECTION_URL },
+  { label: "Services", url: SERVICES_SECTION_URL },
   { label: "Process", url: "/#process" },
-  { label: "Contact", url: CONTACT_URL },
+  { label: "Contact", url: "/#contact" },
 ] as const;
 
 function formatPhone(phone: number) {
