@@ -173,8 +173,7 @@
   margin-inline: calc(50% - 50vw);
   height: 100vh;
   height: 100dvh;
-  min-height: 100vh;
-  min-height: 100dvh;
+ 
   overflow: hidden;
 }
 
@@ -221,6 +220,8 @@
   color: #fff;
   text-shadow: none;
 }
+
+
 
 .problem-section__role {
   margin: 0;
@@ -297,7 +298,7 @@
     inset: auto;
     width: 100%;
     height: auto;
-    aspect-ratio: 16 / 9;
+    
     object-fit: cover;
     object-position: center center;
   }
