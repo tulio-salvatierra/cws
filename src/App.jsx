@@ -9,6 +9,7 @@ import {
 import { useLenis } from "./Hooks/lenis";
 import Layout from "./components/Layout/Layout";
 import Home from "./components/Home/Home";
+import Gallery from "./components/Gallery";
 
 function App() {
   useLenis();
@@ -39,6 +40,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
+              <Route path="gallery" element={<Gallery />} />
             </Route>
           </Routes>
         </Router>
