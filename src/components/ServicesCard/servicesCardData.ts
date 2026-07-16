@@ -9,9 +9,9 @@ export interface ServiceItem {
 import Web from "./lotties/Website.json";
 import Business from "./lotties/Photo.json";
 import IT from "./lotties/AI.json";
-import ThreeD from "./lotties/3D.json";
-import Strategy from "./lotties/Strategy.json";
-import Design from "./lotties/Design.json";
+import ThreeD from "./lotties/3d.json";
+import Strategy from "./lotties/strategy.json";
+import Design from "./lotties/design.json";
 
 
 export const servicesData: ServiceItem[] = [
