@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { projects } from "./ProjectsData";
 import problemDivider from "../../assets/images/problem/divider.svg";
+import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
 import "./Projects.css";
 
 function formatStep(current: number, total: number) {
@@ -97,7 +98,14 @@ export default function Projects() {
     <section id="projects" className="projects-section">
       <div className="projects-section__inner">
         <div className="projects-section__header">
-          <span className="projects-section__icon" aria-hidden="true" />
+          <img
+            src={navigateIcon}
+            alt=""
+            className="projects-section__icon"
+            width={24}
+            height={23}
+            aria-hidden="true"
+          />
           <p className="projects-section__eyebrow">Success Stories</p>
         </div>
 
