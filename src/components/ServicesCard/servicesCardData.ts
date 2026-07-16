@@ -9,6 +9,10 @@ export interface ServiceItem {
 import Web from "./lotties/Website.json";
 import Business from "./lotties/Photo.json";
 import IT from "./lotties/AI.json";
+import ThreeD from "./lotties/3D.json";
+import Strategy from "./lotties/Strategy.json";
+import Design from "./lotties/Design.json";
+
 
 export const servicesData: ServiceItem[] = [
   {
@@ -17,7 +21,7 @@ export const servicesData: ServiceItem[] = [
     title: "Website Design",
     description:
       "Modern, fast designs built to grow your business. We create websites that reflect your brand, rank on Google and turn visitors into customers.",
-    image: Web,
+    image: Design,
   },
   {
     id: 2,
@@ -33,7 +37,7 @@ export const servicesData: ServiceItem[] = [
     title: "Website Strategy",
     description:
       "Conversion-focused planning so every page has a purpose — clearer messaging, stronger CTAs, and a site that supports your goals.",
-    image: IT,
+    image: Strategy,
   },
   {
     id: 4,
@@ -49,6 +53,6 @@ export const servicesData: ServiceItem[] = [
     title: "3D Development",
     description:
       "Interactive 3D visuals and experiences that help your brand stand out and keep visitors engaged longer.",
-    image: IT,
+    image: ThreeD,
   },
 ];
