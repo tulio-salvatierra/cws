@@ -233,19 +233,7 @@
 }
 
 .problem-section__cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: min(100%, 21.375rem);
-  height: clamp(4.5rem, 8vw, 6.25rem);
-  border-radius: 3.75rem;
-  background: #d8955a;
-  color: #000;
-  font-family: "Clash", sans-serif;
-  font-size: clamp(1rem, 1.25vw, 1.125rem);
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .problem-section__cta:hover {

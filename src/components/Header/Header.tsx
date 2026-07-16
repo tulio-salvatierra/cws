@@ -6,6 +6,7 @@ import { MENU_ITEM, PHONE } from "../../Constants/Constants";
 import { scrollToSection } from "../../lib/scrollToSection";
 import Burger from "../../assets/icons/burger.svg";
 import cwsLogo from "../../assets/images/header/cws-logo.svg";
+import CustomButton from "../CustomButton";
 import { useGSAP } from "@gsap/react";
 import "./Header.css";
 
@@ -133,12 +134,13 @@ export default function Header() {
           ))}
         </nav>
 
-        <a
+        <CustomButton
+          label="Call now!"
           href={`tel:+1${PHONE}`}
+          variant="light"
+          size="md"
           className="site-header__cta header-anim-text"
-        >
-          Call now!
-        </a>
+        />
 
         <button
           type="button"
@@ -202,13 +204,15 @@ export default function Header() {
                 ))}
               </div>
 
-              <a
+              <CustomButton
+                label="Call now!"
                 href={`tel:+1${PHONE}`}
+                variant="light"
+                size="sm"
+                fullWidth
                 className="site-header__mobile-cta"
                 onClick={toggleMenu}
-              >
-                Call now!
-              </a>
+              />
             </nav>
           </div>,
           document.body,

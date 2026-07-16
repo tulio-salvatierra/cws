@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { PHONE } from "../../Constants/Constants";
 import MaskedLines from "../MaskedLines/MaskedLines";
+import CustomButton from "../CustomButton";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import logoCicero from "../../assets/images/problem/cicero.svg";
@@ -159,9 +160,12 @@ export default function Problem() {
           <div className="problem-section__showcase-content">
             <h2 className="problem-section__name">Tulio Salvatierra</h2>
             <p className="problem-section__role">Founder - Web Developer</p>
-            <a href={`tel:+1${PHONE}`} className="problem-section__cta">
-              {formatPhone(PHONE)}
-            </a>
+            <CustomButton
+              label={formatPhone(PHONE)}
+              href={`tel:+1${PHONE}`}
+              variant="accent"
+              className="problem-section__cta"
+            />
           </div>
         </div>
       </div>

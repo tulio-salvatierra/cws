@@ -4,15 +4,18 @@ import {
   ABOUT_SECTION_URL,
   EMAIL,
   HOME_URL,
+  INSTAGRAM_URL,
   LINKEDIN_URL,
   PHONE,
   SERVICES_SECTION_URL,
+  TWITTER_URL,
   WORK_SECTION_URL,
+  YOUTUBE_URL,
 } from "../../Constants/Constants";
-import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
+import Decorative from "../../assets/images/Frame13.svg";
 import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
-import linkedinIcon from "../../assets/images/footer/linkedin.svg";
 import arrowUpIcon from "../../assets/images/footer/arrow-up.svg";
+import CustomButton from "../CustomButton";
 import "./Footer.css";
 
 const FOOTER_NAV = [
@@ -21,6 +24,13 @@ const FOOTER_NAV = [
   { label: "Services", url: SERVICES_SECTION_URL },
   { label: "Process", url: "/#process" },
   { label: "Contact", url: "/#contact" },
+] as const;
+
+const FOOTER_SOCIALS = [
+  { label: "LinkedIn", url: LINKEDIN_URL },
+  { label: "YouTube", url: YOUTUBE_URL },
+  { label: "Instagram", url: INSTAGRAM_URL },
+  { label: "X", url: TWITTER_URL },
 ] as const;
 
 function formatPhone(phone: number) {
@@ -60,7 +70,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="site-footer__decorative" aria-hidden>
         <img
-          src={ciceroWebStudio}
+          src={Decorative}
           alt=""
           className="site-footer__decorative-image"
           draggable={false}
@@ -96,40 +106,36 @@ export default function Footer() {
           <div className="site-footer__column site-footer__column--contact">
             <h2 className="site-footer__column-heading">Contact</h2>
             <div className="site-footer__contact">
-              <a
+              <CustomButton
+                label={EMAIL}
                 href={`mailto:${EMAIL}`}
-                className="site-footer__contact-pill site-footer__contact-pill--email"
-              >
-                {EMAIL}
-              </a>
-              <a
+                variant="primary"
+                size="pill"
+              />
+              <CustomButton
+                label={formatPhone(PHONE)}
                 href={`tel:+1${PHONE}`}
-                className="site-footer__contact-pill site-footer__contact-pill--phone"
-              >
-                {formatPhone(PHONE)}
-              </a>
+                variant="secondary"
+                size="pill"
+              />
             </div>
           </div>
 
           <div className="site-footer__column site-footer__column--socials">
             <h2 className="site-footer__column-heading">Socials</h2>
-            <div className="site-footer__socials">
-              <a
-                href={LINKEDIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="site-footer__social-link"
-                aria-label="LinkedIn"
-              >
-                <img
-                  src={linkedinIcon}
-                  alt=""
-                  className="site-footer__social-icon"
-                  width={55}
-                  height={50}
-                />
-              </a>
-            </div>
+            <nav className="site-footer__nav" aria-label="Social links">
+              {FOOTER_SOCIALS.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="site-footer__nav-link"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
           </div>
         </div>
 

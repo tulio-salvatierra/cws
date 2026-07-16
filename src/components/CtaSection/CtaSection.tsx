@@ -1,4 +1,7 @@
 import { PHONE } from "../../Constants/Constants";
+import CustomButton from "../CustomButton";
+import ctaVideo from "../../assets/video/website.mp4";
+import ctaPoster from "../../assets/images/website.jpg";
 import "./CtaSection.css";
 
 function formatPhone(phone: number) {
@@ -8,20 +11,37 @@ function formatPhone(phone: number) {
 
 export default function CtaSection() {
   return (
-    <section id="contact" className="cta-section pb-0 mb-0">
+    <section id="contact" className="cta-section pb-0 mb-0 h-screen">
       <div className="cta-section__panel">
-        <h2 className="cta-section__title">We uncover your story</h2>
-        <p className="cta-section__description">
-          We dig deep into your brand, surface what makes you irreplaceable, and
-          shape it into sharp positioning and a website strategy that connects in
-          seconds.
-        </p>
-        <a href={`tel:+1${PHONE}`} className="cta-section__button">
-          <span className="cta-section__button-label--desktop">Call now!</span>
-          <span className="cta-section__button-label--mobile">
-            {formatPhone(PHONE)}
-          </span>
-        </a>
+        <video
+          className="cta-section__video"
+          src={ctaVideo}
+          poster={ctaPoster}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          disablePictureInPicture
+          disableRemotePlayback
+          aria-hidden="true"
+        />
+        <div className="cta-section__overlay" aria-hidden="true" />
+
+        <div className="cta-section__content">
+          <h2 className="cta-section__title">Let's <span className="text-primary">talk!</span></h2>
+          <p className="cta-section__description">
+            I want to help you uncover your story, find your voice, and
+            shape it into sharp positioning and a website strategy that connects with your audience.
+          </p>
+          <CustomButton
+            label="Call now!"
+            mobileLabel={formatPhone(PHONE)}
+            href={`tel:+1${PHONE}`}
+            variant="primary"
+            className="cta-section__button"
+          />
+        </div>
       </div>
     </section>
   );

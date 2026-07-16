@@ -87,35 +87,6 @@
   gap: clamp(0.75rem, 2vw, 1.5rem);
 }
 
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: clamp(10rem, 23vw, 21.375rem);
-  height: clamp(4rem, 7vw, 6.25rem);
-  padding: 0 2rem;
-  border-radius: 3.75rem;
-  font-family: "Clash", sans-serif;
-  font-size: clamp(0.95rem, 1.25vw, 1.125rem);
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 0.35s ease, opacity 0.35s ease;
-}
-
-.hero-cta:hover {
-  transform: scale(0.97);
-}
-
-.hero-cta--primary {
-  background: #f5892f;
-  color: #000;
-}
-
-.hero-cta--secondary {
-  background: rgba(90, 84, 84, 0.8);
-  color: #fff;
-}
-
 .hero-cta--mobile {
   display: none;
 }
@@ -158,10 +129,8 @@
     margin-top: 1.75rem;
   }
 
-  .hero-cta {
+  .hero-actions .custom-btn {
     width: 100%;
-    min-width: 0;
-    height: 4.25rem;
   }
 
   .hero-cta--desktop {
