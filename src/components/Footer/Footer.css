@@ -33,7 +33,6 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 90rem;
   margin: 0 auto;
   padding: clamp(3rem, 8vw, 5rem) clamp(1.25rem, 3vw, 1.5rem)
     clamp(2rem, 5vw, 3rem);

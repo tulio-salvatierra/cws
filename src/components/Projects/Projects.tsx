@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { projects } from "./ProjectsData";
 import problemDivider from "../../assets/images/problem/divider.svg";
 import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
+import CustomButton from "../CustomButton";
 import "./Projects.css";
 
 function formatStep(current: number, total: number) {
@@ -68,14 +69,13 @@ function ProjectEntry({
         <span className="projects-card__step">{step}</span>
         <h3 className="projects-card__title">{title}</h3>
         <p className="projects-card__description">{description}</p>
-        <a
+        <CustomButton
+          label="View project →"
           href={link}
-          target="_blank"
-          rel="noopener noreferrer"
+          newTab
+          variant="primary"
           className="projects-card__link"
-        >
-          View project →
-        </a>
+        />
       </div>
     </>
   );
@@ -160,14 +160,13 @@ export default function Projects() {
                     <ProjectMedia image={project.image} alt={project.alt} />
                   </div>
                 </div>
-                <a
+                <CustomButton
+                  label="View project →"
                   href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  newTab
+                  variant="primary"
                   className="projects-card__link"
-                >
-                  View project →
-                </a>
+                />
               </div>
             ))}
           </div>

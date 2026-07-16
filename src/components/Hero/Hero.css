@@ -35,7 +35,7 @@
   font-family: "Clash", sans-serif;
   font-size: clamp(3rem, 8.3vw, 7.5rem);
   font-weight: 600;
-  line-height: 0.5;
+  line-height: 0.7;
   letter-spacing: -0.02em;
   color: #fff;
 }
