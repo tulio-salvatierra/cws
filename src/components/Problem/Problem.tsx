@@ -6,7 +6,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import logoCicero from "../../assets/images/problem/cicero.svg";
 import problemDivider from "../../assets/images/problem/divider.svg";
-import workspacePhoto from "../../assets/images/problem/workspace.jpg";
+import workspacePhoto from "../../assets/images/problem/workspace.webp";
 import "./Problem.css";
 
 const ES_LABEL = "[HABLAMOS ESPAÑOL]";

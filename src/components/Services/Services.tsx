@@ -2,7 +2,6 @@ import { useRef, useState, useCallback } from "react";
 import { servicesData } from "../ServicesCard/servicesCardData";
 import LottieAnimation from "../ServicesCard/lotties/Lottie";
 import SectionIntro from "../SectionIntro/SectionIntro";
-import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -109,14 +108,6 @@ export default function Services() {
         <div ref={pinRef} className="services-section__pin">
           <div className="services-section__inner">
             <div className="services-section__header">
-              <img
-                src={navigateIcon}
-                alt=""
-                className="services-section__icon"
-                width={24}
-                height={23}
-                aria-hidden="true"
-              />
               <p className="services-section__eyebrow">What we do</p>
             </div>
 

@@ -13,7 +13,6 @@ import {
   YOUTUBE_URL,
 } from "../../Constants/Constants";
 import Decorative from "../../assets/images/Frame13.svg";
-import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
 import arrowUpIcon from "../../assets/images/footer/arrow-up.svg";
 import CustomButton from "../CustomButton";
 import "./Footer.css";
@@ -80,16 +79,7 @@ export default function Footer() {
       <div className="site-footer__inner">
         <div className="site-footer__columns">
           <div className="site-footer__column site-footer__column--navigate">
-            <h2 className="site-footer__column-heading">
-              <img
-                src={navigateIcon}
-                alt=""
-                className="site-footer__column-icon"
-                width={24}
-                height={23}
-              />
-              Navigate
-            </h2>
+            <h2 className="site-footer__column-heading">Navigate</h2>
             <nav className="site-footer__nav" aria-label="Footer navigation">
               {FOOTER_NAV.map((item) => (
                 <Link

@@ -64,12 +64,6 @@
   color: #0d0d0d;
 }
 
-.site-footer__column-icon {
-  width: 1.5rem;
-  height: 1.4375rem;
-  flex-shrink: 0;
-}
-
 .site-footer__nav {
   display: flex;
   flex-direction: column;

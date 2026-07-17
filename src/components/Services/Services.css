@@ -36,14 +36,6 @@
   margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
 }
 
-.services-section__icon {
-  display: block;
-  width: 1.5rem;
-  height: 1.4375rem;
-  flex-shrink: 0;
-  object-fit: contain;
-}
-
 .services-section__eyebrow {
   margin: 0;
   font-family: "Clash", sans-serif;

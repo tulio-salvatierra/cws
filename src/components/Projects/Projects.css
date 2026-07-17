@@ -21,14 +21,6 @@
   margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
-.projects-section__icon {
-  display: block;
-  width: 1.5rem;
-  height: 1.4375rem;
-  flex-shrink: 0;
-  object-fit: contain;
-}
-
 .projects-section__eyebrow {
   margin: 0;
   font-family: "Clash", sans-serif;
