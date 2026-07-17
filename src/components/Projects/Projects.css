@@ -53,6 +53,7 @@
   padding: clamp(1rem, 2vw, 1.75rem);
   border-radius: 5px;
   background: #d9d9d9;
+  overflow: hidden;
 }
 
 .projects-card__frame-inner {
@@ -61,11 +62,12 @@
   height: 100%;
   border-radius: 5px;
   overflow: hidden;
-  background: #948484;
+  background: #393333;
+  will-change: transform;
 }
 
 .projects-card__frame-inner:hover {
-  background: #d9d9d9;
+  background: #2e2828;
 }
 
 .projects-card__media {
@@ -73,6 +75,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .projects-card__content {

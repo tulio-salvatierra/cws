@@ -65,13 +65,23 @@
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 4px;
-  background: #111;
+  background: #d9d9d9;
+}
+
+.process-step__media-panel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #393333;
+  will-change: transform;
 }
 
 .process-section__media-stack {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .process-section__media-poster,

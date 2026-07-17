@@ -2,7 +2,12 @@ import { useRef, useState } from "react";
 import { projects } from "./ProjectsData";
 import problemDivider from "../../assets/images/problem/divider.svg";
 import CustomButton from "../CustomButton";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import gsap from "gsap";
 import "./Projects.css";
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 function formatStep(current: number, total: number) {
   return `${String(current).padStart(2, "0")}/${String(total).padStart(2, "0")}`;
@@ -80,10 +85,89 @@ function ProjectEntry({
   );
 }
 
+/** Same reveal as Problem showcase: panel rises → media scales to 1 → copy eases up. */
+function createCardReveal(card: HTMLElement) {
+  const mediaWrap = card.querySelector<HTMLElement>(".projects-card__frame-inner");
+  const media = card.querySelector<HTMLElement>(".projects-card__media");
+  const textItems = gsap.utils.toArray<HTMLElement>(
+    card.querySelectorAll(
+      ".projects-card__step, .projects-card__title, .projects-card__description, .projects-card__link",
+    ),
+  );
+
+  if (!mediaWrap || !media) return;
+
+  gsap.set(mediaWrap, { yPercent: 110 });
+  gsap.set(media, { scale: 1.35, transformOrigin: "50% 50%" });
+  if (textItems.length) {
+    gsap.set(textItems, { y: 56, opacity: 0 });
+  }
+
+  const reveal = gsap.timeline({
+    defaults: { ease: "power3.out" },
+    scrollTrigger: {
+      trigger: card,
+      start: "top 85%",
+      once: true,
+    },
+  });
+
+  reveal
+    .to(mediaWrap, {
+      yPercent: 0,
+      duration: 1.35,
+      ease: "power4.out",
+    })
+    .to(
+      media,
+      {
+        scale: 1,
+        duration: 1.9,
+        ease: "power3.out",
+      },
+      0.12,
+    )
+    .to(
+      textItems,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        stagger: 0.12,
+        ease: "power3.out",
+      },
+      0.55,
+    );
+}
+
 export default function Projects() {
   const total = projects.length;
   const [activeIndex, setActiveIndex] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 992px)", () => {
+        gsap.utils
+          .toArray<HTMLElement>(".projects-card")
+          .forEach(createCardReveal);
+      });
+
+      mm.add("(max-width: 991px)", () => {
+        gsap.utils
+          .toArray<HTMLElement>(".projects-section__carousel-slide")
+          .forEach(createCardReveal);
+      });
+
+      return () => {
+        mm.revert();
+      };
+    },
+    { scope: sectionRef },
+  );
 
   const scrollToSlide = (index: number) => {
     setActiveIndex(index);
@@ -94,7 +178,7 @@ export default function Projects() {
   };
 
   return (
-    <section id="projects" className="projects-section">
+    <section ref={sectionRef} id="projects" className="projects-section">
       <div className="projects-section__inner">
         <div className="projects-section__header">
           <p className="projects-section__eyebrow">Success Stories</p>
