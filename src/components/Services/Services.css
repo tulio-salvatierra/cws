@@ -110,8 +110,8 @@
 
 .services-section__preview {
   position: relative;
-  width: clamp(7.5rem, 18vw, 14.0625rem);
-  height: clamp(10rem, 24vw, 19.0625rem);
+  width: clamp(15rem, 36vw, 28.125rem);
+  height: clamp(20rem, 48vw, 38.125rem);
   flex-shrink: 0;
   border-radius: 16px;
   overflow: hidden;
