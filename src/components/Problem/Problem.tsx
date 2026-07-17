@@ -225,7 +225,7 @@ export default function Problem() {
               ref={showcaseImageRef}
               src={workspacePhoto}
               alt="Tulio Salvatierra in his workspace"
-              className="problem-section__showcase-image grain"
+              className="problem-section__showcase-image"
             />
           </div>
           <div

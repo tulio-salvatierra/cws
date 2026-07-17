@@ -274,38 +274,37 @@
   }
 
   /*
-    Landscape workspace photo + portrait 100dvh cover crops left/right hard.
-    Match the image aspect ratio so the full photo fits the screen width,
-    then place name / role / CTA below the image (not as an overlay).
+    Full-bleed image edge-to-edge, then name / role / CTA stacked below.
   */
   .problem-section__showcase {
     display: flex;
     flex-direction: column;
-    width: 100dvh;
-    max-width: 100dvh;
+    width: 100vw;
+    max-width: 100vw;
     margin-inline: calc(50% - 50vw);
     height: auto;
     min-height: 0;
-    overflow: visible;
-    background: #c47900d0;
+    overflow: hidden;
+    background: transparent;
   }
 
   .problem-section__showcase-image-container {
     position: relative;
     inset: auto;
     width: 100%;
-    height: 100%;
-    aspect-ratio: 3 / 4;
-    background: #c47900d0;
-    padding: 1rem;
+    aspect-ratio: 4 / 5;
+    padding: 0;
+    overflow: hidden;
+    background: #393333;
   }
 
   .problem-section__showcase-image {
+    display: block;
     width: 100%;
-    height: auto;
-    object-fit: contain;
-    object-position: center center;
-    padding: 1rem;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
+    padding: 0;
   }
 
   .problem-section__showcase-overlay {
@@ -317,10 +316,10 @@
     inset: auto;
     z-index: 1;
     width: 100%;
-    padding: clamp(1.25rem, 4vw, 2rem) clamp(1rem, 4vw, 1.5rem) 0;
+    padding: clamp(1.25rem, 4vw, 2rem) clamp(1rem, 4vw, 1.5rem)
+      clamp(1.5rem, 5vw, 2.5rem);
     gap: 0.65rem;
-    margin-inline: 2rem;
-    margin-bottom: 2rem;
+    margin: 0;
   }
 
   .problem-section__name {
@@ -336,6 +335,6 @@
     max-width: 21.375rem;
     height: 3.75rem;
     margin-top: 0.35rem;
-    margin-inline: 2rem;
+    margin-inline: 0;
   }
 }
