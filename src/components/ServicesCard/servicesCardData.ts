@@ -1,18 +1,21 @@
+import { galleryImages, type GalleryImage } from "../Gallery/galleryData";
+import Web from "./lotties/Website.json";
+import Design from "./lotties/design.json";
+import ThreeD from "./lotties/3d.json";
+import Strategy from "./lotties/strategy.json";
+
 export interface ServiceItem {
   id: number;
   title: string;
   label: string;
   description: string;
   image?: Record<string, unknown>;
+  preview?: GalleryImage;
 }
 
-import Web from "./lotties/Website.json";
-import Business from "./lotties/Photo.json";
-import IT from "./lotties/AI.json";
-import ThreeD from "./lotties/3d.json";
-import Strategy from "./lotties/strategy.json";
-import Design from "./lotties/design.json";
-
+const galleryById = Object.fromEntries(
+  galleryImages.map((image) => [image.id, image]),
+) as Record<string, GalleryImage>;
 
 export const servicesData: ServiceItem[] = [
   {
@@ -45,7 +48,7 @@ export const servicesData: ServiceItem[] = [
     title: "Photo & Video",
     description:
       "High-impact photos and videos tailored to your brand that boost engagement on your website and social media.",
-    image: Business,
+    preview: galleryById["9"],
   },
   {
     id: 5,

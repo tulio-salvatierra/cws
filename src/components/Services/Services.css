@@ -136,6 +136,14 @@
   height: 100%;
 }
 
+.services-section__preview-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 .services-section__preview-fallback {
   width: 100%;
   height: 100%;
