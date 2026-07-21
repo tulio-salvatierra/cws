@@ -1,7 +1,8 @@
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { servicesData } from "../ServicesCard/servicesCardData";
 import LottieAnimation from "../ServicesCard/lotties/Lottie";
 import SectionIntro from "../SectionIntro/SectionIntro";
+import { servicesPreviewSrc } from "../../utils/cloudinary";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -23,6 +24,19 @@ export default function Services() {
     const next = Math.max(0, Math.min(total - 1, index));
     setActiveIndex((current) => (current === next ? current : next));
   }, [total]);
+
+  // Warm the Photo & Video preview when that step (or a neighbor) is active.
+  useEffect(() => {
+    const src = servicesData
+      .slice(Math.max(0, activeIndex - 1), activeIndex + 2)
+      .map((service) => service.preview?.src)
+      .find(Boolean);
+
+    if (!src) return;
+
+    const img = new Image();
+    img.src = servicesPreviewSrc(src);
+  }, [activeIndex]);
 
   useGSAP(
     () => {
@@ -59,7 +73,7 @@ export default function Services() {
                   duration: { min: 0.12, max: 0.28 },
                   delay: 0,
                 }
-              : false,
+              : undefined,
           onUpdate: (self) => {
             const index = Math.round(self.progress * stepCount);
             setActive(index);
@@ -108,7 +122,6 @@ export default function Services() {
         <div ref={pinRef} className="services-section__pin">
           <div className="services-section__inner">
             <div className="services-section__header">
-              <span className="services-section__icon" aria-hidden="true" />
               <p className="services-section__eyebrow">What we do</p>
             </div>
 
@@ -133,21 +146,38 @@ export default function Services() {
               </ul>
 
               <div className="services-section__preview" aria-live="polite">
-                {servicesData.map((service, index) => (
-                  <div
-                    key={service.id}
-                    className={`services-section__preview-pane${
-                      index === activeIndex ? " is-active" : ""
-                    }`}
-                    aria-hidden={index !== activeIndex}
-                  >
-                    {service.image ? (
-                      <LottieAnimation path={service.image} />
-                    ) : (
-                      <div className="services-section__preview-fallback" />
-                    )}
-                  </div>
-                ))}
+                {servicesData.map((service, index) => {
+                  const isActive = index === activeIndex;
+                  const preview = service.preview;
+
+                  return (
+                    <div
+                      key={service.id}
+                      className={`services-section__preview-pane${
+                        isActive ? " is-active" : ""
+                      }`}
+                      aria-hidden={!isActive}
+                    >
+                      {preview ? (
+                        <img
+                          className="services-section__preview-image"
+                          src={servicesPreviewSrc(preview.src)}
+                          alt={preview.alt}
+                          width={900}
+                          height={1200}
+                          loading={isActive ? "eager" : "lazy"}
+                          decoding="async"
+                          fetchPriority={isActive ? "high" : "low"}
+                          draggable={false}
+                        />
+                      ) : service.image ? (
+                        <LottieAnimation path={service.image} />
+                      ) : (
+                        <div className="services-section__preview-fallback" />
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

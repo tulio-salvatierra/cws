@@ -1,14 +1,21 @@
+import { galleryImages, type GalleryImage } from "../Gallery/galleryData";
+import Web from "./lotties/Website.json";
+import Design from "./lotties/design.json";
+import ThreeD from "./lotties/3d.json";
+import Strategy from "./lotties/strategy.json";
+
 export interface ServiceItem {
   id: number;
   title: string;
   label: string;
   description: string;
   image?: Record<string, unknown>;
+  preview?: GalleryImage;
 }
 
-import Web from "./lotties/Website.json";
-import Business from "./lotties/Photo.json";
-import IT from "./lotties/AI.json";
+const galleryById = Object.fromEntries(
+  galleryImages.map((image) => [image.id, image]),
+) as Record<string, GalleryImage>;
 
 export const servicesData: ServiceItem[] = [
   {
@@ -17,7 +24,7 @@ export const servicesData: ServiceItem[] = [
     title: "Website Design",
     description:
       "Modern, fast designs built to grow your business. We create websites that reflect your brand, rank on Google and turn visitors into customers.",
-    image: Web,
+    image: Design,
   },
   {
     id: 2,
@@ -33,7 +40,7 @@ export const servicesData: ServiceItem[] = [
     title: "Website Strategy",
     description:
       "Conversion-focused planning so every page has a purpose — clearer messaging, stronger CTAs, and a site that supports your goals.",
-    image: IT,
+    image: Strategy,
   },
   {
     id: 4,
@@ -41,7 +48,7 @@ export const servicesData: ServiceItem[] = [
     title: "Photo & Video",
     description:
       "High-impact photos and videos tailored to your brand that boost engagement on your website and social media.",
-    image: Business,
+    preview: galleryById["9"],
   },
   {
     id: 5,
@@ -49,6 +56,6 @@ export const servicesData: ServiceItem[] = [
     title: "3D Development",
     description:
       "Interactive 3D visuals and experiences that help your brand stand out and keep visitors engaged longer.",
-    image: IT,
+    image: ThreeD,
   },
 ];
