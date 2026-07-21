@@ -17,6 +17,7 @@ import BlogPost from "./components/BlogPost";
 import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
 import ClientPortalPage from "./pages/clientPortal/ClientPortalPage";
+import Gallery from "./components/Gallery";
 import { getLandingPageData } from "./data/landingPagesData";
 
 const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
@@ -96,6 +97,7 @@ function App() {
               <Route path="blog" element={<Blog />} />
               <Route path="blog/:slug" element={<BlogPost />} />
               <Route path="contact" element={<Contact />} />
+              <Route path="gallery" element={<Gallery />} />
               <Route path="client-portal" element={<ClientPortalPage />} />
               {/* Dynamic landing page routes inside layout so providers apply */}
               <Route path="landing/:id" element={<LandingPageWrapper />} />
