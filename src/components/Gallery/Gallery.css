@@ -1,0 +1,353 @@
+.mwg_effect019 {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #121212;
+  color: #b8aa98;
+  font: 500 normal 22px / 1.3 "Clash", sans-serif;
+}
+
+.mwg_effect019 * {
+  user-select: none;
+}
+
+.mwg_effect019 .container {
+  width: 40vw;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 25px 0 0;
+  overflow: hidden;
+  transform-origin: center top;
+  will-change: transform;
+}
+
+.mwg_effect019 .header {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(60% - 25px);
+  padding: 25px;
+  z-index: 2;
+}
+
+.mwg_effect019 .header > div {
+  display: flex;
+  gap: 25px;
+}
+
+.mwg_effect019 .header p {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: 16px;
+  font-weight: 500;
+  color: #b8aa98;
+}
+
+.mwg_effect019 .content {
+  display: flex;
+  flex-direction: column;
+  row-gap: 25px;
+  height: max-content;
+  margin: 0 auto;
+  padding-bottom: 25px;
+  will-change: transform;
+}
+
+.mwg_effect019 .media {
+  width: 100%;
+  border-radius: 0.4em;
+  overflow: hidden;
+  pointer-events: none;
+  background: #1a1a1a;
+}
+
+.mwg_effect019 .media__trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  line-height: 0;
+}
+
+.mwg_effect019 img,
+.mwg_effect019 video {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.mwg_effect019 .texts {
+  flex: 1;
+  padding: 25px;
+  font: 500 normal 10vw / 0.8 "Clash", sans-serif;
+  letter-spacing: -0.05em;
+  color: #e58b04;
+}
+
+.mwg_effect019 .texts .span1 {
+  display: block;
+}
+
+.mwg_effect019 .texts .span2 {
+  padding: 0 0 0 10vw;
+}
+
+.mwg_effect019 .texts .span3 {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0 0 6vw;
+}
+
+.mwg_effect019 .texts .span4 {
+  display: block;
+  text-align: right;
+}
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.95);
+  animation: lightboxFadeIn 0.3s ease;
+}
+
+@keyframes lightboxFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.lightbox__close:hover {
+  background: rgba(245, 137, 47, 0.8);
+  transform: scale(1.1);
+}
+
+.lightbox__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.lightbox__nav:hover {
+  background: rgba(245, 137, 47, 0.8);
+}
+
+.lightbox__nav--prev {
+  left: 1.5rem;
+}
+
+.lightbox__nav--prev:hover {
+  transform: translateY(-50%) translateX(-4px);
+}
+
+.lightbox__nav--next {
+  right: 1.5rem;
+}
+
+.lightbox__nav--next:hover {
+  transform: translateY(-50%) translateX(4px);
+}
+
+.lightbox__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: calc(100vw - 8rem);
+  max-height: calc(100vh - 6rem);
+  max-height: calc(100dvh - 6rem);
+}
+
+.lightbox__image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 10rem);
+  max-height: calc(100dvh - 10rem);
+  object-fit: contain;
+  border-radius: 4px;
+  animation: lightboxImageIn 0.4s ease;
+}
+
+@keyframes lightboxImageIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.lightbox__caption {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.lightbox__title {
+  margin: 0;
+  font-family: "Clash", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.lightbox__category {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(245, 137, 47, 0.2);
+  font-family: "Archivo", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #f5892f;
+}
+
+.lightbox__counter {
+  position: absolute;
+  bottom: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Archivo", sans-serif;
+  font-size: 0.875rem;
+  color: #888;
+}
+
+@media (max-width: 991px) {
+  .mwg_effect019 {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: auto;
+  }
+
+  .mwg_effect019 .header {
+    width: 100%;
+    position: relative;
+  }
+
+  .mwg_effect019 .texts {
+    font-size: clamp(3rem, 14vw, 6rem);
+    padding: 1.25rem;
+  }
+
+  .mwg_effect019 .container {
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+    margin: 0;
+    padding: 0 1.25rem 1.25rem;
+  }
+
+  .mwg_effect019 .content {
+    width: max-content;
+  }
+
+  .mwg_effect019 .media {
+    width: min(70vw, 22rem);
+  }
+
+  .lightbox__nav {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .lightbox__nav--prev {
+    left: 0.75rem;
+  }
+
+  .lightbox__nav--next {
+    right: 0.75rem;
+  }
+
+  .lightbox__content {
+    max-width: calc(100vw - 5rem);
+  }
+
+  .lightbox__close {
+    top: 1rem;
+    right: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .lightbox__nav {
+    display: none;
+  }
+
+  .lightbox__content {
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 4rem);
+    max-height: calc(100dvh - 4rem);
+  }
+
+  .lightbox__image {
+    max-height: calc(100vh - 8rem);
+    max-height: calc(100dvh - 8rem);
+  }
+
+  .lightbox__caption {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

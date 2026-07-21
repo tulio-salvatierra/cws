@@ -31,3 +31,11 @@ dist-ssr
 
 # Separate local projects — not part of this repo
 ayuda-terremoto-venezuela/
+
+# Agent / planning artifacts (not app runtime)
+.agents/
+.codex/
+.claude/
+.superpowers/
+.tmp/
+skills-lock.json
