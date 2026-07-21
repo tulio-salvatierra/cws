@@ -3,62 +3,63 @@ import { useEffect, useRef, useState } from "react";
 type ProcessStepMediaProps = {
   video?: string;
   poster?: string;
+  isActive: boolean;
 };
 
 export default function ProcessStepMedia({
   video,
   poster,
+  isActive,
 }: ProcessStepMediaProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [failed, setFailed] = useState(false);
+  const [showPoster, setShowPoster] = useState(!video);
 
   useEffect(() => {
-    setFailed(false);
+    setShowPoster(!video);
   }, [video]);
 
   useEffect(() => {
     const element = videoRef.current;
-    if (!element || failed) return;
+    if (!element || showPoster) return;
 
-    element.muted = true;
-    const playPromise = element.play();
-    if (playPromise) {
-      playPromise.catch(() => {});
+    if (isActive) {
+      const playPromise = element.play();
+      if (playPromise) {
+        playPromise.catch(() => {});
+      }
+      return;
     }
-  }, [failed, video]);
 
-  const showVideo = Boolean(video && !failed);
+    element.pause();
+    element.currentTime = 0;
+  }, [isActive, showPoster]);
 
-  return (
-    <div className="process-section__media-stack">
-      {poster ? (
-        <img
-          className="process-section__media-poster"
-          src={poster}
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <div className="process-section__media-fallback" aria-hidden />
-      )}
+  if (video && !showPoster) {
+    return (
+      <video
+        ref={videoRef}
+        className="process-section__media-asset"
+        src={video}
+        poster={poster}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onError={() => setShowPoster(true)}
+      />
+    );
+  }
 
-      {showVideo && (
-        <video
-          ref={videoRef}
-          className="process-section__media-video"
-          src={video}
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="metadata"
-          disablePictureInPicture
-          disableRemotePlayback
-          onError={() => setFailed(true)}
-        />
-      )}
-    </div>
-  );
+  if (poster) {
+    return (
+      <img
+        className="process-section__media-asset"
+        src={poster}
+        alt=""
+        loading="lazy"
+      />
+    );
+  }
+
+  return <div className="process-section__media-fallback" aria-hidden />;
 }

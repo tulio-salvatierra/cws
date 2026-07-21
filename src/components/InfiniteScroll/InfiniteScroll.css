@@ -1,0 +1,54 @@
+.mwg_effect012 {
+    height: 100%;
+    width: 100%;
+    perspective: 100vw;
+    overflow: hidden; /* Only hide overflow for this component */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.mwg_effect012 .container {
+    height: 100%;
+    transform-style: preserve-3d;
+}
+.mwg_effect012 .header {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font: 500 normal clamp(12px, 0.9vw, 100px) / normal 'IBM Plex Mono';
+    text-transform: uppercase;
+    padding: 25px;
+    top: 0;
+    left: 0;
+}
+.mwg_effect012 .header > * {
+    flex: 1;
+}
+.mwg_effect012 .header > *:nth-child(2) {
+    text-align: center;
+}
+.mwg_effect012 .header > *:nth-child(3) {
+    text-align: right;
+}
+.mwg_effect012 .media {
+    width: 22%;
+    height: auto;
+    position: absolute;
+    transform: translateZ(-300vw);
+}
+.mwg_effect012 .media img {
+    width: 100%;
+    height: auto;
+    display: block;
+    box-shadow: 1px 1px 30px rgba(0, 0, 0, 0.08);
+}
+.mwg_effect012 .preload-medias img {
+    width: 1px;
+    height: 1px;
+    top: 0;
+    left: 0;
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+}

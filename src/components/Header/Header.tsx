@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useModal } from "../LeadFormModal/ModalContext";
 import { MENU_ITEM, PHONE } from "../../Constants/Constants";
 import { scrollToSection } from "../../lib/scrollToSection";
 import Burger from "../../assets/icons/burger.svg";
@@ -48,6 +49,7 @@ function getSectionIdFromUrl(url: string) {
 }
 
 export default function Header() {
+  const { openLeadForm } = useModal();
   const [showMenu, setShowMenu] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const location = useLocation();
@@ -134,13 +136,12 @@ export default function Header() {
           ))}
         </nav>
 
-        <CustomButton
-          label="Call now!"
+        <a
           href={`tel:+1${PHONE}`}
-          variant="light"
-          size="md"
           className="site-header__cta header-anim-text"
-        />
+        >
+          Call now!
+        </a>
 
         <button
           type="button"
@@ -204,14 +205,21 @@ export default function Header() {
                 ))}
               </div>
 
-              <CustomButton
-                label="Call now!"
+              <a
                 href={`tel:+1${PHONE}`}
-                variant="light"
-                size="sm"
-                fullWidth
                 className="site-header__mobile-cta"
                 onClick={toggleMenu}
+              >
+                Call now!
+              </a>
+
+              <CustomButton
+                label="Get a Quote"
+                fullWidth
+                onClick={() => {
+                  toggleMenu();
+                  openLeadForm();
+                }}
               />
             </nav>
           </div>,

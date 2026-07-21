@@ -9,10 +9,10 @@ function HeroBackground() {
   return (
     <UnicornScene
       projectId={HERO_UNICORN_PROJECT_ID}
-      width="100%"
-      height="100%"
+      width="1440px"
+      height="900px"
       scale={1}
-      dpi={1}
+      dpi={1.5}
       sdkUrl={HERO_UNICORN_SDK_URL}
       lazyLoad={false}
       showPlaceholderWhileLoading={false}

@@ -28,17 +28,26 @@
 }
 
 .app-background__unicorn-frame {
+  --unicorn-base-width: 1440;
+  --unicorn-base-height: 900;
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--unicorn-base-width) * 1px);
+  height: calc(var(--unicorn-base-height) * 1px);
+  transform: translate(-50%, -44%)
+    scale(
+      max(
+        calc(100vw / var(--unicorn-base-width)),
+        calc(100dvh / var(--unicorn-base-height))
+      )
+    );
+  transform-origin: center center;
   pointer-events: none;
 }
 
 .app-background__unicorn-frame .hero-unicorn-scene {
   display: block;
-  width: 100%;
-  height: 100%;
   max-width: none;
 }
 
@@ -61,19 +70,19 @@
 
 .app-background__decorative-image {
   display: block;
-  width: 100%;
-  height: auto;
+  width: 115%;
+  height: 115%;
   object-fit: contain;
   object-position: center center;
-  opacity: 100%;
-  /* Frame13.svg paths are solid black; render white so it shows on the dark bg */
-  filter: brightness(0) invert(1);
+  transform: rotate(-30deg);
+  transform-origin: center center;
+  opacity: 0.35;
 }
 
 @media (max-width: 991px) {
   .app-background__decorative-image {
-    width: 100%;
-    max-height: 100%;
+    width: 140%;
+    height: 140%;
     opacity: 0.28;
   }
 }

@@ -1,35 +1,26 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
-  ABOUT_SECTION_URL,
+  ABOUT_URL,
+  CONTACT_URL,
   EMAIL,
   HOME_URL,
-  INSTAGRAM_URL,
   LINKEDIN_URL,
   PHONE,
-  SERVICES_SECTION_URL,
-  TWITTER_URL,
-  WORK_SECTION_URL,
-  YOUTUBE_URL,
+  SERICES_URL,
 } from "../../Constants/Constants";
-import Decorative from "../../assets/images/Frame13.svg";
+import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
+import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
+import linkedinIcon from "../../assets/images/footer/linkedin.svg";
 import arrowUpIcon from "../../assets/images/footer/arrow-up.svg";
-import CustomButton from "../CustomButton";
 import "./Footer.css";
 
 const FOOTER_NAV = [
-  { label: "About", url: ABOUT_SECTION_URL },
-  { label: "Works", url: WORK_SECTION_URL },
-  { label: "Services", url: SERVICES_SECTION_URL },
+  { label: "About", url: ABOUT_URL },
+  { label: "Works", url: "/#projects" },
+  { label: "Services", url: SERICES_URL },
   { label: "Process", url: "/#process" },
-  { label: "Contact", url: "/#contact" },
-] as const;
-
-const FOOTER_SOCIALS = [
-  { label: "LinkedIn", url: LINKEDIN_URL },
-  { label: "YouTube", url: YOUTUBE_URL },
-  { label: "Instagram", url: INSTAGRAM_URL },
-  { label: "X", url: TWITTER_URL },
+  { label: "Contact", url: CONTACT_URL },
 ] as const;
 
 function formatPhone(phone: number) {
@@ -69,7 +60,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="site-footer__decorative" aria-hidden>
         <img
-          src={Decorative}
+          src={ciceroWebStudio}
           alt=""
           className="site-footer__decorative-image"
           draggable={false}
@@ -79,7 +70,16 @@ export default function Footer() {
       <div className="site-footer__inner">
         <div className="site-footer__columns">
           <div className="site-footer__column site-footer__column--navigate">
-            <h2 className="site-footer__column-heading">Navigate</h2>
+            <h2 className="site-footer__column-heading">
+              <img
+                src={navigateIcon}
+                alt=""
+                className="site-footer__column-icon"
+                width={24}
+                height={23}
+              />
+              Navigate
+            </h2>
             <nav className="site-footer__nav" aria-label="Footer navigation">
               {FOOTER_NAV.map((item) => (
                 <Link
@@ -96,36 +96,40 @@ export default function Footer() {
           <div className="site-footer__column site-footer__column--contact">
             <h2 className="site-footer__column-heading">Contact</h2>
             <div className="site-footer__contact">
-              <CustomButton
-                label={EMAIL}
+              <a
                 href={`mailto:${EMAIL}`}
-                variant="primary"
-                size="pill"
-              />
-              <CustomButton
-                label={formatPhone(PHONE)}
+                className="site-footer__contact-pill site-footer__contact-pill--email"
+              >
+                {EMAIL}
+              </a>
+              <a
                 href={`tel:+1${PHONE}`}
-                variant="secondary"
-                size="pill"
-              />
+                className="site-footer__contact-pill site-footer__contact-pill--phone"
+              >
+                {formatPhone(PHONE)}
+              </a>
             </div>
           </div>
 
           <div className="site-footer__column site-footer__column--socials">
             <h2 className="site-footer__column-heading">Socials</h2>
-            <nav className="site-footer__nav" aria-label="Social links">
-              {FOOTER_SOCIALS.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="site-footer__nav-link"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
+            <div className="site-footer__socials">
+              <a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-footer__social-link"
+                aria-label="LinkedIn"
+              >
+                <img
+                  src={linkedinIcon}
+                  alt=""
+                  className="site-footer__social-icon"
+                  width={55}
+                  height={50}
+                />
+              </a>
+            </div>
           </div>
         </div>
 

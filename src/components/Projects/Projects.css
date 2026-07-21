@@ -21,6 +21,15 @@
   margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
+.projects-section__icon {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #d4610e;
+  flex-shrink: 0;
+}
+
 .projects-section__eyebrow {
   margin: 0;
   font-family: "Clash", sans-serif;
@@ -34,12 +43,12 @@
 .projects-section__list {
   display: flex;
   flex-direction: column;
-  
+  gap: clamp(2.5rem, 6vw, 4rem);
 }
 
 .projects-card {
   display: grid;
-  grid-template-columns: minmax(0, 33.333vw) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   gap: clamp(1.5rem, 4vw, 3rem);
   align-items: start;
 }
@@ -48,35 +57,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  padding: clamp(1rem, 2vw, 1.75rem);
+  min-height: clamp(16rem, 40vw, 24.125rem);
+  padding: clamp(1.5rem, 3vw, 1.9375rem) clamp(2rem, 5vw, 4.8125rem);
   border-radius: 5px;
   background: #d9d9d9;
-  overflow: hidden;
 }
 
 .projects-card__frame-inner {
   position: relative;
   width: 100%;
-  height: 100%;
+  max-width: 33.875rem;
+  min-height: clamp(12rem, 28vw, 20.1875rem);
   border-radius: 5px;
   overflow: hidden;
-  background: #393333;
-  will-change: transform;
-}
-
-.projects-card__frame-inner:hover {
-  background: #2e2828;
+  background: #948484;
 }
 
 .projects-card__media {
   display: block;
   width: 100%;
   height: 100%;
+  min-height: clamp(12rem, 28vw, 20.1875rem);
   object-fit: cover;
-  transform-origin: center center;
-  will-change: transform;
 }
 
 .projects-card__content {
@@ -97,12 +99,12 @@
 .projects-card__title {
   margin: 0;
   font-family: "Clash", sans-serif;
-  font-size: clamp(1.25rem, 2vw, 2.5rem);
-  font-weight: 600;
+  font-size: clamp(1.25rem, 2vw, 1.625rem);
+  font-weight: 400;
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #fd9800;
+  color: #fff;
   text-shadow: none;
 }
 
@@ -118,7 +120,16 @@
 
 .projects-card__link {
   margin-top: 1rem;
-  align-self: flex-start;
+  font-family: "Archivo", sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #f5892f;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.projects-card__link:hover {
+  color: #fff;
 }
 
 .projects-section__divider {

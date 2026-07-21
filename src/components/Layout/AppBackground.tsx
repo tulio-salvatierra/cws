@@ -1,6 +1,6 @@
 import { memo } from "react";
 import HeroBackground from "../Hero/HeroBackground";
-import Decorative from "../../assets/images/Frame13.svg";
+import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
 
 function AppBackground() {
   return (
@@ -13,8 +13,8 @@ function AppBackground() {
       </div>
       <div className="app-background__decorative" aria-hidden>
         <img
-          src={Decorative}
-          alt="Decorative"
+          src={ciceroWebStudio}
+          alt=""
           className="app-background__decorative-image"
           draggable={false}
         />

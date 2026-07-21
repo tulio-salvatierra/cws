@@ -1,8 +1,8 @@
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import { PHONE } from "../../Constants/Constants";
 import { useLoaderReady } from "../../context/LoaderContext";
 import { waitForAppFonts } from "../../lib/waitForAppFonts";
-import CustomButton from "../CustomButton";
 
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -54,7 +54,7 @@ export default function Hero() {
           delay: 0.7,
         });
 
-        gsap.from(".hero-actions .custom-btn", {
+        gsap.from(".hero-cta", {
           y: 40,
           opacity: 0,
           duration: 0.9,
@@ -92,23 +92,21 @@ export default function Hero() {
         </div>
 
         <div className="hero-actions">
-          <CustomButton
-            label="Call now!"
+          <a
             href={`tel:+1${PHONE}`}
-            variant="primary"
-            className="hero-cta--desktop"
-          />
-          <CustomButton
-            label="Contact"
+            className="hero-cta hero-cta--primary hero-cta--desktop"
+          >
+            Call now!
+          </a>
+          <Link
             to="/#contact"
-            variant="primary"
-            className="hero-cta--mobile"
-          />
-          <CustomButton
-            label="Work"
-            to="/#projects"
-            variant="secondary"
-          />
+            className="hero-cta hero-cta--primary hero-cta--mobile"
+          >
+            Contact
+          </Link>
+          <Link to="/#projects" className="hero-cta hero-cta--secondary">
+            Work
+          </Link>
         </div>
       </div>
     </section>
