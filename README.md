@@ -1,9 +1,14 @@
-# React + Vite
+# CWS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vite + React application for Cicero Web Studio, including the current marketing site, admin tooling, and the in-progress CWS Operating System workspace.
 
-Currently, two official plugins are available:
+## Agent Memory Workflow
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# cws
+To save an approved agent response into the repo's shared memory files:
+
+```bash
+npm run memory:save -- --input docs/examples/agent-memory-input.example.json --dry-run
+npm run memory:save -- --input docs/examples/agent-memory-input.example.json --apply
+```
+
+See [docs/agent-memory-workflow.md](docs/agent-memory-workflow.md) for the full workflow and input format.

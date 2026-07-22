@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "coverage": "vitest run --coverage",
+    "memory:save": "node scripts/save-agent-memory.mjs",
     "env:setup": "node scripts/env-setup.mjs",
     "env:check": "node scripts/env-check.mjs",
     "env:example-check": "node scripts/env-example-check.mjs",

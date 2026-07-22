@@ -1,0 +1,21 @@
+{
+  "agent": "codex",
+  "taskId": "CWS-AUDIT-001",
+  "latestHandoff": "# Latest Codex Handoff\n\nTask ID: CWS-AUDIT-001\nAgent: GPT/Codex\nObjective: Audit the repository and compare it against the CWS Operating System definition.\nFiles inspected:\n- package.json\n- docs/product-definition.md\nFiles changed:\n- None\nDatabase changes:\n- None\nAPI or function changes:\n- None\nSecurity decisions:\n- None\nDecisions made:\n- Start with a schema-only ticket.\nAssumptions:\n- Existing social publishing remains separate during MVP.\nTests added:\n- None\nTests run:\n- None\nKnown issues:\n- Existing social pipeline occupies `/admin`.\nDeferred future work:\n- Schema implementation.\nRecommended next task:\n- Claude architecture review.\nQuestions requiring Tulio:\n- None.\nReusable decisions discovered:\n- Keep legacy publishing separate from the new workspace module.\n",
+  "projectLogEntry": "## 2026-07-21 — CWS-AUDIT-001\n\nAgent: GPT/Codex  \nStatus: Completed\n\n### Objective\n\nAudit the repository and compare it against the CWS Operating System definition.\n\n### Steps completed\n\n1. Reviewed the stack and routing approach.\n2. Inspected existing docs and memory files.\n3. Confirmed the repo is Vite + React Router.\n\n### Files inspected\n\n- package.json\n- docs/product-definition.md\n\n### Files changed\n\n- None\n\n### Decisions\n\n- A schema-only next step is safest.\n\n### Issues discovered\n\n- `/admin` is already used by the legacy publishing workflow.\n\n### Next action\n\nRequest an architecture review before adding new tables.\n\n### Reusable learning\n\nName collisions with existing subsystems should be resolved before schema work starts.",
+  "taskLedger": {
+    "row": "| CWS-AUDIT-001 | Codex | Completed | Repo audited against product definition | Claude architecture review |"
+  },
+  "proposedDecisions": [
+    {
+      "title": "Keep legacy social publishing separate during MVP",
+      "content": "The existing n8n pipeline should remain untouched while the new workspace module is built."
+    }
+  ],
+  "proposedLearnings": [
+    {
+      "title": "Resolve naming collisions early",
+      "content": "When a live subsystem already uses a product name or route space, define the relationship before adding schema or UI."
+    }
+  ]
+}
