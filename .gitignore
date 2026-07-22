@@ -32,8 +32,11 @@ dist-ssr
 # Separate local projects — not part of this repo
 ayuda-terremoto-venezuela/
 
-# Agent / planning artifacts (not app runtime)
-.agents/
+# Agent / planning artifacts
+# Shared project instructions may live in `agents/` or `.agents/` and should be tracked.
+# Keep only local, machine-specific overrides out of git.
+.agents.local/
+agents.local/
 .codex/
 .claude/
 .superpowers/
