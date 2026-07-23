@@ -78,3 +78,37 @@ Workspace-owned records should include:
 - `updated_at`
 
 RLS policies must validate authorized workspace access.
+
+---
+
+## DEC-008 — Channels are first-class workspace records
+
+Date: 2026-07-23
+Status: Approved
+
+### Decision
+
+The CWS Operating System will store channels as first-class, workspace-owned records before campaigns are implemented.
+
+### Reason
+
+The product definition gives the Cicero Web Studio and Drum Practice channels independent audiences, voices, formats, production requirements, revenue goals, and success metrics. Campaigns such as `CWS-001` must be assigned to the correct channel without relying on loose text.
+
+### Consequence
+
+The database foundation must include a minimal `channels` table before `campaigns`, and campaign records must reference a channel in the same workspace.
+
+---
+
+## DEC-009 — Owners control sensitive workspace transitions
+
+Date: 2026-07-23
+Status: Approved
+
+### Decision
+
+Active workspace members may manage ordinary workspace records. Only workspace owners may manage memberships, set approval outcomes, and approve, reverse, or archive decisions.
+
+### Consequence
+
+RLS and trusted server-side validation must enforce owner-only sensitive transitions while preserving ordinary member access within the workspace.
