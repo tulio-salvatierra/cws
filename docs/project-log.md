@@ -252,3 +252,47 @@ Implement content-variant approvals for human review of `CWS-001`.
 ### Reusable learning
 
 - None added.
+
+## 2026-07-23 — CWS-DB-APPROVALS-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate human approval outcomes for `CWS-001` content variants.
+
+### Steps completed
+
+1. Added variant-focused approvals with workspace ownership, review outcomes, feedback, provenance, constraints, indexes, and immutable history.
+2. Added member read/request RLS and owner-only decision RLS with database-assigned reviewer attribution.
+3. Applied migration `010` to `cws-os-staging`.
+4. Passed fresh-database and managed-Supabase approval lifecycle and RLS scenarios.
+5. Confirmed local and remote migration history through `010` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/010_content_variant_approvals.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Kept approvals specific to content variants for the MVP.
+- Preserved completed approval history and allowed a new pending cycle after a decision.
+- Gave active workspace owners exclusive authority to decide outcomes.
+
+### Issues discovered
+
+- Initial records cannot be seeded until a persistent owner/workspace exists.
+- Agent-run approvals remain deferred.
+
+### Next action
+
+Implement workspace-owned agent runs, or select the persistent owner identity and seed the first workspace and `CWS-001` records.
+
+### Reusable learning
+
+- None added.

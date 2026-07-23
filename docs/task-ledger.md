@@ -8,3 +8,4 @@
 | CWS-DB-VALIDATION-001 | Codex | Completed | Migrations 001–007 and two-user RLS scenarios pass on managed Supabase | Implement channels |
 | CWS-DB-CHANNELS-001 | Codex | Completed | Workspace channels and RLS validated through migration 008 | Implement campaigns and content variants |
 | CWS-DB-CONTENT-001 | Codex | Completed | Campaigns and independent variants validated through migration 009 | Implement variant approvals |
+| CWS-DB-APPROVALS-001 | Codex | Completed | Variant approval lifecycle and owner-only review validated through migration 010 | Implement agent runs or seed CWS-001 |
