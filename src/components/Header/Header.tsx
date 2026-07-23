@@ -2,12 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useModal } from "../LeadFormModal/ModalContext";
 import { MENU_ITEM, PHONE } from "../../Constants/Constants";
 import { scrollToSection } from "../../lib/scrollToSection";
 import Burger from "../../assets/icons/burger.svg";
 import cwsLogo from "../../assets/images/header/cws-logo.svg";
-import CustomButton from "../CustomButton";
 import { useGSAP } from "@gsap/react";
 import "./Header.css";
 
@@ -49,7 +47,6 @@ function getSectionIdFromUrl(url: string) {
 }
 
 export default function Header() {
-  const { openLeadForm } = useModal();
   const [showMenu, setShowMenu] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const location = useLocation();
@@ -212,15 +209,6 @@ export default function Header() {
               >
                 Call now!
               </a>
-
-              <CustomButton
-                label="Get a Quote"
-                fullWidth
-                onClick={() => {
-                  toggleMenu();
-                  openLeadForm();
-                }}
-              />
             </nav>
           </div>,
           document.body,
