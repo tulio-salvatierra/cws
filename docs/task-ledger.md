@@ -7,3 +7,4 @@
 | CWS-DB-FOUNDATION-001 | Codex | Completed with limitation | Workspace and membership migration added; build and targeted tests pass | Run migration and RLS tests in Supabase |
 | CWS-DB-VALIDATION-001 | Codex | Completed | Migrations 001–007 and two-user RLS scenarios pass on managed Supabase | Implement channels |
 | CWS-DB-CHANNELS-001 | Codex | Completed | Workspace channels and RLS validated through migration 008 | Implement campaigns and content variants |
+| CWS-DB-CONTENT-001 | Codex | Completed | Campaigns and independent variants validated through migration 009 | Implement variant approvals |

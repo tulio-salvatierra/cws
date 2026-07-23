@@ -209,3 +209,46 @@ Implement workspace-owned campaigns and independent content variants for `CWS-00
 ### Reusable learning
 
 - None added.
+
+## 2026-07-23 — CWS-DB-CONTENT-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate workspace-owned campaigns and independent content variants for `CWS-001`.
+
+### Steps completed
+
+1. Added campaigns with required same-workspace channels, approved statuses, ownership, constraints, indexes, and RLS.
+2. Added independent content variants with language, title, transcript, tone, editing, caption, export, status, ownership, indexes, and RLS.
+3. Applied migration `009` to `cws-os-staging`.
+4. Passed fresh-database and managed-Supabase `CWS-001` scenarios with independent English and Spanish records.
+5. Confirmed local and remote migration history through `009` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/009_campaigns_content_variants.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Used the approved campaign and variant statuses without integrating the legacy publishing pipeline.
+- Kept English and Spanish as independent mutable records.
+
+### Issues discovered
+
+- Approvals are still required before the pilot can support human review outcomes.
+- Initial records cannot be seeded until a persistent owner/workspace exists.
+
+### Next action
+
+Implement content-variant approvals for human review of `CWS-001`.
+
+### Reusable learning
+
+- None added.
