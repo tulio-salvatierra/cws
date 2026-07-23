@@ -296,3 +296,48 @@ Implement workspace-owned agent runs, or select the persistent owner identity an
 ### Reusable learning
 
 - None added.
+
+## 2026-07-23 — CWS-DB-AGENT-RUNS-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate the smallest auditable workspace-owned agent-run foundation.
+
+### Steps completed
+
+1. Added workspace-owned agent runs with Ask/Propose command levels, structured input/output, approved statuses, lifecycle timestamps, provenance, constraints, and indexes.
+2. Added active-member read/queue RLS while reserving execution results and transitions for trusted server-side code.
+3. Blocked Execute runs until generalized action approvals are available.
+4. Applied migration `011` to `cws-os-staging`.
+5. Passed fresh-database and managed-Supabase agent-run lifecycle and RLS scenarios.
+6. Confirmed local and remote migration history through `011` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/011_agent_runs.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Limited the first agent-run implementation to Ask and Propose.
+- Reserved status, output, error, and timing updates for trusted server-side code.
+- Represented Execute for future compatibility but rejected it until approval linkage exists.
+
+### Issues discovered
+
+- There is no serverless execution endpoint yet.
+- Initial records cannot be seeded until a persistent owner/workspace exists.
+
+### Next action
+
+Select the persistent owner identity and seed the first workspace and `CWS-001`, or implement the first read-only Ask API.
+
+### Reusable learning
+
+- None added.
