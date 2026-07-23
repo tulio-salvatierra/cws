@@ -124,6 +124,12 @@ begin
       and old.status = 'active'
       and (new.role <> 'owner' or new.status <> 'active');
   elsif tg_op = 'DELETE' then
+    -- A trusted workspace deletion cascades to memberships at trigger depth 2.
+    -- Authenticated users are not granted workspace DELETE access.
+    if pg_trigger_depth() > 1 then
+      return old;
+    end if;
+
     removes_active_owner := old.role = 'owner' and old.status = 'active';
   end if;
 
