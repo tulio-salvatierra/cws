@@ -59,6 +59,7 @@ Design the smallest viable workspace-owned database foundation without writing S
 
 ### Files changed
 
+- `.gitignore`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/decisions.md`
 - `docs/project-log.md`
@@ -127,7 +128,7 @@ Static SQL review and application tests do not replace executing migrations agai
 
 Agent: Codex
 
-Status: Completed with managed-platform limitation
+Status: Completed
 
 ### Objective
 
@@ -135,10 +136,12 @@ Execute migrations `001` through `006` in a disposable PostgreSQL environment an
 
 ### Steps completed
 
-1. Verified that no local Supabase, Docker, PostgreSQL, project credentials, or authenticated Supabase CLI session was available.
+1. Verified the Supabase CLI login and created the dedicated `cws-os-staging` non-production project.
 2. Created a disposable embedded PostgreSQL environment under `/tmp`.
-3. Applied migrations `001` through `006` with a test-only UUID-extension compatibility shim.
-4. Tested workspace bootstrap, two-user tenant isolation, member and owner permissions, immutable identity fields, creator spoofing, slug validation, ownership transfer, and final-owner protection.
+3. Applied and tested migrations `001` through `007` in disposable PostgreSQL and managed Supabase.
+4. Tested workspace bootstrap, two-user tenant isolation, member and owner permissions, immutable identity fields, creator spoofing, slug validation, ownership transfer, final-owner protection, and administrative workspace cleanup.
+5. Fixed the membership-cascade edge case through migration `007`.
+6. Deleted the explicitly approved unrelated Supabase project after confirming the healthy replacement.
 
 ### Files changed
 
@@ -146,20 +149,22 @@ Execute migrations `001` through `006` in a disposable PostgreSQL environment an
 - `docs/project-log.md`
 - `docs/task-ledger.md`
 - `docs/learnings.md`
+- `supabase/migrations/006_workspace_foundation.sql`
+- `supabase/migrations/007_allow_workspace_member_cascade.sql`
 
 ### Decisions
 
-- No remote project was modified without an explicit non-production target and credentials.
+- `cws-os-staging` is the dedicated non-production validation target.
+- Direct final-owner removal remains blocked while trusted workspace deletion may cascade to memberships.
 
 ### Issues discovered
 
-- Managed Supabase validation remains unavailable without a project reference and authenticated CLI session.
-- The disposable runtime does not bundle `uuid-ossp`; only the test harness used a compatible UUID function.
+- Validation scripts remain temporary under `/tmp` rather than checked into the repository.
 
 ### Next action
 
-Run the same migrations against an explicitly selected non-production Supabase project, or proceed with the approved `channels` migration based on the successful PostgreSQL/RLS validation.
+Implement the approved first-class `channels` migration against the validated workspace foundation.
 
 ### Reusable learning
 
-Embedded PostgreSQL provides useful migration and RLS validation when Docker is unavailable, but platform extensions and managed Supabase behavior still need a final Supabase run.
+Child-row guard triggers must test parent-delete cascades as well as direct mutations; otherwise a valid administrative delete can be blocked.
