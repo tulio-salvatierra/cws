@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 import Header from '../Header/Header';
-import { ModalProvider } from '../LeadFormModal/ModalContext';
 import Footer from '../Footer/Footer';
 import AppBackground from './AppBackground';
 import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
@@ -21,7 +20,6 @@ export default function Layout() {
   }, []);
 
   return (
-    <ModalProvider>
     <div className="App grid grid-cols-1 w-full relative min-h-screen overflow-x-hidden">
       <div className="app-background" aria-hidden>
         <AppBackground />
@@ -32,6 +30,5 @@ export default function Layout() {
       </main>
       <Footer />
     </div>
-    </ModalProvider>
   );
 }

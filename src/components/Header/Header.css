@@ -42,9 +42,9 @@
 }
 
 .site-header__nav-link {
-  font-family: "Archivo", sans-serif;
+  font-family: "Clash", sans-serif;
   font-size: 1.125rem;
-  font-weight: 400;
+  font-weight: 500;
   color: #fff;
   text-decoration: none;
   transition: color 0.25s ease;
