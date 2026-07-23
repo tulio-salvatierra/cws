@@ -168,3 +168,44 @@ Implement the approved first-class `channels` migration against the validated wo
 ### Reusable learning
 
 Child-row guard triggers must test parent-delete cascades as well as direct mutations; otherwise a valid administrative delete can be blocked.
+
+## 2026-07-23 — CWS-DB-CHANNELS-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate first-class workspace-owned channels before campaigns.
+
+### Steps completed
+
+1. Added the `channels` table with workspace ownership, strategy fields, constraints, indexes, and immutable ownership protection.
+2. Added active-member CRUD RLS while preventing cross-workspace access and creator spoofing.
+3. Applied migration `008` to `cws-os-staging`.
+4. Passed fresh-database and managed-Supabase channel/RLS scenarios.
+5. Confirmed local and remote migration history through `008` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/008_channels.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Implemented first-class channels according to `DEC-008` and ordinary member management according to `DEC-009`.
+
+### Issues discovered
+
+- Initial workspace and channel rows cannot be seeded until the owner/workspace identity is selected.
+
+### Next action
+
+Implement workspace-owned campaigns and independent content variants for `CWS-001`.
+
+### Reusable learning
+
+- None added.
