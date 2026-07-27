@@ -6,7 +6,7 @@ export default {
     extend: {
       fontFamily: {
         main: ['Clash', 'Arial', 'sans-serif'], 
-        secondary: ['Archivo', 'Arial', 'sans-serif'],
+        secondary: ['Clash', 'Arial', 'sans-serif'],
       },},
   },
   plugins: [],

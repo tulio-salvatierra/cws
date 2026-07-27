@@ -254,7 +254,7 @@
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
   background: rgba(245, 137, 47, 0.2);
-  font-family: "Archivo", sans-serif;
+  font-family: "Clash", sans-serif;
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -267,7 +267,7 @@
   bottom: -2.5rem;
   left: 50%;
   transform: translateX(-50%);
-  font-family: "Archivo", sans-serif;
+  font-family: "Clash", sans-serif;
   font-size: 0.875rem;
   color: #888;
 }
