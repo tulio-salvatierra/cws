@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { projects } from "./ProjectsData";
-import problemDivider from "../../assets/images/problem/divider.svg";
+import problemDivider from "../../assets/Images/problem/divider.svg";
 import "./Projects.css";
 
 function formatStep(current: number, total: number) {

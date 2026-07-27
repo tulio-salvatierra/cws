@@ -3,11 +3,11 @@ import { PHONE } from "../../Constants/Constants";
 import MaskedLines from "../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import logoCicero from "../../assets/images/problem/cicero.svg";
-import logoWeb from "../../assets/images/problem/web.svg";
-import logoStudio from "../../assets/images/problem/studio.svg";
-import problemDivider from "../../assets/images/problem/divider.svg";
-import workspacePhoto from "../../assets/images/problem/workspace.jpg";
+import logoCicero from "../../assets/Images/problem/cicero.svg";
+import logoWeb from "../../assets/Images/problem/web.svg";
+import logoStudio from "../../assets/Images/problem/studio.svg";
+import problemDivider from "../../assets/Images/problem/divider.svg";
+import workspacePhoto from "../../assets/Images/problem/workspace.jpg";
 import "./Problem.css";
 
 const ES_LABEL = "[HABLAMOS ESPAÑOL]";

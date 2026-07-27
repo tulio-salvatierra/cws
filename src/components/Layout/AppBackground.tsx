@@ -1,6 +1,6 @@
 import { memo } from "react";
 import HeroBackground from "../Hero/HeroBackground";
-import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
+import ciceroWebStudio from "../../assets/Images/hero/cicero-web-studio.svg";
 
 function AppBackground() {
   return (
