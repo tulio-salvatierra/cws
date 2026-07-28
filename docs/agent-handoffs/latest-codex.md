@@ -1,93 +1,84 @@
 # Latest Codex Handoff
 
-Task ID: CWS-DB-AGENT-RUNS-001
+Task ID: CWS-DB-CONSOLIDATE-001
 Agent: Codex
-Objective: Implement and validate the smallest auditable workspace-owned agent-run foundation.
+Objective: Consolidate the validated migrations 007–011 onto the current integration branch and close unnecessary API-role execution grants on CWS OS SECURITY DEFINER functions through migration 012.
+
 Files inspected:
 - `.agents/codex-project-instructions.md`
 - `docs/product-definition.md`
 - `docs/technical-conventions.md`
 - `docs/decisions.md`
 - `docs/learnings.md`
-- `docs/agent-handoffs/latest-claude.md`
-- `docs/agent-handoffs/latest-codex.md`
-- `docs/project-log.md`
 - `docs/task-ledger.md`
+- `docs/agent-handoffs/latest-codex.md`
 - `supabase/migrations/006_workspace_foundation.sql`
 - `supabase/migrations/007_allow_workspace_member_cascade.sql`
 - `supabase/migrations/008_channels.sql`
 - `supabase/migrations/009_campaigns_content_variants.sql`
 - `supabase/migrations/010_content_variant_approvals.sql`
-Files changed:
 - `supabase/migrations/011_agent_runs.sql`
+
+Files changed:
+- `supabase/migrations/012_lock_down_function_grants.sql`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- Disposable validation scripts under `/tmp` were updated but are not repository files.
+
 Database or API changes:
-- Added workspace-owned `agent_runs` for traceable Ask and Propose requests.
-- Added approved lifecycle statuses, structured JSON input/output, agent identity, error details, start/finish times, creator provenance, and timestamps.
-- Added lifecycle validation and automatic start/finish attribution.
-- Added workspace/status, command-level, creator, and queued-work indexes.
-- Added active-member read and queue policies.
-- Granted authenticated users no update or delete permission; trusted server-side code owns execution results and lifecycle transitions.
-- Applied migration `011_agent_runs.sql` to `cws-os-staging`.
-- No serverless execution API, application UI, autonomous loop, or legacy publishing behavior was added.
+- Added a forward-only migration that explicitly revokes EXECUTE from `anon` for `create_workspace`, `is_workspace_member`, and `is_workspace_owner`, while retaining authenticated execution.
+- Explicitly revoked EXECUTE from both `anon` and `authenticated` for trigger-only `protect_workspace_membership`, `protect_approval_lifecycle`, and `protect_agent_run_lifecycle`.
+- Migrations 006–011 were not rewritten.
+- No legacy publishing table, policy, or n8n integration was modified.
+
 Security decisions:
-- Members may queue only `ask` or `propose` runs for their own active workspace identity.
-- Members cannot fabricate execution status, output, errors, or lifecycle timestamps.
-- `execute` inserts are rejected at the database trigger until a generalized action approval can be linked.
-- Agent-run request identity, workspace ownership, command level, agent key, input, creator, and creation time are immutable.
-- Completed, failed, and superseded runs are immutable.
-- Outsiders cannot read or queue workspace runs.
+- End-user workspace helper functions remain callable only by authenticated users.
+- Trigger-only guard functions are not directly callable by API roles.
+- The grant correction is implemented as migration 012 because migrations 006–011 are already applied to staging.
+
 Decisions made:
-- The first agent-run foundation records Ask and Propose work only.
-- The `execute` command level is represented for forward compatibility but remains disabled.
-- No permanent decision was added because blocking unapproved execution directly follows `DEC-006` and the product command model.
+- No new permanent product or architecture decision was required; this ticket implements the explicitly approved security correction.
+
 Assumptions:
-- `agent_key` is a stable lowercase slug identifying the responsible agent boundary.
-- Inputs and outputs are JSON objects so later APIs can add structured fields without changing the base table.
-- Trusted Vercel serverless functions or equivalent service-role workers will perform lifecycle updates in a later ticket.
+- PostgreSQL trigger execution does not require direct EXECUTE grants to `anon` or `authenticated` on the trigger functions.
+- The `agent/agent-runs` tip contains the validated linear history for migrations 007–011.
+
 Tests added:
 - No repository test harness was added.
-- Disposable fresh-PostgreSQL and managed-Supabase agent-run scenarios were added under `/tmp`.
+
 Tests run:
-- Disposable fresh PostgreSQL run — migrations `001` through `011` passed.
-- Managed `supabase db push --dry-run` — confirmed only migration `011`.
-- Managed migration application — passed for `011_agent_runs.sql`.
-- Managed agent-run lifecycle and RLS suite — passed.
-- Verified active members can queue Ask and Propose runs.
-- Verified member lifecycle updates affect no rows and trusted updates succeed.
-- Verified creator spoofing, outsider requests, outsider reads, and unapproved Execute requests are blocked.
-- Verified queued-to-running-to-completed timestamps and structured output.
-- Verified invalid transitions and terminal-run mutation are rejected.
-- Verified queued runs can be superseded and workspace cleanup cascades to runs.
-- `supabase migration list --linked` — local and remote histories match through `011`.
-- `supabase db lint --linked --level warning` — passed with no schema errors.
-- `git diff --check` — passed.
+- Static audit of every SECURITY DEFINER function introduced by migrations 006–011.
+- Confirmed the relevant functions are the three authenticated helpers and three trigger-only guards listed above.
+- Confirmed migrations 008 and 009 ownership-preservation functions are not SECURITY DEFINER and are outside the reported grant warning set.
+- Managed Supabase migration application and Security Advisor verification remain pending because this execution environment has GitHub access but no Supabase CLI/session connector.
+
 Known issues:
-- There is no serverless agent execution endpoint yet.
-- Generalized action approvals are not modeled, so Execute runs remain blocked.
-- Initial `CWS-001` records are not seeded because no persistent owner/workspace row has been selected.
-- Validation scripts remain temporary rather than checked into the repository.
+- Migration 012 has not yet been applied to project `ddbhxqkckzpwzwvnoxqt` from this environment.
+- Security Advisor warning clearance therefore cannot yet be claimed.
+
 Recommended next task:
-- Select the persistent owner identity and seed the first workspace/channel/campaign/variants, or implement the first read-only Ask API against `agent_runs`.
+- Apply migration 012 only to `cws-os-staging`, rerun the Security Advisor, and verify the six function warnings are cleared before customer-facing use.
+
 Questions requiring Tulio:
-- A persistent Supabase user identity is required before seeding the first real workspace and `CWS-001` records.
+- None for repository work. Managed Supabase execution requires running the linked CLI workflow in the repository environment that already has access to `cws-os-staging`.
+
 Project-memory files updated:
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+
 Permanent decisions added:
 - None.
+
 Reusable learnings added:
-- None.
+- None yet; add only after managed Supabase confirms the explicit role revokes clear the advisor warnings.
+
 Memory updates withheld:
-- The exact agent-key vocabulary and executor implementation remain deferred until the first serverless agent ticket.
-- Generalized action approvals, Execute runs, autonomous loops, and publishing integration remain deferred.
+- A reusable learning about Supabase default function grants was withheld until managed verification is complete.
+
 Git diff summary:
-- Added migration `011_agent_runs.sql`.
-- Replaced the latest Codex handoff.
-- Appended the `CWS-DB-AGENT-RUNS-001` project-log entry.
-- Added the `CWS-DB-AGENT-RUNS-001` task-ledger row.
-- No application source, legacy migration, publishing table, n8n workflow, decision, or learning changed.
+- Added `012_lock_down_function_grants.sql`.
+- Updated the latest Codex handoff and task ledger.
+- Appended the consolidation ticket to the project log.
+- No legacy publishing migration, legacy table definition, `auth_all` RLS policy, application source, or n8n workflow changed.
+- No unrelated/pre-existing changes were introduced on the consolidation branch.
