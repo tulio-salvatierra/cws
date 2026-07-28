@@ -59,6 +59,7 @@ Design the smallest viable workspace-owned database foundation without writing S
 
 ### Files changed
 
+- `.gitignore`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/decisions.md`
 - `docs/project-log.md`
@@ -127,7 +128,7 @@ Static SQL review and application tests do not replace executing migrations agai
 
 Agent: Codex
 
-Status: Completed with managed-platform limitation
+Status: Completed
 
 ### Objective
 
@@ -135,10 +136,12 @@ Execute migrations `001` through `006` in a disposable PostgreSQL environment an
 
 ### Steps completed
 
-1. Verified that no local Supabase, Docker, PostgreSQL, project credentials, or authenticated Supabase CLI session was available.
+1. Verified the Supabase CLI login and created the dedicated `cws-os-staging` non-production project.
 2. Created a disposable embedded PostgreSQL environment under `/tmp`.
-3. Applied migrations `001` through `006` with a test-only UUID-extension compatibility shim.
-4. Tested workspace bootstrap, two-user tenant isolation, member and owner permissions, immutable identity fields, creator spoofing, slug validation, ownership transfer, and final-owner protection.
+3. Applied and tested migrations `001` through `007` in disposable PostgreSQL and managed Supabase.
+4. Tested workspace bootstrap, two-user tenant isolation, member and owner permissions, immutable identity fields, creator spoofing, slug validation, ownership transfer, final-owner protection, and administrative workspace cleanup.
+5. Fixed the membership-cascade edge case through migration `007`.
+6. Deleted the explicitly approved unrelated Supabase project after confirming the healthy replacement.
 
 ### Files changed
 
@@ -146,20 +149,195 @@ Execute migrations `001` through `006` in a disposable PostgreSQL environment an
 - `docs/project-log.md`
 - `docs/task-ledger.md`
 - `docs/learnings.md`
+- `supabase/migrations/006_workspace_foundation.sql`
+- `supabase/migrations/007_allow_workspace_member_cascade.sql`
 
 ### Decisions
 
-- No remote project was modified without an explicit non-production target and credentials.
+- `cws-os-staging` is the dedicated non-production validation target.
+- Direct final-owner removal remains blocked while trusted workspace deletion may cascade to memberships.
 
 ### Issues discovered
 
-- Managed Supabase validation remains unavailable without a project reference and authenticated CLI session.
-- The disposable runtime does not bundle `uuid-ossp`; only the test harness used a compatible UUID function.
+- Validation scripts remain temporary under `/tmp` rather than checked into the repository.
 
 ### Next action
 
-Run the same migrations against an explicitly selected non-production Supabase project, or proceed with the approved `channels` migration based on the successful PostgreSQL/RLS validation.
+Implement the approved first-class `channels` migration against the validated workspace foundation.
 
 ### Reusable learning
 
-Embedded PostgreSQL provides useful migration and RLS validation when Docker is unavailable, but platform extensions and managed Supabase behavior still need a final Supabase run.
+Child-row guard triggers must test parent-delete cascades as well as direct mutations; otherwise a valid administrative delete can be blocked.
+
+## 2026-07-23 — CWS-DB-CHANNELS-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate first-class workspace-owned channels before campaigns.
+
+### Steps completed
+
+1. Added the `channels` table with workspace ownership, strategy fields, constraints, indexes, and immutable ownership protection.
+2. Added active-member CRUD RLS while preventing cross-workspace access and creator spoofing.
+3. Applied migration `008` to `cws-os-staging`.
+4. Passed fresh-database and managed-Supabase channel/RLS scenarios.
+5. Confirmed local and remote migration history through `008` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/008_channels.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Implemented first-class channels according to `DEC-008` and ordinary member management according to `DEC-009`.
+
+### Issues discovered
+
+- Initial workspace and channel rows cannot be seeded until the owner/workspace identity is selected.
+
+### Next action
+
+Implement workspace-owned campaigns and independent content variants for `CWS-001`.
+
+### Reusable learning
+
+- None added.
+
+## 2026-07-23 — CWS-DB-CONTENT-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate workspace-owned campaigns and independent content variants for `CWS-001`.
+
+### Steps completed
+
+1. Added campaigns with required same-workspace channels, approved statuses, ownership, constraints, indexes, and RLS.
+2. Added independent content variants with language, title, transcript, tone, editing, caption, export, status, ownership, indexes, and RLS.
+3. Applied migration `009` to `cws-os-staging`.
+4. Passed fresh-database and managed-Supabase `CWS-001` scenarios with independent English and Spanish records.
+5. Confirmed local and remote migration history through `009` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/009_campaigns_content_variants.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Used the approved campaign and variant statuses without integrating the legacy publishing pipeline.
+- Kept English and Spanish as independent mutable records.
+
+### Issues discovered
+
+- Approvals are still required before the pilot can support human review outcomes.
+- Initial records cannot be seeded until a persistent owner/workspace exists.
+
+### Next action
+
+Implement content-variant approvals for human review of `CWS-001`.
+
+### Reusable learning
+
+- None added.
+
+## 2026-07-23 — CWS-DB-APPROVALS-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate human approval outcomes for `CWS-001` content variants.
+
+### Steps completed
+
+1. Added variant-focused approvals with workspace ownership, review outcomes, feedback, provenance, constraints, indexes, and immutable history.
+2. Added member read/request RLS and owner-only decision RLS with database-assigned reviewer attribution.
+3. Applied migration `010` to `cws-os-staging`.
+4. Passed fresh-database and managed-Supabase approval lifecycle and RLS scenarios.
+5. Confirmed local and remote migration history through `010` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/010_content_variant_approvals.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Kept approvals specific to content variants for the MVP.
+- Preserved completed approval history and allowed a new pending cycle after a decision.
+- Gave active workspace owners exclusive authority to decide outcomes.
+
+### Issues discovered
+
+- Initial records cannot be seeded until a persistent owner/workspace exists.
+- Agent-run approvals remain deferred.
+
+### Next action
+
+Implement workspace-owned agent runs, or select the persistent owner identity and seed the first workspace and `CWS-001` records.
+
+### Reusable learning
+
+- None added.
+
+## 2026-07-23 — CWS-DB-AGENT-RUNS-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Implement and validate the smallest auditable workspace-owned agent-run foundation.
+
+### Steps completed
+
+1. Added workspace-owned agent runs with Ask/Propose command levels, structured input/output, approved statuses, lifecycle timestamps, provenance, constraints, and indexes.
+2. Added active-member read/queue RLS while reserving execution results and transitions for trusted server-side code.
+3. Blocked Execute runs until generalized action approvals are available.
+4. Applied migration `011` to `cws-os-staging`.
+5. Passed fresh-database and managed-Supabase agent-run lifecycle and RLS scenarios.
+6. Confirmed local and remote migration history through `011` and a clean database lint.
+
+### Files changed
+
+- `supabase/migrations/011_agent_runs.sql`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Limited the first agent-run implementation to Ask and Propose.
+- Reserved status, output, error, and timing updates for trusted server-side code.
+- Represented Execute for future compatibility but rejected it until approval linkage exists.
+
+### Issues discovered
+
+- There is no serverless execution endpoint yet.
+- Initial records cannot be seeded until a persistent owner/workspace exists.
+
+### Next action
+
+Select the persistent owner identity and seed the first workspace and `CWS-001`, or implement the first read-only Ask API.
+
+### Reusable learning
+
+- None added.

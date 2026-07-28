@@ -1,86 +1,84 @@
 # Latest Codex Handoff
 
-Task ID: CWS-DB-VALIDATION-001
+Task ID: CWS-DB-CONSOLIDATE-001
 Agent: Codex
-Objective: Execute migrations `001` through `006` in a disposable PostgreSQL environment and validate workspace tenant isolation and owner protections.
+Objective: Consolidate the validated migrations 007–011 onto the current integration branch and close unnecessary API-role execution grants on CWS OS SECURITY DEFINER functions through migration 012.
+
 Files inspected:
 - `.agents/codex-project-instructions.md`
-- `docs/agent-handoffs/latest-codex.md`
+- `docs/product-definition.md`
+- `docs/technical-conventions.md`
 - `docs/decisions.md`
 - `docs/learnings.md`
-- `docs/project-log.md`
 - `docs/task-ledger.md`
-- `env.keys.js`
-- `scripts/env-check.mjs`
-- `supabase/migrations/001_schema.sql`
-- `supabase/migrations/002_rls.sql`
-- `supabase/migrations/003_add_youtube_platform.sql`
-- `supabase/migrations/004_add_youtube_ready_status.sql`
-- `supabase/migrations/005_keywords_status.sql`
+- `docs/agent-handoffs/latest-codex.md`
 - `supabase/migrations/006_workspace_foundation.sql`
+- `supabase/migrations/007_allow_workspace_member_cascade.sql`
+- `supabase/migrations/008_channels.sql`
+- `supabase/migrations/009_campaigns_content_variants.sql`
+- `supabase/migrations/010_content_variant_approvals.sql`
+- `supabase/migrations/011_agent_runs.sql`
+
 Files changed:
+- `supabase/migrations/012_lock_down_function_grants.sql`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `docs/learnings.md`
-- A disposable PGlite runtime and validation script were created under `/tmp`; they are not repository files.
+
 Database or API changes:
-- None. No remote or production database was contacted.
-- No repository migration or application API was changed.
-- Migrations `001` through `006` were executed against a fresh embedded PostgreSQL database.
+- Added a forward-only migration that explicitly revokes EXECUTE from `anon` for `create_workspace`, `is_workspace_member`, and `is_workspace_owner`, while retaining authenticated execution.
+- Explicitly revoked EXECUTE from both `anon` and `authenticated` for trigger-only `protect_workspace_membership`, `protect_approval_lifecycle`, and `protect_agent_run_lifecycle`.
+- Migrations 006–011 were not rewritten.
+- No legacy publishing table, policy, or n8n integration was modified.
+
 Security decisions:
-- Refused to target an unknown remote Supabase project without an authenticated CLI session, project reference, or explicit database credentials.
-- Tested RLS as separate `authenticated` users rather than validating only as a database owner.
-- Kept the `uuid-ossp` compatibility adjustment strictly inside the disposable test harness.
+- End-user workspace helper functions remain callable only by authenticated users.
+- Trigger-only guard functions are not directly callable by API roles.
+- The grant correction is implemented as migration 012 because migrations 006–011 are already applied to staging.
+
 Decisions made:
-- Used an embedded PostgreSQL runtime under `/tmp` because Docker, PostgreSQL, Supabase configuration, and Supabase credentials were unavailable.
-- Replaced only the unsupported `create extension "uuid-ossp"` statement inside the disposable harness with a test-only `uuid_generate_v4()` wrapper around PostgreSQL's `gen_random_uuid()`.
-- Treated this as strong PostgreSQL/RLS validation but not as a substitute for a final managed-Supabase migration run.
+- No new permanent product or architecture decision was required; this ticket implements the explicitly approved security correction.
+
 Assumptions:
-- Supabase provides the `uuid-ossp` extension already required by migration `001`.
-- PGlite's PostgreSQL RLS, role, trigger, constraint, and security-definer behavior is representative for the tested statements.
+- PostgreSQL trigger execution does not require direct EXECUTE grants to `anon` or `authenticated` on the trigger functions.
+- The `agent/agent-runs` tip contains the validated linear history for migrations 007–011.
+
 Tests added:
-- No repository tests.
-- A disposable `/tmp` validation script created Supabase-like `anon`, `authenticated`, and `service_role` roles plus a minimal `auth.users` / `auth.uid()` test surface.
+- No repository test harness was added.
+
 Tests run:
-- `npx supabase --version` — passed with Supabase CLI `2.109.1`.
-- `npx supabase projects list --output json` — could not run because no Supabase access token or authenticated CLI session is available.
-- Disposable PostgreSQL migration run — passed: migrations `001` through `006` applied in order, with the documented test-only UUID-extension shim.
-- Two-user RLS scenarios — passed.
-- Verified an authenticated user initially sees only their own workspace and cannot read another workspace's membership.
-- Verified atomic workspace creation produces exactly one active owner.
-- Verified owners can add members and members then gain workspace visibility.
-- Verified ordinary members cannot update workspace metadata or add memberships.
-- Verified membership `created_by` cannot be spoofed.
-- Verified workspace ownership and membership identity fields are immutable.
-- Verified direct authenticated workspace insertion is denied.
-- Verified anonymous workspace bootstrap is denied.
-- Verified invalid slugs are rejected.
-- Verified the final active owner cannot be suspended or demoted.
-- Verified ownership transfer works when another active owner exists.
+- Static audit of every SECURITY DEFINER function introduced by migrations 006–011.
+- Confirmed the relevant functions are the three authenticated helpers and three trigger-only guards listed above.
+- Confirmed migrations 008 and 009 ownership-preservation functions are not SECURITY DEFINER and are outside the reported grant warning set.
+- Managed Supabase migration application and Security Advisor verification remain pending because this execution environment has GitHub access but no Supabase CLI/session connector.
+
 Known issues:
-- No managed Supabase project was available for final extension, grant, Auth, and platform-specific validation.
-- The disposable PGlite runtime does not bundle `uuid-ossp`; that single extension statement was replaced in the harness only.
-- The validation harness is temporary and is not currently reproducible through a repository command.
+- Migration 012 has not yet been applied to project `ddbhxqkckzpwzwvnoxqt` from this environment.
+- Security Advisor warning clearance therefore cannot yet be claimed.
+
 Recommended next task:
-- Link an explicitly selected non-production Supabase project or configure local Supabase/Docker, rerun migrations `001` through `006`, and then implement the approved first-class `channels` migration.
+- Apply migration 012 only to `cws-os-staging`, rerun the Security Advisor, and verify the six function warnings are cleared before customer-facing use.
+
 Questions requiring Tulio:
-- Which non-production Supabase project should be used for final managed validation, or should Codex proceed next with the `channels` migration based on the successful disposable PostgreSQL tests?
+- None for repository work. Managed Supabase execution requires running the linked CLI workflow in the repository environment that already has access to `cws-os-staging`.
+
 Project-memory files updated:
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `docs/learnings.md`
+
 Permanent decisions added:
 - None.
+
 Reusable learnings added:
-- Embedded PostgreSQL can provide meaningful local migration and RLS coverage when Docker is unavailable, but extension compatibility and managed-Supabase behavior still require a final Supabase run.
+- None yet; add only after managed Supabase confirms the explicit role revokes clear the advisor warnings.
+
 Memory updates withheld:
-- None.
+- A reusable learning about Supabase default function grants was withheld until managed verification is complete.
+
 Git diff summary:
-- Replaced the latest Codex handoff with the validation results.
-- Appended the `CWS-DB-VALIDATION-001` project-log entry.
-- Added the `CWS-DB-VALIDATION-001` task-ledger row.
-- Updated the existing database-validation learning with the verified embedded-PostgreSQL fallback and its boundary.
-- Pre-existing uncommitted schema-design, approved-decision, and workspace-foundation changes remain in the working tree.
-- No migration, application source, legacy publishing file, or test file changed during this validation task.
+- Added `012_lock_down_function_grants.sql`.
+- Updated the latest Codex handoff and task ledger.
+- Appended the consolidation ticket to the project log.
+- No legacy publishing migration, legacy table definition, `auth_all` RLS policy, application source, or n8n workflow changed.
+- No unrelated/pre-existing changes were introduced on the consolidation branch.

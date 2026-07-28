@@ -112,3 +112,18 @@ Active workspace members may manage ordinary workspace records. Only workspace o
 ### Consequence
 
 RLS and trusted server-side validation must enforce owner-only sensitive transitions while preserving ordinary member access within the workspace.
+
+---
+
+## DEC-010 — Use a dedicated CWS Supabase staging project
+
+Date: 2026-07-23
+Status: Approved
+
+### Decision
+
+Use `cws-os-staging` as the dedicated non-production Supabase project for CWS schema migrations, RLS validation, and pre-production database testing.
+
+### Consequence
+
+Database changes must be validated in `cws-os-staging` before any future production rollout. The project must not contain production client data, and destructive validation data must be cleaned up after testing.

@@ -29,6 +29,9 @@ dist-ssr
 .env.production
 .env.*.local
 
+# Local Supabase CLI link and runtime metadata
+supabase/.temp/
+
 # Separate local projects — not part of this repo
 ayuda-terremoto-venezuela/
 
