@@ -1,11 +1,11 @@
 import { useRef } from "react";
 import { useLoaderAnimation } from "@/Hooks/Loader";
-import logoSrc from "@/assets/Images/Frame13.svg";
+import logoSrc from "@/assets/Images/header/cws-logo.svg";
 import "./Loader.css";
 
-/** Native dimensions from Frame13.svg — keeps aspect ratio when scaling */
-const LOGO_WIDTH = 1696;
-const LOGO_HEIGHT = 1101;
+/** Native dimensions from cws-logo.svg — keeps aspect ratio when scaling */
+const LOGO_WIDTH = 94;
+const LOGO_HEIGHT = 37;
 
 type LoaderProps = {
   onComplete?: () => void;

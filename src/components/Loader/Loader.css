@@ -34,9 +34,9 @@
 .loading-logo {
   display: block;
   width: 100%;
-  max-width: 1696px;
+  max-width: min(72vw, 28rem);
   height: auto;
-  aspect-ratio: 1696 / 1101;
+  aspect-ratio: 94 / 37;
   object-fit: contain;
   will-change: transform, opacity;
 }
