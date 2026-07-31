@@ -341,3 +341,50 @@ Select the persistent owner identity and seed the first workspace and `CWS-001`,
 ### Reusable learning
 
 - None added.
+
+## 2026-07-31 — CWS-DB-MANAGED-VALIDATION-001
+
+Agent: Cursor
+
+Status: Completed with limitation
+
+### Objective
+
+Validate workspace foundation migrations `001`–`006` against managed non-production Supabase (`cws-os-staging`) and record the outcome.
+
+### Steps completed
+
+1. Confirmed staging project `ddbhxqkckzpwzwvnoxqt` / `cws-os-staging` via CLI link and MCP.
+2. Confirmed remote migrations include `001`–`006` (`workspace_foundation`) through `list_migrations` and `migration list --linked`.
+3. Attempted `npx supabase db push`; remote already has foundation migrations, but push fails on remote-only `20260730231228`.
+4. Created two staging test users (SQL, after Auth signup rate limit) and ran the authenticated membership checklist.
+5. Verified owner bootstrap, tenant isolation, member add/read, owner-only membership protection, final-owner guard, and ownership transfer.
+6. Cleaned up validation workspaces and test users (`leftover_workspaces=0`, `leftover_users=0`).
+
+### Files changed
+
+- `docs/agent-handoffs/latest-cursor.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+- `docs/learnings.md`
+- `supabase/config.toml`
+- `supabase/.gitignore`
+- `.env.local` (gitignored)
+
+### Decisions
+
+- None permanent.
+
+### Issues discovered
+
+- Literal `db push` fails with `LegacyDbPushMissingLocalError` for remote migration `20260730231228` (`goals_initiatives_projects_tasks_decisions_learnings`) missing locally.
+- Auth `signUp` remained email-rate-limited; SQL-created confirmed users were used for client sign-in tests.
+- PostgREST owner-denied UPDATE/DELETE returned HTTP 200 with zero rows; correctness was confirmed by resulting membership state.
+
+### Next action
+
+Pull or repair remote-only migration `20260730231228` so CLI push history is clean, then continue remaining consolidate/advisor verification.
+
+### Reusable learning
+
+- When validating RLS through PostgREST, assert resulting row state for denied UPDATE/DELETE; do not rely only on error objects.

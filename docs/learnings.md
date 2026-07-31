@@ -17,3 +17,11 @@ Date: 2026-07-23
 Verified by: CWS-DB-VALIDATION-001
 
 A trigger that prevents deletion of the final privileged child row can also intercept a legitimate parent-table cascade. Test both direct child deletion and trusted parent deletion. When ordinary users cannot delete the parent, nested trigger depth can distinguish the trusted cascade while retaining the direct-mutation guard.
+
+## PostgREST RLS denials can look like successful empty writes
+
+Date: 2026-07-31
+
+Verified by: CWS-DB-MANAGED-VALIDATION-001
+
+Under workspace-authorized RLS, a non-owner UPDATE or DELETE through PostgREST may return HTTP 200 with an empty result set and no error. Treat that as a denial only after confirming the target rows are unchanged. Prefer state assertions over error-message assertions for membership and ownership checks.
