@@ -83,10 +83,10 @@ export default function Hero() {
       <div className="hero-footer">
         <div className="hero-intro">
           <h1 className="hero-headline">
-            Presence that <span className="hero-headline__works">works</span>
+            Presence that <span className="hero-headline__works">WORKS!</span>
           </h1>
           <p className="hero-subcopy">
-            I build website that engage the user, sparks curiosity and keep
+            I build websites that engage users, sparks curiosity and keep
             visitors engaged
           </p>
         </div>
