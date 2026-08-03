@@ -114,7 +114,15 @@ export default function WorkspacePage() {
           </Link>
         </header>
 
-        <section className="grid gap-4 py-8 sm:grid-cols-3">
+        <nav className="flex flex-wrap gap-2 border-b border-white/10 py-4" aria-label="Workspace sections">
+          {[['#overview', 'Overview'], ['#campaigns', 'Campaigns'], ['#content', 'Content']].map(([href, label]) => (
+            <a key={href} className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 transition hover:border-orange-300/50 hover:text-orange-200" href={href}>
+              {label}
+            </a>
+          ))}
+        </nav>
+
+        <section id="overview" className="grid scroll-mt-6 gap-4 py-8 sm:grid-cols-3">
           {[
             ['Channels', state.channels.length, 'Independent audiences and voices'],
             ['Campaigns', state.campaigns.length, 'Work currently in motion'],
@@ -147,7 +155,7 @@ export default function WorkspacePage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-orange-300/20 bg-orange-300/[0.06] p-6">
+          <div id="campaigns" className="scroll-mt-6 rounded-3xl border border-orange-300/20 bg-orange-300/[0.06] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-200">Active campaign</p>
             {state.campaigns.map((campaign) => (
               <div key={campaign.id}>
@@ -164,7 +172,7 @@ export default function WorkspacePage() {
           </div>
         </section>
 
-        <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+        <section id="content" className="mt-6 scroll-mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
           <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Content operations</p>
