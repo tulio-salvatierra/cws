@@ -9,10 +9,10 @@ import {
   PHONE,
   SERICES_URL,
 } from "../../Constants/Constants";
-import ciceroWebStudio from "../../assets/Images/hero/cicero-web-studio.svg";
-import navigateIcon from "../../assets/Images/footer/navigate-icon.svg";
-import linkedinIcon from "../../assets/Images/footer/linkedin.svg";
-import arrowUpIcon from "../../assets/Images/footer/arrow-up.svg";
+import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
+import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
+import linkedinIcon from "../../assets/images/footer/linkedin.svg";
+import arrowUpIcon from "../../assets/images/footer/arrow-up.svg";
 import "./Footer.css";
 
 const FOOTER_NAV = [

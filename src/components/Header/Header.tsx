@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MENU_ITEM, PHONE } from "../../Constants/Constants";
 import { scrollToSection } from "../../lib/scrollToSection";
 import Burger from "../../assets/icons/burger.svg";
-import cwsLogo from "../../assets/Images/header/cws-logo.svg";
+import cwsLogo from "../../assets/images/header/cws-logo.svg";
 import { useGSAP } from "@gsap/react";
 import "./Header.css";
 

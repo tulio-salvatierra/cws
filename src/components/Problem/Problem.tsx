@@ -4,10 +4,10 @@ import MaskedLines from "../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import logoCicero from "../../assets/Images/hero/cicero-web-studio.svg";
+import logoCicero from "../../assets/images/hero/cicero-web-studio.svg";
 
-import problemDivider from "../../assets/Images/problem/divider.svg";
-import workspacePhoto from "../../assets/Images/problem/workspace.jpg";
+import problemDivider from "../../assets/images/problem/divider.svg";
+import workspacePhoto from "../../assets/images/problem/workspace.jpg";
 import "./Problem.css";
 
 gsap.registerPlugin(ScrollTrigger);

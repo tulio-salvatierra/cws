@@ -29,6 +29,7 @@ const CalendarPage = lazy(() => import("./pages/admin/CalendarPage"));
 const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
+const WorkspacePage = lazy(() => import("./pages/workspace/WorkspacePage"));
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -107,6 +108,16 @@ function App() {
                 <LoginPage />
               </Suspense>
             } />
+            <Route
+              path="/workspace"
+              element={
+                <Suspense fallback={null}>
+                  <AdminGuard>
+                    <WorkspacePage />
+                  </AdminGuard>
+                </Suspense>
+              }
+            />
             <Route
               path="/admin"
               element={
