@@ -30,6 +30,8 @@ const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
 const WorkspacePage = lazy(() => import("./pages/workspace/WorkspacePage"));
+const CampaignDetailPage = lazy(() => import("./pages/workspace/CampaignDetailPage"));
+const VariantDetailPage = lazy(() => import("./pages/workspace/VariantDetailPage"));
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -118,6 +120,8 @@ function App() {
                 </Suspense>
               }
             />
+            <Route path="/workspace/campaigns/:campaignId" element={<Suspense fallback={null}><AdminGuard><CampaignDetailPage /></AdminGuard></Suspense>} />
+            <Route path="/workspace/variants/:variantId" element={<Suspense fallback={null}><AdminGuard><VariantDetailPage /></AdminGuard></Suspense>} />
             <Route
               path="/admin"
               element={

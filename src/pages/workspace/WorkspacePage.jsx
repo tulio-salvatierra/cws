@@ -158,7 +158,7 @@ export default function WorkspacePage() {
           <div id="campaigns" className="scroll-mt-6 rounded-3xl border border-orange-300/20 bg-orange-300/[0.06] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-200">Active campaign</p>
             {state.campaigns.map((campaign) => (
-              <div key={campaign.id}>
+                <div key={campaign.id}>
                 <div className="mt-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                   <div>
                     <h2 className="text-3xl font-semibold">{campaign.code}</h2>
@@ -166,7 +166,8 @@ export default function WorkspacePage() {
                   </div>
                   <StatusPill status={campaign.status} />
                 </div>
-                <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-300">{campaign.description}</p>
+                  <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-300">{campaign.description}</p>
+                <Link className="mt-5 inline-flex text-sm font-semibold text-orange-200 hover:text-orange-100" to={`/workspace/campaigns/${campaign.id}`}>Open campaign →</Link>
               </div>
             ))}
           </div>
@@ -189,7 +190,7 @@ export default function WorkspacePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-200">{variant.locale}</p>
-                      <h3 className="mt-2 text-lg font-semibold">{variant.working_title}</h3>
+                      <Link className="mt-2 block text-lg font-semibold hover:text-orange-200" to={`/workspace/variants/${variant.id}`}>{variant.working_title}</Link>
                       <p className="mt-1 text-xs text-slate-500">{campaign?.code} · {variant.code}</p>
                     </div>
                     <StatusPill status={variant.status} />
