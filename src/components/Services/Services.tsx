@@ -2,7 +2,7 @@ import { useRef, useState, useCallback } from "react";
 import { servicesData } from "../ServicesCard/servicesCardData";
 import LottieAnimation from "../ServicesCard/lotties/Lottie";
 import SectionIntro from "../SectionIntro/SectionIntro";
-import navigateIcon from "../../assets/Images/footer/navigate-icon.svg";
+import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";

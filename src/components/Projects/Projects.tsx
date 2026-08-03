@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { projects } from "./ProjectsData";
-import problemDivider from "../../assets/Images/problem/divider.svg";
-import navigateIcon from "../../assets/Images/footer/navigate-icon.svg";
+import problemDivider from "../../assets/images/problem/divider.svg";
+import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
