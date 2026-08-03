@@ -3,12 +3,14 @@ import { PHONE } from "../../Constants/Constants";
 import MaskedLines from "../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import logoCicero from "../../assets/Images/problem/cicero.svg";
-import logoWeb from "../../assets/Images/problem/web.svg";
-import logoStudio from "../../assets/Images/problem/studio.svg";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import logoCicero from "../../assets/Images/hero/cicero-web-studio.svg";
+
 import problemDivider from "../../assets/Images/problem/divider.svg";
 import workspacePhoto from "../../assets/Images/problem/workspace.jpg";
 import "./Problem.css";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ES_LABEL = "[HABLAMOS ESPAÑOL]";
 const ES_REPEAT_COUNT = 16;
@@ -22,6 +24,7 @@ export default function Problem() {
   const sectionRef = useRef<HTMLElement>(null);
   const esTrackRef = useRef<HTMLDivElement>(null);
   const esPhraseRef = useRef<HTMLParagraphElement>(null);
+  const showcaseRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -93,13 +96,86 @@ export default function Problem() {
         delay: 0.5,
       });
 
-      gsap.from(".problem-section__showcase-content", {
-        y: 40,
-        opacity: 0,
-        duration: 1,
-        ease: "expo.out",
-        delay: 0.8,
-      });
+      const showcase = showcaseRef.current;
+      if (!showcase) return;
+
+      const image = showcase.querySelector<HTMLElement>(
+        ".problem-section__showcase-image",
+      );
+      const overlay = showcase.querySelector<HTMLElement>(
+        ".problem-section__showcase-overlay",
+      );
+      const contentItems = gsap.utils.toArray<HTMLElement>([
+        ".problem-section__name",
+        ".problem-section__role",
+        ".problem-section__cta",
+      ]);
+
+      if (!image) return;
+
+      const mm = gsap.matchMedia();
+
+      mm.add(
+        {
+          isDesktop: "(min-width: 992px)",
+          isMobile: "(max-width: 991px)",
+        },
+        (context) => {
+          const { isDesktop } = context.conditions as {
+            isDesktop: boolean;
+            isMobile: boolean;
+          };
+
+          gsap.set(image, {
+            opacity: 0,
+            scale: 1.3,
+            yPercent: 18,
+            transformOrigin: isDesktop ? "center center" : "left center",
+          });
+          gsap.set(overlay, { opacity: 0 });
+          gsap.set(contentItems, { opacity: 0, y: 48 });
+
+          const tl = gsap.timeline({
+            defaults: { ease: "power3.out" },
+            scrollTrigger: {
+              trigger: showcase,
+              start: "top 90%",
+              once: true,
+            },
+          });
+
+          tl.to(image, {
+            opacity: 1,
+            scale: 1,
+            yPercent: 0,
+            duration: 1.35,
+          })
+            .to(
+              overlay,
+              {
+                opacity: 1,
+                duration: 0.7,
+              },
+              "-=0.85",
+            )
+            .to(
+              contentItems,
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.9,
+                stagger: 0.14,
+              },
+              "-=0.4",
+            );
+
+          return () => {
+            tl.kill();
+          };
+        },
+      );
+
+      return () => mm.revert();
     },
     { scope: sectionRef },
   );
@@ -113,16 +189,20 @@ export default function Problem() {
               className="problem-section__logo"
               aria-label="Cicero Web Studio"
             >
-              <img className="w-inherit h-inherit" src={logoCicero} alt="Cicero" />
-              <img className="w-inherit h-inherit" src={logoWeb} alt="Web" />
-              <img className="w-inherit h-inherit" src={logoStudio} alt="Studio" />
+              <img
+                className="problem-section__logo-image"
+                src={logoCicero}
+                alt="Cicero Web Studio"
+              />
             </div>
 
             <div className="problem-section__es" aria-hidden="true">
               <div ref={esTrackRef} className="problem-section__es-track">
                 <p ref={esPhraseRef} className="problem-section__es-phrase">
                   {Array.from({ length: ES_REPEAT_COUNT * 2 }, (_, index) => (
-                    <span className="text-white text-2xl" key={index}>{ES_LABEL}</span>
+                    <span className="text-white text-2xl" key={index}>
+                      {ES_LABEL}
+                    </span>
                   ))}
                 </p>
               </div>
@@ -152,13 +232,18 @@ export default function Problem() {
           aria-hidden="true"
         />
 
-        <div className="problem-section__showcase">
-          <img
-            src={workspacePhoto}
-            alt="Tulio Salvatierra in his workspace"
-            className="problem-section__showcase-image"
-          />
-          <div className="problem-section__showcase-overlay" aria-hidden="true" />
+        <div ref={showcaseRef} className="problem-section__showcase">
+          <div className="problem-section__showcase-media">
+            <img
+              src={workspacePhoto}
+              alt="Tulio Salvatierra in his workspace"
+              className="problem-section__showcase-image"
+            />
+            <div
+              className="problem-section__showcase-overlay"
+              aria-hidden="true"
+            />
+          </div>
 
           <div className="problem-section__showcase-content">
             <h2 className="problem-section__name">Tulio Salvatierra</h2>

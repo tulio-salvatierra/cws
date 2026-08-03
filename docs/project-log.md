@@ -388,3 +388,94 @@ Pull or repair remote-only migration `20260730231228` so CLI push history is cle
 ### Reusable learning
 
 - When validating RLS through PostgREST, assert resulting row state for denied UPDATE/DELETE; do not rely only on error objects.
+
+## 2026-07-31 — CWS-DB-MIGRATION-RECONCILE-001
+
+Agent: Cursor
+
+Status: Completed with follow-up required
+
+### Objective
+
+Reconcile remote-only migration `20260730231228` so local history and `db push` can align safely.
+
+### Steps completed
+
+1. Confirmed linked migration list: `001`–`012` match; remote-only `20260730231228`.
+2. Ran `npx supabase db pull remote_20260730231228_sync --linked --yes`; failed with `LegacyDbPullMigrationConflictError`.
+3. Attempted `db dump`; failed because Docker Desktop is required.
+4. Inspected remote schema for `goals`, `initiatives`, `projects`, `tasks`, `decisions`, and `learnings` (tables, constraints, indexes, RLS, triggers).
+5. Compared against local `007`–`012` and confirmed those objects are not duplicated there.
+
+### Files changed
+
+- `docs/agent-handoffs/latest-cursor.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+- `docs/learnings.md`
+
+### Decisions
+
+- KEEP the remote migration; do not repair it as reverted.
+- Do not invent a local migration file until complete DDL can be captured (Docker dump or equivalent).
+
+### Issues discovered
+
+- CLI pull cannot fetch a remote-only migration while histories diverge; its suggested repair is unsafe when the migration maps to real schema.
+- Dump requires Docker in this environment.
+
+### Next action
+
+Start Docker, dump/extract goals-family DDL into
+`supabase/migrations/20260730231228_goals_initiatives_projects_tasks_decisions_learnings.sql`,
+then rerun `migration list --linked` and `db push`.
+
+### Reusable learning
+
+- Treat CLI “repair reverted” suggestions as unsafe when a remote-only migration corresponds to real schema absent from local files.
+
+## 2026-08-03 — CWS-WEB-MARKETING-MOTION-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Validate and publish the prepared marketing-section motion and video update to `main`.
+
+### Steps completed
+
+1. Audited the mixed working tree and retained the coherent marketing/video and project-memory scope.
+2. Corrected three asset imports for Linux/Vercel case-sensitive resolution.
+3. Added five tracked video assets used by Process and CTA sections.
+4. Verified the production build and Vercel Preview admin login.
+5. Confirmed Preview uses the verified staging Supabase URL and browser-safe publishable key.
+
+### Files changed
+
+- Marketing components and CSS under `src/components/{CtaSection,Problem,Process,Projects,Services}`
+- Five MP4 files under `src/assets/video`
+- `docs/agent-handoffs/latest-cursor.md`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/learnings.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Published the prepared scope directly to `main` as requested.
+- Kept the Supabase publishable key browser-side and did not expose privileged credentials.
+
+### Issues discovered
+
+- Two stale admin tests fail against current behavior; 40 other tests pass.
+- Existing large-bundle warnings remain.
+
+### Next action
+
+Reconcile remote migration `20260730231228`, then repair the stale admin tests.
+
+### Reusable learning
+
+- None added.

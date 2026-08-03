@@ -25,3 +25,11 @@ Date: 2026-07-31
 Verified by: CWS-DB-MANAGED-VALIDATION-001
 
 Under workspace-authorized RLS, a non-owner UPDATE or DELETE through PostgREST may return HTTP 200 with an empty result set and no error. Treat that as a denial only after confirming the target rows are unchanged. Prefer state assertions over error-message assertions for membership and ownership checks.
+
+## Do not repair-revert meaningful remote-only migrations
+
+Date: 2026-07-31
+
+Verified by: CWS-DB-MIGRATION-RECONCILE-001
+
+When `db pull` fails because a remote migration version is missing locally, the CLI may suggest `migration repair --status reverted`. Inspect the remote schema first. If that version created real tables/policies absent from local history, keep the version and add a matching local file; repairing as reverted orphans applied schema and can make a later push recreate existing objects.

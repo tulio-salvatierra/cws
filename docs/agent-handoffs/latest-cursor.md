@@ -1,8 +1,8 @@
 # Latest Cursor Handoff
 
-Task ID: CWS-DB-MANAGED-VALIDATION-001
+Task ID: CWS-DB-MIGRATION-RECONCILE-001
 Agent: Cursor
-Objective: Validate the workspace foundation against non-production Supabase (`cws-os-staging`) and record the outcome. No product redesign, UI, legacy publishing changes, or channels implementation.
+Objective: Safely reconcile remote-only migration `20260730231228` with local history so `npx supabase db push` can become clean. Migration-history work only.
 
 Files inspected:
 - `.agents/cursor-project-instructions.md`
@@ -11,71 +11,82 @@ Files inspected:
 - `docs/decisions.md`
 - `docs/learnings.md`
 - `docs/agent-handoffs/latest-codex.md`
-- `docs/task-ledger.md`
-- `docs/project-log.md`
-- `supabase/migrations/006_workspace_foundation.sql`
-- `src/lib/supabase.js`
-- `package.json`
+- `docs/agent-handoffs/latest-cursor.md`
+- `supabase/migrations/001_schema.sql` through `012_lock_down_function_grants.sql`
+- Remote staging schema via MCP (`goals`, `initiatives`, `projects`, `tasks`, `decisions`, `learnings`)
 
 Files changed:
 - `docs/agent-handoffs/latest-cursor.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
 - `docs/learnings.md`
-- `supabase/config.toml` (from earlier `supabase init`)
-- `supabase/.gitignore` (from earlier `supabase init`)
-- `.env.local` (gitignored; staging URL/publishable key)
 
 UI behavior added:
 - None
 
 Data integration added:
-- None in application code.
+- None
 
 Architecture alignment:
-- Confirmed staging project URL `https://ddbhxqkckzpwzwvnoxqt.supabase.co` (DEC-010).
-- Remote migrations include `001`–`006` (`workspace_foundation`) plus later validated migrations through `012` and one remote-only timestamped migration.
-- Did not implement or modify the `channels` schema in this task.
+- Linked project remains `cws-os-staging` / `ddbhxqkckzpwzwvnoxqt`.
+- Local `001`–`012` match remote.
+- Remote-only `20260730231228` (`goals_initiatives_projects_tasks_decisions_learnings`) is real product-schema state for Goals → Initiatives → Projects/Tasks plus Decisions/Learnings, not covered by local `007`–`012`.
+- Migration `012` is already applied on staging; reconcile does not need to re-apply it.
 
 Decisions made:
-- None permanent beyond recording validation results.
+- Choose KEEP, not repair.
+- Do not run `supabase migration repair --status reverted 20260730231228`.
+- Do not invent or commit a reconstructed migration file in this ticket because CLI pull did not produce one and Docker-based dump is unavailable.
 
 Assumptions:
-- Temporary SQL-created Auth users were acceptable for staging RLS validation after email signup rate limits blocked `signUp`.
-- Checklist item “`db push` succeeds” is satisfied for foundation intent by verifying `001`–`006` are present on remote; literal `db push` currently fails due to an unrelated remote-only migration.
+- The remote history row name accurately describes the applied schema objects inspected on staging.
+- Reconstructing a local file with the exact remote version/name is the correct keep-path once DDL can be captured completely.
 
 Tests added:
-- None checked into the repository.
+- None
 
 Tests run:
-1. `npx supabase migration list --linked` — local/remote match for `001`–`012`; remote also has `20260730231228`.
-2. MCP `list_migrations` / `get_project_url` — staging confirmed; `006_workspace_foundation` applied.
-3. `npx supabase db push` — failed: `LegacyDbPushMissingLocalError` for remote version `20260730231228` not present locally.
-4. Two-user authenticated RLS checklist on staging:
-   - user A creates workspace — pass
-   - user A is initial active owner — pass
-   - user B cannot read before membership — pass
-   - user A adds user B as member — pass
-   - user B can read after membership — pass
-   - user B cannot perform owner-only membership mutations (state unchanged; PostgREST returns empty 200) — pass on retest
-   - final active owner cannot be removed/demoted — pass
-   - ownership transfer works when another active owner remains — pass
+1. `npx supabase migration list --linked` — `001`–`012` aligned; remote-only `20260730231228`.
+2. `npx supabase db pull remote_20260730231228_sync --linked --yes` — failed: `LegacyDbPullMigrationConflictError` (suggests repair reverted).
+3. `npx supabase db dump --linked --schema public` — failed: Docker Desktop required (`LegacyDockerRunError`).
+4. MCP schema inspection — confirmed tables/columns/constraints/indexes/policies/triggers for goals-family objects exist on staging and are absent from local migration SQL.
 
 Known issues:
-- `npx supabase db push` fails until local history includes or repairs remote migration `20260730231228` (`goals_initiatives_projects_tasks_decisions_learnings`).
-- Auth `signUp` remains rate-limited; validation used SQL-created confirmed users, then client sign-in.
-- Did not continue to channels work as new implementation.
-- Validation workspaces and test users were cleaned up (`leftover_workspaces=0`, `leftover_users=0`).
+- CLI `db pull` cannot retrieve a remote-only migration while history is divergent; it recommends repair, which is unsafe here.
+- CLI `db dump` requires Docker Desktop in this environment.
+- Bare shell command `db pull` is invalid; use `npx supabase db pull ...`.
 
 Deferred future work:
-- Repair/pull remote-only migration `20260730231228` so `db push` is clean.
-- Finish Security Advisor verification around migration `012` if still pending.
+- Capture complete DDL for the goals-family migration into local file
+  `supabase/migrations/20260730231228_goals_initiatives_projects_tasks_decisions_learnings.sql`
+  (exact remote version + name), then re-check list/push.
+- Optional follow-up: owner-only decision transitions vs current member CRUD policies on `decisions`.
 
-Recommended next task:
-- Align local migration history with remote (`20260730231228`), confirm `db push` is a no-op, then proceed with any remaining `CWS-DB-CONSOLIDATE-001` advisor verification.
+Recommended next command sequence:
+1. Start Docker Desktop (required for dump), then:
+   ```bash
+   npx supabase db dump --linked --schema public -f /tmp/cws_staging_public.sql
+   ```
+2. Extract from that dump only the objects for `goals`, `initiatives`, `projects`, `tasks`, `decisions`, and `learnings` (tables, constraints, indexes, RLS enable/policies, grants, updated_at triggers) into:
+   ```bash
+   supabase/migrations/20260730231228_goals_initiatives_projects_tasks_decisions_learnings.sql
+   ```
+3. Verify:
+   ```bash
+   npx supabase migration list --linked
+   npx supabase db push
+   ```
+   Expect local+remote match for `20260730231228` and a clean/no-op push on staging.
+
+Do not run:
+```bash
+npx supabase migration repair --status reverted 20260730231228 --linked
+```
+Reason: the migration is meaningful remote schema, not redundant with `007`–`012`. Reverting history would orphan applied tables and risk a later push trying to recreate existing objects.
 
 Questions requiring Tulio:
-1. Confirm whether remote-only migration `20260730231228` should be pulled into the repo or repaired as reverted.
+1. Approve a follow-up ticket to add the kept local migration file from dump/reconstruction (Docker available), then confirm clean `db push`.
+2. Optional: confirm whether `decisions` policies should later be tightened to owner-only for sensitive transitions (DEC-009), separately from history reconcile.
 
 Project-memory files updated:
 - `docs/agent-handoffs/latest-cursor.md`
@@ -87,12 +98,12 @@ Permanent decisions added:
 - None
 
 Reusable learnings added:
-- PostgREST RLS denials on UPDATE/DELETE may return HTTP 200 with zero rows; assert resulting state, not only error objects.
+- Do not treat CLI “repair reverted” suggestions as safe when a remote-only migration maps to real schema absent from local history.
 
 Memory updates withheld:
 - None
 
 Git diff summary:
-- Docs/memory updates for completed managed validation
-- Untracked `supabase/config.toml` and `supabase/.gitignore` from earlier init may remain
-- No legacy publishing, `/admin`, marketing UI, channels, or campaign code changes
+- Docs/memory updates only
+- No migration SQL added (pull produced no file; dump blocked by Docker)
+- No app/UI/legacy publishing changes

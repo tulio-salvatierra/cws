@@ -1,8 +1,8 @@
 # Latest Codex Handoff
 
-Task ID: CWS-DB-CONSOLIDATE-001
+Task ID: CWS-WEB-MARKETING-MOTION-001
 Agent: Codex
-Objective: Consolidate the validated migrations 007–011 onto main and close unnecessary API-role execution grants on CWS OS SECURITY DEFINER functions through migration 012.
+Objective: Validate and publish the prepared marketing-section motion/video update to `main`, including Vercel Preview configuration verification.
 
 Files inspected:
 - `.agents/codex-project-instructions.md`
@@ -10,76 +10,88 @@ Files inspected:
 - `docs/technical-conventions.md`
 - `docs/decisions.md`
 - `docs/learnings.md`
-- `docs/task-ledger.md`
 - `docs/agent-handoffs/latest-codex.md`
-- `supabase/migrations/006_workspace_foundation.sql`
-- `supabase/migrations/007_allow_workspace_member_cascade.sql`
-- `supabase/migrations/008_channels.sql`
-- `supabase/migrations/009_campaigns_content_variants.sql`
-- `supabase/migrations/010_content_variant_approvals.sql`
-- `supabase/migrations/011_agent_runs.sql`
+- `docs/agent-handoffs/latest-cursor.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+- Changed marketing components and assets listed below
 
 Files changed:
-- `supabase/migrations/012_lock_down_function_grants.sql`
+- `src/components/CtaSection/CtaSection.tsx`
+- `src/components/CtaSection/CtaSection.css`
+- `src/components/Problem/Problem.tsx`
+- `src/components/Problem/Problem.css`
+- `src/components/Process/processData.ts`
+- `src/components/Process/Process.css`
+- `src/components/Projects/Projects.tsx`
+- `src/components/Projects/Projects.css`
+- `src/components/Services/Services.tsx`
+- `src/components/Services/Services.css`
+- `src/assets/video/call.mp4`
+- `src/assets/video/precision.mp4`
+- `src/assets/video/send.mp4`
+- `src/assets/video/shape.mp4`
+- `src/assets/video/website.mp4`
+- `docs/agent-handoffs/latest-cursor.md`
 - `docs/agent-handoffs/latest-codex.md`
+- `docs/learnings.md`
+- `docs/project-log.md`
 - `docs/task-ledger.md`
 
 Database or API changes:
-- Merged the validated linear migration history through 011 into `main` without squashing or rewriting branch history.
-- Added a forward-only migration that explicitly revokes EXECUTE from `anon` for `create_workspace`, `is_workspace_member`, and `is_workspace_owner`, while retaining authenticated execution.
-- Explicitly revoked EXECUTE from both `anon` and `authenticated` for trigger-only `protect_workspace_membership`, `protect_approval_lifecycle`, and `protect_agent_run_lifecycle`.
-- Migrations 006–011 were not rewritten.
-- No legacy publishing table, policy, or n8n integration was modified.
+- No database schema or application API changed.
+- Vercel Preview now has the verified `cws-os-staging` Supabase URL and public publishable key under the existing Vite client variable names.
 
 Security decisions:
-- End-user workspace helper functions remain callable only by authenticated users.
-- Trigger-only guard functions are not directly callable by API roles.
-- The grant correction is implemented as migration 012 because migrations 006–011 are already applied to staging.
+- Only the browser-safe Supabase publishable key was placed in Preview; no secret or service-role key was exposed.
 
 Decisions made:
-- No new permanent product or architecture decision was required; this ticket implements the explicitly approved security correction.
+- Publish the prepared marketing motion/video scope directly to `main` as explicitly requested.
+- Correct three asset imports to the repository's tracked `assets/Images` casing so Linux/Vercel builds resolve them.
 
 Assumptions:
-- PostgreSQL trigger execution does not require direct EXECUTE grants to `anon` or `authenticated` on the trigger functions.
-- The `agent/agent-runs` tip contains the validated linear history for migrations 007–011.
+- The existing marketing and memory-document changes in the working tree form the intended publish scope.
+- Existing failing admin tests are outside this marketing ticket because neither their components nor tests changed.
 
 Tests added:
-- No repository test harness was added.
+- None.
 
 Tests run:
-- Static audit of every SECURITY DEFINER function introduced by migrations 006–011.
-- Confirmed the relevant functions are the three authenticated helpers and three trigger-only guards listed above.
-- Confirmed migrations 008 and 009 ownership-preservation functions are not SECURITY DEFINER and are outside the reported grant warning set.
-- Confirmed the consolidation pull request merged cleanly into `main` as merge commit `ef3c8fe02067b3c77f9eee068103657458247cc8`.
-- Managed Supabase migration application and Security Advisor verification remain pending because this execution environment has GitHub access but no Supabase CLI/session connector.
+- `npm run lint` — completed with one existing `useDrafts.js` hook-dependency warning and no errors.
+- `npm run test:run` — 40 passed, 2 existing admin expectation failures (`KeywordsPage`, `PublishedCard`).
+- `npm run build` — passed; 407 modules transformed.
+- `git diff --check` — passed after formatting cleanup.
+- Vercel Preview build — passed.
+- Browser check of `/admin/login` — Email, Password, and Sign in rendered with no console errors.
 
 Known issues:
-- Migration 012 has not yet been applied to project `ddbhxqkckzpwzwvnoxqt` from this environment.
-- Security Advisor warning clearance therefore cannot yet be claimed.
-- `docs/project-log.md` was not appended in this execution because the available GitHub connector only supports whole-file replacement and no safe append operation was completed.
+- Two stale admin tests remain failing and should be reconciled with current behavior.
+- The build reports existing large-bundle warnings, including the large `cwsbanner` SVG and main JavaScript chunk.
+- Remote-only Supabase migration `20260730231228` still requires safe local-history reconciliation.
 
 Recommended next task:
-- Apply migration 012 only to `cws-os-staging`, rerun the Security Advisor, verify the six function warnings are cleared, then append the final verified result to `docs/project-log.md` and mark this ticket complete.
+- Reconcile migration `20260730231228` into local history, then confirm a clean linked `db push`; separately repair the two stale admin tests.
 
 Questions requiring Tulio:
-- None for repository work. Managed Supabase execution requires running the linked CLI workflow in the repository environment that already has access to `cws-os-staging`.
+- None.
 
 Project-memory files updated:
 - `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
 - `docs/task-ledger.md`
 
 Permanent decisions added:
 - None.
 
 Reusable learnings added:
-- None yet; add only after managed Supabase confirms the explicit role revokes clear the advisor warnings.
+- None.
 
 Memory updates withheld:
-- The project-log entry and reusable learning remain withheld until managed verification is complete.
+- No new permanent product decision was required.
 
 Git diff summary:
-- Added `012_lock_down_function_grants.sql`.
-- Updated the latest Codex handoff and task ledger.
-- Merged migrations 007–012 into `main` through PR #8.
-- No legacy publishing migration, legacy table definition, `auth_all` RLS policy, application source, or n8n workflow changed.
-- No unrelated/pre-existing changes were introduced by the consolidation branch.
+- Added five marketing video assets and integrated them into Process and CTA sections.
+- Added/refined scroll-triggered motion and responsive presentation across CTA, Problem, Projects, and Services.
+- Preserved the Cursor migration-reconciliation documentation changes.
+- Added this publish handoff and ledger/log entry.
+- No Supabase migration, legacy publishing workflow, or n8n integration changed.

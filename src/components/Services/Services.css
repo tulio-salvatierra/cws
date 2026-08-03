@@ -38,12 +38,19 @@
 }
 
 .services-section__icon {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-  border-radius: 999px;
-  background: #d4610e;
   flex-shrink: 0;
+}
+
+.services-section__icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .services-section__eyebrow {

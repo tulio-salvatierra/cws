@@ -1,7 +1,13 @@
 import { useRef, useState } from "react";
 import { projects } from "./ProjectsData";
 import problemDivider from "../../assets/Images/problem/divider.svg";
+import navigateIcon from "../../assets/Images/footer/navigate-icon.svg";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./Projects.css";
+
+gsap.registerPlugin(ScrollTrigger);
 
 function formatStep(current: number, total: number) {
   return `${String(current).padStart(2, "0")}/${String(total).padStart(2, "0")}`;
@@ -83,6 +89,7 @@ function ProjectEntry({
 export default function Projects() {
   const total = projects.length;
   const [activeIndex, setActiveIndex] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   const scrollToSlide = (index: number) => {
@@ -93,11 +100,65 @@ export default function Projects() {
     slide?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
   };
 
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      const animateFrames = (selector: string) => {
+        const frames = gsap.utils.toArray<HTMLElement>(selector);
+
+        frames.forEach((frame) => {
+          const media = frame.querySelector<HTMLElement>(".projects-card__media");
+          if (!media) return;
+
+          gsap.set(frame, { yPercent: 18, opacity: 0 });
+          gsap.set(media, { scale: 1.3, transformOrigin: "center center" });
+
+          gsap
+            .timeline({
+              defaults: { ease: "power3.out" },
+              scrollTrigger: {
+                trigger: frame,
+                start: "top 90%",
+                once: true,
+              },
+            })
+            .to(frame, {
+              yPercent: 0,
+              opacity: 1,
+              duration: 1.05,
+            })
+            .to(
+              media,
+              {
+                scale: 1,
+                duration: 1.25,
+              },
+              0,
+            );
+        });
+      };
+
+      mm.add("(min-width: 992px)", () => {
+        animateFrames(".projects-section__list .projects-card__frame");
+      });
+
+      mm.add("(max-width: 991px)", () => {
+        animateFrames(".projects-section__carousel .projects-card__frame");
+      });
+
+      return () => mm.revert();
+    },
+    { scope: sectionRef },
+  );
+
   return (
-    <section id="projects" className="projects-section">
+    <section ref={sectionRef} id="projects" className="projects-section">
       <div className="projects-section__inner">
         <div className="projects-section__header">
-          <span className="projects-section__icon" aria-hidden="true" />
+          <span className="projects-section__icon" aria-hidden="true">
+            <img src={navigateIcon} alt="" />
+          </span>
           <p className="projects-section__eyebrow">Success Stories</p>
         </div>
 
