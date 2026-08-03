@@ -479,3 +479,48 @@ Reconcile remote migration `20260730231228`, then repair the stale admin tests.
 ### Reusable learning
 
 - None added.
+
+## 2026-08-03 — CWS-WEB-WORKSPACE-001
+
+Agent: Codex
+
+Status: Completed
+
+### Objective
+
+Add the first protected `/workspace` operating dashboard backed by the seeded CWS OS data.
+
+### Steps completed
+
+1. Added a protected read-only `/workspace` route using the existing Supabase session guard.
+2. Added workspace, channel, campaign, variant, and approval summary cards with loading and error states.
+3. Seeded staging with two channels, `CWS-001`, and independent English/Spanish variants.
+4. Corrected case-sensitive asset imports that failed on Vercel's Linux build workers.
+5. Published a ready Vercel Preview and opened draft PR #9.
+
+### Files changed
+
+- `src/App.jsx`
+- `src/pages/workspace/WorkspacePage.jsx`
+- Case-sensitive asset imports under `src/components/`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Decisions
+
+- Kept the first workspace surface read-only and limited it to Content Operations.
+- Reused existing authentication and RLS rather than introducing a new auth path.
+
+### Issues discovered
+
+- Two stale admin tests remain unrelated failures.
+- Remote-only migration `20260730231228` still needs safe local-history reconciliation.
+
+### Next action
+
+Add read-only campaign/variant detail views and a small workspace navigation shell, then reconcile the remote migration history.
+
+### Reusable learning
+
+- None added.
