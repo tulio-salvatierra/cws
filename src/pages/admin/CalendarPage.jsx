@@ -40,15 +40,15 @@ export default function CalendarPage() {
       end.setDate(now.getDate() + range)
 
       const { data, error } = await supabase
-        .from('platform_posts')
-        .select('id, platform, copy, status, scheduled_at, draft_id, content_drafts(id, topic)')
+        .from('content_drafts')
+        .select('id, topic, scheduled_at, platform_posts(id, platform, copy, status, draft_id)')
         .not('scheduled_at', 'is', null)
         .gte('scheduled_at', now.toISOString())
         .lte('scheduled_at', end.toISOString())
         .order('scheduled_at', { ascending: true })
 
       if (error) setError(error.message)
-      else setPosts(data || [])
+      else setPosts((data || []).flatMap((draft) => (draft.platform_posts || []).map((post) => ({ ...post, scheduled_at: draft.scheduled_at, content_drafts: { id: draft.id, topic: draft.topic } }))))
       setLoading(false)
     }
     load()
