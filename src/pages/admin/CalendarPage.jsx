@@ -41,7 +41,7 @@ export default function CalendarPage() {
 
       const { data, error } = await supabase
         .from('platform_posts')
-        .select('id, platform, copy, status, scheduled_at, draft_id, content_drafts(id, topic, image_url)')
+        .select('id, platform, copy, status, scheduled_at, draft_id, content_drafts(id, topic)')
         .not('scheduled_at', 'is', null)
         .gte('scheduled_at', now.toISOString())
         .lte('scheduled_at', end.toISOString())

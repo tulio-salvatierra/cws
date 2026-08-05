@@ -10,7 +10,7 @@ export default function ContentQueue() {
   const [activeTab, setActiveTab] = useState('pending')
   const [expandedDraft, setExpandedDraft] = useState(null)
 
-  const pending = useDrafts('review_pending')
+  const pending = useDrafts('pending_review')
   const published = useDrafts('published')
   const youtube = useYouTubeDrafts()
 

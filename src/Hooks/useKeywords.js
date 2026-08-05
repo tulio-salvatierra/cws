@@ -11,7 +11,7 @@ export function useKeywords() {
     const { data, error } = await supabase
       .from('keywords')
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('priority', { ascending: true })
     if (error) {
       setError(error.message)
     } else {

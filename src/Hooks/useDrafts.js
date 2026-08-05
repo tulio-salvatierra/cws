@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-export function useDrafts(statusFilter = 'review_pending') {
+export function useDrafts(statusFilter = 'pending_review') {
   const [drafts, setDrafts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -67,18 +67,9 @@ export function useYouTubeDrafts() {
   const [error, setError] = useState(null)
 
   async function fetchDrafts() {
-    const { data, error } = await supabase
-      .from('content_drafts')
-      .select('*, platform_posts!inner(*)')
-      .eq('platform_posts.platform', 'youtube')
-      .eq('platform_posts.status', 'scheduled')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      setError(error.message)
-    } else {
-      setDrafts(data)
-    }
+    // YouTube is not part of the legacy platform enum; keep this panel empty
+    // until the publishing pipeline adds an explicit YouTube contract.
+    setDrafts([])
     setLoading(false)
   }
 
