@@ -3,6 +3,7 @@ import { useAuth } from '../../Hooks/useAuth'
 
 const NAV = [
   { to: '/admin', label: '📋 Queue', end: true },
+  { to: '/workspace', label: '🧭 Workspace' },
   { to: '/admin/clients', label: 'Clients' },
   { to: '/admin/calendar', label: '📅 Calendar' },
   { to: '/admin/keywords', label: '🔑 Keywords' },
