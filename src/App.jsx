@@ -21,6 +21,7 @@ import Gallery from "./components/Gallery";
 import { getLandingPageData } from "./data/landingPagesData";
 
 const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
+const ResetPasswordPage = lazy(() => import("./pages/admin/ResetPasswordPage"));
 const AdminPage = lazy(() => import("./pages/admin/AdminPage"));
 const AdminGuard = lazy(() => import("./components/admin/AdminGuard"));
 const ContentQueue = lazy(() => import("./components/admin/ContentQueue"));
@@ -111,6 +112,7 @@ function App() {
                 <LoginPage />
               </Suspense>
             } />
+            <Route path="/admin/reset-password" element={<Suspense fallback={null}><ResetPasswordPage /></Suspense>} />
             <Route
               path="/workspace"
               element={
