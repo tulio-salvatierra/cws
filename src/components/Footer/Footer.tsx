@@ -5,15 +5,25 @@ import {
   CONTACT_URL,
   EMAIL,
   HOME_URL,
+  INSTAGRAM_URL,
   LINKEDIN_URL,
   PHONE,
   SERICES_URL,
+  YOUTUBE_URL,
 } from "../../Constants/Constants";
 import ciceroWebStudio from "../../assets/images/hero/cicero-web-studio.svg";
 import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
 import linkedinIcon from "../../assets/images/footer/linkedin.svg";
+import instagramIcon from "../../assets/images/footer/instagram.svg";
+import youtubeIcon from "../../assets/images/footer/youtube.svg";
 import arrowUpIcon from "../../assets/images/footer/arrow-up.svg";
 import "./Footer.css";
+
+const FOOTER_SOCIALS = [
+  { label: "LinkedIn", url: LINKEDIN_URL, icon: linkedinIcon },
+  { label: "Instagram", url: INSTAGRAM_URL, icon: instagramIcon },
+  { label: "YouTube", url: YOUTUBE_URL, icon: youtubeIcon },
+] as const;
 
 const FOOTER_NAV = [
   { label: "About", url: ABOUT_URL },
@@ -114,21 +124,24 @@ export default function Footer() {
           <div className="site-footer__column site-footer__column--socials">
             <h2 className="site-footer__column-heading">Socials</h2>
             <div className="site-footer__socials">
-              <a
-                href={LINKEDIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="site-footer__social-link"
-                aria-label="LinkedIn"
-              >
-                <img
-                  src={linkedinIcon}
-                  alt=""
-                  className="site-footer__social-icon"
-                  width={55}
-                  height={50}
-                />
-              </a>
+              {FOOTER_SOCIALS.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="site-footer__social-link"
+                  aria-label={social.label}
+                >
+                  <img
+                    src={social.icon}
+                    alt=""
+                    className="site-footer__social-icon"
+                    width={55}
+                    height={50}
+                  />
+                </a>
+              ))}
             </div>
           </div>
         </div>

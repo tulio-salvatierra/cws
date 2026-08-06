@@ -22,22 +22,27 @@ export default function Hero() {
       let cancelled = false;
       let headlineSplit: SplitText | null = null;
       let subcopySplit: SplitText | null = null;
+      const tweens: gsap.core.Tween[] = [];
 
       const runAnimations = () => {
+        if (cancelled || !heroRef.current) return;
+
         headlineSplit = new SplitText(".hero-headline", {
           type: "chars, words",
           charsClass: "char-js",
           wordsClass: "word-js",
         });
 
-        gsap.from(headlineSplit.chars, {
-          yPercent: 110,
-          opacity: 0,
-          duration: 1.2,
-          stagger: 0.02,
-          ease: "expo.out",
-          delay: 0.4,
-        });
+        tweens.push(
+          gsap.from(headlineSplit.chars, {
+            yPercent: 110,
+            opacity: 0,
+            duration: 1.2,
+            stagger: 0.02,
+            ease: "expo.out",
+            delay: 0.4,
+          }),
+        );
 
         subcopySplit = new SplitText(".hero-subcopy", {
           type: "words, lines",
@@ -45,23 +50,36 @@ export default function Hero() {
           linesClass: "line-js",
         });
 
-        gsap.from(subcopySplit.words, {
-          yPercent: 100,
-          opacity: 0,
-          duration: 1,
-          stagger: 0.04,
-          ease: "expo.out",
-          delay: 0.7,
-        });
+        tweens.push(
+          gsap.from(subcopySplit.words, {
+            yPercent: 100,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.04,
+            ease: "expo.out",
+            delay: 0.7,
+          }),
+        );
 
-        gsap.from(".hero-cta", {
-          y: 40,
-          opacity: 0,
-          duration: 0.9,
-          stagger: 0.12,
-          ease: "expo.out",
-          delay: 0.9,
-        });
+        const ctas = gsap.utils.toArray<HTMLElement>(
+          heroRef.current.querySelectorAll(".hero-cta"),
+        );
+
+        tweens.push(
+          gsap.fromTo(
+            ctas,
+            { y: 40, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.9,
+              stagger: 0.12,
+              ease: "expo.out",
+              delay: 0.9,
+              clearProps: "transform",
+            },
+          ),
+        );
       };
 
       void waitForAppFonts().then(() => {
@@ -71,6 +89,7 @@ export default function Hero() {
 
       return () => {
         cancelled = true;
+        tweens.forEach((tween) => tween.kill());
         headlineSplit?.revert();
         subcopySplit?.revert();
       };
@@ -87,7 +106,7 @@ export default function Hero() {
           </h1>
           <p className="hero-subcopy">
             I build websites that engage users, sparks curiosity and keep
-            visitors engaged
+            visitors engaged so your business can grow.
           </p>
         </div>
 
