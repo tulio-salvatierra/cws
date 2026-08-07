@@ -42,7 +42,7 @@ describe('KeywordsPage', () => {
 
   it('shows empty state when no suggestions', () => {
     render(<KeywordsPage />)
-    expect(screen.getByText(/WF5 runs every Monday/i)).toBeInTheDocument()
+    expect(screen.getByText(/No AI suggestions yet/i)).toBeInTheDocument()
   })
 
   it('renders a suggestion card and calls approve', () => {

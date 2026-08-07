@@ -33,8 +33,8 @@ describe('PublishedCard', () => {
     expect(screen.getByText('X ✗')).toBeInTheDocument()
   })
 
-  it('shows pending badge for youtube_ready platform', () => {
+  it('shows the neutral badge for youtube_ready platform', () => {
     render(<PublishedCard draft={mockDraft} />)
-    expect(screen.getByText('YT ⏳')).toBeInTheDocument()
+    expect(screen.getByText('YT')).toBeInTheDocument()
   })
 })
