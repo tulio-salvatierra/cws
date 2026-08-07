@@ -521,6 +521,74 @@ Add the first protected `/workspace` operating dashboard backed by the seeded CW
 
 Add read-only campaign/variant detail views and a small workspace navigation shell, then reconcile the remote migration history.
 
+## 2026-08-07 — CWS-ADMIN-CONSOLIDATE-003
+
+Agent: Codex
+Status: Completed with external validation pending
+
+### Objective
+
+Unblock CI, harden the remaining Supabase function surface, and consolidate the CWS Operating System route tree under `/admin`.
+
+### Steps completed
+
+1. Ran `npm install`, synchronized the stale lockfile, and verified `npm ci` succeeds.
+2. Repaired the two stale admin expectations without deleting tests.
+3. Added migration `013_harden_function_security.sql` to set the trigger function search path and revoke direct authenticated execution of the two internal workspace helper functions.
+4. Moved all CWS OS routes under the existing protected `/admin` parent, added redirects for every legacy `/workspace/*` path, updated dashboard/sidebar destinations, and updated internal links.
+5. Moved the workspace page modules into `src/pages/admin` and updated lazy imports with the exact filename casing.
+
+### Files changed
+
+- `package-lock.json`
+- `src/App.jsx`
+- `src/components/admin/AdminLayout.jsx`
+- `src/pages/admin/AdminOverview.jsx`
+- `src/pages/admin/` (workspace page modules moved here)
+- `src/components/admin/__tests__/KeywordsPage.test.jsx`
+- `src/components/admin/__tests__/PublishedCard.test.jsx`
+- `src/Hooks/useDrafts.js`
+- `supabase/migrations/013_harden_function_security.sql`
+- `docs/decisions.md`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+
+### Commits
+
+- `62b3238` — `chore: sync package lockfile`
+- `84d5176` — `fix: harden function security and refresh stale tests`
+- `89f8680` — `refactor: consolidate workspace routes under admin`
+- `4cd19e0` — `refactor: move workspace pages into admin`
+- `413fe71` — `fix: clear unused legacy hook state`
+
+### Verification
+
+- `npm ci` — passed.
+- `npm run check:imports` — passed.
+- `npm run build` with staging URL and a non-secret build placeholder key — passed; Linux import-casing check passed.
+- `npx vitest run` — 12 files and 42 tests passed.
+- `npm run lint` — passed with one existing hook-dependency warning in `src/Hooks/useDrafts.js`; no errors or route-related lint findings.
+
+### Database validation result and blocker
+
+The linked staging project is `ddbhxqkckzpwzwvnoxqt` (`cws-os-staging`). Migration 013 was applied through the Supabase MCP migration tool and is recorded remotely as `20260807215908_harden_function_security` while the repository source file remains `013_harden_function_security.sql`; migration-history alignment must be checked before the next CLI push. The security advisor went from five warnings to two: the three targeted warnings for `update_updated_at`, `is_workspace_member`, and `is_workspace_owner` cleared; the intentional `create_workspace` warning and the independent leaked-password-protection warning remain.
+
+The required RLS check then failed for both the active member and a non-member with `permission denied for function is_workspace_member`, proving that the two revokes break policy evaluation. Direct privilege inspection confirms `authenticated` has no execute privilege on either helper, `create_workspace` remains executable, and `update_updated_at` now has `search_path=public`. Per the ticket, no workaround or RLS loosening was applied. Staging is blocked pending an approved helper-access correction; no production database was touched.
+
+### Decisions
+
+- Added approved DEC-011 (CWS OS routes under `/admin`) and DEC-012 (markdown memory and workspace knowledge records remain separate).
+- Marked DEC-005 as superseded by DEC-011 while retaining it as historical context.
+
+### Next action
+
+Approve a corrected helper-access design that preserves RLS policy evaluation while removing the direct RPC exposure, remediate staging, and rerun the member/non-member RLS checks. Then verify the Preview route redirects manually. Recommended follow-up after that: add a dedicated `/admin/channels` page and smoke tests.
+
+### Permanent-memory scope
+
+The verified RLS helper privilege behavior was added to `docs/learnings.md`; no other new permanent memory was added.
+
 ### Reusable learning
 
 - None added.

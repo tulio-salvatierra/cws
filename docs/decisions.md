@@ -18,7 +18,7 @@ No existing n8n workflow, publishing route, or legacy content table will be modi
 ## DEC-005 — New workspace routes use `/workspace`
 
 Date: 2026-07-21
-Status: Approved
+Status: Superseded by DEC-011
 
 ### Decision
 
@@ -27,6 +27,8 @@ The new CWS Operating System interface will use `/workspace` as its route namesp
 ### Reason
 
 The existing `/admin` route namespace is already occupied by the current social-content system.
+
+This decision is retained as historical context. DEC-011 supersedes it for the consolidated admin surface.
 
 ### Consequence
 
@@ -127,3 +129,35 @@ Use `cws-os-staging` as the dedicated non-production Supabase project for CWS sc
 ### Consequence
 
 Database changes must be validated in `cws-os-staging` before any future production rollout. The project must not contain production client data, and destructive validation data must be cleaned up after testing.
+
+---
+
+## DEC-011 — Consolidate CWS OS routes under `/admin`
+
+Date: 2026-08-07
+Status: Approved
+
+### Decision
+
+The CWS Operating System and the existing administrative tools share one protected `/admin` route tree. CWS OS pages use `/admin/workspace`, `/admin/campaigns`, `/admin/tasks`, `/admin/planning`, `/admin/knowledge`, `/admin/agent-runs`, and their related detail/create routes. The existing `/admin` page remains the unified dashboard index.
+
+Legacy `/workspace/*` URLs redirect to their `/admin/*` equivalents so existing Preview links and bookmarks continue to work.
+
+### Consequence
+
+The parent `/admin` route owns the session guard, suspense boundary, and navigation shell. New CWS OS pages must be added as children of that route rather than as separate protected route trees. Legacy publishing routes and tables remain unchanged.
+
+---
+
+## DEC-012 — Markdown project memory and workspace knowledge records are separate
+
+Date: 2026-08-07
+Status: Approved
+
+### Decision
+
+Repository markdown files such as decisions, learnings, handoffs, logs, and the task ledger are agent/project memory. The CWS OS `decisions` and `learnings` tables are workspace knowledge records for product and delivery work. They are separate records and are never synchronized automatically.
+
+### Consequence
+
+An agent may reference or summarize approved project context in a workspace record only through an explicit, reviewed action. Database knowledge changes do not rewrite repository memory, and repository updates do not silently create database rows.

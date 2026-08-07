@@ -33,3 +33,11 @@ Date: 2026-07-31
 Verified by: CWS-DB-MIGRATION-RECONCILE-001
 
 When `db pull` fails because a remote migration version is missing locally, the CLI may suggest `migration repair --status reverted`. Inspect the remote schema first. If that version created real tables/policies absent from local history, keep the version and add a matching local file; repairing as reverted orphans applied schema and can make a later push recreate existing objects.
+
+## RLS helper functions need execution privilege during policy evaluation
+
+Date: 2026-08-07
+
+Verified by: CWS-ADMIN-CONSOLIDATE-003
+
+Workspace RLS policies that call `SECURITY DEFINER` helper functions still require the querying role to have `EXECUTE` on those functions. Revoking `authenticated` execution from `is_workspace_member(uuid)` or `is_workspace_owner(uuid)` can block both members and non-members with `permission denied for function ...`, even though it removes the direct RPC surface. Protect these helpers through a non-exposed schema or another tested access pattern rather than removing the privilege required by policy evaluation.
