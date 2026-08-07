@@ -7,9 +7,9 @@
 }
 
 .process-section__stage {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(2rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 8vw, 5.5rem);
   width: 100%;
   max-width: 90rem;
   margin: 0 auto;
@@ -17,32 +17,17 @@
     clamp(4rem, 10vw, 7rem);
 }
 
-.process-section__copy {
-  display: flex;
-  flex-direction: column;
-}
-
 .process-step-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+
+.process-step__copy {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: clamp(0.75rem, 2vw, 1.25rem);
-  min-height: min(85vh, 45rem);
-  padding: clamp(2rem, 6vw, 4rem) 0;
-}
-
-.process-step-block.is-active .process-step__label {
-  color: #f5892f;
-}
-
-.process-step-block.is-active .process-step__title {
-  color: #fff;
-}
-
-.process-step-block:not(.is-active) .process-step__label,
-.process-step-block:not(.is-active) .process-step__title,
-.process-step-block:not(.is-active) .process-step__description {
-  opacity: 0.42;
 }
 
 .process-step__label {
@@ -52,8 +37,7 @@
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  transition: color 0.35s ease, opacity 0.35s ease;
+  color: #f5892f;
 }
 
 .process-step__title {
@@ -64,8 +48,6 @@
   font-weight: 600;
   line-height: 1.08;
   color: #fff;
-  text-shadow: none;
-  transition: opacity 0.35s ease, color 0.35s ease;
 }
 
 .process-step__description {
@@ -76,43 +58,17 @@
   font-weight: 300;
   line-height: 1.6;
   color: #d9d9d9;
-  transition: opacity 0.35s ease;
 }
 
-.process-section__media-sticky {
-  position: sticky;
-  top: clamp(5rem, 12vw, 7rem);
-  align-self: start;
-  width: 100%;
-  max-width: 100%;
-  height: min(41.666vh, calc(100dvh - 8rem));
-  height: min(41.666dvh, calc(100dvh - 8rem));
-}
-
-.process-section__media-frame {
+.process-step__media {
   position: relative;
   width: 100%;
-  height: 100%;
+  max-width: 100%;
+  height: min(50vh, calc(100dvh - 8rem));
+  height: min(50dvh, calc(100dvh - 8rem));
   overflow: hidden;
   border-radius: 4px;
   background: #111;
-}
-
-.process-section__media-pane {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.55s ease,
-    visibility 0.55s ease;
-}
-
-.process-section__media-pane.is-active {
-  opacity: 1;
-  visibility: visible;
-  z-index: 1;
 }
 
 .process-section__media-asset {
@@ -131,37 +87,28 @@
   background: linear-gradient(145deg, #948484, #d9d9d9);
 }
 
-.process-section__media-inline {
-  display: none;
+.process-step__media .process-section__media-asset,
+.process-step__media .process-section__media-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
 }
 
 @media (max-width: 991px) {
   .process-section__stage {
-    grid-template-columns: 1fr;
-    gap: 0;
+    gap: clamp(2.5rem, 8vw, 3.5rem);
     padding-top: 1rem;
   }
 
-  .process-section__media-sticky {
-    display: none;
-  }
-
   .process-step-block {
-    min-height: auto;
-    padding: clamp(2.5rem, 8vw, 3.5rem) 0;
-  }
-
-  .process-step-block:not(.is-active) .process-step__label,
-  .process-step-block:not(.is-active) .process-step__title,
-  .process-step-block:not(.is-active) .process-step__description {
-    opacity: 1;
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .process-step__label {
-    color: rgba(212, 97, 14, 0.55);
-  }
-
-  .process-step-block.is-active .process-step__label {
     color: #d4610e;
   }
 
@@ -170,26 +117,8 @@
     font-weight: 400;
   }
 
-  .process-section__media-inline {
-    position: relative;
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    height: min(41.666vh, 22.5rem);
-    height: min(41.666dvh, 22.5rem);
-    margin-top: 1rem;
-    overflow: hidden;
-    border-radius: 4px;
-    background: #111;
-  }
-
-  .process-section__media-inline .process-section__media-asset,
-  .process-section__media-inline .process-section__media-fallback {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-    object-fit: cover;
+  .process-step__media {
+    height: min(50vh, 27rem);
+    height: min(50dvh, 27rem);
   }
 }

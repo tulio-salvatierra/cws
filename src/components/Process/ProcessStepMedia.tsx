@@ -3,13 +3,13 @@ import { useEffect, useRef, useState } from "react";
 type ProcessStepMediaProps = {
   video?: string;
   poster?: string;
-  isActive: boolean;
+  isActive?: boolean;
 };
 
 export default function ProcessStepMedia({
   video,
   poster,
-  isActive,
+  isActive = true,
 }: ProcessStepMediaProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showPoster, setShowPoster] = useState(!video);
@@ -31,7 +31,6 @@ export default function ProcessStepMedia({
     }
 
     element.pause();
-    element.currentTime = 0;
   }, [isActive, showPoster]);
 
   if (video && !showPoster) {
@@ -44,6 +43,7 @@ export default function ProcessStepMedia({
         muted
         loop
         playsInline
+        autoPlay
         preload="metadata"
         onError={() => setShowPoster(true)}
       />
