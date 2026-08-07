@@ -1,0 +1,9 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
+
+export default function NewGoalPage() {
+  const [title, setTitle] = useState(''); const [description, setDescription] = useState(''); const [error, setError] = useState(''); const [saving, setSaving] = useState(false); const navigate = useNavigate()
+  async function submit(e) { e.preventDefault(); setSaving(true); const m = await supabase.from('workspace_members').select('workspace_id').eq('status', 'active').order('created_at').limit(1).single(); const { data: user } = await supabase.auth.getUser(); const result = await supabase.from('goals').insert({ workspace_id: m.data.workspace_id, title, description, created_by: user.user.id }).select('id').single(); if (result.error) { setError(result.error.message); setSaving(false) } else navigate('/workspace/planning') }
+  return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-3xl"><Link className="text-sm font-semibold text-orange-300" to="/workspace/planning">← Planning</Link><h1 className="mt-10 text-4xl font-semibold">New goal</h1><form onSubmit={submit} className="mt-8 space-y-5 rounded-3xl border border-white/10 bg-white/[0.04] p-6"><input required value={title} onChange={e => setTitle(e.target.value)} placeholder="Goal title" className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" /><textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" rows="5" className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />{error && <p className="text-sm text-rose-300">{error}</p>}<button disabled={saving} className="rounded-full bg-orange-300 px-5 py-3 font-semibold text-slate-950">{saving ? 'Creating…' : 'Create goal'}</button></form></div></main>
+}
