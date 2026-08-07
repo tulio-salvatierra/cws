@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
 const cards = [
-  ['Workspace', 'Campaigns, variants, tasks, planning, knowledge, and agent runs.', '/workspace'],
-  ['Campaigns', 'Manage active campaign work and content variants.', '/workspace/campaigns'],
-  ['Tasks', 'Track delivery work and status.', '/workspace/tasks'],
-  ['Planning', 'Goals, initiatives, and projects.', '/workspace/planning'],
-  ['Knowledge', 'Decisions and learnings.', '/workspace/knowledge'],
-  ['Agent runs', 'Review automation activity.', '/workspace/agent-runs'],
+  ['Workspace', 'Campaigns, variants, tasks, planning, knowledge, and agent runs.', '/admin/workspace'],
+  ['Campaigns', 'Manage active campaign work and content variants.', '/admin/campaigns'],
+  ['Tasks', 'Track delivery work and status.', '/admin/tasks'],
+  ['Planning', 'Goals, initiatives, and projects.', '/admin/planning'],
+  ['Knowledge', 'Decisions and learnings.', '/admin/knowledge'],
+  ['Agent runs', 'Review automation activity.', '/admin/agent-runs'],
 ]
 
 export default function AdminOverview() {

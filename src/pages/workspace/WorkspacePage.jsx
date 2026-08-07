@@ -115,7 +115,7 @@ export default function WorkspacePage() {
         </header>
 
         <nav className="flex flex-wrap gap-2 border-b border-white/10 py-4" aria-label="Workspace sections">
-          {[['#overview', 'Overview'], ['#campaigns', 'Campaigns'], ['#content', 'Content'], ['/workspace/tasks', 'Tasks'], ['/workspace/planning', 'Planning'], ['/workspace/knowledge', 'Knowledge'], ['/workspace/agent-runs', 'Agent runs']].map(([href, label]) => (
+          {[['#overview', 'Overview'], ['#campaigns', 'Campaigns'], ['#content', 'Content'], ['/admin/tasks', 'Tasks'], ['/admin/planning', 'Planning'], ['/admin/knowledge', 'Knowledge'], ['/admin/agent-runs', 'Agent runs']].map(([href, label]) => (
             <a key={href} className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 transition hover:border-orange-300/50 hover:text-orange-200" href={href}>
               {label}
             </a>
@@ -167,7 +167,7 @@ export default function WorkspacePage() {
                   <StatusPill status={campaign.status} />
                 </div>
                   <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-300">{campaign.description}</p>
-                <Link className="mt-5 inline-flex text-sm font-semibold text-orange-200 hover:text-orange-100" to={`/workspace/campaigns/${campaign.id}`}>Open campaign →</Link>
+                <Link className="mt-5 inline-flex text-sm font-semibold text-orange-200 hover:text-orange-100" to={`/admin/campaigns/${campaign.id}`}>Open campaign →</Link>
               </div>
             ))}
           </div>
@@ -190,7 +190,7 @@ export default function WorkspacePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-200">{variant.locale}</p>
-                      <Link className="mt-2 block text-lg font-semibold hover:text-orange-200" to={`/workspace/variants/${variant.id}`}>{variant.working_title}</Link>
+                      <Link className="mt-2 block text-lg font-semibold hover:text-orange-200" to={`/admin/variants/${variant.id}`}>{variant.working_title}</Link>
                       <p className="mt-1 text-xs text-slate-500">{campaign?.code} · {variant.code}</p>
                     </div>
                     <StatusPill status={variant.status} />

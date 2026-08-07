@@ -4,7 +4,12 @@ import { useAuth } from '../../Hooks/useAuth'
 const NAV = [
   { to: '/admin', label: '◈ Overview', end: true },
   { to: '/admin/legacy-queue', label: '📋 Legacy queue' },
-  { to: '/workspace', label: '🧭 Workspace' },
+  { to: '/admin/workspace', label: '🧭 Workspace' },
+  { to: '/admin/campaigns', label: 'Campaigns' },
+  { to: '/admin/tasks', label: 'Tasks' },
+  { to: '/admin/planning', label: 'Planning' },
+  { to: '/admin/knowledge', label: 'Knowledge' },
+  { to: '/admin/agent-runs', label: 'Agent runs' },
   { to: '/admin/clients', label: 'Clients' },
   { to: '/admin/calendar', label: '📅 Calendar' },
   { to: '/admin/keywords', label: '🔑 Keywords' },

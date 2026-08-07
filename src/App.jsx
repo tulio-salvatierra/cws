@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Routes, Route, useParams } from "react-router-dom";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Loader from "./components/Loader";
 import {
@@ -78,6 +78,12 @@ function LandingPageWrapper() {
   return <LandingPage data={landingPageData} />;
 }
 
+function LegacyWorkspaceRedirect({ to }) {
+  const params = useParams();
+  const destination = to.replace(/:([A-Za-z0-9_]+)/g, (_, key) => params[key] || '');
+  return <Navigate to={destination} replace />;
+}
+
 function App() {
   useLenis(); // Custom hook for smooth scrolling
 
@@ -124,29 +130,21 @@ function App() {
               </Suspense>
             } />
             <Route path="/admin/reset-password" element={<Suspense fallback={null}><ResetPasswordPage /></Suspense>} />
-            <Route
-              path="/workspace"
-              element={
-                <Suspense fallback={null}>
-                  <AdminGuard>
-                    <WorkspacePage />
-                  </AdminGuard>
-                </Suspense>
-              }
-            />
-            <Route path="/workspace/campaigns/:campaignId" element={<Suspense fallback={null}><AdminGuard><CampaignDetailPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/campaigns/new" element={<Suspense fallback={null}><AdminGuard><NewCampaignPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/campaigns/:campaignId/variants/new" element={<Suspense fallback={null}><AdminGuard><NewVariantPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/tasks" element={<Suspense fallback={null}><AdminGuard><TasksPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/planning" element={<Suspense fallback={null}><AdminGuard><PlanningPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/knowledge" element={<Suspense fallback={null}><AdminGuard><KnowledgePage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/agent-runs" element={<Suspense fallback={null}><AdminGuard><AgentRunsPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/planning/new-goal" element={<Suspense fallback={null}><AdminGuard><NewGoalPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/planning/new-initiative" element={<Suspense fallback={null}><AdminGuard><NewInitiativePage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/planning/new-project" element={<Suspense fallback={null}><AdminGuard><NewProjectPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/projects/:projectId" element={<Suspense fallback={null}><AdminGuard><ProjectDetailPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/campaigns" element={<Suspense fallback={null}><AdminGuard><CampaignsPage /></AdminGuard></Suspense>} />
-            <Route path="/workspace/variants/:variantId" element={<Suspense fallback={null}><AdminGuard><VariantDetailPage /></AdminGuard></Suspense>} />
+            {/* Legacy workspace URLs remain valid while the operating system lives under /admin. */}
+            <Route path="/workspace" element={<Navigate to="/admin/workspace" replace />} />
+            <Route path="/workspace/campaigns" element={<Navigate to="/admin/campaigns" replace />} />
+            <Route path="/workspace/campaigns/new" element={<Navigate to="/admin/campaigns/new" replace />} />
+            <Route path="/workspace/campaigns/:campaignId/variants/new" element={<LegacyWorkspaceRedirect to="/admin/campaigns/:campaignId/variants/new" />} />
+            <Route path="/workspace/campaigns/:campaignId" element={<LegacyWorkspaceRedirect to="/admin/campaigns/:campaignId" />} />
+            <Route path="/workspace/variants/:variantId" element={<LegacyWorkspaceRedirect to="/admin/variants/:variantId" />} />
+            <Route path="/workspace/tasks" element={<Navigate to="/admin/tasks" replace />} />
+            <Route path="/workspace/planning/new-goal" element={<Navigate to="/admin/planning/new-goal" replace />} />
+            <Route path="/workspace/planning/new-initiative" element={<Navigate to="/admin/planning/new-initiative" replace />} />
+            <Route path="/workspace/planning/new-project" element={<Navigate to="/admin/planning/new-project" replace />} />
+            <Route path="/workspace/planning" element={<Navigate to="/admin/planning" replace />} />
+            <Route path="/workspace/projects/:projectId" element={<LegacyWorkspaceRedirect to="/admin/projects/:projectId" />} />
+            <Route path="/workspace/knowledge" element={<Navigate to="/admin/knowledge" replace />} />
+            <Route path="/workspace/agent-runs" element={<Navigate to="/admin/agent-runs" replace />} />
             <Route
               path="/admin"
               element={
@@ -164,6 +162,20 @@ function App() {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="workspace" element={<WorkspacePage />} />
+              <Route path="campaigns" element={<CampaignsPage />} />
+              <Route path="campaigns/new" element={<NewCampaignPage />} />
+              <Route path="campaigns/:campaignId" element={<CampaignDetailPage />} />
+              <Route path="campaigns/:campaignId/variants/new" element={<NewVariantPage />} />
+              <Route path="variants/:variantId" element={<VariantDetailPage />} />
+              <Route path="tasks" element={<TasksPage />} />
+              <Route path="planning" element={<PlanningPage />} />
+              <Route path="planning/new-goal" element={<NewGoalPage />} />
+              <Route path="planning/new-initiative" element={<NewInitiativePage />} />
+              <Route path="planning/new-project" element={<NewProjectPage />} />
+              <Route path="projects/:projectId" element={<ProjectDetailPage />} />
+              <Route path="knowledge" element={<KnowledgePage />} />
+              <Route path="agent-runs" element={<AgentRunsPage />} />
             </Route>
           </Routes>
         </Router>
