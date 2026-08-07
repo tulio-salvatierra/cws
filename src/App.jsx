@@ -23,6 +23,7 @@ import { getLandingPageData } from "./data/landingPagesData";
 const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
 const ResetPasswordPage = lazy(() => import("./pages/admin/ResetPasswordPage"));
 const AdminPage = lazy(() => import("./pages/admin/AdminPage"));
+const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminGuard = lazy(() => import("./components/admin/AdminGuard"));
 const ContentQueue = lazy(() => import("./components/admin/ContentQueue"));
 const KeywordsPage = lazy(() => import("./pages/admin/KeywordsPage"));
@@ -148,7 +149,8 @@ function App() {
                 </Suspense>
               }
             >
-              <Route index element={<ContentQueue />} />
+              <Route index element={<AdminOverview />} />
+              <Route path="legacy-queue" element={<ContentQueue />} />
               <Route path="keywords" element={<KeywordsPage />} />
               <Route path="calendar" element={<CalendarPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />

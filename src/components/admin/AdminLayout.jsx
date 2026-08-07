@@ -2,7 +2,8 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../Hooks/useAuth'
 
 const NAV = [
-  { to: '/admin', label: '📋 Queue', end: true },
+  { to: '/admin', label: '◈ Overview', end: true },
+  { to: '/admin/legacy-queue', label: '📋 Legacy queue' },
   { to: '/workspace', label: '🧭 Workspace' },
   { to: '/admin/clients', label: 'Clients' },
   { to: '/admin/calendar', label: '📅 Calendar' },
