@@ -43,6 +43,7 @@ const AgentRunsPage = lazy(() => import("./pages/workspace/AgentRunsPage"));
 const NewGoalPage = lazy(() => import("./pages/workspace/NewGoalPage"));
 const NewInitiativePage = lazy(() => import("./pages/workspace/NewInitiativePage"));
 const NewProjectPage = lazy(() => import("./pages/workspace/NewProjectPage"));
+const ProjectDetailPage = lazy(() => import("./pages/workspace/ProjectDetailPage"));
 const VariantDetailPage = lazy(() => import("./pages/workspace/VariantDetailPage"));
 
 // Wrapper component for dynamic landing pages
@@ -143,6 +144,7 @@ function App() {
             <Route path="/workspace/planning/new-goal" element={<Suspense fallback={null}><AdminGuard><NewGoalPage /></AdminGuard></Suspense>} />
             <Route path="/workspace/planning/new-initiative" element={<Suspense fallback={null}><AdminGuard><NewInitiativePage /></AdminGuard></Suspense>} />
             <Route path="/workspace/planning/new-project" element={<Suspense fallback={null}><AdminGuard><NewProjectPage /></AdminGuard></Suspense>} />
+            <Route path="/workspace/projects/:projectId" element={<Suspense fallback={null}><AdminGuard><ProjectDetailPage /></AdminGuard></Suspense>} />
             <Route path="/workspace/campaigns" element={<Suspense fallback={null}><AdminGuard><CampaignsPage /></AdminGuard></Suspense>} />
             <Route path="/workspace/variants/:variantId" element={<Suspense fallback={null}><AdminGuard><VariantDetailPage /></AdminGuard></Suspense>} />
             <Route
