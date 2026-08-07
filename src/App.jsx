@@ -31,20 +31,20 @@ const CalendarPage = lazy(() => import("./pages/admin/CalendarPage"));
 const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
-const WorkspacePage = lazy(() => import("./pages/workspace/WorkspacePage"));
-const CampaignDetailPage = lazy(() => import("./pages/workspace/CampaignDetailPage"));
-const CampaignsPage = lazy(() => import("./pages/workspace/CampaignsPage"));
-const NewCampaignPage = lazy(() => import("./pages/workspace/NewCampaignPage"));
-const NewVariantPage = lazy(() => import("./pages/workspace/NewVariantPage"));
-const TasksPage = lazy(() => import("./pages/workspace/TasksPage"));
-const PlanningPage = lazy(() => import("./pages/workspace/PlanningPage"));
-const KnowledgePage = lazy(() => import("./pages/workspace/KnowledgePage"));
-const AgentRunsPage = lazy(() => import("./pages/workspace/AgentRunsPage"));
-const NewGoalPage = lazy(() => import("./pages/workspace/NewGoalPage"));
-const NewInitiativePage = lazy(() => import("./pages/workspace/NewInitiativePage"));
-const NewProjectPage = lazy(() => import("./pages/workspace/NewProjectPage"));
-const ProjectDetailPage = lazy(() => import("./pages/workspace/ProjectDetailPage"));
-const VariantDetailPage = lazy(() => import("./pages/workspace/VariantDetailPage"));
+const WorkspacePage = lazy(() => import("./pages/admin/WorkspacePage"));
+const CampaignDetailPage = lazy(() => import("./pages/admin/CampaignDetailPage"));
+const CampaignsPage = lazy(() => import("./pages/admin/CampaignsPage"));
+const NewCampaignPage = lazy(() => import("./pages/admin/NewCampaignPage"));
+const NewVariantPage = lazy(() => import("./pages/admin/NewVariantPage"));
+const TasksPage = lazy(() => import("./pages/admin/TasksPage"));
+const PlanningPage = lazy(() => import("./pages/admin/PlanningPage"));
+const KnowledgePage = lazy(() => import("./pages/admin/KnowledgePage"));
+const AgentRunsPage = lazy(() => import("./pages/admin/AgentRunsPage"));
+const NewGoalPage = lazy(() => import("./pages/admin/NewGoalPage"));
+const NewInitiativePage = lazy(() => import("./pages/admin/NewInitiativePage"));
+const NewProjectPage = lazy(() => import("./pages/admin/NewProjectPage"));
+const ProjectDetailPage = lazy(() => import("./pages/admin/ProjectDetailPage"));
+const VariantDetailPage = lazy(() => import("./pages/admin/VariantDetailPage"));
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
