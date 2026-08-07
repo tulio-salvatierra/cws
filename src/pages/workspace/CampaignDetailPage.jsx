@@ -5,25 +5,8 @@ import { supabase } from '../../lib/supabase'
 export default function CampaignDetailPage() {
   const { campaignId } = useParams()
   const [state, setState] = useState({ loading: true, error: '', campaign: null, variants: [] })
-
-  useEffect(() => {
-    let active = true
-    async function load() {
-      const membership = await supabase.from('workspace_members').select('workspace_id').eq('status', 'active').order('created_at').limit(1).single()
-      if (membership.error) throw membership.error
-      const [campaign, variants] = await Promise.all([
-        supabase.from('campaigns').select('id, code, title, status, description, created_at').eq('id', campaignId).eq('workspace_id', membership.data.workspace_id).single(),
-        supabase.from('content_variants').select('id, code, locale, working_title, status').eq('campaign_id', campaignId).eq('workspace_id', membership.data.workspace_id).order('code'),
-      ])
-      if (campaign.error) throw campaign.error
-      if (variants.error) throw variants.error
-      if (active) setState({ loading: false, error: '', campaign: campaign.data, variants: variants.data || [] })
-    }
-    load().catch((error) => active && setState({ loading: false, error: error.message || 'Unable to load campaign.', campaign: null, variants: [] }))
-    return () => { active = false }
-  }, [campaignId])
-
+  useEffect(() => { let active = true; async function load() { const membership = await supabase.from('workspace_members').select('workspace_id').eq('status', 'active').order('created_at').limit(1).single(); if (membership.error) throw membership.error; const [campaign, variants] = await Promise.all([supabase.from('campaigns').select('id, code, title, status, description').eq('id', campaignId).eq('workspace_id', membership.data.workspace_id).single(), supabase.from('content_variants').select('id, code, locale, working_title, status').eq('campaign_id', campaignId).eq('workspace_id', membership.data.workspace_id).order('code')]); if (campaign.error) throw campaign.error; if (variants.error) throw variants.error; if (active) setState({ loading: false, error: '', campaign: campaign.data, variants: variants.data || [] }) }; load().catch(error => active && setState({ loading: false, error: error.message, campaign: null, variants: [] })); return () => { active = false } }, [campaignId])
   if (state.loading) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Loading campaign…</div>
-  if (state.error) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><p className="text-rose-200">{state.error}</p><Link className="mt-4 inline-block text-orange-300" to="/workspace">Back to workspace</Link></main>
-  return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-4xl"><Link className="text-sm font-semibold text-orange-300" to="/workspace">← Workspace</Link><p className="mt-10 text-xs font-semibold uppercase tracking-[0.25em] text-orange-200">Campaign detail</p><h1 className="mt-3 text-4xl font-semibold">{state.campaign.code}</h1><p className="mt-2 text-xl text-slate-200">{state.campaign.title}</p><p className="mt-6 max-w-2xl leading-7 text-slate-300">{state.campaign.description}</p><section className="mt-10 rounded-3xl border border-white/10 bg-white/[0.04] p-6"><h2 className="text-2xl font-semibold">Content variants</h2><div className="mt-5 space-y-3">{state.variants.map((variant) => <Link className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/60 p-4 transition hover:border-orange-300/50" key={variant.id} to={`/workspace/variants/${variant.id}`}><span><span className="block font-semibold">{variant.working_title}</span><span className="text-xs uppercase tracking-wide text-slate-500">{variant.locale} · {variant.code}</span></span><span className="text-sm text-slate-400">{variant.status.replaceAll('_', ' ')}</span></Link>)}</div></section></div></main>
+  if (state.error) return <main className="min-h-screen bg-slate-950 p-8 text-white"><p className="text-rose-300">{state.error}</p><Link className="mt-4 inline-block text-orange-300" to="/workspace/campaigns">Back to campaigns</Link></main>
+  return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-4xl"><Link className="text-sm font-semibold text-orange-300" to="/workspace/campaigns">← Campaigns</Link><p className="mt-10 text-xs font-semibold uppercase tracking-[0.25em] text-orange-200">Campaign detail</p><h1 className="mt-3 text-4xl font-semibold">{state.campaign.code}</h1><p className="mt-2 text-xl text-slate-200">{state.campaign.title}</p><p className="mt-6 leading-7 text-slate-300">{state.campaign.description}</p><section className="mt-10 rounded-3xl border border-white/10 bg-white/[0.04] p-6"><div className="flex items-center justify-between gap-4"><h2 className="text-2xl font-semibold">Content variants</h2><Link className="rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950" to={`/workspace/campaigns/${campaignId}/variants/new`}>+ New variant</Link></div><div className="mt-5 space-y-3">{state.variants.map(variant => <Link className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/60 p-4 hover:border-orange-300/50" key={variant.id} to={`/workspace/variants/${variant.id}`}><span><span className="block font-semibold">{variant.working_title}</span><span className="text-xs uppercase tracking-wide text-slate-500">{variant.locale} · {variant.code}</span></span><span className="text-sm text-slate-400">{variant.status.replaceAll('_', ' ')}</span></Link>)}</div></section></div></main>
 }
