@@ -115,7 +115,7 @@ export default function WorkspacePage() {
         </header>
 
         <nav className="flex flex-wrap gap-2 border-b border-white/10 py-4" aria-label="Workspace sections">
-          {[['#overview', 'Overview'], ['#campaigns', 'Campaigns'], ['#content', 'Content'], ['/workspace/tasks', 'Tasks'], ['/workspace/planning', 'Planning'], ['/workspace/knowledge', 'Knowledge']].map(([href, label]) => (
+          {[['#overview', 'Overview'], ['#campaigns', 'Campaigns'], ['#content', 'Content'], ['/workspace/tasks', 'Tasks'], ['/workspace/planning', 'Planning'], ['/workspace/knowledge', 'Knowledge'], ['/workspace/agent-runs', 'Agent runs']].map(([href, label]) => (
             <a key={href} className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 transition hover:border-orange-300/50 hover:text-orange-200" href={href}>
               {label}
             </a>
