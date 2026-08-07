@@ -64,7 +64,7 @@ export function useDrafts(statusFilter = 'pending_review') {
 export function useYouTubeDrafts() {
   const [drafts, setDrafts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const error = null
 
   async function fetchDrafts() {
     // YouTube is not part of the legacy platform enum; keep this panel empty
