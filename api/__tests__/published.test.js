@@ -1,0 +1,141 @@
+/* global process */
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { createClientMock } = vi.hoisted(() => ({ createClientMock: vi.fn() }))
+vi.mock('@supabase/supabase-js', () => ({ createClient: createClientMock }))
+
+import handler, { PUBLISHED_PLATFORMS } from '../published'
+
+function createResponse() {
+  const response = {
+    status: vi.fn(() => response),
+    json: vi.fn(() => response),
+  }
+  return response
+}
+
+function createSupabaseMock({ existing = null, inserted = null, insertError = null } = {}) {
+  const maybeSingle = vi.fn().mockResolvedValue({ data: existing, error: null })
+  const firstEq = vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle })) }))
+  const selectExisting = vi.fn(() => ({ eq: firstEq }))
+  const single = vi.fn().mockResolvedValue({ data: inserted, error: insertError })
+  const selectInserted = vi.fn(() => ({ single }))
+  const insert = vi.fn(() => ({ select: selectInserted }))
+  const client = {
+    from: vi.fn(() => ({ select: selectExisting, insert })),
+  }
+  return { client, insert }
+}
+
+function request(body, secret = 'test-secret') {
+  return {
+    method: 'POST',
+    headers: secret ? { 'x-published-webhook-secret': secret } : {},
+    body,
+  }
+}
+
+describe('published posts API', () => {
+  beforeEach(() => {
+    process.env.PUBLISHED_SUPABASE_URL = 'https://project.supabase.co'
+    process.env.PUBLISHED_SUPABASE_SERVICE_ROLE_KEY = 'service-role-key'
+    process.env.PUBLISHED_WEBHOOK_SECRET = 'test-secret'
+    process.env.PUBLISHED_WORKSPACE_ID = 'workspace-1'
+    createClientMock.mockReset()
+  })
+
+  afterEach(() => {
+    delete process.env.PUBLISHED_SUPABASE_URL
+    delete process.env.PUBLISHED_SUPABASE_SERVICE_ROLE_KEY
+    delete process.env.PUBLISHED_WEBHOOK_SECRET
+    delete process.env.PUBLISHED_WORKSPACE_ID
+  })
+
+  it('rejects missing authentication', async () => {
+    const response = createResponse()
+    await handler(request({ platform: 'youtube', published_at: '2026-08-09T12:00:00Z' }, ''), response)
+    expect(response.status).toHaveBeenCalledWith(401)
+    expect(createClientMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects incorrect authentication', async () => {
+    const response = createResponse()
+    await handler(request({ platform: 'youtube', published_at: '2026-08-09T12:00:00Z' }, 'wrong'), response)
+    expect(response.status).toHaveBeenCalledWith(401)
+    expect(createClientMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects unknown platforms and names every accepted value', async () => {
+    const response = createResponse()
+    await handler(request({ platform: 'tiktok', published_at: '2026-08-09T12:00:00Z' }), response)
+    expect(response.status).toHaveBeenCalledWith(400)
+    expect(response.json).toHaveBeenCalledWith({
+      ok: false,
+      error: `Invalid platform. Accepted values: ${PUBLISHED_PLATFORMS.join(', ')}.`,
+    })
+  })
+
+  it('rejects a missing required field', async () => {
+    const response = createResponse()
+    await handler(request({ platform: 'youtube' }), response)
+    expect(response.status).toHaveBeenCalledWith(400)
+    expect(response.json).toHaveBeenCalledWith({ ok: false, error: 'published_at is required.' })
+  })
+
+  it('inserts a publish event and retains the full request body', async () => {
+    const body = {
+      platform: 'youtube',
+      published_at: '2026-08-09T12:00:00Z',
+      external_post_id: 'video-1',
+      external_url: 'https://youtube.example/video-1',
+      source: 'n8n',
+    }
+    const inserted = { id: 'published-1', ...body, workspace_id: 'workspace-1' }
+    const database = createSupabaseMock({ inserted })
+    createClientMock.mockReturnValue(database.client)
+    const response = createResponse()
+
+    await handler(request(body), response)
+
+    expect(response.status).toHaveBeenCalledWith(201)
+    expect(response.json).toHaveBeenCalledWith({
+      ok: true,
+      created: true,
+      id: 'published-1',
+      record: inserted,
+    })
+    expect(database.insert).toHaveBeenCalledWith(expect.objectContaining({
+      workspace_id: 'workspace-1',
+      platform: 'youtube',
+      external_post_id: 'video-1',
+      raw_payload: body,
+    }))
+  })
+
+  it('returns the existing record when a retry repeats the platform post id', async () => {
+    const existing = {
+      id: 'published-existing',
+      platform: 'youtube',
+      external_post_id: 'video-1',
+    }
+    const database = createSupabaseMock({ existing })
+    createClientMock.mockReturnValue(database.client)
+    const response = createResponse()
+
+    await handler(request({
+      platform: 'youtube',
+      published_at: '2026-08-09T12:00:00Z',
+      external_post_id: 'video-1',
+    }), response)
+
+    expect(response.status).toHaveBeenCalledWith(200)
+    expect(response.json).toHaveBeenCalledWith({
+      ok: true,
+      created: false,
+      id: 'published-existing',
+      record: existing,
+    })
+    expect(database.insert).not.toHaveBeenCalled()
+  })
+})
