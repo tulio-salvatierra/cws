@@ -210,6 +210,33 @@ Implement workspace-owned campaigns and independent content variants for `CWS-00
 
 - None added.
 
+## 2026-08-08 — CWS-ADMIN-CONSOLIDATE-003 security correction
+
+Agent: Codex
+
+The approved helper-access correction was applied to staging project
+`ddbhxqkckzpwzwvnoxqt`. Migration `20260808203339_move_workspace_rls_helpers_to_private`
+creates the non-exposed `private` schema, moves `is_workspace_member` and
+`is_workspace_owner` there, preserves authenticated execution for RLS policy
+evaluation, repoints all 47 affected policies, updates the approval trigger,
+and removes the old public helper functions. The prior migration source file
+was renamed locally to `20260807215908_harden_function_security.sql` so local
+history matches the remote migration version.
+
+Staging validation passed: the owner sees one workspace, one membership, two
+campaigns, and four goals; a non-member sees zero rows for those same workspace
+scopes. Both private helpers have authenticated schema usage and execution,
+anonymous/public execution is denied, no public helper functions remain, and
+all 47 policy references are private. The security advisor now reports only the
+intentional `create_workspace` warning and the independent leaked-password
+protection warning.
+
+Repository checks also passed: import casing, 42 Vitest tests across 12 files,
+production build, and lint with the existing single hook-dependency warning.
+No push or deployment was performed. Next action is to decide whether to accept
+the two remaining advisor warnings, then push and smoke-test the consolidated
+`/admin` route tree.
+
 ## 2026-07-23 — CWS-DB-CONTENT-001
 
 Agent: Codex

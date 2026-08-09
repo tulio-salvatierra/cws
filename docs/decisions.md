@@ -161,3 +161,30 @@ Repository markdown files such as decisions, learnings, handoffs, logs, and the 
 ### Consequence
 
 An agent may reference or summarize approved project context in a workspace record only through an explicit, reviewed action. Database knowledge changes do not rewrite repository memory, and repository updates do not silently create database rows.
+
+---
+
+## DEC-013 — Keep workspace RLS helpers in a non-exposed schema
+
+Date: 2026-08-08
+Status: Approved
+
+### Decision
+
+Workspace membership and ownership helpers used by RLS policies live in the
+non-exposed `private` schema. The `authenticated` role retains only the schema
+usage and function execution privileges required for policy evaluation. The
+old public helper RPC endpoints are removed.
+
+### Reason
+
+Revoking `authenticated` execution from a helper called by an RLS policy blocks
+both authorized and unauthorized queries before the policy can return a result.
+Keeping the helpers outside the Data API removes direct RPC exposure without
+removing the privilege required by RLS evaluation.
+
+### Consequence
+
+Future workspace RLS policies must reference `private.is_workspace_member` or
+`private.is_workspace_owner`. Any new helper used by RLS must be kept out of the
+exposed API schemas and validated with both member and non-member tests.

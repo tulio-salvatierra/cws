@@ -41,3 +41,8 @@ Date: 2026-08-07
 Verified by: CWS-ADMIN-CONSOLIDATE-003
 
 Workspace RLS policies that call `SECURITY DEFINER` helper functions still require the querying role to have `EXECUTE` on those functions. Revoking `authenticated` execution from `is_workspace_member(uuid)` or `is_workspace_owner(uuid)` can block both members and non-members with `permission denied for function ...`, even though it removes the direct RPC surface. Protect these helpers through a non-exposed schema or another tested access pattern rather than removing the privilege required by policy evaluation.
+
+Validated on 2026-08-08: moving both helpers to the non-exposed `private`
+schema, granting `authenticated` only schema usage and function execution, and
+repointing all 47 policies preserves member access and returns zero rows to a
+non-member while removing the public helper endpoints.
