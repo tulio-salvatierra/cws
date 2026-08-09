@@ -135,3 +135,16 @@ even though applied migrations `003` and `004` had already added `youtube` and
 confirm applied migration history, columns, constraints, and enum values. Treat
 repository documentation as design context, not proof of current database
 state.
+
+## Build the return path before publishing capability
+
+Date: 2026-08-09
+
+Verified by: CWS-RETURN-PATH-007
+
+Build and verify the authenticated, idempotent publication return path before
+adding or reviving any outbound publishing capability. The previous pipeline
+published without recording and left no usable history, which made its true
+state impossible to determine from within the system. A durable return record
+gives every later manual or automated publisher a common evidence contract from
+its first execution.

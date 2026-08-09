@@ -941,3 +941,31 @@ existing `useDrafts` dependency warning. No workflow, credential, database,
 environment variable, application code, migration, or deployment was changed.
 The assessment documentation was published on
 `agent/cws-n8n-assessment-006`. Next action: Tulio decides revive or retire.
+
+## 2026-08-09 — CWS-RETURN-PATH-007 authenticated publish record
+
+Agent: Codex
+Status: Completed locally; staging migration applied; push/deploy pending
+
+Added staging migration 015 with the pending content-variant outcome fields and
+the workspace-owned `published_posts` return log. RLS grants active members
+read/outcome access, denies non-members, leaves inserts to the service role,
+and protects publication identity from later mutation. The security advisor
+retained the same two pre-existing warnings before and after the migration.
+
+Added constant-time shared-secret `POST /api/published`, live-enum validation,
+full raw-payload retention, and platform/external-ID retry idempotency. Explicit
+endpoint-specific Supabase variables prevent the existing generic Vercel
+integration from silently targeting a different database. Added the minimal
+`/admin/published` table and outcome editor as a content-area tab without
+expanding the sidebar.
+
+The first local authenticated request against staging returned 201 and the
+retry returned 200 with the same ID. The database contained one row, retained
+the request body, and persisted a member-authenticated outcome; test data and
+temporary keys were removed. `npm ci`, build, lint, all 76 tests, and whitespace
+validation passed. The authenticated deployed UI smoke remains pending because
+the ticket prohibits push/deploy. Added approved DEC-025 and the verified
+return-path-first learning. Next: configure the endpoint-specific Production
+variables, push/deploy, and perform one signed-in smoke test before wiring any
+publisher.

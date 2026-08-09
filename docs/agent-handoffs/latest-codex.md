@@ -1,123 +1,163 @@
 # Latest Codex Handoff
 
-Task ID: CWS-N8N-ASSESS-006
+Task ID: CWS-RETURN-PATH-007
 Agent: Codex
-Objective: Audit the renewed n8n Cloud instance, reconcile it with the current application and live Supabase schema, and produce a read-only operational checklist.
+Objective: Build one authenticated, idempotent endpoint for recording publish events from any source and a minimal member-visible outcome log.
 
 ## Files inspected
 
 - `.agents/codex-project-instructions.md`
+- `docs/n8n-assessment.md`
 - `docs/product-definition.md`
 - `docs/technical-conventions.md`
-- `docs/pilot-readiness.md`
 - `docs/decisions.md`
 - `docs/learnings.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `src/components/admin/GenerateButton.jsx`
+- `docs/pilot-readiness.md`
+- `api/lead-outreach.js`
+- `api/client-portal-intake.js`
+- `api/lib/`
+- Existing API tests and admin page tests
+- `src/App.jsx`
 - `src/components/admin/ContentQueue.jsx`
-- `src/pages/admin/SettingsPage.jsx`
-- `src/Hooks/useDrafts.js`
-- Legacy analytics, calendar, and published-card status consumers
-- All serverless routes under `api/`
-- `vite.config.js`
-- `.env.example`
-- All five `n8n/*.md` setup documents
-- Relevant legacy Supabase migrations and the live schema/migration history
-- Live n8n workflow, execution, trigger, node configuration, and credential-name views
-- Production Vercel environment-variable names
+- `src/components/admin/AdminLayout.jsx`
+- `src/lib/supabase.js`
+- Supabase migrations `001`–`012` and the three timestamped workspace migrations
+- Live staging migration history, enum values, RLS helpers, tables, policies, indexes, and security advisor
 
 ## Files changed
 
-- `docs/n8n-assessment.md`
+- `.env.example`
+- `api/published.js`
+- `api/__tests__/published.test.js`
+- `src/App.jsx`
+- `src/components/admin/ContentAreaTabs.jsx`
+- `src/components/admin/ContentQueue.jsx`
+- `src/pages/admin/PublishedPostsPage.jsx`
+- `src/pages/admin/__tests__/PublishedPostsPage.test.jsx`
+- `supabase/migrations/015_published_posts_return_path.sql`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+- `docs/decisions.md`
 - `docs/learnings.md`
 
 ## Database or API changes
 
-None. Live Supabase queries were read-only. No workflow, credential, environment variable, Vercel route, migration, or database row was changed.
+- Applied staging migration `20260809191332` (`015_published_posts_return_path`). Migration 015 had not previously landed.
+- Added `published_at`, `outcome_score`, `outcome_note`, and `outcome_recorded_at` to `content_variants`.
+- Added `published_posts` with workspace-scoped foreign keys, the existing `platform_name` enum, source/outcome checks, immutable publication identity fields, raw request payload retention, member read/outcome policies, and service-role write access.
+- Added a partial unique index on `(platform, external_post_id)` when the external ID is non-null and the required workspace/date index.
+- Added `POST /api/published`. It requires `x-published-webhook-secret`, validates the live platform contract, uses constant-time secret comparison, defaults source to `manual`, and returns HTTP 200 with the existing row when a retry repeats a platform/external ID pair.
+- Added `/admin/published`, linked as a tab beside `/admin/legacy-queue`, without adding a sidebar item.
 
 ## Security decisions
 
-- No workflow was triggered, tested, published, unpublished, enabled, disabled, edited, duplicated, or exported.
-- Credential names and visible error indicators were inspected; credential values were never opened or copied.
-- Unauthenticated browser-facing n8n webhooks were recorded as a risk. A future server-side relay and signed inbound return route are recommendations only.
-- No service-role key or secret was exposed.
+- The endpoint uses server-only `PUBLISHED_SUPABASE_URL`, `PUBLISHED_SUPABASE_SERVICE_ROLE_KEY`, and `PUBLISHED_WEBHOOK_SECRET`. Explicit endpoint-specific database variables prevent the generic Vercel Supabase integration from silently targeting a different project.
+- The service-role key is never exposed to the browser, logged, committed, or included in the webhook body.
+- `anon` has no `published_posts` access. Authenticated members receive only SELECT and UPDATE; no client INSERT or DELETE grant exists.
+- A database trigger makes publication identity and raw payload immutable. Member UPDATE is therefore limited to outcome fields even if a client submits additional columns.
+- The caller's complete JSON body is retained in `raw_payload`; the shared secret must remain in the request header.
+- Staging RLS allowed an active member to read/update an outcome and returned zero rows for a fabricated non-member. Temporary verification rows were deleted.
+- The security advisor reported the same two pre-existing warnings before and after: the intentional authenticated `create_workspace` security-definer RPC and disabled leaked-password protection. No new warning was introduced. Remediation references: https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable and https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection.
 
 ## Decisions made
 
-- None. DEC-004 remains the governing boundary.
-- Revive versus retire, database authority, WF4/WF5 identity, and approved publishing platforms remain Tulio decisions.
+- Added approved DEC-025: every publish, from any pipeline, records to the OS at publish time; no pipeline may publish without recording.
+- Reused `platform_name` unchanged. No legacy publishing enum or workflow was modified.
+- A caller may supply `workspace_id`, or a single-workspace deployment may configure `PUBLISHED_WORKSPACE_ID`.
+- `created_by` is nullable because machine-originated publish events do not necessarily have a user actor; the field remains explicit for manual/user-attributed events.
 
 ## Assumptions
 
-- A workflow showing `Published` is treated as active configuration, not as evidence of successful operation.
-- Because execution retention is seven days and no records remain, exact 90-day counts and last success/failure timestamps are unavailable.
-- Compatibility checks compare live n8n payloads with current project `ddbhxqkckzpwzwvnoxqt`; the workflows' target project `ugxipyozzhvqoqenygiz` could not be accessed through the connected Supabase account.
+- Migration 015's pending `content_variants` outcome fields are `published_at`, `outcome_score`, `outcome_note`, and `outcome_recorded_at`, matching the approved outcome vocabulary used by `published_posts`.
+- `manual` is the safest default source when a caller omits `source`.
+- English and Spanish remain the supported publication languages for this smallest return-path foundation.
 
 ## Tests added
 
-None. This was an assessment ticket.
+- API: missing secret, wrong secret, invalid platform with accepted-value message, missing required timestamp, successful insert with full raw payload, and duplicate retry returning the existing row.
+- UI: member-scoped newest-first publish-log rendering and persisted outcome score/note/timestamp updates.
+- Existing Content Queue coverage now also exercises the shared content-area tab component.
 
 ## Tests run
 
 - `npm ci` — passed.
-- Production `npm run build` with valid placeholder client Supabase variables — passed; 430 modules transformed.
-- `npm run lint` — passed with one existing `src/Hooks/useDrafts.js` dependency warning.
-- `npx vitest run` — 22 files, 68 tests passed.
-- Live n8n and Supabase inspections — read-only.
+- Focused API tests — 1 file, 6 tests passed.
+- Focused publish-log and Content Queue tests — 2 files, 8 tests passed.
+- `VITE_SUPABASE_URL=https://example.supabase.co VITE_SUPABASE_ANON_KEY=test-anon-key npm run build` — passed; import casing passed and 432 modules transformed.
+- `npm run lint` — passed with the existing `src/Hooks/useDrafts.js` dependency warning.
+- `npx vitest run` — 24 files, 76 tests passed.
+- `git diff --check` — passed before the final project-memory refresh.
+- Staging manual POST — first request returned 201; the retry returned 200 with the same row ID; exactly one row existed and retained the full body.
+- Staging manual outcome update — an active member set `worked` plus a note and `outcome_recorded_at` persisted.
+- Local browser route check — `/admin/published` loaded through the app and correctly redirected the unauthenticated localhost origin to `/admin/login`. An authenticated deployed visual check remains pending because this ticket forbids push/deploy and the localhost origin does not share the Production session.
+
+## Exact webhook request
+
+Required headers:
+
+- `Content-Type: application/json`
+- `x-published-webhook-secret: <PUBLISHED_WEBHOOK_SECRET>`
+
+```bash
+curl --request POST 'https://<cws-domain>/api/published' \
+  --header 'Content-Type: application/json' \
+  --header "x-published-webhook-secret: $PUBLISHED_WEBHOOK_SECRET" \
+  --data '{
+    "workspace_id": "a0eb078c-8ea5-44b6-b3cb-a7ba9ca23293",
+    "platform": "youtube",
+    "external_post_id": "<platform-post-id>",
+    "external_url": "https://<platform>/<post>",
+    "published_at": "2026-08-09T19:20:00Z",
+    "language": "en",
+    "source": "n8n"
+  }'
+```
+
+Accepted platforms: `instagram`, `facebook`, `x`, `linkedin`, `pinterest`, `whatsapp`, `youtube`.
 
 ## Known issues
 
-- Five workflows are published but have no retained execution evidence.
-- Nothing active publishes to social platforms.
-- The active workflows target an older, inaccessible Supabase project.
-- WF3, WF4, and WF5 contain schema/status writes incompatible with the current live database.
-- The unpublished publisher contains unresolved placeholders and lacks named social OAuth credentials.
-- Production lacks `VITE_N8N_WF2_WEBHOOK_URL`.
-- Approval only updates Supabase and does not invoke n8n.
-- The Settings page shows hardcoded healthy labels.
-- Seven-day execution retention prevents a reliable 90-day operational history.
+- No application deployment or Vercel environment mutation was authorized. Production must receive the four server-only return-path variables before deployment verification.
+- The existing generic server-side Supabase integration points at a different project. Do not reuse it for this endpoint; configure the explicit `PUBLISHED_SUPABASE_*` variables for `cws-os-staging` or the future production OS project.
+- The final authenticated visual smoke test at `/admin/published` remains pending deployment.
+- The existing `useDrafts` lint warning and build chunk/eval warnings remain unchanged.
+- The two pre-existing Supabase security-advisor warnings remain.
 
 ## Recommended next task
 
-Tulio first decides revive or retire. If reviving, run a separately authorized contract-recovery task that chooses the authoritative database, exports the selected live workflows, ratifies WF4/WF5 identities, and designs schema/status alignment before any credential or execution testing.
+Configure the four server-only Vercel variables, push/deploy these three commits, sign in, verify the publish-log row/outcome flow once, then wire any future publisher to this endpoint before enabling its outbound post node.
 
 ## Questions requiring Tulio
 
-- Revive or retire the legacy n8n pipeline?
-- Recover `ugxipyozzhvqoqenygiz` or retarget a revived pipeline to `ddbhxqkckzpwzwvnoxqt`?
-- Keep live WF4 compiler and WF5 scheduler, or implement the documented publisher and keyword roles?
-- Which social platforms remain in scope, and are sandbox accounts available?
-- Authorize workflow export in a follow-up ticket?
-- Retain execution outcomes for at least 90 days outside n8n?
+- Which Supabase project should the endpoint-specific variables target in Production after staging acceptance?
+- Should the endpoint use one configured workspace or require every future pipeline to send `workspace_id` explicitly?
 
 ## Project-memory files updated
 
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+- `docs/decisions.md`
 - `docs/learnings.md`
 
 ## Permanent decisions added
 
-None.
+- DEC-025 — every publish must record to the CWS OS at publish time.
+- DEC-021 through DEC-024 and DEC-026 were not added.
 
 ## Reusable learnings added
 
-- Operational status must come from an observed signal; otherwise show `Unknown`.
-- Verify live schema and applied migrations before acting on documentation-based schema claims.
+- Build the authenticated return path before publishing capability so every future pipeline begins with durable outcome evidence.
 
 ## Memory updates withheld
 
-- Revive versus retire is unapproved.
-- Database authority is unresolved.
-- WF4/WF5 canonical identities are unresolved.
-- Publishing platform scope and workflow-export authorization are unresolved.
+- The future production Supabase project and single-workspace versus caller-supplied workspace convention remain unapproved.
+- No revive/retire decision, publishing platform scope, workflow identity, or n8n wiring decision was added.
 
 ## Git diff summary
 
-Read-only assessment documentation only: one new n8n assessment, refreshed Codex handoff, one appended project-log entry, one task-ledger row, and two verified reusable learnings. No application code, SQL, migration, dependency, workflow, credential, environment, or remote system was changed. The assessment package was committed and pushed on `agent/cws-n8n-assessment-006`; no unrelated changes were included.
+Three ordered local commits: migration, authenticated endpoint/tests/environment contract, then publish-log UI/tests/project memory. Migration 015 is applied only to staging. No workflow, publishing action, social credential, application deployment, Vercel environment, CWS-001 record, or legacy enum was changed. Nothing was pushed.

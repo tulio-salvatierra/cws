@@ -5,6 +5,7 @@ import PublishedCard from './PublishedCard'
 import YouTubeCard from './YouTubeCard'
 import SlideOver from './SlideOver'
 import GenerateButton from './GenerateButton'
+import ContentAreaTabs from './ContentAreaTabs'
 
 export default function ContentQueue() {
   const [activeTab, setActiveTab] = useState('pending')
@@ -44,6 +45,8 @@ export default function ContentQueue() {
         <h1 className="text-white text-lg font-semibold">Content Queue</h1>
         <GenerateButton webhookUrl={import.meta.env.VITE_N8N_WF2_WEBHOOK_URL} />
       </div>
+
+      <ContentAreaTabs active="queue" />
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
