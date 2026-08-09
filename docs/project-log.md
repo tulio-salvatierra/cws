@@ -945,7 +945,7 @@ The assessment documentation was published on
 ## 2026-08-09 — CWS-RETURN-PATH-007 authenticated publish record
 
 Agent: Codex
-Status: Completed locally; staging migration applied; push/deploy pending
+Status: Completed, published, deployed, and UI-verified
 
 Added staging migration 015 with the pending content-variant outcome fields and
 the workspace-owned `published_posts` return log. RLS grants active members
@@ -964,8 +964,14 @@ The first local authenticated request against staging returned 201 and the
 retry returned 200 with the same ID. The database contained one row, retained
 the request body, and persisted a member-authenticated outcome; test data and
 temporary keys were removed. `npm ci`, build, lint, all 76 tests, and whitespace
-validation passed. The authenticated deployed UI smoke remains pending because
-the ticket prohibits push/deploy. Added approved DEC-025 and the verified
-return-path-first learning. Next: configure the endpoint-specific Production
-variables, push/deploy, and perform one signed-in smoke test before wiring any
-publisher.
+validation passed. Added approved DEC-025 and the verified return-path-first
+learning.
+
+After approval, the four endpoint-specific secrets/settings were added to the
+Vercel Production environment, the complete change set was published through
+PR #11, and deployment `dpl_3vvwf3TjrzRFRo2qN7YNnrDv9fif` reached Ready at
+`https://cws-two.vercel.app`. A signed-in production browser check confirmed
+that `/admin/published` renders the consolidated navigation and expected empty
+state. No synthetic publication was retained. Next: wire the selected publisher
+to the return endpoint before enabling its outbound post node, then validate one
+real publish, retry, and member outcome update.

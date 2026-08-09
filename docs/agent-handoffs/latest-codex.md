@@ -93,7 +93,8 @@ Objective: Build one authenticated, idempotent endpoint for recording publish ev
 - `git diff --check` — passed before the final project-memory refresh.
 - Staging manual POST — first request returned 201; the retry returned 200 with the same row ID; exactly one row existed and retained the full body.
 - Staging manual outcome update — an active member set `worked` plus a note and `outcome_recorded_at` persisted.
-- Local browser route check — `/admin/published` loaded through the app and correctly redirected the unauthenticated localhost origin to `/admin/login`. An authenticated deployed visual check remains pending because this ticket forbids push/deploy and the localhost origin does not share the Production session.
+- Local browser route check — `/admin/published` loaded through the app and correctly redirected the unauthenticated localhost origin to `/admin/login`.
+- Production browser check — the authenticated `/admin/published` route loaded at `https://cws-two.vercel.app`, rendered the consolidated navigation, and showed the expected empty-state message.
 
 ## Exact webhook request
 
@@ -121,20 +122,20 @@ Accepted platforms: `instagram`, `facebook`, `x`, `linkedin`, `pinterest`, `what
 
 ## Known issues
 
-- No application deployment or Vercel environment mutation was authorized. Production must receive the four server-only return-path variables before deployment verification.
 - The existing generic server-side Supabase integration points at a different project. Do not reuse it for this endpoint; configure the explicit `PUBLISHED_SUPABASE_*` variables for `cws-os-staging` or the future production OS project.
-- The final authenticated visual smoke test at `/admin/published` remains pending deployment.
+- Production currently uses the staging OS project through the endpoint-specific variables. Moving the return path to a future production OS project requires changing all matching endpoint variables together.
+- The production UI is verified, but no synthetic publish event was left in the production log. The first real publisher integration should verify the live 201/200 retry path and member outcome update.
 - The existing `useDrafts` lint warning and build chunk/eval warnings remain unchanged.
 - The two pre-existing Supabase security-advisor warnings remain.
 
 ## Recommended next task
 
-Configure the four server-only Vercel variables, push/deploy these three commits, sign in, verify the publish-log row/outcome flow once, then wire any future publisher to this endpoint before enabling its outbound post node.
+Wire the selected publisher to `POST /api/published` before enabling its outbound post node, then verify one real publication, one idempotent retry, and one member outcome update in the Production log.
 
 ## Questions requiring Tulio
 
-- Which Supabase project should the endpoint-specific variables target in Production after staging acceptance?
 - Should the endpoint use one configured workspace or require every future pipeline to send `workspace_id` explicitly?
+- Which assessed publisher, if any, should be revived first and wired to the return path?
 
 ## Project-memory files updated
 
@@ -160,4 +161,4 @@ Configure the four server-only Vercel variables, push/deploy these three commits
 
 ## Git diff summary
 
-Three ordered local commits: migration, authenticated endpoint/tests/environment contract, then publish-log UI/tests/project memory. Migration 015 is applied only to staging. No workflow, publishing action, social credential, application deployment, Vercel environment, CWS-001 record, or legacy enum was changed. Nothing was pushed.
+The three ordered implementation commits plus the read-only n8n assessment are published through PR #11. Migration 015 is applied to staging. The four endpoint-specific variables are configured as encrypted Production variables, deployment `dpl_3vvwf3TjrzRFRo2qN7YNnrDv9fif` is Ready at `https://cws-two.vercel.app`, and the signed-in empty publish-log state is verified. No workflow, publishing action, social credential, CWS-001 record, or legacy enum was changed.
