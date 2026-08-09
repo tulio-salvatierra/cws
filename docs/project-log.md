@@ -801,3 +801,9 @@ WORKS.
 Next action: push and deploy, then run the full CWS-001 pilot cycle. The explicit
 export/outcome model remains the only definition-of-done schema gap and requires
 a separately approved migration design based on the live cycle.
+
+### Push record
+
+Commit `5b5161a feat: add campaign lifecycle controls` was pushed to
+`origin/main` on 2026-08-09. Deployment confirmation and the live pilot cycle
+remain pending.

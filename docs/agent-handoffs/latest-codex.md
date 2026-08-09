@@ -89,9 +89,9 @@ policies.
 
 ## Recommended next task
 
-Push and deploy the campaign status control, then run the full CWS-001 pilot
-cycle. After the live run, design the explicit export/outcome migration using
-the actual information the pilot needed.
+Confirm the Vercel deployment, then run the full CWS-001 pilot cycle. After the
+live run, design the explicit export/outcome migration using the actual
+information the pilot needed.
 
 ## Questions requiring Tulio
 
@@ -122,7 +122,8 @@ the actual information the pilot needed.
 
 ## Git diff summary
 
-The working tree contains the workspace-scoped campaign lifecycle control, one
-focused interaction test, the refreshed readiness audit, and required project
-memory updates. No migration, database mutation, commit, push, or deployment was
-performed.
+Commit `5b5161a feat: add campaign lifecycle controls` contains the
+workspace-scoped campaign lifecycle control, one focused interaction test, the
+refreshed readiness audit, and required project-memory updates. It was pushed to
+`origin/main`. No migration, database mutation, or manual production workflow
+was performed.
