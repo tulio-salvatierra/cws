@@ -839,3 +839,31 @@ with the Spanish variant.
 Commit `0ecd8e3 fix: confirm owner review decisions` was pushed to
 `origin/main` on 2026-08-09. Deployment confirmation and the fresh Spanish
 approval/revision cycle remain pending.
+
+## 2026-08-09 — CWS-VERCEL-RELIABILITY-006 background intake relay
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Investigated a production 504 from `/api/client-portal-intake` and invalid
+regular-expression warnings on the New campaign page. The intake relay was
+still holding the browser request open while Google Apps Script completed, so
+its controlled 12-second deadline surfaced as a 504. The campaign code pattern
+placed an unescaped hyphen in a character class, which current browsers compile
+with Unicode-aware HTML pattern rules and reject.
+
+Changed the intake endpoint to return HTTP 202 immediately and register the
+Google Sheets request as managed Vercel background work. The downstream call
+has a 45-second bounded deadline within a 60-second function duration, retains
+structured failure logs, and keeps the webhook secret server-only. The manual
+sync message now says queued. Replaced the campaign code expression with a
+valid hyphen-separated pattern and removed the restrictive phone pattern.
+
+Added tests for immediate acceptance, registered background work, contained
+timeouts, and the campaign pattern. The full suite passes with 21 files and 67
+tests. Lint, import casing, the production Vite build, `git diff --check`, and a
+full Vercel build pass. Lint retains the existing `useDrafts` dependency
+warning. No database or remote environment was changed.
+
+Next action: push and deploy, then verify one client update reaches the workbook
+without a browser 504 and create `CWS-002` without a pattern warning.

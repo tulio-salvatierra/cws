@@ -1,4 +1,4 @@
-export const GOOGLE_SHEETS_WEBHOOK_TIMEOUT_MS = 12_000
+export const GOOGLE_SHEETS_WEBHOOK_TIMEOUT_MS = 45_000
 
 export class GoogleSheetsWebhookTimeoutError extends Error {
   constructor(message = 'Google Sheet sync timed out.') {

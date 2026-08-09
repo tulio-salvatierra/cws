@@ -1,5 +1,6 @@
 /* global process */
 
+import { waitUntil } from '@vercel/functions'
 import {
   GoogleSheetsWebhookTimeoutError,
   postGoogleSheetsWebhook,
@@ -22,42 +23,42 @@ export default async function handler(req, res) {
 
   console.info('[client-portal-intake] request received', { event })
 
-  try {
-    const { response, result } = await postGoogleSheetsWebhook({
-      url: process.env.GOOGLE_SHEETS_WEBHOOK_URL,
-      secret: process.env.GOOGLE_SHEETS_WEBHOOK_SECRET,
-      payload,
-    })
+  const syncPromise = (async () => {
+    try {
+      const { response, result } = await postGoogleSheetsWebhook({
+        url: process.env.GOOGLE_SHEETS_WEBHOOK_URL,
+        secret: process.env.GOOGLE_SHEETS_WEBHOOK_SECRET,
+        payload,
+      })
 
-    if (!response.ok || result?.ok === false) {
-      console.error('[client-portal-intake] Google Sheets rejected request', {
+      if (!response.ok || result?.ok === false) {
+        console.error('[client-portal-intake] Google Sheets rejected request', {
+          event,
+          status: response.status,
+        })
+        return
+      }
+
+      console.info('[client-portal-intake] Google Sheets sync completed', {
         event,
         status: response.status,
       })
-      return res.status(502).json({
-        ok: false,
-        error: result?.error || 'Google Sheet sync failed',
+    } catch (error) {
+      if (error instanceof GoogleSheetsWebhookTimeoutError) {
+        console.error('[client-portal-intake] background sync timed out', { event })
+        return
+      }
+
+      console.error('[client-portal-intake] background sync failed', {
+        event,
+        message: error instanceof Error ? error.message : 'Unknown webhook error',
       })
     }
+  })()
 
-    return res.status(200).json({ ok: true, result })
-  } catch (error) {
-    if (error instanceof GoogleSheetsWebhookTimeoutError) {
-      return res.status(504).json({
-        ok: false,
-        error: 'Google Sheet sync timed out. Please try again.',
-      })
-    }
+  waitUntil(syncPromise)
 
-    console.error('[client-portal-intake] request failed', {
-      event,
-      message: error instanceof Error ? error.message : 'Unknown webhook error',
-    })
-    return res.status(502).json({
-      ok: false,
-      error: 'Google Sheet sync failed. Please try again.',
-    })
-  }
+  return res.status(202).json({ ok: true, queued: true })
 }
 
 function parseRequestBody(body) {

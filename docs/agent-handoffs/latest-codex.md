@@ -1,8 +1,8 @@
 # Latest Codex Handoff
 
-Task ID: CWS-PILOT-READINESS-004
+Task ID: CWS-VERCEL-RELIABILITY-006
 Agent: Codex
-Objective: Remove ambiguity from the single-owner approval flow after a review request appeared to approve itself.
+Objective: Remove recurring client-portal intake 504 responses and repair browser-invalid form patterns.
 
 ## Files inspected
 
@@ -11,82 +11,103 @@ Objective: Remove ambiguity from the single-owner approval flow after a review r
 - `docs/technical-conventions.md`
 - `docs/decisions.md`
 - `docs/learnings.md`
-- `docs/pilot-readiness.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `src/pages/admin/VariantDetailPage.jsx`
-- `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
-- Staging approval, variant, and user attribution rows (read-only)
-- Current Supabase JavaScript update and filter documentation
+- `api/client-portal-intake.js`
+- `api/__tests__/client-portal-intake.test.js`
+- `server/google-sheets-webhook.js`
+- `src/lib/clientPortalGoogleSheet.js`
+- `src/lib/clientPortalAutomations.js`
+- `src/components/ClientPortal/AdminClientDashboard.jsx`
+- `src/components/LeadFormModal/LeadFormModal.tsx`
+- `src/pages/admin/NewCampaignPage.jsx`
+- `src/pages/admin/__tests__/WorkspacePagesSmoke.test.jsx`
+- `vercel.json`
+- Current official Vercel `waitUntil` documentation
 
 ## Files changed
 
-- `src/pages/admin/VariantDetailPage.jsx`
-- `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
-- `docs/pilot-readiness.md`
-- `docs/learnings.md`
+- `api/client-portal-intake.js`
+- `api/__tests__/client-portal-intake.test.js`
+- `server/google-sheets-webhook.js`
+- `src/components/ClientPortal/AdminClientDashboard.jsx`
+- `src/components/LeadFormModal/LeadFormModal.tsx`
+- `src/pages/admin/NewCampaignPage.jsx`
+- `src/pages/admin/__tests__/WorkspacePagesSmoke.test.jsx`
+- `package.json`
+- `package-lock.json`
+- `vercel.json`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-
-## Root cause and fix
-
-The staging record was inserted as pending and updated to approved about 19
-seconds later by the same owner account. It was not auto-approved by the
-database. Because the only owner was both requester and reviewer, the immediate
-review controls made the two actions appear to be one transition.
-
-The pending state now says `Submitted for owner review`, labels the input as
-reviewer feedback, and requires a second explicit confirmation before either
-Approve or Request revision writes to Supabase. Review controls are disabled
-while the confirmed update is saving, and save errors are separated from
-approval errors.
+- `docs/learnings.md`
 
 ## Database or API changes
 
-None. The existing approved test record was not changed or deleted. No
-migration, remote write, service-role credential, RLS bypass, legacy publishing
-change, or n8n integration was introduced.
+The intake endpoint now schedules the Google Sheets request with Vercel
+`waitUntil` and immediately returns HTTP 202 with `{ ok: true, queued: true }`.
+The bounded downstream deadline increased from 12 to 45 seconds, inside a
+60-second function duration. Downstream rejection, timeout, and failure remain
+structured server logs. No database or Supabase change was made.
+
+## Security decisions
+
+- The Google Sheets secret remains server-only and is still added only inside the Vercel function.
+- The browser receives acceptance state, not the secret or downstream response body.
+- Background work remains bounded and is registered with the function lifecycle rather than left as an unmanaged promise.
+
+## Decisions made
+
+- Treat the workbook update as a non-blocking side effect because client UI changes do not depend on its response body.
+- Report the manual action as queued rather than claiming the workbook already changed.
+- Use a hyphen-separated campaign-code pattern that is valid under current Unicode-aware HTML pattern rules.
+- Remove the restrictive phone pattern; `type="tel"` and `inputMode="tel"` remain without rejecting legitimate international formats.
+
+## Assumptions
+
+- Vercel's configured Node runtime is at least Node 20, as required by `@vercel/functions` 3.9.1 and confirmed by the Node 24 Vercel build.
+- Google Sheets processing is eventually consistent and is not required to complete before the UI update returns.
 
 ## Tests added
 
-- The first Approve click opens confirmation and performs no database update.
-- Confirm approval performs exactly one update with approved status and reviewer feedback.
-- Persisted reviewer feedback appears after the confirmed update.
+- The intake handler returns HTTP 202 immediately and registers one background promise.
+- A downstream timeout is contained and logged without changing the accepted browser response.
+- The campaign code field exposes the browser-valid hyphen-separated pattern.
 
 ## Tests run
 
-- Focused variant tests — 1 file, 3 tests passed.
+- Focused intake and workspace tests — 2 files, 13 tests passed.
 - `npm run test:run` — 21 files, 67 tests passed.
-- `npm run check:imports` — passed.
 - `npm run lint` — passed with the existing `useDrafts` dependency warning.
-- `npm run build` — passed.
-- `git diff --check` — passed before documentation refresh.
+- `npm run build` — passed, including import-casing validation.
+- `npx vercel build` — passed with the 60-second function configuration.
+- `git diff --check` — passed before project-memory refresh.
 
 ## Known issues
 
-- The full approval-history timeline is not displayed in the UI.
-- The English staging approval is already completed and immutable; validate the
-  guard with the Spanish variant or a new review cycle.
-- Export filename, export version, outcome, and published timestamp still need a
-  separately approved migration design.
+- A 202 response confirms queuing, not successful workbook persistence; production logs remain the source for downstream completion or failure.
+- The Google Apps Script endpoint itself may still fail or exceed 45 seconds; the browser will no longer wait on it.
 - The existing `src/Hooks/useDrafts.js` dependency warning remains.
+- `npm audit` reports 19 dependency vulnerabilities; no broad audit fix was applied because it is outside this ticket.
 
 ## Recommended next task
 
-Confirm the Vercel deployment, then use the Spanish variant to request review.
-Verify that the page remains pending after submission, that the first Approve
-click only opens confirmation, and that only Confirm approval changes the
-record. Continue the pilot with a revision-request and re-submission cycle.
+Push and deploy, then change one client status and verify the browser receives
+202 without a 504. Confirm the corresponding workbook change and inspect the
+function log for the matching completion event. Also open New campaign and
+verify `CWS-002` submits without a pattern warning.
+
+## Questions requiring Tulio
+
+- None before deployment testing.
 
 ## Project-memory files updated
 
-- `docs/pilot-readiness.md`
-- `docs/learnings.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+- `docs/learnings.md`
 
 ## Permanent decisions added
 
@@ -94,17 +115,17 @@ record. Continue the pilot with a revision-request and re-submission cycle.
 
 ## Reusable learnings added
 
-- Single-owner review interfaces need an explicit decision confirmation because
-  requester and reviewer roles collapse into one account.
+- Non-critical external side effects should use a managed background task and return an honest accepted/queued state to the UI.
 
 ## Memory updates withheld
 
-- No architectural decision was inferred from this interaction safeguard.
-- No approval record was rewritten because completed review history is immutable.
+- The 45/60-second timeout values are integration-specific implementation settings, not permanent product decisions.
+- No guarantee of Google Sheets persistence is recorded until the deployed workflow is verified live.
 
 ## Git diff summary
 
-Commit `0ecd8e3 fix: confirm owner review decisions` adds an explicit two-step
-owner decision flow, focused regression coverage, and the required project
-records. It was pushed to `origin/main`. It does not alter the database schema
-or existing staging records.
+The pending diff changes the intake relay from synchronous 504-prone behavior
+to managed background execution, adds the official Vercel Functions dependency,
+repairs both browser-risky HTML patterns, updates the manual sync message, and
+adds focused regression coverage and required project records. No unrelated
+pre-existing changes were present. Nothing is committed or pushed.

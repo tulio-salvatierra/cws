@@ -103,7 +103,7 @@ export default function AdminClientDashboard() {
 
     setSheetSyncStatus(
       result?.synced
-        ? 'Workbook sync sent.'
+        ? 'Workbook sync queued.'
         : 'Workbook sync payload is ready. Add the webhook URL to write live.',
     )
   }

@@ -105,6 +105,7 @@ describe('relocated workspace page render smoke tests', () => {
     mockFrom.mockImplementation(createQuery)
     renderPage(<NewCampaignPage />, '/admin/campaigns/new')
     expect(screen.getByRole('heading', { name: 'New campaign' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Code')).toHaveAttribute('pattern', '[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*')
   })
 
   it('renders NewVariantPage with its primary heading', () => {

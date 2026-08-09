@@ -1,6 +1,11 @@
 /* global process */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { waitUntilMock } = vi.hoisted(() => ({ waitUntilMock: vi.fn() }))
+
+vi.mock('@vercel/functions', () => ({ waitUntil: waitUntilMock }))
+
 import handler from '../client-portal-intake'
 import { GOOGLE_SHEETS_WEBHOOK_TIMEOUT_MS } from '../../server/google-sheets-webhook'
 
@@ -14,6 +19,7 @@ function createResponse() {
 
 describe('client portal intake API', () => {
   beforeEach(() => {
+    waitUntilMock.mockReset()
     process.env.GOOGLE_SHEETS_WEBHOOK_URL = 'https://example.com/webhook'
     process.env.GOOGLE_SHEETS_WEBHOOK_SECRET = 'test-secret'
     vi.spyOn(console, 'info').mockImplementation(() => {})
@@ -28,7 +34,7 @@ describe('client portal intake API', () => {
     vi.restoreAllMocks()
   })
 
-  it('returns the successful Google Sheets response', async () => {
+  it('queues the Google Sheets request and returns immediately', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -39,18 +45,20 @@ describe('client portal intake API', () => {
 
     await handler({ method: 'POST', body: { event: 'client_intake.created' } }, response)
 
-    expect(response.status).toHaveBeenCalledWith(200)
+    expect(response.status).toHaveBeenCalledWith(202)
     expect(response.json).toHaveBeenCalledWith({
       ok: true,
-      result: { ok: true, rowId: 'row-1' },
+      queued: true,
     })
+    expect(waitUntilMock).toHaveBeenCalledTimes(1)
+    await waitUntilMock.mock.calls[0][0]
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
       event: 'client_intake.created',
       secret: 'test-secret',
     })
   })
 
-  it('returns a controlled timeout before Vercel terminates the function', async () => {
+  it('contains a background timeout without changing the accepted response', async () => {
     vi.useFakeTimers()
     vi.stubGlobal('fetch', vi.fn((url, options) => new Promise((resolve, reject) => {
       options.signal.addEventListener('abort', () => {
@@ -61,14 +69,18 @@ describe('client portal intake API', () => {
     })))
     const response = createResponse()
 
-    const request = handler({ method: 'POST', body: { event: 'client_intake.created' } }, response)
-    await vi.advanceTimersByTimeAsync(GOOGLE_SHEETS_WEBHOOK_TIMEOUT_MS)
-    await request
+    await handler({ method: 'POST', body: { event: 'client_intake.created' } }, response)
 
-    expect(response.status).toHaveBeenCalledWith(504)
-    expect(response.json).toHaveBeenCalledWith({
-      ok: false,
-      error: 'Google Sheet sync timed out. Please try again.',
-    })
+    expect(response.status).toHaveBeenCalledWith(202)
+    expect(response.json).toHaveBeenCalledWith({ ok: true, queued: true })
+    expect(waitUntilMock).toHaveBeenCalledTimes(1)
+
+    await vi.advanceTimersByTimeAsync(GOOGLE_SHEETS_WEBHOOK_TIMEOUT_MS)
+    await waitUntilMock.mock.calls[0][0]
+
+    expect(console.error).toHaveBeenCalledWith(
+      '[client-portal-intake] background sync timed out',
+      { event: 'client_intake.created' },
+    )
   })
 })

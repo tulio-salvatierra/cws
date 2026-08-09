@@ -118,7 +118,6 @@ export default function LeadFormModal({ isOpen, onClose, onSubmit }: LeadFormMod
               type="tel"
               autoComplete="tel"
               inputMode="tel"
-              pattern="[0-9()+\-\s]*"
               className="mt-1 w-full rounded-lg bg-zinc-800 border border-zinc-700 px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
@@ -137,5 +136,4 @@ export default function LeadFormModal({ isOpen, onClose, onSubmit }: LeadFormMod
     </div>
   );
 }
-
 

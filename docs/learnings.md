@@ -85,3 +85,15 @@ look automatic. Verify the audit timestamps and actor IDs before diagnosing a
 database transition, then require a separate confirmation before recording an
 approval or revision decision. Preserve completed approval history rather than
 rewriting the evidence.
+
+## Non-critical external side effects should not hold the UI response open
+
+Date: 2026-08-09
+
+Verified by: CWS-VERCEL-RELIABILITY-006
+
+When a browser action succeeds independently of a slow external webhook, return
+an honest accepted/queued response and register the side effect with the
+serverless platform's background-work mechanism. Keep the downstream call
+bounded, log its eventual result, and do not use an unmanaged fire-and-forget
+promise. A longer synchronous timeout only delays the same visible failure.
