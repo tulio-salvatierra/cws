@@ -210,6 +210,36 @@ Implement workspace-owned campaigns and independent content variants for `CWS-00
 
 - None added.
 
+## 2026-08-08 — CWS-PILOT-READINESS-004
+
+Agent: Codex
+
+Phase 1 added one render smoke assertion for each of the 11 relocated workspace
+pages: Workspace, Campaigns, Campaign detail, New campaign, New variant,
+Variant detail, Tasks, Planning, New goal, Knowledge, and Agent runs. Supabase
+is mocked; the tests assert only that the primary heading renders. Phase 1 was
+committed as `cbc9186 test: add workspace page render smoke coverage`.
+
+Phase 2 audited the first complete CWS-001 cycle without changing application
+code, data, or schema. Findings are recorded in `docs/pilot-readiness.md`.
+The live staging query found one workspace, two channels, two campaigns, three
+variants, one task, one unrelated approval, four goals, two initiatives, one
+project, zero decisions, zero learnings, and zero agent runs. CWS-001 remains
+`editing`; both EN and ES variants remain `recorded` with no transcript,
+caption text, editing notes, or export reference, and no CWS-001 approval.
+
+The UI can create a campaign, create variants, request/review a pending
+approval, create a campaign-linked task, and complete that task. It cannot
+drive campaign or variant status transitions, edit variant lifecycle fields,
+resolve a revision-requested approval, write decisions or learnings, or record
+an outcome. The schema has no outcome or `published_at` field, as expected by
+the ticket; no migration was added.
+
+Required validation passed: `npm ci`, production build with non-secret staging
+client values, import-casing check, lint with the existing single
+`useDrafts` dependency warning, and `npx vitest run` with 16 files and 57 tests.
+Phase 2 remains local and unpushed.
+
 ## 2026-08-08 — CWS-ADMIN-CONSOLIDATE-003 security correction
 
 Agent: Codex

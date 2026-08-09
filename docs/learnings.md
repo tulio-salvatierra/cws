@@ -46,3 +46,15 @@ Validated on 2026-08-08: moving both helpers to the non-exposed `private`
 schema, granting `authenticated` only schema usage and function execution, and
 repointing all 47 policies preserves member access and returns zero rows to a
 non-member while removing the public helper endpoints.
+
+## Schema status enums do not guarantee UI lifecycle coverage
+
+Date: 2026-08-08
+
+Verified by: CWS-PILOT-READINESS-004
+
+The CWS OS schema contains the campaign and content-variant status enums and
+fields for transcripts, captions, editing notes, and export references, while
+the current admin pages mostly read those values and do not expose mutation
+controls. A readiness audit must trace each required status transition and
+field through the UI instead of treating schema support as operational support.

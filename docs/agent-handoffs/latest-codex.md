@@ -1,126 +1,120 @@
 # Latest Codex Handoff
 
-Task ID: CWS-ADMIN-CONSOLIDATE-003
+Task ID: CWS-PILOT-READINESS-004
 Agent: Codex
-Objective: Unblock CI, harden the Supabase function surface, consolidate the CWS Operating System under `/admin`, and add the next approved channel-management surface without changing legacy publishing.
+Objective: Make the first CWS-001 cycle auditable and human-runnable by adding render smoke coverage and documenting the exact UI/schema gaps. No pilot data, feature fixes, or migrations were added.
 
 ## Files inspected
 
-- `.agents/codex-project-instructions.md`
-- Product, technical-convention, decision, learning, handoff, log, and ledger docs
-- `src/App.jsx`, admin/workspace pages, admin navigation, tests, and import-casing script
-- Existing Supabase migrations and staging policies/functions
-
-## Files changed in this follow-up
-
-- `src/App.jsx`
-- `src/components/admin/AdminLayout.jsx`
-- `src/components/admin/LegacyWorkspaceRedirect.jsx`
-- `src/components/admin/__tests__/AdminLayout.test.jsx`
-- `src/components/admin/__tests__/LegacyWorkspaceRedirect.test.jsx`
-- `src/pages/admin/AdminOverview.jsx`
-- `src/pages/admin/ChannelsPage.jsx`
-- `src/pages/admin/WorkspacePage.jsx`
-- `src/pages/admin/__tests__/ChannelsPage.test.jsx`
+- `docs/product-definition.md`
+- `docs/decisions.md`
+- `docs/technical-conventions.md`
 - `docs/agent-handoffs/latest-codex.md`
+- All relocated `src/pages/admin/*` workspace pages
+- Campaign, content-variant, approval, task, and knowledge migrations
+- Current staging rows and CWS-001 records
+
+## Files changed
+
+- `src/pages/admin/__tests__/WorkspacePagesSmoke.test.jsx`
+- `docs/pilot-readiness.md`
+- `docs/learnings.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+- `docs/agent-handoffs/latest-codex.md`
 
 ## Database or API changes
 
-No schema or migration changes were made in this follow-up. The page reads the
-existing workspace-owned `channels` table through the active membership and
-existing RLS policies. Legacy publishing tables, routes, and n8n integration
-remain unchanged.
+None. Staging was queried read-only. No rows were inserted or updated, and no
+migration was created. The existing private-schema RLS helper correction and
+admin/channels deployment were not changed.
 
-The previously approved staging migration remains validated: workspace helpers
-live in the non-exposed `private` schema, all 47 policies use private helper
-references, and member/non-member RLS checks pass.
+## Phase 1 — smoke tests
 
-## Route result
+Added 11 render smoke assertions, one for each relocated workspace page:
+Workspace, Campaigns, Campaign detail, New campaign, New variant, Variant
+detail, Tasks, Planning, New goal, Knowledge, and Agent runs. Supabase is
+mocked; each assertion checks only the page’s primary heading. Committed as:
 
-Added protected `/admin/channels` as a child of the existing guarded admin
-route. The sidebar, admin overview card, and workspace navigation link to it.
-The page displays each channel’s audience, voice, formats, production
-requirements, revenue goal, and success metrics, with clear membership/error
-states.
+- `cbc9186` — `test: add workspace page render smoke coverage`
 
-Moved `LegacyWorkspaceRedirect` into its own component without changing route
-behavior. Dynamic legacy paths continue to preserve IDs when redirecting under
-`/admin`.
+## Phase 2 — readiness audit
+
+Added `docs/pilot-readiness.md` with WORKS/PARTIAL/MISSING findings and exact
+file/line evidence for 14 cycle steps. The current staging state is:
+
+- 1 workspace, 1 member, 2 channels, 2 campaigns, 3 variants
+- 1 task and 1 unrelated approval; no approval is attached to CWS-001
+- 4 goals, 2 initiatives, 1 project
+- 0 decisions, 0 learnings, 0 agent runs
+- CWS-001 is `editing`
+- EN and ES variants are both `recorded` with no transcript, caption text,
+  editing notes, or export reference
+
+The UI can create campaigns and variants, request/review a pending approval,
+create a campaign-linked task, and complete that task. It cannot drive campaign
+or variant status transitions, edit variant lifecycle fields, resolve a
+revision-requested approval, write decisions or learnings, or record an
+outcome. The schema has no outcome or `published_at` field; this was reported
+as expected and not changed.
 
 ## Tests run
 
-- Targeted channel/navigation/redirect tests — 3 passed.
-- `npx vitest run` — 15 files, 46 tests passed.
-- `npm run check:imports` — passed.
+- `npm ci` — passed.
+- `npx vitest run` — 16 files, 57 tests passed.
+- `npm run check:imports` — passed through the build.
 - Production Vite build with staging URL and a non-secret placeholder key — passed.
-- `npm run lint` — passed with the existing hook-dependency warning in
-  `src/Hooks/useDrafts.js`; no errors.
-- Prior staging RLS and security-advisor validation remains passing.
+- `npm run lint` — passed with the existing one-line `useDrafts` dependency
+  warning; no errors.
 
-## Commits
+## Decisions and security
 
-- `dbd9396` — `feat: add admin channels overview` (local, not pushed).
-- Earlier security, route-consolidation, migration, and documentation commits
-  are already on remote `main` through `1520fe9`.
-
-## Decisions made
-
-- No new permanent decision was added in this follow-up.
-- Existing DEC-008 remains the basis for treating channels as first-class
-  workspace records.
-
-## Assumptions
-
-- Channels are read-only for this first dedicated page; creation/editing is a
-  separate scope.
-- Existing workspace membership selection remains the current MVP behavior.
-
-## Known issues
-
-- The new channels commit has not been pushed or deployed.
-- Manual browser smoke testing of `/admin/channels` is still pending.
-- The intentional `create_workspace` advisor warning and independent
-  leaked-password warning remain.
-- Lint retains one pre-existing `useDrafts` hook-dependency warning.
+- No new decision was added. DEC-013 and above were not extended by this task.
+- No schema, RLS, publishing, OAuth, Final Cut, AI, or channel mutation work
+  was performed.
 
 ## Recommended next task
 
-Push `dbd9396`, wait for Vercel Production to become Ready, then manually verify
-login, `/admin/channels`, a channel detail render, and the `/workspace` redirect.
-After that, decide whether channels need create/edit workflows or whether to
-prioritize broader workspace route smoke automation.
+Prioritize the smallest workflow set needed for a real pilot run:
+
+1. Variant editor and lifecycle status controls.
+2. Approval revision resolution loop.
+3. Decision and learning capture forms.
+4. A separately approved future migration for export filename/version,
+   outcome, and `published_at` fields.
 
 ## Questions requiring Tulio
 
-- Should `dbd9396` be pushed and deployed now?
-- Should channels remain read-only for the MVP, or should creation/editing be
-  the next feature?
-- Should the remaining Supabase advisor warnings be accepted or separately
-  remediated?
+- Should variant editing/status controls come before decision/learning forms?
+- Should revision resolution create a new approval record or use another
+  approved lifecycle model?
+- What outcome should be recorded after export once the future schema is
+  approved?
 
 ## Project-memory files updated
 
-- `docs/agent-handoffs/latest-codex.md`
+- `docs/pilot-readiness.md`
+- `docs/learnings.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+- `docs/agent-handoffs/latest-codex.md`
 
 ## Permanent decisions added
 
-- None in this follow-up.
+- None.
 
 ## Reusable learnings added
 
-- None; the existing channel and RLS learnings already cover this work.
+- Added the verified learning that schema status enums and fields do not
+  guarantee UI lifecycle coverage.
 
 ## Memory updates withheld
 
-- No decision was recorded about channel mutation workflows, advisor-warning
-  acceptance, or deployment.
+- No decisions about editor design, approval-record modeling, outcome fields,
+  migrations, or future automation were recorded.
 
 ## Git diff summary
 
-- Feature implementation is committed as `dbd9396`.
-- Documentation updates for this follow-up are currently uncommitted.
-- No push or deployment was performed.
+- Phase 1 is committed locally as `cbc9186`.
+- Phase 2 audit and memory updates are ready for a separate local commit.
+- No push was performed.
