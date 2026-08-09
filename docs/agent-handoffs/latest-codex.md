@@ -81,26 +81,31 @@ Local Vite development uses the same shared webhook behavior.
 - Production Vite build with non-secret validation values — passed.
 - `npx vercel build --prod --yes` — passed and validated the route pattern and 20-second function configuration.
 - `npm run lint` — passed with the existing `useDrafts` dependency warning; no errors.
+- Production deployment `dpl_7t6jYRVgUiWoBp6cL9qk7B8c5t2h` — Ready and aliased to `cws-two.vercel.app`.
+- Live stale asset request — returned `404 text/plain` instead of SPA HTML.
+- Live `/admin/campaigns` request — returned `200 text/html` for the current app.
+- Live unknown API request — returned 404; safe intake GET returned JSON 405.
 
 ## Known issues
 
 - The real Google Sheets webhook was not invoked during automated testing to
   avoid creating a production intake row.
-- Live asset-404 and intake behavior require deployment and production smoke
-  testing.
+- The actual Google Sheets POST remains to be verified with one intentional
+  client-intake submission by Tulio.
 - The existing `useDrafts` hook-dependency lint warning remains unrelated.
 - Vercel's install step reports existing npm audit findings; no dependency
   upgrade was attempted in this scoped task.
 
 ## Recommended next task
 
-Push and deploy this patch, then verify that an old/missing `/assets/*.js` URL
-returns 404, a current campaign page loads, and one controlled client-intake
-submission either succeeds or returns a logged error within 12 seconds.
+Submit one intentional client intake and confirm that the Google Sheets webhook
+either succeeds or returns a logged controlled error within 12 seconds. Then
+resume `CWS-PILOT-READINESS-004` with the approval revision-resolution loop.
 
 ## Questions requiring Tulio
 
-- Approve the commit and push to `main` when ready for live verification.
+- Tulio should submit one test intake when ready to create the corresponding
+  production workbook row.
 
 ## Project-memory files updated
 
@@ -125,6 +130,7 @@ submission either succeeds or returns a logged error within 12 seconds.
 
 ## Git diff summary
 
-The reliability patch and project-memory updates are local and uncommitted.
-No unrelated pre-existing worktree changes were present. No commit, push,
-deployment, database mutation, or production intake submission was performed.
+Commit `ae46c83` was pushed to `main` and deployed successfully to production.
+The stale-asset, SPA route, missing-API, and non-mutating intake boundaries were
+verified live. No database mutation or production intake submission was
+performed. A documentation-only completion commit follows this handoff update.

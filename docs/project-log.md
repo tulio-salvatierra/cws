@@ -698,7 +698,7 @@ The verified RLS helper privilege behavior was added to `docs/learnings.md`; no 
 ## 2026-08-08 — CWS-VERCEL-RELIABILITY-005
 
 Agent: Codex
-Status: Completed locally; deployment pending
+Status: Completed and deployed
 
 Confirmed two independent production failures. A cached Vite entry bundle
 requested an obsolete campaign chunk, and the catch-all SPA rewrite returned
@@ -714,5 +714,9 @@ development. The shared helper is not exposed as a Vercel function.
 
 Focused tests pass, the full suite passes with 19 files and 62 tests, import
 casing passes, the production Vite build passes, and Vercel's production build
-accepts the routing rule and function configuration. Live verification remains
-pending a commit, push, and deployment.
+accepts the routing rule and function configuration. Commit `ae46c83` was
+pushed to `main`; production deployment `dpl_7t6jYRVgUiWoBp6cL9qk7B8c5t2h`
+is Ready and serves `cws-two.vercel.app`. Live checks confirmed a stale asset
+returns `404 text/plain`, `/admin/campaigns` returns the current SPA, unknown
+API routes return 404, and the intake function returns JSON 405 for a safe GET.
+No production intake row was created; one intentional POST remains for Tulio.
