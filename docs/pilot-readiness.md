@@ -4,7 +4,8 @@ Date: 2026-08-08
 Agent: Codex  
 Environment: staging project `ddbhxqkckzpwzwvnoxqt`  
 Scope: baseline audit of the existing `/admin` UI and current CWS OS schema,
-plus a follow-up implementation of the smallest high-value variant workflow gap.
+plus follow-up implementation of variant editing, revision resolution, and
+decision/learning capture.
 
 The audit snapshot below records what a human could do before the follow-up.
 The follow-up does not run the CWS-001 pilot or change the database schema/data.
@@ -19,9 +20,13 @@ and workspace ID, so sibling language variants remain independent.
 
 This closes the baseline audit gaps for variant content editing and variant
 status transitions without adding migrations, publishing behavior, outcome
-fields, or approval-history mutations. Campaign status control, approval
-revision resolution, decision/learning capture, and outcome recording remain
-open gaps below.
+fields, or approval-history mutations.
+
+`VariantDetailPage` now also creates a new pending approval after a completed
+revision request, preserving immutable completed review history. The Knowledge
+page links to workspace-authorized decision and learning forms. Decisions enter
+as `proposed`; owner-only status transitions are not exposed. Campaign status
+control and outcome recording remain open gaps below.
 
 ## Current staging state
 
@@ -62,18 +67,18 @@ Status meanings:
 | # | Path step | Result | Evidence | Human fallback |
 |---:|---|---|---|---|
 | 1 | Move `CWS-001` through campaign statuses toward `published` | PARTIAL | Campaign status values exist in `supabase/migrations/009_campaigns_content_variants.sql:17-30`, but `CampaignsPage` only reads campaigns (`src/pages/admin/CampaignsPage.jsx:10-25`) and `CampaignDetailPage` only reads the campaign (`src/pages/admin/CampaignDetailPage.jsx:5-11`). | Direct table edit or SQL update of `campaigns.status`. |
-| 2 | Move EN and ES variants independently | PARTIAL | Variants are separate rows and are opened by separate IDs (`src/pages/admin/CampaignDetailPage.jsx:8-11`, `src/pages/admin/VariantDetailPage.jsx:5-25`). No status mutation exists. | Direct table edit or SQL update of each `content_variants.status`. |
-| 3 | Edit a variant transcript | MISSING | The schema stores `transcript` (`supabase/migrations/009_campaigns_content_variants.sql:59-60`), and the detail page only displays it (`src/pages/admin/VariantDetailPage.jsx:16-37`). | Direct table edit or SQL update. |
-| 4 | Edit caption text and set caption status | MISSING | `caption_text` and the lifecycle statuses exist (`supabase/migrations/009_campaigns_content_variants.sql:62-78`), but the detail page has no edit or status control (`src/pages/admin/VariantDetailPage.jsx:26-37`). | Direct table edit or SQL update. |
-| 5 | Record editing notes | MISSING | `editing_notes` exists in the schema (`supabase/migrations/009_campaigns_content_variants.sql:61-62`); no current page reads or writes it. | Direct table edit or SQL update. |
-| 6 | Record export filename and export version | MISSING | The schema has one `export_reference` text field (`supabase/migrations/009_campaigns_content_variants.sql:63-64`), with no separate filename or version fields; no UI control exists. | A single reference can be written by SQL, but filename/version cannot be recorded separately without a future schema decision. |
-| 7 | Advance a variant through `rough_cut` → `fine_cut` → `captions_pending` → `ready_for_review` → `approved` → `exported` | MISSING | The allowed statuses exist (`supabase/migrations/009_campaigns_content_variants.sql:64-78`), but `VariantDetailPage` only updates approvals, not `content_variants.status` (`src/pages/admin/VariantDetailPage.jsx:26-37`). | Direct table edit or SQL update for each transition. |
+| 2 | Move EN and ES variants independently | WORKS | Variants are separate rows, and each detail page saves its own status and content fields using both variant ID and workspace ID. | None required. |
+| 3 | Edit a variant transcript | WORKS | `VariantDetailPage` exposes and saves the existing `transcript` field independently per variant. | None required. |
+| 4 | Edit caption text and set caption status | WORKS | The variant editor exposes `caption_text` and every allowed lifecycle status. | None required. |
+| 5 | Record editing notes | WORKS | The variant editor exposes and saves `editing_notes`. | None required. |
+| 6 | Record export filename and export version | PARTIAL | The variant editor saves the existing `export_reference`, but the schema has no separate filename or version fields. | Record a combined reference until a future schema decision adds explicit fields. |
+| 7 | Advance a variant through `rough_cut` → `fine_cut` → `captions_pending` → `ready_for_review` → `approved` → `exported` | WORKS | `VariantDetailPage` saves any allowed content-variant lifecycle status on the independently selected variant. | None required. |
 | 8 | Create an approval on a variant | WORKS | `VariantDetailPage` calls `approvals.insert` with `status: 'pending'` (`src/pages/admin/VariantDetailPage.jsx:26-29`) and exposes `Request review` (`src/pages/admin/VariantDetailPage.jsx:37`). | None required, assuming the user is an active workspace member. |
 | 9 | Request a revision | WORKS | The pending approval review controls call `review('revision_requested')` (`src/pages/admin/VariantDetailPage.jsx:31-37`); the approval schema allows that status (`supabase/migrations/010_content_variant_approvals.sql:7-9`). | None required for the first revision request. |
-| 10 | Resolve the revision and approve | MISSING | After an approval leaves `pending`, the page renders no review controls (`src/pages/admin/VariantDetailPage.jsx:37`). The database trigger also makes completed approvals immutable (`supabase/migrations/010_content_variant_approvals.sql:74-84`). | Insert a new pending approval directly by SQL/table edit, then approve it through the UI. |
+| 10 | Resolve the revision and approve | WORKS | A `revision_requested` review exposes `Re-submit for review`, which inserts a new pending approval while preserving the completed review; the new pending row can then be approved. | None required. |
 | 11 | Create a campaign-linked task and complete it | WORKS | `TasksPage` loads campaigns, inserts a task with `campaign_id`, and exposes the `completed` status (`src/pages/admin/TasksPage.jsx:6-12`). | None required. |
-| 12 | Write a decision from the UI | MISSING | `KnowledgePage` only selects and displays decisions (`src/pages/admin/KnowledgePage.jsx:5-8`); there is no create form or mutation. | Direct table edit or SQL insert. |
-| 13 | Write a learning from the UI | MISSING | `KnowledgePage` only selects and displays learnings (`src/pages/admin/KnowledgePage.jsx:5-8`); there is no create form or mutation. | Direct table edit or SQL insert. |
+| 12 | Write a decision from the UI | WORKS | `NewDecisionPage` creates a workspace-owned decision with the current user and fixed `proposed` status. | None required for capture; sensitive status transitions remain separate. |
+| 13 | Write a learning from the UI | WORKS | `NewLearningPage` creates a workspace-owned learning with optional category and current-user attribution. | None required. |
 | 14 | Record an outcome after a variant reaches `exported` | MISSING | `content_variants` has no outcome or `published_at` field; its current columns end with `export_reference`, `status`, and timestamps (`supabase/migrations/009_campaigns_content_variants.sql:42-88`). | Nothing possible in the current schema. This requires a future migration and is intentionally not added here. |
 
 ## What is runnable today
@@ -85,26 +90,25 @@ ES records are independently addressable. After the follow-up implementation,
 each variant can also be edited and moved through its allowed lifecycle statuses
 from its own detail page.
 
-The cycle cannot currently reach a trustworthy exported/published state through
-the UI because campaign status transitions, revision resolution, decisions,
-learnings, and outcome recording remain missing or partial.
+The cycle can now edit and advance each variant, complete a real approval
+revision loop, and capture decisions and learnings. It cannot yet record the
+full definition-of-done outcome or move the parent campaign through its status
+lifecycle from the UI.
 
 ## Remaining recommended changes
 
-The variant editor/status item below is implemented in the follow-up section
-above. The remaining smallest changes are:
+The variant editor, approval revision loop, and knowledge-capture items are
+implemented in the follow-up section above. The remaining changes are:
 
 1. **Campaign status control — S.** Add a controlled status transition surface
    for the campaign lifecycle through `published`.
-2. **Approval revision loop — S.** Let a revision-requested variant create a new
-   pending approval, then review that pending approval. Preserve the existing
-   completed-approval immutability rule.
-3. **Decision and learning capture — S/M.** Add workspace-authorized forms for
-   one decision and one learning, with the current ownership fields.
-4. **Explicit export/outcome model — L and future migration.** Add separately
+2. **Explicit export/outcome model — L and future migration.** Add separately
    approved fields for export filename, export version, outcome, and published
    timestamp. This is required for the definition-of-done outcome record and is
    intentionally outside this ticket.
+3. **Decision transition enforcement — schema/security follow-up.** Before
+   exposing approved, reversed, superseded, or archived controls, align the
+   current broad decision update policy with DEC-009 owner-only transitions.
 
 The task path already works and does not need a readiness blocker fix.
 
@@ -118,9 +122,7 @@ The current staging state has not begun that run: both variants are still
 
 ## Questions requiring Tulio
 
-- Should the next implementation prioritize the variant editor/status surface
-  or the decision/learning capture forms?
 - What should count as the CWS-001 outcome once the future outcome fields are
   approved?
-- Should revision resolution create a new approval record or use another
-  approved lifecycle model?
+- Should the next implementation prioritize campaign status control or the
+  explicit export/outcome migration design?

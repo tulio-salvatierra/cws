@@ -720,3 +720,53 @@ is Ready and serves `cws-two.vercel.app`. Live checks confirmed a stale asset
 returns `404 text/plain`, `/admin/campaigns` returns the current SPA, unknown
 API routes return 404, and the intake function returns JSON 405 for a safe GET.
 No production intake row was created; one intentional POST remains for Tulio.
+
+## 2026-08-08 — CWS-PILOT-READINESS-004 approval revision follow-up
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Completed the smallest viable revision-resolution loop for content-variant
+approvals. When the latest review is `revision_requested`, the variant detail
+page now keeps the review feedback visible and offers `Re-submit for review`.
+That action resolves the authenticated user and inserts a new workspace-owned
+pending approval instead of modifying the immutable completed review. The
+existing one-pending-per-variant constraint and workspace-member RLS policy
+remain the enforcement boundaries. No schema, migration, API, service-role,
+publishing, or legacy-table change was made.
+
+Added focused interaction coverage for the re-submission payload and transition
+back to pending review. The focused test passed; the full suite passed with 19
+files and 63 tests. Import casing, lint, the production build, and
+`git diff --check` passed. Lint retains the existing `useDrafts` dependency
+warning.
+
+Next action: add workspace decision and learning capture, then deploy and run a
+complete CWS-001 edit, revision, re-submission, and approval cycle with the
+owner account.
+
+## 2026-08-09 — CWS-PILOT-READINESS-004 knowledge capture follow-up
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Added workspace-authorized decision and learning creation under the existing
+`/admin/knowledge` surface. The Knowledge page now links to dedicated forms.
+Decision creation captures title, optional context, and decision text with a
+fixed `proposed` status; learning creation captures title, optional category,
+and lesson body. Both flows resolve the active workspace and authenticated user,
+trim submitted values, reuse the existing RLS policies, and return to the
+Knowledge overview after insertion. No migration, remote mutation, service-role
+credential, legacy publishing change, or permanent-memory synchronization was
+introduced.
+
+Added two interaction tests for exact ownership payloads and navigation. The
+full suite passes with 20 files and 65 tests; import casing, lint, production
+build, and `git diff --check` pass. Lint retains the existing `useDrafts`
+dependency warning. Refreshed `docs/pilot-readiness.md` so implemented variant,
+revision, decision, and learning steps no longer appear missing.
+
+Next action: push and deploy the accumulated pilot controls, then run one live
+CWS-001 edit/revision/re-submission/approval cycle and create test decision and
+learning records. Campaign status control and explicit export/outcome fields
+remain separate follow-ups.

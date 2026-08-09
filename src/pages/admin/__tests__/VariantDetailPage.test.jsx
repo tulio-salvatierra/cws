@@ -3,15 +3,17 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-const { mockFrom, mockUpdate } = vi.hoisted(() => ({
+const { mockFrom, mockGetUser, mockInsert, mockUpdate } = vi.hoisted(() => ({
   mockFrom: vi.fn(),
+  mockGetUser: vi.fn(),
+  mockInsert: vi.fn(),
   mockUpdate: vi.fn(),
 }))
 
 vi.mock('../../../lib/supabase', () => ({
   supabase: {
     from: mockFrom,
-    auth: { getUser: vi.fn() },
+    auth: { getUser: mockGetUser },
   },
 }))
 
@@ -44,6 +46,10 @@ function query({ data = [], error = null, singleData = data } = {}) {
     eq: vi.fn(() => chain),
     order: vi.fn(() => chain),
     limit: vi.fn(() => chain),
+    insert: vi.fn((payload) => {
+      mockInsert(payload)
+      return chain
+    }),
     update: vi.fn((payload) => {
       mockUpdate(payload)
       return chain
@@ -85,5 +91,54 @@ describe('VariantDetailPage', () => {
       status: 'rough_cut',
     }))
     expect(await screen.findByRole('status')).toHaveTextContent('Variant saved.')
+  })
+
+  it('creates a new pending approval after revisions are requested', async () => {
+    const revisedApproval = {
+      id: 'approval-1',
+      status: 'revision_requested',
+      feedback: 'Tighten the opening.',
+      reviewed_at: '2026-08-08T12:00:00Z',
+    }
+    const pendingApproval = {
+      id: 'approval-2',
+      status: 'pending',
+      feedback: null,
+      reviewed_at: null,
+    }
+
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null })
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1' } })
+      if (table === 'content_variants') return query({ singleData: variant })
+      if (table === 'approvals') {
+        return mockInsert.mock.calls.length === 0
+          ? query({ data: [revisedApproval], singleData: pendingApproval })
+          : query({ singleData: pendingApproval })
+      }
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const user = userEvent.setup()
+    expect(await screen.findByText('revision requested')).toBeInTheDocument()
+    expect(screen.getByText('Tighten the opening.')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Re-submit for review' }))
+
+    expect(mockInsert).toHaveBeenCalledWith({
+      workspace_id: 'workspace-1',
+      content_variant_id: 'variant-1',
+      created_by: 'user-1',
+      status: 'pending',
+    })
+    expect(await screen.findByText('pending')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Re-submit for review' })).not.toBeInTheDocument()
   })
 })

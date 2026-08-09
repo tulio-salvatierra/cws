@@ -42,6 +42,7 @@ export default function VariantDetailPage() {
   const [actionError, setActionError] = useState('')
   const [saveMessage, setSaveMessage] = useState('')
   const [saving, setSaving] = useState(false)
+  const [approvalActionPending, setApprovalActionPending] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -93,9 +94,18 @@ export default function VariantDetailPage() {
 
   async function requestApproval() {
     setActionError('')
-    const { data: user } = await supabase.auth.getUser()
-    const result = await supabase.from('approvals').insert({ workspace_id: state.workspaceId, content_variant_id: variantId, created_by: user.user.id, status: 'pending' }).select('id, status, feedback, reviewed_at').single()
+    setApprovalActionPending(true)
+    const { data, error: userError } = await supabase.auth.getUser()
+
+    if (userError || !data?.user) {
+      setActionError(userError?.message || 'Unable to identify the current user.')
+      setApprovalActionPending(false)
+      return
+    }
+
+    const result = await supabase.from('approvals').insert({ workspace_id: state.workspaceId, content_variant_id: variantId, created_by: data.user.id, status: 'pending' }).select('id, status, feedback, reviewed_at').single()
     if (result.error) setActionError(result.error.message); else setState((current) => ({ ...current, approval: result.data }))
+    setApprovalActionPending(false)
   }
 
   async function review(status) {
@@ -147,6 +157,6 @@ export default function VariantDetailPage() {
       <button disabled={!form || saving} className="rounded-full bg-orange-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
     </form>
 
-    <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6"><p className="text-xs uppercase tracking-[0.2em] text-slate-500">Approval</p><p className="mt-3 text-lg font-semibold">{statusLabel(state.approval?.status || 'not_requested')}</p>{state.approval?.feedback && <p className="mt-2 text-slate-300">{state.approval.feedback}</p>}{!state.approval && <button onClick={requestApproval} className="mt-4 rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950">Request review</button>}{state.approval?.status === 'pending' && <div className="mt-4 space-y-3"><textarea value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Optional review feedback" rows="3" className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white" /><div className="flex gap-3"><button onClick={() => review('approved')} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">Approve</button><button onClick={() => review('revision_requested')} className="rounded-full border border-rose-300/40 px-4 py-2 text-sm font-semibold text-rose-200">Request revision</button></div></div>}</section>
+    <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6"><p className="text-xs uppercase tracking-[0.2em] text-slate-500">Approval</p><p className="mt-3 text-lg font-semibold">{statusLabel(state.approval?.status || 'not_requested')}</p>{state.approval?.feedback && <p className="mt-2 text-slate-300">{state.approval.feedback}</p>}{!state.approval && <button disabled={approvalActionPending} onClick={requestApproval} className="mt-4 rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Requesting…' : 'Request review'}</button>}{state.approval?.status === 'revision_requested' && <button disabled={approvalActionPending} onClick={requestApproval} className="mt-4 rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Re-submitting…' : 'Re-submit for review'}</button>}{state.approval?.status === 'pending' && <div className="mt-4 space-y-3"><textarea value={feedback} onChange={e => setFeedback(e.target.value)} placeholder="Optional review feedback" rows="3" className="w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white" /><div className="flex gap-3"><button onClick={() => review('approved')} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">Approve</button><button onClick={() => review('revision_requested')} className="rounded-full border border-rose-300/40 px-4 py-2 text-sm font-semibold text-rose-200">Request revision</button></div></div>}</section>
   </div></main>
 }
