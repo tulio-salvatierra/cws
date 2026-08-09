@@ -770,3 +770,9 @@ Next action: push and deploy the accumulated pilot controls, then run one live
 CWS-001 edit/revision/re-submission/approval cycle and create test decision and
 learning records. Campaign status control and explicit export/outcome fields
 remain separate follow-ups.
+
+### Push record
+
+Commit `695b765 feat: complete pilot review and knowledge flows` was pushed to
+`origin/main` on 2026-08-09. Deployment confirmation and the live pilot cycle
+remain pending.

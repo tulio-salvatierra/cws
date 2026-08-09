@@ -102,8 +102,8 @@ workspace membership, grants, constraints, and RLS policies.
 
 ## Recommended next task
 
-Commit, push, and deploy these pilot controls, then manually exercise decision
-and learning creation plus one real edit/revision/re-submission/approval cycle.
+Confirm the Vercel deployment from `main`, then manually exercise decision and
+learning creation plus one real edit/revision/re-submission/approval cycle.
 After that, choose between campaign status control and the explicit
 export/outcome migration design.
 
@@ -137,7 +137,8 @@ export/outcome migration design.
 
 ## Git diff summary
 
-The working tree contains the approval revision loop, decision and learning
-creation routes, three interaction tests across two test files, a refreshed
-pilot-readiness audit, and required project-memory updates. No migration,
-database mutation, commit, push, or deployment was performed.
+Commit `695b765 feat: complete pilot review and knowledge flows` contains the
+approval revision loop, decision and learning creation routes, three interaction
+tests across two test files, the refreshed pilot-readiness audit, and required
+project-memory updates. It was pushed to `origin/main`. No migration, database
+mutation, or manual production workflow was performed.
