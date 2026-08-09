@@ -912,3 +912,66 @@ message, then resume approval history and the revision cycle.
 
 Commit `22c3373 fix: explain duplicate campaign codes` was pushed to
 `origin/main` on 2026-08-09. Deployment verification remains pending.
+
+## 2026-08-09 — CWS-N8N-ASSESS-006 live pipeline assessment
+
+Agent: Codex
+Status: Completed — read-only assessment
+
+Audited the renewed n8n Cloud workspace without executing or changing any
+workflow. Eight workflows exist; WF1–WF5 are published, but the global and
+per-workflow execution views contain no saved executions and the Cloud account
+shows zero August production executions. WF1 and WF5 have active cron triggers,
+but no active workflow publishes to a social platform. The only publisher is
+unpublished, uses unresolved Supabase and WhatsApp placeholders, and has no
+named social OAuth credentials.
+
+The published workflows target old Supabase project
+`ugxipyozzhvqoqenygiz`, not the current CWS project
+`ddbhxqkckzpwzwvnoxqt`. Live schema checks confirmed YouTube and
+`youtube_ready` exist, while WF3's image fields and `ready`, WF4's
+`notifications`/`review_pending`, and WF5's `scheduled_at`/`scheduled` writes
+are incompatible with the current schema. Production lacks
+`VITE_N8N_WF2_WEBHOOK_URL`; approval only updates Supabase; no inbound n8n API
+route exists. Findings and the dependency-ordered revive checklist are in
+`docs/n8n-assessment.md`.
+
+`npm ci`, the production build, lint, and all 68 tests passed. Lint retains the
+existing `useDrafts` dependency warning. No workflow, credential, database,
+environment variable, application code, migration, or deployment was changed.
+The assessment documentation was published on
+`agent/cws-n8n-assessment-006`. Next action: Tulio decides revive or retire.
+
+## 2026-08-09 — CWS-RETURN-PATH-007 authenticated publish record
+
+Agent: Codex
+Status: Completed, published, deployed, and UI-verified
+
+Added staging migration 015 with the pending content-variant outcome fields and
+the workspace-owned `published_posts` return log. RLS grants active members
+read/outcome access, denies non-members, leaves inserts to the service role,
+and protects publication identity from later mutation. The security advisor
+retained the same two pre-existing warnings before and after the migration.
+
+Added constant-time shared-secret `POST /api/published`, live-enum validation,
+full raw-payload retention, and platform/external-ID retry idempotency. Explicit
+endpoint-specific Supabase variables prevent the existing generic Vercel
+integration from silently targeting a different database. Added the minimal
+`/admin/published` table and outcome editor as a content-area tab without
+expanding the sidebar.
+
+The first local authenticated request against staging returned 201 and the
+retry returned 200 with the same ID. The database contained one row, retained
+the request body, and persisted a member-authenticated outcome; test data and
+temporary keys were removed. `npm ci`, build, lint, all 76 tests, and whitespace
+validation passed. Added approved DEC-025 and the verified return-path-first
+learning.
+
+After approval, the four endpoint-specific secrets/settings were added to the
+Vercel Production environment, the complete change set was published through
+PR #11, and deployment `dpl_3vvwf3TjrzRFRo2qN7YNnrDv9fif` reached Ready at
+`https://cws-two.vercel.app`. A signed-in production browser check confirmed
+that `/admin/published` renders the consolidated navigation and expected empty
+state. No synthetic publication was retained. Next: wire the selected publisher
+to the return endpoint before enabling its outbound post node, then validate one
+real publish, retry, and member outcome update.

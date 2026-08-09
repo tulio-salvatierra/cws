@@ -188,3 +188,29 @@ removing the privilege required by RLS evaluation.
 Future workspace RLS policies must reference `private.is_workspace_member` or
 `private.is_workspace_owner`. Any new helper used by RLS must be kept out of the
 exposed API schemas and validated with both member and non-member tests.
+
+---
+
+## DEC-025 — Every publish records to the CWS Operating System
+
+Date: 2026-08-09
+Status: Approved
+
+### Decision
+
+Every publish, whether performed manually or by any current or future
+pipeline, must record the publish event in the CWS Operating System at publish
+time. No pipeline may publish without recording the result.
+
+### Reason
+
+The previous publishing pipeline did not retain a durable publication history,
+so its real operational state and outcomes could not be established from
+within the system.
+
+### Consequence
+
+All future publishers must call the authenticated return path and successfully
+record the platform, publication time, source, and available external identity
+before the pipeline is considered complete. Publishing capability remains out
+of scope until that contract is wired and tested.

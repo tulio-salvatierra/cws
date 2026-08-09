@@ -109,3 +109,42 @@ on the stable Postgres error code rather than matching message text that may
 change across database or API versions. Keep the database constraint as the
 enforcement boundary, preserve unknown errors for diagnosis, and make the
 translated feedback accessible in the form.
+
+## Operational status must come from an observed signal
+
+Date: 2026-08-09
+
+Verified by: CWS-N8N-ASSESS-006
+
+The Settings page displayed hardcoded `active` labels for n8n workflows it
+never contacted, so a suspended and dormant workspace appeared healthy for the
+entire idle period. Operational status indicators must derive from an observed
+signal such as publication state, a recent execution heartbeat, or a checked
+dependency. When no signal is available, display `Unknown` rather than a
+synthetic healthy state. Keep enabled and recently executed as separate facts.
+
+## Verify live schema before acting on documentation claims
+
+Date: 2026-08-09
+
+Verified by: CWS-N8N-ASSESS-006
+
+A documentation-based audit reported YouTube missing from the platform enum
+even though applied migrations `003` and `004` had already added `youtube` and
+`youtube_ready`. Before proposing a schema change, query the live database and
+confirm applied migration history, columns, constraints, and enum values. Treat
+repository documentation as design context, not proof of current database
+state.
+
+## Build the return path before publishing capability
+
+Date: 2026-08-09
+
+Verified by: CWS-RETURN-PATH-007
+
+Build and verify the authenticated, idempotent publication return path before
+adding or reviving any outbound publishing capability. The previous pipeline
+published without recording and left no usable history, which made its true
+state impossible to determine from within the system. A durable return record
+gives every later manual or automated publisher a common evidence contract from
+its first execution.
