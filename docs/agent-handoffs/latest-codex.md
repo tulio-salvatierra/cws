@@ -2,7 +2,7 @@
 
 Task ID: CWS-PILOT-READINESS-004
 Agent: Codex
-Objective: Close the CWS-001 variant revision and workspace knowledge-capture gaps using the existing schema and consolidated admin routes.
+Objective: Add the final migration-free CWS-001 blocker control by making campaign lifecycle status editable from the consolidated admin dashboard.
 
 ## Files inspected
 
@@ -15,23 +15,15 @@ Objective: Close the CWS-001 variant revision and workspace knowledge-capture ga
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `src/App.jsx`
-- `src/pages/admin/KnowledgePage.jsx`
-- `src/pages/admin/VariantDetailPage.jsx`
-- Existing admin creation pages and tests
-- `supabase/migrations/010_content_variant_approvals.sql`
-- `supabase/migrations/20260730231228_goals_initiatives_projects_tasks_decisions_learnings.sql`
-- Current Supabase JavaScript insert documentation and breaking-change changelog
+- `src/pages/admin/CampaignDetailPage.jsx`
+- Existing admin smoke and interaction tests
+- `supabase/migrations/009_campaigns_content_variants.sql`
+- Current Supabase JavaScript update documentation and breaking-change changelog
 
 ## Files changed
 
-- `src/App.jsx`
-- `src/pages/admin/KnowledgePage.jsx`
-- `src/pages/admin/NewDecisionPage.jsx`
-- `src/pages/admin/NewLearningPage.jsx`
-- `src/pages/admin/VariantDetailPage.jsx`
-- `src/pages/admin/__tests__/KnowledgeCreationPages.test.jsx`
-- `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
+- `src/pages/admin/CampaignDetailPage.jsx`
+- `src/pages/admin/__tests__/CampaignDetailPage.test.jsx`
 - `docs/pilot-readiness.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
@@ -39,51 +31,45 @@ Objective: Close the CWS-001 variant revision and workspace knowledge-capture ga
 
 ## Database or API changes
 
-None. The implementation reuses the existing approvals, decisions, learnings,
-workspace membership, grants, constraints, and RLS policies.
+None. The campaign update reuses the existing status constraint, immutable
+ownership trigger, explicit authenticated grant, and workspace-member RLS
+policies.
 
 ## Security decisions
 
-- Approval re-submission inserts a new pending review with authenticated user,
-  workspace, and variant ownership; it never overwrites completed reviews.
-- Decision creation fixes status to `proposed`; the form does not expose
-  sensitive decision status transitions.
-- Learning and decision inserts derive `created_by` from `auth.getUser()` and
-  the workspace from the active membership query.
-- No service-role credential, RLS bypass, or legacy publishing access was added.
+- The update changes only `campaigns.status`.
+- The mutation is filtered by both campaign ID and the active membership's
+  workspace ID.
+- The UI exposes only the status values already approved in the database and
+  product definition.
+- No service-role credential, RLS bypass, publishing integration, or legacy
+  table access was introduced.
 
 ## Decisions made
 
-- Add dedicated `/admin/knowledge/new-decision` and
-  `/admin/knowledge/new-learning` creation routes.
-- Treat decision context and learning category as optional fields.
-- Normalize submitted text before inserting and reject whitespace-only required
-  values in the client.
-- Keep approved/rejected approval re-opening and decision status controls out of
-  this scoped change.
+- Use a select-and-save lifecycle control on the existing campaign detail page.
+- Disable saving until the selected status differs from the persisted status.
+- Keep transitions reversible within the existing allowed status set; no new
+  transition graph or database rule was introduced.
 
 ## Assumptions
 
-- The current user has one active workspace membership selected by the existing
-  application convention.
-- A proposed decision satisfies the pilot's capture step; owner-controlled
-  approval is a separate sensitive transition.
-- The existing combined `export_reference` remains adequate until explicit
-  filename/version/outcome fields receive migration approval.
+- Active workspace members may manage ordinary campaign records under DEC-009.
+- The existing campaign status constraint remains the authoritative allowed set.
+- Changing the CWS OS campaign to `published` does not invoke or synchronize the
+  separate n8n publishing pipeline.
 
 ## Tests added
 
-- Revision-requested approval re-submission creates a new pending row with the
-  correct ownership payload and returns the UI to pending review.
-- Decision creation inserts a trimmed, workspace-owned proposed decision and
-  returns to Knowledge.
-- Learning creation inserts trimmed content, optional category, and current-user
-  ownership and returns to Knowledge.
+- Campaign lifecycle status can be changed and saved.
+- The update payload contains only the selected status.
+- The update applies both campaign ID and workspace ID filters.
+- Successful persistence produces a visible confirmation and updated selector.
 
 ## Tests run
 
-- Focused knowledge, variant, and workspace tests — 3 files, 15 tests passed.
-- `npm run test:run` — 20 files, 65 tests passed.
+- Focused campaign and workspace tests — 2 files, 12 tests passed.
+- `npm run test:run` — 21 files, 66 tests passed.
 - `npm run check:imports` — passed.
 - `npm run lint` — passed with the existing `useDrafts` dependency warning.
 - `npm run build` — passed.
@@ -91,27 +77,27 @@ workspace membership, grants, constraints, and RLS policies.
 
 ## Known issues
 
-- Campaign status still cannot be changed through the UI.
 - Export filename, export version, outcome, and published timestamp need a
   separately approved migration design.
 - The current decisions RLS allows broad member updates; DEC-009 requires a
   security follow-up before exposing sensitive decision transitions.
+- Campaign statuses are constrained to approved values but do not enforce a
+  one-direction transition graph.
 - The full approval-history timeline is not displayed in the UI.
 - The existing `src/Hooks/useDrafts.js` dependency warning remains.
-- No live CWS-001 data was mutated during automated validation.
+- No live campaign data was mutated during automated validation.
 
 ## Recommended next task
 
-Confirm the Vercel deployment from `main`, then manually exercise decision and
-learning creation plus one real edit/revision/re-submission/approval cycle.
-After that, choose between campaign status control and the explicit
-export/outcome migration design.
+Push and deploy the campaign status control, then run the full CWS-001 pilot
+cycle. After the live run, design the explicit export/outcome migration using
+the actual information the pilot needed.
 
 ## Questions requiring Tulio
 
-- What should count as the recorded CWS-001 outcome for the future outcome
-  fields?
-- After deployment, Tulio must perform the owner-only live review actions.
+- What should count as the recorded CWS-001 outcome?
+- Which fields should be separate: export filename, version, publication URL,
+  publication timestamp, performance notes, and outcome summary?
 
 ## Project-memory files updated
 
@@ -130,15 +116,13 @@ export/outcome migration design.
 
 ## Memory updates withheld
 
-- The creation-route layout and optional field choices are scoped UI behavior,
-  not permanent architectural decisions.
-- The decision-transition policy mismatch is recorded as a known security
-  follow-up, not a new reusable learning.
+- The select-and-save interaction is scoped UI behavior, not a permanent
+  architectural decision.
+- A transition graph was not inferred or added without explicit approval.
 
 ## Git diff summary
 
-Commit `695b765 feat: complete pilot review and knowledge flows` contains the
-approval revision loop, decision and learning creation routes, three interaction
-tests across two test files, the refreshed pilot-readiness audit, and required
-project-memory updates. It was pushed to `origin/main`. No migration, database
-mutation, or manual production workflow was performed.
+The working tree contains the workspace-scoped campaign lifecycle control, one
+focused interaction test, the refreshed readiness audit, and required project
+memory updates. No migration, database mutation, commit, push, or deployment was
+performed.

@@ -4,8 +4,8 @@ Date: 2026-08-08
 Agent: Codex  
 Environment: staging project `ddbhxqkckzpwzwvnoxqt`  
 Scope: baseline audit of the existing `/admin` UI and current CWS OS schema,
-plus follow-up implementation of variant editing, revision resolution, and
-decision/learning capture.
+plus follow-up implementation of campaign and variant lifecycle controls,
+revision resolution, and decision/learning capture.
 
 The audit snapshot below records what a human could do before the follow-up.
 The follow-up does not run the CWS-001 pilot or change the database schema/data.
@@ -26,7 +26,8 @@ fields, or approval-history mutations.
 revision request, preserving immutable completed review history. The Knowledge
 page links to workspace-authorized decision and learning forms. Decisions enter
 as `proposed`; owner-only status transitions are not exposed. Campaign status
-control and outcome recording remain open gaps below.
+can now be changed from the campaign detail page using the approved lifecycle
+values. Outcome recording remains the open definition-of-done gap below.
 
 ## Current staging state
 
@@ -66,7 +67,7 @@ Status meanings:
 
 | # | Path step | Result | Evidence | Human fallback |
 |---:|---|---|---|---|
-| 1 | Move `CWS-001` through campaign statuses toward `published` | PARTIAL | Campaign status values exist in `supabase/migrations/009_campaigns_content_variants.sql:17-30`, but `CampaignsPage` only reads campaigns (`src/pages/admin/CampaignsPage.jsx:10-25`) and `CampaignDetailPage` only reads the campaign (`src/pages/admin/CampaignDetailPage.jsx:5-11`). | Direct table edit or SQL update of `campaigns.status`. |
+| 1 | Move `CWS-001` through campaign statuses toward `published` | WORKS | `CampaignDetailPage` exposes every approved campaign status and saves the selected value using both campaign ID and workspace ID. | None required. |
 | 2 | Move EN and ES variants independently | WORKS | Variants are separate rows, and each detail page saves its own status and content fields using both variant ID and workspace ID. | None required. |
 | 3 | Edit a variant transcript | WORKS | `VariantDetailPage` exposes and saves the existing `transcript` field independently per variant. | None required. |
 | 4 | Edit caption text and set caption status | WORKS | The variant editor exposes `caption_text` and every allowed lifecycle status. | None required. |
@@ -90,23 +91,21 @@ ES records are independently addressable. After the follow-up implementation,
 each variant can also be edited and moved through its allowed lifecycle statuses
 from its own detail page.
 
-The cycle can now edit and advance each variant, complete a real approval
-revision loop, and capture decisions and learnings. It cannot yet record the
-full definition-of-done outcome or move the parent campaign through its status
-lifecycle from the UI.
+The cycle can now advance the campaign, edit and advance each variant, complete
+a real approval revision loop, and capture decisions and learnings. It cannot
+yet record the full definition-of-done outcome.
 
 ## Remaining recommended changes
 
-The variant editor, approval revision loop, and knowledge-capture items are
-implemented in the follow-up section above. The remaining changes are:
+The campaign and variant lifecycle controls, approval revision loop, and
+knowledge-capture items are implemented in the follow-up section above. The
+remaining changes are:
 
-1. **Campaign status control — S.** Add a controlled status transition surface
-   for the campaign lifecycle through `published`.
-2. **Explicit export/outcome model — L and future migration.** Add separately
+1. **Explicit export/outcome model — L and future migration.** Add separately
    approved fields for export filename, export version, outcome, and published
    timestamp. This is required for the definition-of-done outcome record and is
    intentionally outside this ticket.
-3. **Decision transition enforcement — schema/security follow-up.** Before
+2. **Decision transition enforcement — schema/security follow-up.** Before
    exposing approved, reversed, superseded, or archived controls, align the
    current broad decision update policy with DEC-009 owner-only transitions.
 
@@ -124,5 +123,5 @@ The current staging state has not begun that run: both variants are still
 
 - What should count as the CWS-001 outcome once the future outcome fields are
   approved?
-- Should the next implementation prioritize campaign status control or the
-  explicit export/outcome migration design?
+- Which export filename, version, outcome, and publication fields should be
+  approved for the final migration design?

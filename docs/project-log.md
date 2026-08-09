@@ -776,3 +776,28 @@ remain separate follow-ups.
 Commit `695b765 feat: complete pilot review and knowledge flows` was pushed to
 `origin/main` on 2026-08-09. Deployment confirmation and the live pilot cycle
 remain pending.
+
+## 2026-08-09 — CWS-PILOT-READINESS-004 campaign lifecycle follow-up
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Added campaign lifecycle status control to the existing campaign detail page.
+An active workspace member can select any approved campaign status and save an
+update containing only `status`, filtered by both campaign ID and workspace ID.
+The page disables unchanged submissions and displays persistence errors or a
+successful save confirmation. The existing status constraint, ownership trigger,
+explicit authenticated grant, and workspace RLS remain authoritative. No
+migration, remote mutation, n8n integration, legacy-table change, or service-role
+access was introduced.
+
+Added focused interaction coverage for the status payload, campaign/workspace
+filters, persisted selector value, and success message. The full suite passes
+with 21 files and 66 tests; import casing, lint, production build, and
+`git diff --check` pass. Lint retains the existing `useDrafts` dependency
+warning. Updated the pilot readiness matrix so campaign lifecycle is now marked
+WORKS.
+
+Next action: push and deploy, then run the full CWS-001 pilot cycle. The explicit
+export/outcome model remains the only definition-of-done schema gap and requires
+a separately approved migration design based on the live cycle.
