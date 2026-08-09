@@ -104,6 +104,7 @@ record. Continue the pilot with a revision-request and re-submission cycle.
 
 ## Git diff summary
 
-The pending diff adds an explicit two-step owner decision flow, focused
-regression coverage, and the required project records. It does not alter the
-database schema or existing staging records.
+Commit `0ecd8e3 fix: confirm owner review decisions` adds an explicit two-step
+owner decision flow, focused regression coverage, and the required project
+records. It was pushed to `origin/main`. It does not alter the database schema
+or existing staging records.

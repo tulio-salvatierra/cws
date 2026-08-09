@@ -833,3 +833,9 @@ warning. No migration or remote mutation was introduced.
 
 Next action: push and deploy, then validate a fresh approval and revision cycle
 with the Spanish variant.
+
+### Push record
+
+Commit `0ecd8e3 fix: confirm owner review decisions` was pushed to
+`origin/main` on 2026-08-09. Deployment confirmation and the fresh Spanish
+approval/revision cycle remain pending.
