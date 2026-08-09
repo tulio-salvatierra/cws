@@ -18,6 +18,7 @@ import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
 import ClientPortalPage from "./pages/clientPortal/ClientPortalPage";
 import Gallery from "./components/Gallery";
+import LegacyWorkspaceRedirect from "./components/admin/LegacyWorkspaceRedirect";
 import { getLandingPageData } from "./data/landingPagesData";
 
 const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
@@ -32,6 +33,7 @@ const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
 const WorkspacePage = lazy(() => import("./pages/admin/WorkspacePage"));
+const ChannelsPage = lazy(() => import("./pages/admin/ChannelsPage"));
 const CampaignDetailPage = lazy(() => import("./pages/admin/CampaignDetailPage"));
 const CampaignsPage = lazy(() => import("./pages/admin/CampaignsPage"));
 const NewCampaignPage = lazy(() => import("./pages/admin/NewCampaignPage"));
@@ -76,12 +78,6 @@ function LandingPageWrapper() {
   }
 
   return <LandingPage data={landingPageData} />;
-}
-
-function LegacyWorkspaceRedirect({ to }) {
-  const params = useParams();
-  const destination = to.replace(/:([A-Za-z0-9_]+)/g, (_, key) => params[key] || '');
-  return <Navigate to={destination} replace />;
 }
 
 function App() {
@@ -163,6 +159,7 @@ function App() {
               <Route path="clients" element={<ClientsPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="workspace" element={<WorkspacePage />} />
+              <Route path="channels" element={<ChannelsPage />} />
               <Route path="campaigns" element={<CampaignsPage />} />
               <Route path="campaigns/new" element={<NewCampaignPage />} />
               <Route path="campaigns/:campaignId" element={<CampaignDetailPage />} />

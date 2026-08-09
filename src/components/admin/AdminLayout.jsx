@@ -5,6 +5,7 @@ const NAV = [
   { to: '/admin', label: '◈ Overview', end: true },
   { to: '/admin/legacy-queue', label: '📋 Legacy queue' },
   { to: '/admin/workspace', label: '🧭 Workspace' },
+  { to: '/admin/channels', label: 'Channels' },
   { to: '/admin/campaigns', label: 'Campaigns' },
   { to: '/admin/tasks', label: 'Tasks' },
   { to: '/admin/planning', label: 'Planning' },

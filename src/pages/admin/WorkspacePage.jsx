@@ -115,7 +115,7 @@ export default function WorkspacePage() {
         </header>
 
         <nav className="flex flex-wrap gap-2 border-b border-white/10 py-4" aria-label="Workspace sections">
-          {[['#overview', 'Overview'], ['#campaigns', 'Campaigns'], ['#content', 'Content'], ['/admin/tasks', 'Tasks'], ['/admin/planning', 'Planning'], ['/admin/knowledge', 'Knowledge'], ['/admin/agent-runs', 'Agent runs']].map(([href, label]) => (
+          {[['#overview', 'Overview'], ['#campaigns', 'Campaigns'], ['#content', 'Content'], ['/admin/channels', 'Channels'], ['/admin/tasks', 'Tasks'], ['/admin/planning', 'Planning'], ['/admin/knowledge', 'Knowledge'], ['/admin/agent-runs', 'Agent runs']].map(([href, label]) => (
             <a key={href} className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 transition hover:border-orange-300/50 hover:text-orange-200" href={href}>
               {label}
             </a>
@@ -143,7 +143,7 @@ export default function WorkspacePage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Workspace channels</p>
                 <h2 className="mt-2 text-2xl font-semibold">Two distinct voices</h2>
               </div>
-              <span className="text-2xl text-orange-300">◌</span>
+              <Link className="text-sm font-semibold text-orange-200 hover:text-orange-100" to="/admin/channels">Open channels →</Link>
             </div>
             <div className="mt-6 space-y-3">
               {state.channels.map((channel) => (
