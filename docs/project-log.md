@@ -907,3 +907,8 @@ dependency warning.
 
 Next action: push and deploy, confirm a repeated code shows the tailored
 message, then resume approval history and the revision cycle.
+
+### Push record
+
+Commit `22c3373 fix: explain duplicate campaign codes` was pushed to
+`origin/main` on 2026-08-09. Deployment verification remains pending.

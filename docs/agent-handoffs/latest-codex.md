@@ -102,8 +102,8 @@ records. Then resume the approval-history and new-review-cycle workflow.
 
 ## Git diff summary
 
-The pending diff adds a stable-code duplicate-campaign error mapper, an
-accessible alert, one focused interaction test, and required project records.
-It also contains the previously completed documentation-only live-verification
-record for CWS-VERCEL-RELIABILITY-006. No unrelated user changes are present.
-Nothing is committed or pushed.
+Commit `22c3373 fix: explain duplicate campaign codes` adds a stable-code
+duplicate-campaign error mapper, an accessible alert, one focused interaction
+test, and required project records. It also contains the previously completed
+live-verification record for CWS-VERCEL-RELIABILITY-006. It was pushed to
+`origin/main`; no unrelated user changes were included.
