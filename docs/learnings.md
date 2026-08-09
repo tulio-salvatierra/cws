@@ -97,3 +97,15 @@ an honest accepted/queued response and register the side effect with the
 serverless platform's background-work mechanism. Keep the downstream call
 bounded, log its eventual result, and do not use an unmanaged fire-and-forget
 promise. A longer synchronous timeout only delays the same visible failure.
+
+## Translate database failures using stable error codes
+
+Date: 2026-08-09
+
+Verified by: CWS-CAMPAIGN-UX-007
+
+When converting a Supabase/PostgREST failure into user-facing feedback, branch
+on the stable Postgres error code rather than matching message text that may
+change across database or API versions. Keep the database constraint as the
+enforcement boundary, preserve unknown errors for diagnosis, and make the
+translated feedback accessible in the form.

@@ -873,3 +873,37 @@ without a browser 504 and create `CWS-002` without a pattern warning.
 Commit `b8206f6 fix: queue client portal sheet sync` was pushed to
 `origin/main` on 2026-08-09. Deployment and live workbook/pattern verification
 remain pending.
+
+### Live verification
+
+Production deployment `dpl_FhLADZ3XLJKZwLrSuDVdh4cBen4G` is Ready. Runtime
+logs show two `client_project.updated` requests completed the Google Sheets
+webhook with HTTP 200 in 12.137 and 13.016 seconds. Production serves entry
+asset `index-DT1EyZI1.js` and the campaign asset contains the corrected
+hyphen-separated code pattern. The user's console lines referenced the prior
+`index-Ze7kvzDe.js` bundle and were retained from the old page session.
+
+The subsequent Supabase 409 is a separate valid uniqueness rejection because
+campaign codes are unique per workspace and `CWS-002` had already been
+submitted. A tailored duplicate-code message remains a small UX follow-up.
+
+## 2026-08-09 — CWS-CAMPAIGN-UX-007 duplicate-code feedback
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Replaced the raw Supabase uniqueness message on New campaign with a clear,
+workspace-scoped explanation. The form branches on stable Postgres code `23505`
+rather than version-dependent message text, tells the user the entered campaign
+code already exists, preserves the form, re-enables submission, and exposes the
+feedback as an accessible alert. The existing `(workspace_id, code)` constraint
+remains authoritative; no preflight query, schema change, RLS change, or remote
+mutation was added.
+
+Added a focused interaction test for the `23505` response and recovery state.
+The full suite passes with 22 files and 68 tests. Lint, import casing, production
+build, and `git diff --check` pass. Lint retains the existing `useDrafts`
+dependency warning.
+
+Next action: push and deploy, confirm a repeated code shows the tailored
+message, then resume approval history and the revision cycle.

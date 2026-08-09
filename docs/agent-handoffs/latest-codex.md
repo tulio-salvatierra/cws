@@ -1,8 +1,8 @@
 # Latest Codex Handoff
 
-Task ID: CWS-VERCEL-RELIABILITY-006
+Task ID: CWS-CAMPAIGN-UX-007
 Agent: Codex
-Objective: Remove recurring client-portal intake 504 responses and repair browser-invalid form patterns.
+Objective: Replace the raw duplicate campaign-code conflict with a clear, accessible form message.
 
 ## Files inspected
 
@@ -14,93 +14,72 @@ Objective: Remove recurring client-portal intake 504 responses and repair browse
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `api/client-portal-intake.js`
-- `api/__tests__/client-portal-intake.test.js`
-- `server/google-sheets-webhook.js`
-- `src/lib/clientPortalGoogleSheet.js`
-- `src/lib/clientPortalAutomations.js`
-- `src/components/ClientPortal/AdminClientDashboard.jsx`
-- `src/components/LeadFormModal/LeadFormModal.tsx`
 - `src/pages/admin/NewCampaignPage.jsx`
-- `src/pages/admin/__tests__/WorkspacePagesSmoke.test.jsx`
-- `vercel.json`
-- Current official Vercel `waitUntil` documentation
+- Existing admin interaction and smoke tests
+- `supabase/migrations/009_campaigns_content_variants.sql`
+- Current Supabase PostgREST error-code and JavaScript error-handling documentation
 
 ## Files changed
 
-- `api/client-portal-intake.js`
-- `api/__tests__/client-portal-intake.test.js`
-- `server/google-sheets-webhook.js`
-- `src/components/ClientPortal/AdminClientDashboard.jsx`
-- `src/components/LeadFormModal/LeadFormModal.tsx`
 - `src/pages/admin/NewCampaignPage.jsx`
-- `src/pages/admin/__tests__/WorkspacePagesSmoke.test.jsx`
-- `package.json`
-- `package-lock.json`
-- `vercel.json`
+- `src/pages/admin/__tests__/NewCampaignPage.test.jsx`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
 - `docs/learnings.md`
 
+The pending CWS-VERCEL-RELIABILITY-006 live-verification documentation in the
+same four memory files was preserved.
+
 ## Database or API changes
 
-The intake endpoint now schedules the Google Sheets request with Vercel
-`waitUntil` and immediately returns HTTP 202 with `{ ok: true, queued: true }`.
-The bounded downstream deadline increased from 12 to 45 seconds, inside a
-60-second function duration. Downstream rejection, timeout, and failure remain
-structured server logs. No database or Supabase change was made.
+None. The existing `(workspace_id, code)` uniqueness constraint remains the
+authoritative enforcement boundary.
 
 ## Security decisions
 
-- The Google Sheets secret remains server-only and is still added only inside the Vercel function.
-- The browser receives acceptance state, not the secret or downstream response body.
-- Background work remains bounded and is registered with the function lifecycle rather than left as an unmanaged promise.
+- The UI handles only the stable Postgres `23505` error code and does not weaken, pre-bypass, or replace the database constraint.
+- Other Supabase errors retain their existing human-readable message.
+- No service-role credential, RLS change, or additional data read was introduced.
 
 ## Decisions made
 
-- Treat the workbook update as a non-blocking side effect because client UI changes do not depend on its response body.
-- Report the manual action as queued rather than claiming the workbook already changed.
-- Use a hyphen-separated campaign-code pattern that is valid under current Unicode-aware HTML pattern rules.
-- Remove the restrictive phone pattern; `type="tel"` and `inputMode="tel"` remain without rejecting legitimate international formats.
+- Branch on `error.code === '23505'`, not database message text.
+- Tell the user that the campaign code already exists in the current workspace and ask for a different code.
+- Render the message through an accessible `role="alert"` while keeping the completed form values and re-enabling submission.
 
 ## Assumptions
 
-- Vercel's configured Node runtime is at least Node 20, as required by `@vercel/functions` 3.9.1 and confirmed by the Node 24 Vercel build.
-- Google Sheets processing is eventually consistent and is not required to complete before the UI update returns.
+- Any `23505` returned by this minimal campaign insert currently represents the approved workspace/code uniqueness constraint.
+- Campaign codes remain case-normalized by the existing uppercase input behavior.
 
 ## Tests added
 
-- The intake handler returns HTTP 202 immediately and registers one background promise.
-- A downstream timeout is contained and logged without changing the accepted browser response.
-- The campaign code field exposes the browser-valid hyphen-separated pattern.
+- A Supabase `23505` response displays the workspace-scoped duplicate-code message.
+- The Create campaign button is re-enabled after the rejected insert.
 
 ## Tests run
 
-- Focused intake and workspace tests — 2 files, 13 tests passed.
-- `npm run test:run` — 21 files, 67 tests passed.
+- Focused New campaign and workspace tests — 2 files, 12 tests passed.
+- `npm run test:run` — 22 files, 68 tests passed.
 - `npm run lint` — passed with the existing `useDrafts` dependency warning.
 - `npm run build` — passed, including import-casing validation.
-- `npx vercel build` — passed with the 60-second function configuration.
 - `git diff --check` — passed before project-memory refresh.
 
 ## Known issues
 
-- A 202 response confirms queuing, not successful workbook persistence; production logs remain the source for downstream completion or failure.
-- The Google Apps Script endpoint itself may still fail or exceed 45 seconds; the browser will no longer wait on it.
+- The browser network panel will still show the legitimate HTTP 409 because the database rejects the duplicate; the page now explains it clearly.
+- The form does not proactively query code availability, avoiding a race-prone extra request.
 - The existing `src/Hooks/useDrafts.js` dependency warning remains.
-- `npm audit` reports 19 dependency vulnerabilities; no broad audit fix was applied because it is outside this ticket.
 
 ## Recommended next task
 
-Push and deploy, then change one client status and verify the browser receives
-202 without a 504. Confirm the corresponding workbook change and inspect the
-function log for the matching completion event. Also open New campaign and
-verify `CWS-002` submits without a pattern warning.
+Push and deploy the duplicate-code message with the pending live-verification
+records. Then resume the approval-history and new-review-cycle workflow.
 
 ## Questions requiring Tulio
 
-- None before deployment testing.
+- None.
 
 ## Project-memory files updated
 
@@ -115,18 +94,16 @@ verify `CWS-002` submits without a pattern warning.
 
 ## Reusable learnings added
 
-- Non-critical external side effects should use a managed background task and return an honest accepted/queued state to the UI.
+- Branch on stable Postgres/PostgREST error codes rather than message text when translating database errors into user-facing feedback.
 
 ## Memory updates withheld
 
-- The 45/60-second timeout values are integration-specific implementation settings, not permanent product decisions.
-- No guarantee of Google Sheets persistence is recorded until the deployed workflow is verified live.
+- The exact duplicate-code wording is a scoped UI choice, not a permanent product or architectural decision.
 
 ## Git diff summary
 
-Commit `b8206f6 fix: queue client portal sheet sync` changes the intake relay
-from synchronous 504-prone behavior to managed background execution, adds the
-official Vercel Functions dependency, repairs both browser-risky HTML patterns,
-updates the manual sync message, and adds focused regression coverage and
-required project records. It was pushed to `origin/main`. No unrelated
-pre-existing changes were present.
+The pending diff adds a stable-code duplicate-campaign error mapper, an
+accessible alert, one focused interaction test, and required project records.
+It also contains the previously completed documentation-only live-verification
+record for CWS-VERCEL-RELIABILITY-006. No unrelated user changes are present.
+Nothing is committed or pushed.
