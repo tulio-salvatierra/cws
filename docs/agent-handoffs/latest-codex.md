@@ -1,85 +1,99 @@
 # Latest Codex Handoff
 
-Task ID: CWS-CAMPAIGN-UX-007
+Task ID: CWS-N8N-ASSESS-006
 Agent: Codex
-Objective: Replace the raw duplicate campaign-code conflict with a clear, accessible form message.
+Objective: Audit the renewed n8n Cloud instance, reconcile it with the current application and live Supabase schema, and produce a read-only operational checklist.
 
 ## Files inspected
 
 - `.agents/codex-project-instructions.md`
 - `docs/product-definition.md`
 - `docs/technical-conventions.md`
+- `docs/pilot-readiness.md`
 - `docs/decisions.md`
 - `docs/learnings.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `src/pages/admin/NewCampaignPage.jsx`
-- Existing admin interaction and smoke tests
-- `supabase/migrations/009_campaigns_content_variants.sql`
-- Current Supabase PostgREST error-code and JavaScript error-handling documentation
+- `src/components/admin/GenerateButton.jsx`
+- `src/components/admin/ContentQueue.jsx`
+- `src/pages/admin/SettingsPage.jsx`
+- `src/Hooks/useDrafts.js`
+- Legacy analytics, calendar, and published-card status consumers
+- All serverless routes under `api/`
+- `vite.config.js`
+- `.env.example`
+- All five `n8n/*.md` setup documents
+- Relevant legacy Supabase migrations and the live schema/migration history
+- Live n8n workflow, execution, trigger, node configuration, and credential-name views
+- Production Vercel environment-variable names
 
 ## Files changed
 
-- `src/pages/admin/NewCampaignPage.jsx`
-- `src/pages/admin/__tests__/NewCampaignPage.test.jsx`
+- `docs/n8n-assessment.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
 - `docs/learnings.md`
 
-The pending CWS-VERCEL-RELIABILITY-006 live-verification documentation in the
-same four memory files was preserved.
-
 ## Database or API changes
 
-None. The existing `(workspace_id, code)` uniqueness constraint remains the
-authoritative enforcement boundary.
+None. Live Supabase queries were read-only. No workflow, credential, environment variable, Vercel route, migration, or database row was changed.
 
 ## Security decisions
 
-- The UI handles only the stable Postgres `23505` error code and does not weaken, pre-bypass, or replace the database constraint.
-- Other Supabase errors retain their existing human-readable message.
-- No service-role credential, RLS change, or additional data read was introduced.
+- No workflow was triggered, tested, published, unpublished, enabled, disabled, edited, duplicated, or exported.
+- Credential names and visible error indicators were inspected; credential values were never opened or copied.
+- Unauthenticated browser-facing n8n webhooks were recorded as a risk. A future server-side relay and signed inbound return route are recommendations only.
+- No service-role key or secret was exposed.
 
 ## Decisions made
 
-- Branch on `error.code === '23505'`, not database message text.
-- Tell the user that the campaign code already exists in the current workspace and ask for a different code.
-- Render the message through an accessible `role="alert"` while keeping the completed form values and re-enabling submission.
+- None. DEC-004 remains the governing boundary.
+- Revive versus retire, database authority, WF4/WF5 identity, and approved publishing platforms remain Tulio decisions.
 
 ## Assumptions
 
-- Any `23505` returned by this minimal campaign insert currently represents the approved workspace/code uniqueness constraint.
-- Campaign codes remain case-normalized by the existing uppercase input behavior.
+- A workflow showing `Published` is treated as active configuration, not as evidence of successful operation.
+- Because execution retention is seven days and no records remain, exact 90-day counts and last success/failure timestamps are unavailable.
+- Compatibility checks compare live n8n payloads with current project `ddbhxqkckzpwzwvnoxqt`; the workflows' target project `ugxipyozzhvqoqenygiz` could not be accessed through the connected Supabase account.
 
 ## Tests added
 
-- A Supabase `23505` response displays the workspace-scoped duplicate-code message.
-- The Create campaign button is re-enabled after the rejected insert.
+None. This was an assessment ticket.
 
 ## Tests run
 
-- Focused New campaign and workspace tests — 2 files, 12 tests passed.
-- `npm run test:run` — 22 files, 68 tests passed.
-- `npm run lint` — passed with the existing `useDrafts` dependency warning.
-- `npm run build` — passed, including import-casing validation.
-- `git diff --check` — passed before project-memory refresh.
+- `npm ci` — passed.
+- Production `npm run build` with valid placeholder client Supabase variables — passed; 430 modules transformed.
+- `npm run lint` — passed with one existing `src/Hooks/useDrafts.js` dependency warning.
+- `npx vitest run` — 22 files, 68 tests passed.
+- Live n8n and Supabase inspections — read-only.
 
 ## Known issues
 
-- The browser network panel will still show the legitimate HTTP 409 because the database rejects the duplicate; the page now explains it clearly.
-- The form does not proactively query code availability, avoiding a race-prone extra request.
-- The existing `src/Hooks/useDrafts.js` dependency warning remains.
+- Five workflows are published but have no retained execution evidence.
+- Nothing active publishes to social platforms.
+- The active workflows target an older, inaccessible Supabase project.
+- WF3, WF4, and WF5 contain schema/status writes incompatible with the current live database.
+- The unpublished publisher contains unresolved placeholders and lacks named social OAuth credentials.
+- Production lacks `VITE_N8N_WF2_WEBHOOK_URL`.
+- Approval only updates Supabase and does not invoke n8n.
+- The Settings page shows hardcoded healthy labels.
+- Seven-day execution retention prevents a reliable 90-day operational history.
 
 ## Recommended next task
 
-Push and deploy the duplicate-code message with the pending live-verification
-records. Then resume the approval-history and new-review-cycle workflow.
+Tulio first decides revive or retire. If reviving, run a separately authorized contract-recovery task that chooses the authoritative database, exports the selected live workflows, ratifies WF4/WF5 identities, and designs schema/status alignment before any credential or execution testing.
 
 ## Questions requiring Tulio
 
-- None.
+- Revive or retire the legacy n8n pipeline?
+- Recover `ugxipyozzhvqoqenygiz` or retarget a revived pipeline to `ddbhxqkckzpwzwvnoxqt`?
+- Keep live WF4 compiler and WF5 scheduler, or implement the documented publisher and keyword roles?
+- Which social platforms remain in scope, and are sandbox accounts available?
+- Authorize workflow export in a follow-up ticket?
+- Retain execution outcomes for at least 90 days outside n8n?
 
 ## Project-memory files updated
 
@@ -90,20 +104,20 @@ records. Then resume the approval-history and new-review-cycle workflow.
 
 ## Permanent decisions added
 
-- None.
+None.
 
 ## Reusable learnings added
 
-- Branch on stable Postgres/PostgREST error codes rather than message text when translating database errors into user-facing feedback.
+- Operational status must come from an observed signal; otherwise show `Unknown`.
+- Verify live schema and applied migrations before acting on documentation-based schema claims.
 
 ## Memory updates withheld
 
-- The exact duplicate-code wording is a scoped UI choice, not a permanent product or architectural decision.
+- Revive versus retire is unapproved.
+- Database authority is unresolved.
+- WF4/WF5 canonical identities are unresolved.
+- Publishing platform scope and workflow-export authorization are unresolved.
 
 ## Git diff summary
 
-Commit `22c3373 fix: explain duplicate campaign codes` adds a stable-code
-duplicate-campaign error mapper, an accessible alert, one focused interaction
-test, and required project records. It also contains the previously completed
-live-verification record for CWS-VERCEL-RELIABILITY-006. It was pushed to
-`origin/main`; no unrelated user changes were included.
+Read-only assessment documentation only: one new n8n assessment, refreshed Codex handoff, one appended project-log entry, one task-ledger row, and two verified reusable learnings. No application code, SQL, migration, dependency, workflow, credential, environment, or remote system was changed. The assessment package was committed and pushed on `agent/cws-n8n-assessment-006`; no unrelated changes were included.
