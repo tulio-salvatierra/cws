@@ -998,3 +998,22 @@ values because they are intentionally non-exportable, so endpoint mapping is
 covered by tests and persistence was verified directly in staging. No workflow,
 UI, deployment, Production setting, or CWS-001 record changed. Next: author the
 real briefs independently, then push/deploy before building generation.
+
+### Release and first real brief record
+
+After Tulio approved the next sequence, four independently authored active
+version-1 briefs were inserted: English and Spanish for Cicero Web Studio and
+English and Spanish for Drum Practice. Their source was each channel's approved
+live audience, voice, formats, production, revenue, and success fields; no
+language row derives from its sibling. CWS uses a 7-day target cadence and Drum
+uses 3 days.
+
+PR #12 merged as `943fdc2`, and Production deployment
+`dpl_8JPoghpYSiVdMpBW1f8zEhcyPpH9` reached Ready at
+`https://cws-two.vercel.app`. The unused Sensitive webhook secret was rotated
+and retained only in Vercel. A signed Production publish request with
+`brief_version: 1` returned 201; its identical retry returned 200 with the same
+ID and `created: false`. The synthetic publish row and temporary secret files
+were deleted; all four real briefs remain active. Next: review brief wording,
+then build a non-publishing generation path that reads the active brief and
+records its version.

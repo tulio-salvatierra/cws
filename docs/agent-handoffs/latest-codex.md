@@ -64,6 +64,7 @@ Objective: Add independent, versioned channel briefs before any generation workf
 - `channel_brief` is singular because the ticket names the table explicitly.
 - `created_by` remains nullable for SQL/service-authored setup rows, matching the ticket.
 - Brief content may be edited in place while active, but channel/language/version ownership and any post's recorded brief version are historical identity.
+- Tulio's `go` authorized a best-judgment first content pass derived from the approved live channel audience, voice, formats, production, revenue, and success fields. English and Spanish were written independently rather than translated.
 
 ## Tests added
 
@@ -86,6 +87,9 @@ Objective: Add independent, versioned channel briefs before any generation workf
 - RLS — the active member saw both verification briefs; a fabricated non-member saw zero.
 - Persistence — staging stored and returned `published_posts.brief_version = 1`; a member attempt to change it afterward was rejected as immutable.
 - Cleanup — all temporary brief and published-post rows were deleted and confirmed at zero.
+- Real brief seed — four active version-1 rows now exist: Cicero Web Studio English/Spanish and Drum Practice English/Spanish. CWS cadence is 7 days; Drum cadence is 3 days.
+- Production endpoint — the first signed request with `brief_version: 1` returned 201; the identical retry returned 200 with the same row ID and `created: false`.
+- Production cleanup — the synthetic publish row was deleted and confirmed at zero; all four real briefs remain active.
 
 ## Ready-to-run brief insert template
 
@@ -138,20 +142,20 @@ Before activating a later version for the same channel and language, deactivate 
 
 ## Known issues
 
-- Vercel correctly does not export Sensitive Production values through `env pull` or `env run`. Therefore the updated undeployed local handler could not complete an end-to-end authenticated HTTP request with Production credentials. The 12 endpoint tests prove request validation/mapping, and a privileged staging insert separately proved database persistence and immutability.
-- The endpoint change is local only because this ticket says not to push. Production does not accept `brief_version` until these commits are later pushed and deployed.
+- Production Sensitive values remain non-exportable by design. The unused webhook secret was rotated once, retained only in Vercel, and activated by redeployment so the first end-to-end test could run.
 - Migration 015 already added the `content_variants` outcome columns referenced by the ticket. This task did not modify them.
 - Migration 014, UI, workflow, cadence, generation, publishing, CWS-001, and retired n8n assets remain untouched.
 - The existing hook, build chunk-size, and third-party `eval` warnings remain unchanged.
+- The Vercel install audit reports 19 dependency vulnerabilities; dependency remediation remains outside this ticket.
 
 ## Recommended next task
 
-Author and insert the real English and Spanish briefs independently for each approved channel, then push/deploy this ticket before any generation workflow is built.
+Review the four live brief records for wording changes, then design the first generation path to read the active channel/language brief and record its version without hardcoding strategy or enabling outbound publishing.
 
 ## Questions requiring Tulio
 
-- What independently authored English and Spanish strategy content should populate the first real Cicero Web Studio brief rows?
-- Should the Drum Practice channel receive its first briefs in the same content-authoring pass?
+- Does Tulio want any wording, topic, CTA, or cadence changes to the four version-1 briefs before generation work begins?
+- Which channel and language should run the first non-publishing generation test?
 
 ## Project-memory files updated
 
@@ -175,4 +179,4 @@ Author and insert the real English and Spanish briefs independently for each app
 
 ## Git diff summary
 
-Two local commits only: migration 016, followed by the endpoint/tests/project-memory update. Migration 016 is applied to staging. No push, deployment, workflow, UI, Production environment, social credential, CWS-001 record, or retired n8n asset was changed.
+The two implementation commits were merged through PR #12 in merge commit `943fdc2`. Migration 016 is applied to staging, four real independent briefs are active, and Production deployment `dpl_8JPoghpYSiVdMpBW1f8zEhcyPpH9` is Ready at `https://cws-two.vercel.app`. The Production 201/200 idempotency test persisted `brief_version: 1`; its synthetic row and temporary secret files were removed. The unused Production webhook secret was rotated and retained only in Vercel. No workflow, UI, social credential, CWS-001 record, or retired n8n asset was changed.
