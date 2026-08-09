@@ -237,6 +237,27 @@ No push or deployment was performed. Next action is to decide whether to accept
 the two remaining advisor warnings, then push and smoke-test the consolidated
 `/admin` route tree.
 
+## 2026-08-08 — CWS-ADMIN-CONSOLIDATE-003 channels follow-up
+
+Agent: Codex
+
+Added the protected `/admin/channels` route using the existing workspace-owned
+`channels` table. The page loads the active member’s workspace channels through
+Supabase RLS and displays each channel’s audience, voice, formats, production
+requirements, revenue goal, and success metrics. Admin overview, sidebar, and
+workspace navigation now link to the page; the legacy publishing surface and
+database schema remain unchanged.
+
+Extracted the legacy workspace redirect component so its dynamic-id behavior can
+be tested directly. Added navigation, channel-data, membership-denial, and
+redirect smoke tests. `npx vitest run` now passes 15 files and 46 tests; the
+production build and import-casing check pass; lint still has only the existing
+`useDrafts` hook-dependency warning.
+
+Committed locally as `dbd9396 feat: add admin channels overview`. It has not been
+pushed or deployed. Next action is to push this commit and verify the live
+`/admin/channels` page and `/workspace` redirect manually.
+
 ## 2026-07-23 — CWS-DB-CONTENT-001
 
 Agent: Codex
