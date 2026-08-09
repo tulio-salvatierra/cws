@@ -975,3 +975,26 @@ that `/admin/published` renders the consolidated navigation and expected empty
 state. No synthetic publication was retained. Next: wire the selected publisher
 to the return endpoint before enabling its outbound post node, then validate one
 real publish, retry, and member outcome update.
+
+## 2026-08-09 — CWS-CHANNEL-BRIEF-008 versioned channel strategy
+
+Agent: Codex
+Status: Completed locally; staging migration applied; push prohibited
+
+Added and applied migration 016 with `channel_brief`, independently versioned
+English and Spanish strategy rows, workspace-member RLS, immutable ownership,
+one-active-brief-per-language enforcement, and nullable immutable
+`published_posts.brief_version`. The publish endpoint accepts an optional
+positive integer version without changing authentication or retry behavior.
+
+On staging, active English and Spanish briefs coexisted for the Cicero Web
+Studio channel, a second active Spanish row failed with `23505`, the member saw
+both rows, and a non-member saw zero. A publish record persisted version 1 and
+rejected later identity mutation. Verification rows were removed. The security
+advisor retained the same two pre-existing warnings. `npm ci`, production
+build, lint, all 82 tests, and whitespace validation passed; lint retains the
+existing hook warning. A live local HTTP call could not use Vercel Sensitive
+values because they are intentionally non-exportable, so endpoint mapping is
+covered by tests and persistence was verified directly in staging. No workflow,
+UI, deployment, Production setting, or CWS-001 record changed. Next: author the
+real briefs independently, then push/deploy before building generation.

@@ -148,3 +148,15 @@ published without recording and left no usable history, which made its true
 state impossible to determine from within the system. A durable return record
 gives every later manual or automated publisher a common evidence contract from
 its first execution.
+
+## Create versioned strategy before generation workflows
+
+Date: 2026-08-09
+
+Verified by: CWS-CHANNEL-BRIEF-008
+
+Create the strategy table before any generation workflow exists so no workflow
+can begin by hardcoding strategy into an unversioned prompt. The retired
+pipeline's operating strategy could not be reconstructed after the fact;
+independent, versioned channel-and-language briefs make the strategy that
+produced each recorded post durable and traceable from the start.

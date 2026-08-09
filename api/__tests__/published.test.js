@@ -111,7 +111,48 @@ describe('published posts API', () => {
       external_post_id: 'video-1',
       raw_payload: body,
     }))
+    expect(database.insert.mock.calls[0][0]).not.toHaveProperty('brief_version')
   })
+
+  it('persists a positive brief version when present', async () => {
+    const body = {
+      platform: 'youtube',
+      published_at: '2026-08-09T12:00:00Z',
+      brief_version: 2,
+    }
+    const inserted = { id: 'published-brief-2', ...body, workspace_id: 'workspace-1' }
+    const database = createSupabaseMock({ inserted })
+    createClientMock.mockReturnValue(database.client)
+    const response = createResponse()
+
+    await handler(request(body), response)
+
+    expect(response.status).toHaveBeenCalledWith(201)
+    expect(database.insert).toHaveBeenCalledWith(expect.objectContaining({
+      brief_version: 2,
+      raw_payload: body,
+    }))
+  })
+
+  it.each([0, -1, 1.5, '1', null])(
+    'rejects invalid brief version %j',
+    async (briefVersion) => {
+      const response = createResponse()
+
+      await handler(request({
+        platform: 'youtube',
+        published_at: '2026-08-09T12:00:00Z',
+        brief_version: briefVersion,
+      }), response)
+
+      expect(response.status).toHaveBeenCalledWith(400)
+      expect(response.json).toHaveBeenCalledWith({
+        ok: false,
+        error: 'brief_version must be a positive integer.',
+      })
+      expect(createClientMock).not.toHaveBeenCalled()
+    },
+  )
 
   it('returns the existing record when a retry repeats the platform post id', async () => {
     const existing = {

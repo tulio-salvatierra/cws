@@ -149,6 +149,12 @@ function validatePayload(body) {
   if (body.source && !PUBLISHED_SOURCES.includes(body.source)) {
     return `Invalid source. Accepted values: ${PUBLISHED_SOURCES.join(', ')}.`
   }
+  if (
+    body.brief_version !== undefined
+    && (!Number.isInteger(body.brief_version) || body.brief_version <= 0)
+  ) {
+    return 'brief_version must be a positive integer.'
+  }
   if (body.outcome_score && !OUTCOME_SCORES.includes(body.outcome_score)) {
     return `Invalid outcome_score. Accepted values: ${OUTCOME_SCORES.join(', ')}.`
   }
@@ -162,6 +168,7 @@ function buildInsertPayload(body, workspaceId, externalPostId) {
     'content_variant_id',
     'external_url',
     'language',
+    'brief_version',
     'outcome_score',
     'outcome_note',
     'outcome_recorded_at',
