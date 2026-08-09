@@ -124,8 +124,9 @@ verify `CWS-002` submits without a pattern warning.
 
 ## Git diff summary
 
-The pending diff changes the intake relay from synchronous 504-prone behavior
-to managed background execution, adds the official Vercel Functions dependency,
-repairs both browser-risky HTML patterns, updates the manual sync message, and
-adds focused regression coverage and required project records. No unrelated
-pre-existing changes were present. Nothing is committed or pushed.
+Commit `b8206f6 fix: queue client portal sheet sync` changes the intake relay
+from synchronous 504-prone behavior to managed background execution, adds the
+official Vercel Functions dependency, repairs both browser-risky HTML patterns,
+updates the manual sync message, and adds focused regression coverage and
+required project records. It was pushed to `origin/main`. No unrelated
+pre-existing changes were present.
