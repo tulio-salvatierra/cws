@@ -58,3 +58,17 @@ fields for transcripts, captions, editing notes, and export references, while
 the current admin pages mostly read those values and do not expose mutation
 controls. A readiness audit must trace each required status transition and
 field through the UI instead of treating schema support as operational support.
+
+## SPA fallbacks must preserve missing-asset failures
+
+Date: 2026-08-08
+
+Verified by: CWS-VERCEL-RELIABILITY-005
+
+A catch-all SPA rewrite can turn a missing hashed JavaScript chunk into a 200
+HTML response, which browsers reject as a module MIME-type error after a new
+deployment replaces old chunk names. Keep SPA navigation fallbacks for
+extensionless application routes, let missing assets and API routes return real
+404 responses, and handle Vite's `vite:preloadError` with a guarded one-time
+reload so users move from an old entry bundle to the current deployment without
+entering a refresh loop.

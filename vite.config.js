@@ -6,6 +6,10 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { SERVER_ENV_KEYS } from './env.keys.js'
 import validateProductionClientEnv from './scripts/validate-production-client-env.mjs'
+import {
+  GoogleSheetsWebhookTimeoutError,
+  postGoogleSheetsWebhook,
+} from './server/google-sheets-webhook.js'
 
 // In ESM, __dirname is not defined. Recreate it from import.meta.url
 const __filename = fileURLToPath(import.meta.url)
@@ -42,16 +46,11 @@ function clientPortalApiPlugin(env) {
 
         try {
           const requestBody = await readJsonBody(req)
-          const response = await fetch(env.GOOGLE_SHEETS_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...requestBody,
-              secret: env.GOOGLE_SHEETS_WEBHOOK_SECRET,
-            }),
+          const { response, result } = await postGoogleSheetsWebhook({
+            url: env.GOOGLE_SHEETS_WEBHOOK_URL,
+            secret: env.GOOGLE_SHEETS_WEBHOOK_SECRET,
+            payload: requestBody,
           })
-
-          const result = await response.json().catch(() => null)
 
           if (!response.ok || result?.ok === false) {
             sendJson(res, 502, {
@@ -63,9 +62,11 @@ function clientPortalApiPlugin(env) {
 
           sendJson(res, 200, { ok: true, result })
         } catch (error) {
-          sendJson(res, 500, {
+          sendJson(res, error instanceof GoogleSheetsWebhookTimeoutError ? 504 : 502, {
             ok: false,
-            error: error instanceof Error ? error.message : 'Client portal sync failed',
+            error: error instanceof GoogleSheetsWebhookTimeoutError
+              ? 'Google Sheet sync timed out. Please try again.'
+              : 'Google Sheet sync failed. Please try again.',
           })
         }
       })

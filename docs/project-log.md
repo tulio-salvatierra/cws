@@ -694,3 +694,25 @@ The verified RLS helper privilege behavior was added to `docs/learnings.md`; no 
 ### Reusable learning
 
 - None added.
+
+## 2026-08-08 — CWS-VERCEL-RELIABILITY-005
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Confirmed two independent production failures. A cached Vite entry bundle
+requested an obsolete campaign chunk, and the catch-all SPA rewrite returned
+`index.html` with `text/html` for that missing JavaScript path. The client
+intake function also waited on its Google Sheets webhook without an internal
+deadline or structured logs, allowing Vercel to terminate it with a 504.
+
+Added guarded `vite:preloadError` recovery, excluded assets/API/file-like paths
+from the SPA fallback, and configured the intake function for a 20-second
+maximum duration. Added a shared 12-second Google Sheets deadline with safe
+structured logs and controlled error responses in both production and local
+development. The shared helper is not exposed as a Vercel function.
+
+Focused tests pass, the full suite passes with 19 files and 62 tests, import
+casing passes, the production Vite build passes, and Vercel's production build
+accepts the routing rule and function configuration. Live verification remains
+pending a commit, push, and deployment.
