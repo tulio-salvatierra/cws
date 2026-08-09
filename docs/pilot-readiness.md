@@ -3,10 +3,25 @@
 Date: 2026-08-08  
 Agent: Codex  
 Environment: staging project `ddbhxqkckzpwzwvnoxqt`  
-Scope: read-only audit of the existing `/admin` UI and current CWS OS schema.
+Scope: baseline audit of the existing `/admin` UI and current CWS OS schema,
+plus a follow-up implementation of the smallest high-value variant workflow gap.
 
-This report does not run the CWS-001 pilot and does not add UI, migrations, or
-data. It records what a human can do today and where the cycle stops.
+The audit snapshot below records what a human could do before the follow-up.
+The follow-up does not run the CWS-001 pilot or change the database schema/data.
+
+## Follow-up implementation
+
+`src/pages/admin/VariantDetailPage.jsx` now provides an independent editor for
+each content variant. An active workspace member can save the existing
+transcript/script, tone, editing notes, caption text, export reference, and any
+allowed variant lifecycle status. The update is constrained by the variant ID
+and workspace ID, so sibling language variants remain independent.
+
+This closes the baseline audit gaps for variant content editing and variant
+status transitions without adding migrations, publishing behavior, outcome
+fields, or approval-history mutations. Campaign status control, approval
+revision resolution, decision/learning capture, and outcome recording remain
+open gaps below.
 
 ## Current staging state
 
@@ -66,28 +81,27 @@ Status meanings:
 A human can log in, open the workspace and campaign, create campaigns and
 variants, request an approval, approve or request a revision while an approval
 is pending, create a campaign-linked task, and mark that task complete. EN and
-ES records are independently addressable.
+ES records are independently addressable. After the follow-up implementation,
+each variant can also be edited and moved through its allowed lifecycle statuses
+from its own detail page.
 
 The cycle cannot currently reach a trustworthy exported/published state through
-the UI because campaign and variant status transitions, content editing,
-revision resolution, decisions, learnings, and outcome recording are missing or
-partial.
+the UI because campaign status transitions, revision resolution, decisions,
+learnings, and outcome recording remain missing or partial.
 
-## Smallest recommended changes
+## Remaining recommended changes
 
-These are recommendations only; none are implemented by this ticket.
+The variant editor/status item below is implemented in the follow-up section
+above. The remaining smallest changes are:
 
-1. **Variant editor and lifecycle controls — M.** Add editing for transcript,
-   tone, editing notes, caption text, status, and the existing export reference;
-   keep each variant scoped by its own ID.
-2. **Campaign status control — S.** Add a controlled status transition surface
+1. **Campaign status control — S.** Add a controlled status transition surface
    for the campaign lifecycle through `published`.
-3. **Approval revision loop — S.** Let a revision-requested variant create a new
+2. **Approval revision loop — S.** Let a revision-requested variant create a new
    pending approval, then review that pending approval. Preserve the existing
    completed-approval immutability rule.
-4. **Decision and learning capture — S/M.** Add workspace-authorized forms for
+3. **Decision and learning capture — S/M.** Add workspace-authorized forms for
    one decision and one learning, with the current ownership fields.
-5. **Explicit export/outcome model — L and future migration.** Add separately
+4. **Explicit export/outcome model — L and future migration.** Add separately
    approved fields for export filename, export version, outcome, and published
    timestamp. This is required for the definition-of-done outcome record and is
    intentionally outside this ticket.

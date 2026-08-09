@@ -288,6 +288,30 @@ Committed locally as `dbd9396 feat: add admin channels overview`. It has not bee
 pushed or deployed. Next action is to push this commit and verify the live
 `/admin/channels` page and `/workspace` redirect manually.
 
+## 2026-08-08 — CWS-PILOT-READINESS-004 variant editor follow-up
+
+Agent: Codex
+
+Implemented the first high-value gap from the pilot readiness audit. The
+content-variant detail page now lets an active workspace member edit and save
+each variant's transcript/script, tone, editing notes, caption text, existing
+export reference, and lifecycle status independently. Updates are scoped by
+both variant ID and workspace ID and use the existing RLS policy; approval
+records remain separate and completed approvals remain unchanged.
+
+Added a focused interaction test for the save flow and status transition. No
+database migration, seed, publishing integration, outcome field, or push was
+performed.
+
+Validation passed: 17 Vitest files and 58 tests, import casing, production
+build with a non-secret staging client placeholder, `git diff --check`, and
+lint with the existing single `useDrafts` dependency warning.
+
+Next action: implement revision resolution by creating a new pending approval
+after a revision request, preserving completed approval history. Decision and
+learning capture remain after that; export filename/version and outcome fields
+still require a separately approved migration.
+
 ## 2026-07-23 — CWS-DB-CONTENT-001
 
 Agent: Codex
