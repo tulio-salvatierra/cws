@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -61,6 +61,10 @@ function query({ data = [], error = null, singleData = data } = {}) {
 }
 
 describe('VariantDetailPage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('saves editable content and an independent lifecycle status', async () => {
     mockFrom.mockImplementation((table) => {
       if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1' } })
@@ -140,5 +144,47 @@ describe('VariantDetailPage', () => {
     })
     expect(await screen.findByText('pending')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Re-submit for review' })).not.toBeInTheDocument()
+  })
+
+  it('requires explicit confirmation before recording an owner approval', async () => {
+    const pendingApproval = {
+      id: 'approval-1',
+      status: 'pending',
+      feedback: null,
+      reviewed_at: null,
+    }
+    const approvedApproval = {
+      ...pendingApproval,
+      status: 'approved',
+      feedback: 'Ready to proceed.',
+      reviewed_at: '2026-08-09T15:43:26Z',
+    }
+
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1' } })
+      if (table === 'content_variants') return query({ singleData: variant })
+      if (table === 'approvals') return query({ data: [pendingApproval], singleData: approvedApproval })
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const user = userEvent.setup()
+    expect(await screen.findByText('Submitted for owner review')).toBeInTheDocument()
+    await user.type(screen.getByRole('textbox', { name: 'Reviewer feedback' }), 'Ready to proceed.')
+    await user.click(screen.getByRole('button', { name: 'Approve' }))
+
+    expect(mockUpdate).not.toHaveBeenCalled()
+    expect(screen.getByRole('alertdialog', { name: 'Confirm review decision' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Confirm approval' }))
+
+    expect(mockUpdate).toHaveBeenCalledWith({ status: 'approved', feedback: 'Ready to proceed.' })
+    expect(await screen.findByText('Ready to proceed.')).toBeInTheDocument()
   })
 })

@@ -2,7 +2,7 @@
 
 Task ID: CWS-PILOT-READINESS-004
 Agent: Codex
-Objective: Add the final migration-free CWS-001 blocker control by making campaign lifecycle status editable from the consolidated admin dashboard.
+Objective: Remove ambiguity from the single-owner approval flow after a review request appeared to approve itself.
 
 ## Files inspected
 
@@ -15,93 +15,75 @@ Objective: Add the final migration-free CWS-001 blocker control by making campai
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `src/pages/admin/CampaignDetailPage.jsx`
-- Existing admin smoke and interaction tests
-- `supabase/migrations/009_campaigns_content_variants.sql`
-- Current Supabase JavaScript update documentation and breaking-change changelog
+- `src/pages/admin/VariantDetailPage.jsx`
+- `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
+- Staging approval, variant, and user attribution rows (read-only)
+- Current Supabase JavaScript update and filter documentation
 
 ## Files changed
 
-- `src/pages/admin/CampaignDetailPage.jsx`
-- `src/pages/admin/__tests__/CampaignDetailPage.test.jsx`
+- `src/pages/admin/VariantDetailPage.jsx`
+- `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
 - `docs/pilot-readiness.md`
+- `docs/learnings.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
 
+## Root cause and fix
+
+The staging record was inserted as pending and updated to approved about 19
+seconds later by the same owner account. It was not auto-approved by the
+database. Because the only owner was both requester and reviewer, the immediate
+review controls made the two actions appear to be one transition.
+
+The pending state now says `Submitted for owner review`, labels the input as
+reviewer feedback, and requires a second explicit confirmation before either
+Approve or Request revision writes to Supabase. Review controls are disabled
+while the confirmed update is saving, and save errors are separated from
+approval errors.
+
 ## Database or API changes
 
-None. The campaign update reuses the existing status constraint, immutable
-ownership trigger, explicit authenticated grant, and workspace-member RLS
-policies.
-
-## Security decisions
-
-- The update changes only `campaigns.status`.
-- The mutation is filtered by both campaign ID and the active membership's
-  workspace ID.
-- The UI exposes only the status values already approved in the database and
-  product definition.
-- No service-role credential, RLS bypass, publishing integration, or legacy
-  table access was introduced.
-
-## Decisions made
-
-- Use a select-and-save lifecycle control on the existing campaign detail page.
-- Disable saving until the selected status differs from the persisted status.
-- Keep transitions reversible within the existing allowed status set; no new
-  transition graph or database rule was introduced.
-
-## Assumptions
-
-- Active workspace members may manage ordinary campaign records under DEC-009.
-- The existing campaign status constraint remains the authoritative allowed set.
-- Changing the CWS OS campaign to `published` does not invoke or synchronize the
-  separate n8n publishing pipeline.
+None. The existing approved test record was not changed or deleted. No
+migration, remote write, service-role credential, RLS bypass, legacy publishing
+change, or n8n integration was introduced.
 
 ## Tests added
 
-- Campaign lifecycle status can be changed and saved.
-- The update payload contains only the selected status.
-- The update applies both campaign ID and workspace ID filters.
-- Successful persistence produces a visible confirmation and updated selector.
+- The first Approve click opens confirmation and performs no database update.
+- Confirm approval performs exactly one update with approved status and reviewer feedback.
+- Persisted reviewer feedback appears after the confirmed update.
 
 ## Tests run
 
-- Focused campaign and workspace tests — 2 files, 12 tests passed.
-- `npm run test:run` — 21 files, 66 tests passed.
+- Focused variant tests — 1 file, 3 tests passed.
+- `npm run test:run` — 21 files, 67 tests passed.
 - `npm run check:imports` — passed.
 - `npm run lint` — passed with the existing `useDrafts` dependency warning.
 - `npm run build` — passed.
-- `git diff --check` — passed.
+- `git diff --check` — passed before documentation refresh.
 
 ## Known issues
 
-- Export filename, export version, outcome, and published timestamp need a
-  separately approved migration design.
-- The current decisions RLS allows broad member updates; DEC-009 requires a
-  security follow-up before exposing sensitive decision transitions.
-- Campaign statuses are constrained to approved values but do not enforce a
-  one-direction transition graph.
 - The full approval-history timeline is not displayed in the UI.
+- The English staging approval is already completed and immutable; validate the
+  guard with the Spanish variant or a new review cycle.
+- Export filename, export version, outcome, and published timestamp still need a
+  separately approved migration design.
 - The existing `src/Hooks/useDrafts.js` dependency warning remains.
-- No live campaign data was mutated during automated validation.
 
 ## Recommended next task
 
-Confirm the Vercel deployment, then run the full CWS-001 pilot cycle. After the
-live run, design the explicit export/outcome migration using the actual
-information the pilot needed.
-
-## Questions requiring Tulio
-
-- What should count as the recorded CWS-001 outcome?
-- Which fields should be separate: export filename, version, publication URL,
-  publication timestamp, performance notes, and outcome summary?
+Confirm the Vercel deployment, then use the Spanish variant to request review.
+Verify that the page remains pending after submission, that the first Approve
+click only opens confirmation, and that only Confirm approval changes the
+record. Continue the pilot with a revision-request and re-submission cycle.
 
 ## Project-memory files updated
 
 - `docs/pilot-readiness.md`
+- `docs/learnings.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
@@ -112,18 +94,16 @@ information the pilot needed.
 
 ## Reusable learnings added
 
-- None.
+- Single-owner review interfaces need an explicit decision confirmation because
+  requester and reviewer roles collapse into one account.
 
 ## Memory updates withheld
 
-- The select-and-save interaction is scoped UI behavior, not a permanent
-  architectural decision.
-- A transition graph was not inferred or added without explicit approval.
+- No architectural decision was inferred from this interaction safeguard.
+- No approval record was rewritten because completed review history is immutable.
 
 ## Git diff summary
 
-Commit `5b5161a feat: add campaign lifecycle controls` contains the
-workspace-scoped campaign lifecycle control, one focused interaction test, the
-refreshed readiness audit, and required project-memory updates. It was pushed to
-`origin/main`. No migration, database mutation, or manual production workflow
-was performed.
+The pending diff adds an explicit two-step owner decision flow, focused
+regression coverage, and the required project records. It does not alter the
+database schema or existing staging records.

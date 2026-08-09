@@ -807,3 +807,29 @@ a separately approved migration design based on the live cycle.
 Commit `5b5161a feat: add campaign lifecycle controls` was pushed to
 `origin/main` on 2026-08-09. Deployment confirmation and the live pilot cycle
 remain pending.
+
+## 2026-08-09 — CWS-PILOT-READINESS-004 approval confirmation guard
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Investigated a report that requesting review immediately approved the variant.
+A read-only staging query showed the approval was inserted pending and updated
+to approved about 19 seconds later by the same owner account. The database did
+not auto-approve it; the single-owner interface made submission and review feel
+like one action.
+
+Updated the variant review panel to clearly label the pending owner-review
+state, label reviewer feedback, and require a second explicit confirmation
+before Approve or Request revision writes to Supabase. Review controls are
+disabled during persistence, and save errors are separated from approval
+errors. The existing approved staging row remains unchanged.
+
+Added regression coverage proving the first Approve click performs no update
+and the confirmation performs one correctly scoped decision update. The full
+suite passes with 21 files and 67 tests; import casing, lint, production build,
+and `git diff --check` pass. Lint retains the existing `useDrafts` dependency
+warning. No migration or remote mutation was introduced.
+
+Next action: push and deploy, then validate a fresh approval and revision cycle
+with the Spanish variant.

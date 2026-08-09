@@ -72,3 +72,16 @@ extensionless application routes, let missing assets and API routes return real
 404 responses, and handle Vite's `vite:preloadError` with a guarded one-time
 reload so users move from an old entry bundle to the current deployment without
 entering a refresh loop.
+
+## Single-owner reviews need an explicit decision boundary
+
+Date: 2026-08-09
+
+Verified by: CWS-PILOT-READINESS-004
+
+When the same account can submit work and act as the only owner-reviewer,
+showing review controls immediately after submission can make a later approval
+look automatic. Verify the audit timestamps and actor IDs before diagnosing a
+database transition, then require a separate confirmation before recording an
+approval or revision decision. Preserve completed approval history rather than
+rewriting the evidence.

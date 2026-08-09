@@ -27,7 +27,10 @@ revision request, preserving immutable completed review history. The Knowledge
 page links to workspace-authorized decision and learning forms. Decisions enter
 as `proposed`; owner-only status transitions are not exposed. Campaign status
 can now be changed from the campaign detail page using the approved lifecycle
-values. Outcome recording remains the open definition-of-done gap below.
+values. A pending approval is explicitly labeled as submitted for owner review,
+and Approve or Request revision requires a separate confirmation before the
+database update occurs. Outcome recording remains the open definition-of-done
+gap below.
 
 ## Current staging state
 
@@ -74,8 +77,8 @@ Status meanings:
 | 5 | Record editing notes | WORKS | The variant editor exposes and saves `editing_notes`. | None required. |
 | 6 | Record export filename and export version | PARTIAL | The variant editor saves the existing `export_reference`, but the schema has no separate filename or version fields. | Record a combined reference until a future schema decision adds explicit fields. |
 | 7 | Advance a variant through `rough_cut` → `fine_cut` → `captions_pending` → `ready_for_review` → `approved` → `exported` | WORKS | `VariantDetailPage` saves any allowed content-variant lifecycle status on the independently selected variant. | None required. |
-| 8 | Create an approval on a variant | WORKS | `VariantDetailPage` calls `approvals.insert` with `status: 'pending'` (`src/pages/admin/VariantDetailPage.jsx:26-29`) and exposes `Request review` (`src/pages/admin/VariantDetailPage.jsx:37`). | None required, assuming the user is an active workspace member. |
-| 9 | Request a revision | WORKS | The pending approval review controls call `review('revision_requested')` (`src/pages/admin/VariantDetailPage.jsx:31-37`); the approval schema allows that status (`supabase/migrations/010_content_variant_approvals.sql:7-9`). | None required for the first revision request. |
+| 8 | Create an approval on a variant | WORKS | `VariantDetailPage` inserts a pending approval and clearly separates submission from the later owner decision. | None required, assuming the user is an active workspace member. |
+| 9 | Request a revision | WORKS | The pending approval controls require an explicit second confirmation before recording either revision requested or approved. | None required for the first revision request. |
 | 10 | Resolve the revision and approve | WORKS | A `revision_requested` review exposes `Re-submit for review`, which inserts a new pending approval while preserving the completed review; the new pending row can then be approved. | None required. |
 | 11 | Create a campaign-linked task and complete it | WORKS | `TasksPage` loads campaigns, inserts a task with `campaign_id`, and exposes the `completed` status (`src/pages/admin/TasksPage.jsx:6-12`). | None required. |
 | 12 | Write a decision from the UI | WORKS | `NewDecisionPage` creates a workspace-owned decision with the current user and fixed `proposed` status. | None required for capture; sensitive status transitions remain separate. |
@@ -94,6 +97,14 @@ from its own detail page.
 The cycle can now advance the campaign, edit and advance each variant, complete
 a real approval revision loop, and capture decisions and learnings. It cannot
 yet record the full definition-of-done outcome.
+
+## Live approval diagnosis
+
+A read-only staging check on 2026-08-09 found that the English approval was
+created pending and updated to approved about 19 seconds later by the same owner
+account. This ruled out database auto-approval and identified an ambiguous
+single-owner interaction. The existing approved row remains unchanged. Use the
+Spanish variant or a new review cycle to validate the confirmation guard.
 
 ## Remaining recommended changes
 
