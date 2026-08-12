@@ -47,7 +47,7 @@ function statusLabel(status) {
 
 export default function VariantDetailPage() {
   const { variantId } = useParams()
-  const [state, setState] = useState({ loading: true, error: '', variant: null, approval: null, exports: [], workspaceId: null })
+  const [state, setState] = useState({ loading: true, error: '', variant: null, approval: null, exports: [], workspaceId: null, membershipRole: null })
   const [form, setForm] = useState(null)
   const [feedback, setFeedback] = useState('')
   const [saveError, setSaveError] = useState('')
@@ -65,12 +65,18 @@ export default function VariantDetailPage() {
   const [correctionForm, setCorrectionForm] = useState({ caption_text: '', export_reference: '', correction_reason: '' })
   const [correctionError, setCorrectionError] = useState('')
   const [correcting, setCorrecting] = useState(false)
+  const [revisionOpen, setRevisionOpen] = useState(false)
+  const [revisionConfirm, setRevisionConfirm] = useState(false)
+  const [revisionReason, setRevisionReason] = useState('')
+  const [revisionError, setRevisionError] = useState('')
+  const [revisionMessage, setRevisionMessage] = useState('')
+  const [revising, setRevising] = useState(false)
 
   useEffect(() => {
     let active = true
 
     async function load() {
-      const membership = await supabase.from('workspace_members').select('workspace_id').eq('status', 'active').order('created_at').limit(1).single()
+      const membership = await supabase.from('workspace_members').select('workspace_id, role').eq('status', 'active').order('created_at').limit(1).single()
       if (membership.error) throw membership.error
 
       const [variant, approval, exportHistory] = await Promise.all([
@@ -85,7 +91,7 @@ export default function VariantDetailPage() {
       if (active) {
         const exports = exportHistory.data || []
         const latestExport = exports[0]
-        setState({ loading: false, error: '', variant: variant.data, approval: approval.data?.[0] || null, exports, workspaceId: membership.data.workspace_id })
+        setState({ loading: false, error: '', variant: variant.data, approval: approval.data?.[0] || null, exports, workspaceId: membership.data.workspace_id, membershipRole: membership.data.role })
         setForm(formFromVariant(variant.data))
         setCorrectionForm({
           caption_text: latestExport?.caption_text || variant.data.caption_text || '',
@@ -102,6 +108,10 @@ export default function VariantDetailPage() {
   async function saveVariant(event) {
     event.preventDefault()
     if (state.variant?.export_snapshot) return
+    if (state.variant?.status === 'approved') {
+      setSaveError('Start an approved-content revision before editing reviewed content.')
+      return
+    }
     setSaving(true)
     setSaveError('')
     setSaveMessage('')
@@ -143,6 +153,7 @@ export default function VariantDetailPage() {
       setForm((current) => ({ ...current, status: 'ready_for_review' }))
       setFeedback('')
       setReviewDecision(null)
+      setRevisionMessage('')
     }
     setApprovalActionPending(false)
   }
@@ -249,11 +260,48 @@ export default function VariantDetailPage() {
     setCorrecting(false)
   }
 
+  function beginApprovedRevision() {
+    if (!revisionReason.trim()) {
+      setRevisionError('Add a revision reason before continuing.')
+      return
+    }
+
+    setRevisionError('')
+    setRevisionConfirm(true)
+  }
+
+  async function recordApprovedRevision() {
+    setRevisionError('')
+    setRevising(true)
+    const result = await supabase
+      .from('content_variant_revision_events')
+      .insert({
+        workspace_id: state.workspaceId,
+        content_variant_id: variantId,
+        reason: revisionReason.trim(),
+      })
+      .select('id, reason, source_approval_id, created_by, created_at')
+      .single()
+
+    if (result.error) {
+      setRevisionError(result.error.message)
+    } else {
+      setState((current) => ({ ...current, variant: { ...current.variant, status: 'draft' } }))
+      setForm((current) => ({ ...current, status: 'draft' }))
+      setRevisionReason('')
+      setRevisionConfirm(false)
+      setRevisionOpen(false)
+      setRevisionMessage('Revision started. Update the content, save it, then request a new review.')
+    }
+    setRevising(false)
+  }
+
   if (state.loading) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Loading content variant…</div>
   if (state.error) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><p className="text-rose-200">{state.error}</p><Link className="mt-4 inline-block text-orange-300" to="/admin/workspace">Back to workspace</Link></main>
 
   const variant = state.variant
   const exportLocked = Boolean(variant.export_snapshot)
+  const approvedContentLocked = variant.status === 'approved' && !exportLocked
   const latestExport = state.exports[0]
   const currentExport = latestExport || (exportLocked ? {
     version: 1,
@@ -275,20 +323,20 @@ export default function VariantDetailPage() {
           <p className="mt-2 text-sm text-slate-400">Edit this language/version independently from the campaign and other variants.</p>
         </div>
         <label className="text-sm text-slate-300">Status
-          <select aria-label="Status" disabled={exportLocked} value={form?.status || ''} onChange={(event) => setForm({ ...form, status: event.target.value })} className="mt-2 block rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-60">
+          <select aria-label="Status" disabled={exportLocked || approvedContentLocked} value={form?.status || ''} onChange={(event) => setForm({ ...form, status: event.target.value })} className="mt-2 block rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-60">
             {statusOptions(form?.status || variant.status).map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
           </select>
         </label>
       </div>
 
       <label className="block text-sm text-slate-300">Transcript / script
-        <textarea aria-label="Transcript / script" disabled={exportLocked} rows="7" value={form?.transcript || ''} onChange={(event) => setForm({ ...form, transcript: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
+        <textarea aria-label="Transcript / script" disabled={exportLocked || approvedContentLocked} rows="7" value={form?.transcript || ''} onChange={(event) => setForm({ ...form, transcript: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
       <label className="block text-sm text-slate-300">Tone
-        <textarea aria-label="Tone" disabled={exportLocked} rows="3" value={form?.tone || ''} onChange={(event) => setForm({ ...form, tone: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
+        <textarea aria-label="Tone" disabled={exportLocked || approvedContentLocked} rows="3" value={form?.tone || ''} onChange={(event) => setForm({ ...form, tone: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
       <label className="block text-sm text-slate-300">Editing notes
-        <textarea aria-label="Editing notes" disabled={exportLocked} rows="4" value={form?.editing_notes || ''} onChange={(event) => setForm({ ...form, editing_notes: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
+        <textarea aria-label="Editing notes" disabled={exportLocked || approvedContentLocked} rows="4" value={form?.editing_notes || ''} onChange={(event) => setForm({ ...form, editing_notes: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
       <label className="block text-sm text-slate-300">Caption text
         <textarea aria-label="Caption text" disabled={exportLocked} rows="4" value={form?.caption_text || ''} onChange={(event) => setForm({ ...form, caption_text: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
@@ -298,7 +346,8 @@ export default function VariantDetailPage() {
       </label>
       {saveError && <p className="text-sm text-rose-300">{saveError}</p>}
       {saveMessage && <p className="text-sm text-emerald-300" role="status">{saveMessage}</p>}
-      {!exportLocked && <button disabled={!form || saving} className="rounded-full bg-orange-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>}
+      {!exportLocked && !approvedContentLocked && <button disabled={!form || saving} className="rounded-full bg-orange-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>}
+      {approvedContentLocked && <p className="text-sm text-amber-100">Reviewed content is locked. The caption and export reference above may be finalized only through the confirmed export handoff, or an owner can start a revision below.</p>}
       {exportLocked && <p className="text-sm text-emerald-200">The exported content and handoff evidence are locked.</p>}
     </form>
 
@@ -308,6 +357,30 @@ export default function VariantDetailPage() {
       {state.approval?.feedback && <p className="mt-2 text-slate-300">{state.approval.feedback}</p>}
       {!state.approval && <div className="mt-4"><p className="mb-3 text-sm text-slate-400">Submitting captures an immutable snapshot of the current variant and moves it to ready for review. It does not approve or publish anything.</p><button disabled={approvalActionPending} onClick={requestApproval} className="rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Requesting…' : 'Request review'}</button></div>}
       {state.approval?.status === 'revision_requested' && <button disabled={approvalActionPending} onClick={requestApproval} className="mt-4 rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Re-submitting…' : 'Re-submit for review'}</button>}
+      {state.approval?.status === 'approved' && variant.status === 'draft' && <div className="mt-4"><p className="mb-3 text-sm text-slate-400">The prior approval remains preserved. After saving the revised content, request a new review to capture a fresh snapshot.</p><button disabled={approvalActionPending} onClick={requestApproval} className="rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Requesting…' : 'Request new review'}</button></div>}
+      {state.approval?.status === 'approved' && variant.status === 'approved' && !exportLocked && state.membershipRole === 'owner' && <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4">
+        <p className="font-semibold text-amber-100">Need to change reviewed content?</p>
+        <p className="mt-1 text-sm text-slate-400">Starting a revision preserves this approval, returns the variant to draft, and requires a new review before export.</p>
+        <button type="button" onClick={() => {
+          setRevisionOpen((open) => !open)
+          setRevisionConfirm(false)
+          setRevisionError('')
+        }} className="mt-4 rounded-full border border-amber-300/40 px-4 py-2 text-sm font-semibold text-amber-100">{revisionOpen ? 'Cancel revision' : 'Revise approved content'}</button>
+        {revisionOpen && <div className="mt-4 space-y-3">
+          <label className="block text-sm text-slate-300">Revision reason
+            <textarea aria-label="Revision reason" rows="3" value={revisionReason} onChange={(event) => setRevisionReason(event.target.value)} placeholder="What needs to change and why?" className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white" />
+          </label>
+          <button type="button" disabled={revising} onClick={beginApprovedRevision} className="rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">Review revision</button>
+        </div>}
+      </div>}
+      {revisionConfirm && <div role="alertdialog" aria-label="Confirm approved-content revision" className="mt-4 rounded-2xl border border-amber-300/30 bg-slate-950/70 p-4">
+        <p className="font-semibold">Confirm revision</p>
+        <p className="mt-1 text-sm text-slate-400">This preserves the completed approval, records your reason, and returns the content to draft. A new approval will be required before export.</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button type="button" disabled={revising} onClick={recordApprovedRevision} className="rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{revising ? 'Starting revision…' : 'Confirm revision'}</button>
+          <button type="button" disabled={revising} onClick={() => setRevisionConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button>
+        </div>
+      </div>}
       {state.approval?.status === 'pending' && <div className="mt-4 space-y-4 rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4">
         <div>
           <p className="font-semibold text-amber-100">Submitted for owner review</p>
@@ -330,6 +403,8 @@ export default function VariantDetailPage() {
         </div>}
       </div>}
       {approvalError && <p className="mt-4 text-sm text-rose-300">{approvalError}</p>}
+      {revisionError && <p role="alert" className="mt-4 text-sm text-rose-300">{revisionError}</p>}
+      {revisionMessage && <p role="status" className="mt-4 text-sm text-emerald-300">{revisionMessage}</p>}
     </section>
 
     {(variant.status === 'approved' || exportLocked) && <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-300/[0.04] p-6">

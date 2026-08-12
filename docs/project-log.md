@@ -1195,3 +1195,31 @@ revision/re-review path before replacing the English test placeholders.
 Commit `6c5d49e` was pushed to
 `agent/reconcile-historical-approval-status`. Pull request, merge, and deployment
 remain pending.
+
+PR #21 merged into `main` as `3abf34a`, completing the bounded historical
+reconciliation before the approved-content revision work began.
+
+## 2026-08-12 — CWS-APPROVED-REVISION-015 approved-content re-review
+
+Agent: Codex
+Status: Completed and pushed; staging migrations applied; deployment pending
+
+Added an explicit owner-confirmed revision event for approved, non-exported
+content. The event preserves the completed approval, derives its owner and
+source approval in the database, returns the variant to draft, and requires a
+fresh pending snapshot and owner decision before the content can become
+approved again. Direct approved edits, direct approval/status bypasses,
+non-owner revisions, and exported-content revisions are denied. Existing
+confirmed export and versioned export-correction paths remain separate, and no
+publishing or n8n behavior changed.
+
+Managed staging lifecycle probes exercised the entire revision and fresh-review
+cycle inside rollback transactions; the real pilot content and evidence were
+unchanged. Migrations `20260812194145` and `20260812195057` are applied. The two
+older return-path/channel-brief migration filenames were aligned locally to
+their existing remote versions without reverting or re-running schema. All 99
+tests pass, lint has only the existing hook warning, build/import casing pass,
+and the new table has RLS, minimal browser grants, non-executable trigger
+functions, and complete foreign-key indexes. The feature branch is published;
+next: merge and deploy, then use
+the control to replace and freshly approve the English CWS-001 test content.

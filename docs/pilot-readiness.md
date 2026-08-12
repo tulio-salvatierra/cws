@@ -152,3 +152,19 @@ only those proven stale-state shapes:
 The English variant is no longer lifecycle-blocked, but its content and approval
 snapshot contain test placeholders. It must enter a new explicit revision and
 approval cycle before being treated as a real export-ready pilot deliverable.
+
+## 2026-08-12 approved-content revision path
+
+Migrations `20260812194145_content_variant_approved_revisions.sql` and
+`20260812195057_index_content_variant_revision_event_foreign_keys.sql` add the
+missing re-review path. An active owner can now record a reason and explicitly
+confirm a revision of approved, non-exported content. The completed approval is
+preserved, the variant returns to draft, reviewed fields become editable, and a
+new pending approval captures the revised snapshot before a new owner decision.
+
+The database rejects direct approved edits, direct draft/approved status
+bypasses, non-owner revision attempts, and any revision of exported content.
+Rollback-only staging probes completed the full revision and fresh-approval
+cycle without changing the real pilot rows. The next human pilot action is to
+deploy this UI, revise `CWS-001-EN-MASTER` with final content, save it, request a
+new review, and inspect the new snapshot before approval and export.
