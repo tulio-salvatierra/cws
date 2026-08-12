@@ -212,6 +212,72 @@ describe('VariantDetailPage', () => {
     expect(screen.getByText(/It does not approve or publish anything/)).toBeInTheDocument()
   })
 
+  it('requires an owner-confirmed revision before editing approved content and requesting a fresh review', async () => {
+    const approvedVariant = {
+      ...variant,
+      status: 'approved',
+      exported_by: null,
+      exported_at: null,
+      export_snapshot: null,
+    }
+    const approvedApproval = {
+      id: 'approval-1',
+      status: 'approved',
+      feedback: 'Approved before revision.',
+      reviewed_at: '2026-08-12T15:00:00Z',
+    }
+    const revisionEvent = {
+      id: 'revision-1',
+      reason: 'Replace the test transcript.',
+      source_approval_id: 'approval-1',
+      created_by: 'user-1',
+      created_at: '2026-08-12T16:00:00Z',
+    }
+
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1', role: 'owner' } })
+      if (table === 'content_variants') return query({ singleData: approvedVariant })
+      if (table === 'approvals') return query({ data: [approvedApproval], singleData: approvedApproval })
+      if (table === 'content_variant_revision_events') return query({ singleData: revisionEvent })
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const user = userEvent.setup()
+    expect(await screen.findByText(/Reviewed content is locked/)).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Transcript / script' })).toBeDisabled()
+    expect(screen.getByRole('textbox', { name: 'Caption text' })).toBeEnabled()
+    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Revise approved content' }))
+    await user.click(screen.getByRole('button', { name: 'Review revision' }))
+    expect(screen.getByRole('alert')).toHaveTextContent('Add a revision reason before continuing.')
+    expect(screen.queryByRole('alertdialog', { name: 'Confirm approved-content revision' })).not.toBeInTheDocument()
+
+    await user.type(screen.getByRole('textbox', { name: 'Revision reason' }), 'Replace the test transcript.')
+    await user.click(screen.getByRole('button', { name: 'Review revision' }))
+    expect(screen.getByRole('alertdialog', { name: 'Confirm approved-content revision' })).toBeInTheDocument()
+    expect(mockInsert).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: 'Confirm revision' }))
+
+    expect(mockInsert).toHaveBeenCalledWith({
+      workspace_id: 'workspace-1',
+      content_variant_id: 'variant-1',
+      reason: 'Replace the test transcript.',
+    })
+    expect(await screen.findByRole('status')).toHaveTextContent('Revision started. Update the content, save it, then request a new review.')
+    expect(screen.getByRole('combobox', { name: 'Status' })).toHaveValue('draft')
+    expect(screen.getByRole('textbox', { name: 'Transcript / script' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Request new review' })).toBeInTheDocument()
+  })
+
   it('requires an explicit confirmation to record an approved export without publishing', async () => {
     const approvedVariant = {
       ...variant,
