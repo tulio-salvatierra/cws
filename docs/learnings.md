@@ -172,3 +172,16 @@ referenced version's editable fields can still change. Persist the exact source
 snapshot in an immutable agent-run input alongside its record ID and version.
 This preserves generation provenance without freezing ordinary strategy edits
 or duplicating the source as another mutable business record.
+
+## Promote generated proposals atomically with workspace-consistent provenance
+
+Date: 2026-08-12
+
+Verified by: CWS-GENERATION-REVIEW-010
+
+When a human promotes generated output into a durable business record, create
+the record and close the review run in one idempotent database operation. Link
+the promoted record to its source run with a workspace-consistent composite
+foreign key, and make that provenance immutable. This prevents partial review
+states, duplicate promotion on retry, and cross-workspace attribution even if
+an API or client validation regresses.
