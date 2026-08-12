@@ -211,4 +211,91 @@ describe('VariantDetailPage', () => {
     expect(await screen.findByText(/Submitting captures an immutable snapshot/)).toBeInTheDocument()
     expect(screen.getByText(/It does not approve or publish anything/)).toBeInTheDocument()
   })
+
+  it('requires an explicit confirmation to record an approved export without publishing', async () => {
+    const approvedVariant = {
+      ...variant,
+      status: 'approved',
+      caption_text: 'Final social caption',
+      export_reference: 'CWS-AI-E0104603-v1.mp4',
+      exported_by: null,
+      exported_at: null,
+      export_snapshot: null,
+    }
+    const exportedVariant = {
+      ...approvedVariant,
+      status: 'exported',
+      exported_by: 'user-1',
+      exported_at: '2026-08-12T16:30:00Z',
+      export_snapshot: { snapshot_version: 1 },
+    }
+    let contentVariantQueryCount = 0
+
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1' } })
+      if (table === 'content_variants') {
+        contentVariantQueryCount += 1
+        return contentVariantQueryCount === 1
+          ? query({ singleData: approvedVariant })
+          : query({ singleData: exportedVariant })
+      }
+      if (table === 'approvals') return query({ data: [{ id: 'approval-1', status: 'approved', feedback: 'approved' }] })
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const user = userEvent.setup()
+    expect(await screen.findByRole('heading', { name: 'Prepare the approved variant for external export' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'exported' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Mark exported' }))
+    expect(mockUpdate).not.toHaveBeenCalled()
+    expect(screen.getByRole('alertdialog', { name: 'Confirm export handoff' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Confirm exported' }))
+
+    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      caption_text: 'Final social caption',
+      export_reference: 'CWS-AI-E0104603-v1.mp4',
+      status: 'exported',
+    }))
+    expect(await screen.findByRole('heading', { name: 'Export recorded' })).toBeInTheDocument()
+    expect(screen.getByText('No publication action was triggered.')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Caption text' })).toBeDisabled()
+    expect(screen.getByRole('textbox', { name: 'Export filename or reference' })).toBeDisabled()
+  })
+
+  it('keeps the export action disabled until caption and reference are present', async () => {
+    const approvedVariant = {
+      ...variant,
+      status: 'approved',
+      caption_text: '',
+      export_reference: '',
+      exported_by: null,
+      exported_at: null,
+      export_snapshot: null,
+    }
+
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1' } })
+      if (table === 'content_variants') return query({ singleData: approvedVariant })
+      if (table === 'approvals') return query({ data: [{ id: 'approval-1', status: 'approved' }] })
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByRole('button', { name: 'Mark exported' })).toBeDisabled()
+  })
 })

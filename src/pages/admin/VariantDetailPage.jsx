@@ -17,7 +17,17 @@ const VARIANT_STATUSES = [
   'archived',
 ]
 
-const VARIANT_FIELDS = 'id, code, locale, working_title, status, transcript, tone, editing_notes, caption_text, export_reference, campaign_id'
+const VARIANT_FIELDS = 'id, code, locale, working_title, status, transcript, tone, editing_notes, caption_text, export_reference, exported_by, exported_at, export_snapshot, campaign_id'
+
+const MANUAL_VARIANT_STATUSES = VARIANT_STATUSES.filter(
+  (status) => !['ready_for_review', 'approved', 'exported', 'published'].includes(status),
+)
+
+function statusOptions(currentStatus) {
+  return MANUAL_VARIANT_STATUSES.includes(currentStatus)
+    ? MANUAL_VARIANT_STATUSES
+    : [...MANUAL_VARIANT_STATUSES, currentStatus]
+}
 
 function formFromVariant(variant) {
   return {
@@ -46,6 +56,9 @@ export default function VariantDetailPage() {
   const [approvalActionPending, setApprovalActionPending] = useState(false)
   const [reviewDecision, setReviewDecision] = useState(null)
   const [reviewing, setReviewing] = useState(false)
+  const [exportConfirm, setExportConfirm] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
 
   useEffect(() => {
     let active = true
@@ -73,6 +86,7 @@ export default function VariantDetailPage() {
 
   async function saveVariant(event) {
     event.preventDefault()
+    if (state.variant?.export_snapshot) return
     setSaving(true)
     setSaveError('')
     setSaveMessage('')
@@ -134,10 +148,37 @@ export default function VariantDetailPage() {
     setReviewing(false)
   }
 
+  async function recordExport() {
+    setExportError('')
+    setExporting(true)
+    const result = await supabase
+      .from('content_variants')
+      .update({
+        ...form,
+        caption_text: form.caption_text.trim(),
+        export_reference: form.export_reference.trim(),
+        status: 'exported',
+      })
+      .eq('id', variantId)
+      .eq('workspace_id', state.workspaceId)
+      .select(VARIANT_FIELDS)
+      .single()
+
+    if (result.error) {
+      setExportError(result.error.message)
+    } else {
+      setState((current) => ({ ...current, variant: result.data }))
+      setForm(formFromVariant(result.data))
+      setExportConfirm(false)
+    }
+    setExporting(false)
+  }
+
   if (state.loading) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Loading content variant…</div>
   if (state.error) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><p className="text-rose-200">{state.error}</p><Link className="mt-4 inline-block text-orange-300" to="/admin/workspace">Back to workspace</Link></main>
 
   const variant = state.variant
+  const exportLocked = Boolean(variant.export_snapshot)
   return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-4xl">
     <Link className="text-sm font-semibold text-orange-300" to={`/admin/campaigns/${variant.campaign_id}`}>← Campaign</Link>
     <p className="mt-10 text-xs font-semibold uppercase tracking-[0.25em] text-orange-200">Content variant · {variant.locale}</p>
@@ -151,30 +192,31 @@ export default function VariantDetailPage() {
           <p className="mt-2 text-sm text-slate-400">Edit this language/version independently from the campaign and other variants.</p>
         </div>
         <label className="text-sm text-slate-300">Status
-          <select aria-label="Status" value={form?.status || ''} onChange={(event) => setForm({ ...form, status: event.target.value })} className="mt-2 block rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white">
-            {VARIANT_STATUSES.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
+          <select aria-label="Status" disabled={exportLocked} value={form?.status || ''} onChange={(event) => setForm({ ...form, status: event.target.value })} className="mt-2 block rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-60">
+            {statusOptions(form?.status || variant.status).map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
           </select>
         </label>
       </div>
 
       <label className="block text-sm text-slate-300">Transcript / script
-        <textarea aria-label="Transcript / script" rows="7" value={form?.transcript || ''} onChange={(event) => setForm({ ...form, transcript: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+        <textarea aria-label="Transcript / script" disabled={exportLocked} rows="7" value={form?.transcript || ''} onChange={(event) => setForm({ ...form, transcript: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
       <label className="block text-sm text-slate-300">Tone
-        <textarea aria-label="Tone" rows="3" value={form?.tone || ''} onChange={(event) => setForm({ ...form, tone: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+        <textarea aria-label="Tone" disabled={exportLocked} rows="3" value={form?.tone || ''} onChange={(event) => setForm({ ...form, tone: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
       <label className="block text-sm text-slate-300">Editing notes
-        <textarea aria-label="Editing notes" rows="4" value={form?.editing_notes || ''} onChange={(event) => setForm({ ...form, editing_notes: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+        <textarea aria-label="Editing notes" disabled={exportLocked} rows="4" value={form?.editing_notes || ''} onChange={(event) => setForm({ ...form, editing_notes: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
       <label className="block text-sm text-slate-300">Caption text
-        <textarea aria-label="Caption text" rows="4" value={form?.caption_text || ''} onChange={(event) => setForm({ ...form, caption_text: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+        <textarea aria-label="Caption text" disabled={exportLocked} rows="4" value={form?.caption_text || ''} onChange={(event) => setForm({ ...form, caption_text: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
-      <label className="block text-sm text-slate-300">Export reference
-        <input aria-label="Export reference" value={form?.export_reference || ''} onChange={(event) => setForm({ ...form, export_reference: event.target.value })} placeholder="Filename, folder, or delivery reference" className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+      <label className="block text-sm text-slate-300">Export filename or reference
+        <input aria-label="Export filename or reference" disabled={exportLocked} value={form?.export_reference || ''} onChange={(event) => setForm({ ...form, export_reference: event.target.value })} placeholder="Filename, folder, or delivery reference" className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white disabled:opacity-60" />
       </label>
       {saveError && <p className="text-sm text-rose-300">{saveError}</p>}
       {saveMessage && <p className="text-sm text-emerald-300" role="status">{saveMessage}</p>}
-      <button disabled={!form || saving} className="rounded-full bg-orange-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>
+      {!exportLocked && <button disabled={!form || saving} className="rounded-full bg-orange-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">{saving ? 'Saving…' : 'Save changes'}</button>}
+      {exportLocked && <p className="text-sm text-emerald-200">The exported content and handoff evidence are locked.</p>}
     </form>
 
     <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
@@ -206,5 +248,13 @@ export default function VariantDetailPage() {
       </div>}
       {approvalError && <p className="mt-4 text-sm text-rose-300">{approvalError}</p>}
     </section>
+
+    {(variant.status === 'approved' || exportLocked) && <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-300/[0.04] p-6">
+      <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Export handoff</p>
+      {variant.status === 'approved' && <><h2 className="mt-3 text-xl font-semibold">Prepare the approved variant for external export</h2><p className="mt-2 text-sm text-slate-400">Add the final caption and Final Cut filename or delivery reference above. Confirming saves the current fields, captures an immutable handoff snapshot, and marks the variant exported. It does not publish or contact n8n.</p><button type="button" disabled={!form?.caption_text.trim() || !form?.export_reference.trim()} onClick={() => setExportConfirm(true)} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Mark exported</button></>}
+      {exportLocked && <><h2 className="mt-3 text-xl font-semibold">Export recorded</h2><p className="mt-2 text-sm text-slate-300">{variant.export_reference}</p>{variant.exported_at && <time className="mt-2 block text-xs text-slate-500">Recorded {new Date(variant.exported_at).toLocaleString()}</time>}<p className="mt-3 text-sm text-slate-400">No publication action was triggered.</p></>}
+      {exportError && <p role="alert" className="mt-4 text-sm text-rose-300">{exportError}</p>}
+      {exportConfirm && <div role="alertdialog" aria-label="Confirm export handoff" className="mt-4 rounded-2xl border border-emerald-300/30 bg-slate-950/70 p-4"><p className="font-semibold">Confirm export handoff</p><p className="mt-1 text-sm text-slate-400">This locks the current content, caption, and export reference as the final exported handoff. It will not publish anything.</p><div className="mt-4 flex flex-wrap gap-3"><button type="button" disabled={exporting} onClick={recordExport} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{exporting ? 'Recording…' : 'Confirm exported'}</button><button type="button" disabled={exporting} onClick={() => setExportConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button></div></div>}
+    </section>}
   </div></main>
 }

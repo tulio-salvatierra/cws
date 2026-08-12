@@ -198,3 +198,16 @@ snapshot when review is requested, or freeze the artifact for the entire
 approval lifetime. For historical approvals whose original content cannot be
 reconstructed, store an explicit unavailable marker rather than presenting the
 artifact's current state as historical evidence.
+
+## Terminal artifact handoffs need immutable final evidence
+
+Date: 2026-08-12
+
+Verified by: CWS-EXPORT-HANDOFF-012
+
+A terminal status such as exported does not establish what file or content was
+actually handed off, who confirmed it, or when. Capture the final artifact
+fields, delivery reference, actor, timestamp, and upstream approval together at
+the transition, then prevent later content edits from rewriting that evidence.
+For older terminal records that cannot be reconstructed, retain an explicit
+unavailable marker rather than inventing attribution or copying current data.
