@@ -87,14 +87,14 @@ Objective: Add the smallest audited correction and re-export workflow while pres
 ## Known issues
 
 - The real corrected version 2 has not been created; the first handoff remains current until Tulio supplies and confirms the actual corrected caption, a new reference, and the reason in Production.
-- The UI changes are local only and are not committed, pushed, or deployed.
+- The UI is deployed, but the real correction still requires Tulio's explicit caption, reference, reason, and confirmation.
 - Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
 - The two pre-existing Supabase security-advisor warnings remain unchanged.
 - Existing historical local/remote migration naming mismatches remain unchanged.
 
 ## Recommended next task
 
-Publish the validated UI through the normal pull-request and Production deployment path, then use the real Variant Detail correction dialog to create version 2 with the final caption and a new Final Cut filename/reference. Verify that Production renders version 2 as current, version 1 unchanged, and no publication record or n8n execution was created.
+Use the real Variant Detail correction dialog to create version 2 with the final caption and a new Final Cut filename/reference. Verify that Production renders version 2 as current, version 1 unchanged, and no publication record or n8n execution was created.
 
 ## Questions requiring Tulio
 
@@ -123,4 +123,4 @@ Publish the validated UI through the normal pull-request and Production deployme
 
 ## Git diff summary
 
-Five implementation files and four project-memory files are changed locally. Three migrations are applied to staging and aligned with remote history. The UI adds an append-only correction dialog and export history; one test brings the full suite to 98 passing tests. Nothing has been committed, pushed, deployed, published, or sent to n8n, and the real version-1 export remains unchanged.
+PR #18 merged into `main` as `18f0957`. Production deployment `dpl_6itez6HwyCR1Zz7mK1Mja8Rqwv7P` is Ready and aliased to `https://cws-two.vercel.app`. Three migrations are applied to staging and aligned with remote history; the UI now includes an append-only correction dialog and export history. Nothing was published or sent to n8n, no real version 2 was created, and version 1 remains unchanged.

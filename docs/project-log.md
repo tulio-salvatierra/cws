@@ -1170,3 +1170,10 @@ grant risk and PostgreSQL `UPDATE OF` trigger behavior. Migrations
 All 98 tests, lint, build, import-casing, and whitespace checks pass; lint keeps
 the existing hook warning. Next: push and deploy the UI, then create and verify
 the real corrected version 2 without invoking publication.
+
+PR #18 merged into `main` as `18f0957`. Production deployment
+`dpl_6itez6HwyCR1Zz7mK1Mja8Rqwv7P` reached Ready and is aliased to
+`https://cws-two.vercel.app`. The release build passed with 433 modules. No real
+version 2, publication record, webhook call, or n8n execution was created.
+Next: enter and explicitly confirm the real corrected caption, new export
+reference, and correction reason, then verify versions 1 and 2 in Production.
