@@ -109,6 +109,7 @@ describe('VariantDetailPage', () => {
       status: 'pending',
       feedback: null,
       reviewed_at: null,
+      content_snapshot: { transcript: 'Original script' },
     }
 
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null })
@@ -143,6 +144,7 @@ describe('VariantDetailPage', () => {
       status: 'pending',
     })
     expect(await screen.findByText('pending')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Status' })).toHaveValue('ready_for_review')
     expect(screen.queryByRole('button', { name: 'Re-submit for review' })).not.toBeInTheDocument()
   })
 
@@ -186,5 +188,27 @@ describe('VariantDetailPage', () => {
 
     expect(mockUpdate).toHaveBeenCalledWith({ status: 'approved', feedback: 'Ready to proceed.' })
     expect(await screen.findByText('Ready to proceed.')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Status' })).toHaveValue('approved')
+  })
+
+  it('explains that requesting review captures a snapshot without approving or publishing', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null })
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1' } })
+      if (table === 'content_variants') return query({ singleData: variant })
+      if (table === 'approvals') return query({ data: [], singleData: { id: 'approval-1', status: 'pending', content_snapshot: {} } })
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText(/Submitting captures an immutable snapshot/)).toBeInTheDocument()
+    expect(screen.getByText(/It does not approve or publish anything/)).toBeInTheDocument()
   })
 })
