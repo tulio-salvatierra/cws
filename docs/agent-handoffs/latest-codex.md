@@ -81,8 +81,8 @@ Objective: Add the smallest explicit, audited, non-publishing handoff from an ap
 
 ## Known issues
 
-- The real approved variant has no caption or export reference yet and remains deliberately unexported.
-- Live verification found that a silently disabled export button looked nonfunctional when the filename existed but the caption was blank. The local follow-up replaces silent disabling with actionable validation and is pending release.
+- The real variant `CWS-AI-E0104603` is now exported with authenticated attribution, linked approved review, filename `CWS-AI-E0104603-v1.mp4`, and immutable caption `test` recorded at `2026-08-12 18:47:13.374327+00`.
+- Live verification found that a silently disabled export button looked nonfunctional when the filename existed but the caption was blank. PR #17 merged as `53e7356`, and Production deployment `dpl_QwCuS4bhRC6nrPuR8YhmqYBxS4Ge` contains the actionable validation fix.
 - PR #16 merged into `main` as `391693d`, and Production deployment `dpl_6NdNSzSRfBViQ5zJMfaUR4sgmcMB` is Ready at `https://cws-two.vercel.app`.
 - File upload, checksum, storage URL, export version modeling, and outbound publishing remain deferred.
 - Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
@@ -90,11 +90,11 @@ Objective: Add the smallest explicit, audited, non-publishing handoff from an ap
 
 ## Recommended next task
 
-Open the real approved variant, add the final caption and Final Cut filename/reference, confirm the export handoff, and verify the recorded actor, time, and snapshot before designing any publishing action.
+Confirm whether the immutable `test` caption represents acceptable pilot evidence. If it was only temporary, design a versioned correction/re-export path that retains this first handoff rather than rewriting it; do not add publishing behavior yet.
 
 ## Questions requiring Tulio
 
-- What final caption and exported filename/reference should be recorded for `CWS-AI-E0104603` after deployment?
+- Is the recorded `test` caption acceptable pilot evidence, or should the next task add an explicit versioned correction/re-export workflow?
 
 ## Project-memory files updated
 
@@ -119,4 +119,4 @@ Open the real approved variant, add the final caption and Final Cut filename/ref
 
 ## Git diff summary
 
-PR #16 merged as `391693d`, and Production deployment `dpl_6NdNSzSRfBViQ5zJMfaUR4sgmcMB` is Ready. One applied migration adds audited export evidence and a guarded approved-to-exported transition. The Variant Detail page adds a non-publishing confirmation and locked terminal view, two UI tests cover the new boundary, and the required memory files document the completed work. No unrelated pre-existing local changes were present.
+PR #16 merged as `391693d`; the feedback fix in PR #17 merged as `53e7356`, and Production deployment `dpl_QwCuS4bhRC6nrPuR8YhmqYBxS4Ge` is Ready. The real variant completed the first audited handoff and renders locked with its actor, time, approval, filename, and final snapshot retained. No publication action occurred and no unrelated pre-existing local changes were present.

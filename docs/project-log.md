@@ -1139,3 +1139,11 @@ broken. The follow-up makes the control respond with the exact missing fields
 and opens confirmation after both are completed; the focused test, all 97
 tests, lint, build, import-casing, and whitespace checks pass. Deployment of
 this feedback fix is pending.
+
+PR #17 merged into `main` as `53e7356`; Production deployment
+`dpl_QwCuS4bhRC6nrPuR8YhmqYBxS4Ge` reached Ready and the public alias points to
+it. The first real handoff recorded `CWS-AI-E0104603-v1.mp4`, owner attribution,
+the approved review, and caption `test` at `2026-08-12 18:47:13.374327+00`.
+A signed-in Production reload showed `Export recorded`, locked evidence, and
+the explicit no-publication notice. Next: decide whether the test caption is
+acceptable pilot evidence or requires a new versioned correction workflow.
