@@ -246,3 +246,16 @@ PostgreSQL `UPDATE OF column` triggers respond to columns named in the original
 one trigger derives a column and another must capture its first transition,
 attach the latter to the broader update event and guard it with an `OLD`/`NEW`
 condition. Verify the complete trigger chain with a realistic transaction.
+
+## Lifecycle synchronization triggers need a historical backfill
+
+Date: 2026-08-12
+
+Verified by: CWS-PILOT-STATUS-RECONCILE-014
+
+Adding a trigger that synchronizes lifecycle state fixes future transitions but
+does not repair rows whose decisions were completed before the trigger existed.
+Audit existing parent/child states when deploying synchronization logic, define
+the smallest proven stale-state predicates, exclude terminal evidence, and
+validate the exact affected rows inside a rollback-only transaction before
+applying a one-time backfill.

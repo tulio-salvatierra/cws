@@ -1177,3 +1177,21 @@ PR #18 merged into `main` as `18f0957`. Production deployment
 version 2, publication record, webhook call, or n8n execution was created.
 Next: enter and explicitly confirm the real corrected caption, new export
 reference, and correction reason, then verify versions 1 and 2 in Production.
+
+## 2026-08-12 — CWS-PILOT-STATUS-RECONCILE-014 historical approval status
+
+Agent: Codex
+Status: Completed and pushed; staging migration applied; merge pending
+
+Found three non-exported variants whose completed approval decisions predated
+the status-synchronization trigger. Added and applied bounded migration
+`20260812193142`, reconciling two stale approved rows to `approved` and one
+revision-requested row to `draft`; exported evidence and all content remained
+untouched. English CWS-001 is now lifecycle-consistent, Spanish remains
+exported, all 98 tests pass, lint has only the existing hook warning, and the
+security advisor is unchanged. Next: add an explicit approved-content
+revision/re-review path before replacing the English test placeholders.
+
+Commit `6c5d49e` was pushed to
+`agent/reconcile-historical-approval-status`. Pull request, merge, and deployment
+remain pending.
