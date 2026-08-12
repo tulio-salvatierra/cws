@@ -91,15 +91,16 @@ Objective: Add the first protected, non-publishing content-generation test for t
 
 ## Known issues
 
-- The feature is local and uncommitted. It has not been pushed or deployed.
-- Production has `OPENAI_API_KEY`, `GENERATION_SUPABASE_URL`, and `GENERATION_SUPABASE_SERVICE_ROLE_KEY` configured as hidden Vercel values. Deployment and signed-in live verification remain pending.
+- Production has `OPENAI_API_KEY`, `GENERATION_SUPABASE_URL`, and `GENERATION_SUPABASE_SERVICE_ROLE_KEY` configured as hidden Vercel values.
+- PR #13 is merged into `main`, and Production deployment `dpl_FkKgAMycjwAtKnAeVWFFT8B3YQEL` is Ready at `https://cws-two.vercel.app` with the new function included.
+- Signed-in generation remains a user validation step because it intentionally creates a real `needs_review` agent run under the user's account.
 - The visible first-cycle form is intentionally fixed to Cicero Web Studio English. Channel/language selection can be added after this path is live-verified.
 - A generated proposal can be reviewed in Agent Runs but cannot yet be promoted, approved, or copied into a content variant through this workflow.
 - Existing build chunk-size, third-party `eval`, dependency audit, and `useDrafts` lint warnings remain unchanged.
 
 ## Recommended next task
 
-Deploy the feature, run one signed-in Cicero English generation, verify the saved `needs_review` run and brief snapshot, then decide the reviewed-proposal promotion path.
+Run one signed-in Cicero English generation, verify the saved `needs_review` run and brief snapshot, then decide the reviewed-proposal promotion path.
 
 ## Questions requiring Tulio
 
@@ -127,4 +128,4 @@ Deploy the feature, run one signed-in Cicero English generation, verify the save
 
 ## Git diff summary
 
-The local diff adds one protected generation endpoint, five focused API/UI tests, the non-publishing Agent Runs form and result display, server-only environment documentation, a bounded function duration, and required project-memory updates. The three required Production variables are configured and hidden in Vercel. No migration, seed, legacy table, n8n workflow, publishing route, commit, push, or deployment is included yet.
+PR #13 merged as `2a1e1cd`; Production deployment `dpl_FkKgAMycjwAtKnAeVWFFT8B3YQEL` is Ready and aliased to `https://cws-two.vercel.app`, `https://cicerowebstudio.xyz`, and their companion aliases. The release adds one protected generation endpoint, five focused API/UI tests, the non-publishing Agent Runs form and result display, server-only environment documentation, a bounded function duration, and required project-memory updates. No migration, seed, legacy table, n8n workflow, or publishing route changed.

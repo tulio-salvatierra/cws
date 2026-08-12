@@ -1042,3 +1042,9 @@ draft and its saved `needs_review` run before designing promotion behavior.
 On 2026-08-12, `OPENAI_API_KEY`, `GENERATION_SUPABASE_URL`, and
 `GENERATION_SUPABASE_SERVICE_ROLE_KEY` were added as hidden Vercel Production
 values without printing or exporting their contents. Deployment remains next.
+
+PR #13 merged into `main` as `2a1e1cd`. Production deployment
+`dpl_FkKgAMycjwAtKnAeVWFFT8B3YQEL` reached Ready with the new
+`api/generate-draft` function and aliases including `https://cws-two.vercel.app`
+and `https://cicerowebstudio.xyz`. The remaining release check is one
+user-initiated signed-in generation that creates a real review-only agent run.
