@@ -1106,3 +1106,23 @@ PR #15 merged into `main` as `4cbf31a`. Production deployment
 `dpl_DyUEfC4Gmz7oTXnDtFWf3M5cQzV7` reached Ready. The real accepted variant
 remains a draft with no approval request so Tulio can initiate and verify the
 first durable review cycle in Production.
+
+## 2026-08-12 — CWS-EXPORT-HANDOFF-012 audited manual export
+
+Agent: Codex
+Status: Completed locally; staging migration applied; deployment pending
+
+Added a separate confirmed approved-to-exported handoff that records the
+authenticated actor, time, approved review, exact final content, caption, and
+filename/reference without invoking publishing or n8n. Captured exports remain
+immutable through publish/archive status changes; the two historical exported
+rows received an honest unavailable-evidence marker without invented
+attribution.
+
+Managed staging tests verified the valid transition plus direct-publish,
+missing-caption, missing-approval, non-member, and post-export mutation denials;
+all synthetic rows were rolled back. Migration `20260812162351` is applied,
+all 97 tests, lint, build, import-casing, and whitespace checks pass, and the
+real approved variant remains unexported. Next: publish the UI, enter its final
+caption and Final Cut filename/reference, then explicitly confirm the first
+real handoff.

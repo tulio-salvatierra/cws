@@ -1,8 +1,8 @@
 # Latest Codex Handoff
 
-Task ID: CWS-GENERATION-APPROVAL-011
+Task ID: CWS-EXPORT-HANDOFF-012
 Agent: Codex
-Objective: Harden the separate request-approval step so each review has durable content evidence and the approval and content-variant lifecycles stay synchronized.
+Objective: Add the smallest explicit, audited, non-publishing handoff from an approved content variant to an externally exported artifact.
 
 ## Files inspected
 
@@ -18,13 +18,14 @@ Objective: Harden the separate request-approval step so each review has durable 
 - `supabase/migrations/010_content_variant_approvals.sql`
 - `supabase/migrations/20260808203339_move_workspace_rls_helpers_to_private.sql`
 - `supabase/migrations/20260812153257_generated_draft_review.sql`
+- `supabase/migrations/20260812155214_sync_content_variant_approval_status.sql`
 - `src/pages/admin/VariantDetailPage.jsx`
 - `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
-- Current Supabase changelog, Data API, RLS, function, and security guidance
+- Current Supabase RLS, function-security, and platform-change guidance
 
 ## Files changed
 
-- `supabase/migrations/20260812155214_sync_content_variant_approval_status.sql`
+- `supabase/migrations/20260812162351_content_variant_export_handoff.sql`
 - `src/pages/admin/VariantDetailPage.jsx`
 - `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
 - `docs/agent-handoffs/latest-codex.md`
@@ -34,64 +35,64 @@ Objective: Harden the separate request-approval step so each review has durable 
 
 ## Database or API changes
 
-- Added required `approvals.content_snapshot` JSON evidence. Existing approvals receive an explicit marker that their historical snapshot is unavailable; each new request captures the exact code, locale, title, transcript, tone, editing notes, caption, export reference, and source status.
-- Added a security-invoker before-insert trigger that derives the snapshot from the workspace-consistent content variant and accepts only editable/reviewable source statuses.
-- Added a security-invoker status trigger that atomically moves the content variant to `ready_for_review` when requested, `approved` when approved, and `draft` after a revision request or rejection.
-- Made the captured snapshot immutable in the existing approval lifecycle guard.
-- The Variant Detail UI now explains the request boundary and immediately reflects the database-managed variant status after request and review actions.
-- No new API endpoint, browser secret, approval auto-decision, publish action, webhook, legacy-table mutation, or n8n integration was added.
+- Added `content_variants.exported_by`, `exported_at`, and `export_snapshot` so a confirmed handoff records the authenticated actor, time, approved review, and exact final content and delivery reference.
+- Added a security-invoker update trigger that permits a new export only from `approved`, requires an approved review plus nonblank caption and export reference, blocks direct `published` bypasses, and makes captured export evidence and content immutable.
+- Preserved the two historical exported records with an explicit unavailable-evidence marker instead of inventing an actor or timestamp.
+- The Variant Detail page now provides a separate confirmation step, removes approval/export/publication states from ordinary manual selection, locks captured exports, and explicitly states that no publishing or n8n action occurs.
+- No endpoint, webhook, social API, legacy table, n8n workflow, or outbound publication behavior was added or changed.
 
 ## Security decisions
 
-- Snapshot and status trigger functions are security invokers, remain protected by existing workspace RLS, and cannot be executed directly by anonymous or authenticated roles.
-- The request still derives `created_by` from the authenticated Supabase user and the existing insert policy requires active workspace membership.
-- Owner-only approval outcomes remain enforced by the existing lifecycle trigger and private owner helper.
-- The Supabase security advisor reported the same two pre-existing warnings before and after the migration: intentional authenticated access to `create_workspace` and disabled leaked-password protection.
+- Existing workspace RLS remains the authorization boundary; non-members affect zero rows.
+- The export trigger runs as the caller and cannot be executed directly by anonymous or authenticated roles.
+- Export evidence is derived in the database from `auth.uid()`, current row values, and the latest approved approval rather than trusted from browser input.
+- The Supabase security advisor retained the same two pre-existing warnings: intentional authenticated access to `create_workspace` and disabled leaked-password protection.
 
 ## Decisions made
 
 - No permanent decision was added.
-- Task-level lifecycle mapping is request to `ready_for_review`, approval to `approved`, and revision/rejection to `draft`.
-- Approved variants cannot be submitted into a new pending approval without first entering a future explicitly designed revision lifecycle.
+- The task-level handoff requires an approved review, final caption, filename or delivery reference, and a separate explicit confirmation.
+- Recording export is evidence of an external file handoff only; it does not mean published.
 
 ## Assumptions
 
-- Approval evidence must preserve the exact mutable content presented to the reviewer.
-- Existing approval records cannot be reconstructed historically, so an honest unavailable marker is safer than copying current variant content into old approvals.
-- The existing Variant Detail page remains the correct place for the separate request and owner-review controls.
+- The existing Variant Detail page remains the smallest usable place for export confirmation.
+- A filename, folder, or delivery reference is sufficient for the first manual Final Cut handoff; file upload and storage are deferred.
+- Caption and delivery reference may be finalized during the explicit export confirmation; the export snapshot preserves those final values separately from the earlier approval snapshot.
 
 ## Tests added
 
-- The UI reflects `ready_for_review` after requesting review.
-- The UI reflects `approved` after owner approval.
-- The request explanation states that content is snapshotted and not approved or published.
+- Approved export requires a separate confirmation and records the final caption/reference without publishing.
+- The export action remains disabled until both caption and reference are present.
+- Captured exported fields render locked.
 
 ## Tests run
 
-- Managed staging transaction verified snapshot capture, request-to-review status synchronization, duplicate-pending denial, owner approval, snapshot immutability after current-content edits, approved-variant resubmission denial, revision-to-draft, a new snapshot on resubmission, and non-member denial; all synthetic rows were rolled back.
-- Direct function privileges: anonymous false and authenticated false for both trigger functions.
-- Focused Variant Detail tests: 1 file, 4 tests passed.
-- Full Vitest suite: 28 files, 95 tests passed.
-- `npm run lint`: passed with the unchanged `src/Hooks/useDrafts.js` dependency warning.
+- Managed staging transaction verified approval-to-export, authenticated attribution, trimming, final snapshot capture, direct-publish denial, blank-caption denial, missing-approved-review denial, non-member denial, immutable exported content, allowed exported-to-published/archive status progression, and immutability after archive; all synthetic rows were rolled back.
+- Direct function privileges: anonymous false and authenticated false.
+- Historical-data check: both existing terminal rows received only the explicit historical-evidence marker.
+- Real variant check: `CWS-AI-E0104603` remains `approved` with no export actor, timestamp, or snapshot.
+- Focused Variant Detail tests: 1 file, 6 tests passed.
+- Full Vitest suite: 28 files, 97 tests passed.
+- `npm run lint`: no errors; unchanged `src/Hooks/useDrafts.js` dependency warning remains.
 - `npm run build`: passed; import-casing passed and 433 modules transformed.
 - `git diff --check`: passed.
-- `npx supabase migration list`: migration `20260812155214` matches locally and remotely.
+- Managed migration list: `20260812162351_content_variant_export_handoff` is applied.
 
 ## Known issues
 
-- The real accepted generated variant `5cf97ebf-54fa-4277-ac13-c51d4862e436` remains `draft` with zero approvals so Tulio can perform the first real request after deployment.
-- PR #15 is merged into `main` as `4cbf31a`, and Production deployment `dpl_DyUEfC4Gmz7oTXnDtFWf3M5cQzV7` is Ready.
-- The first staging apply attempt rolled back because an UPDATE backfill correctly hit completed-approval immutability. The final migration uses a constant default marker for legacy history and applied successfully without rewriting completed approvals.
-- Existing migration-history mismatches for local `015`, remote `20260809191332`, local `20260809195932`, and remote `20260809200028` remain unchanged.
+- The real approved variant has no caption or export reference yet and remains deliberately unexported.
+- File upload, checksum, storage URL, export version modeling, and outbound publishing remain deferred.
 - Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
+- Existing historical local/remote migration naming mismatches remain unchanged.
 
 ## Recommended next task
 
-Have Tulio open the accepted variant and click Request review. Verify the pending snapshot and `ready_for_review` status before making the separate owner approval or revision decision.
+Publish this change, open the real approved variant, add the final caption and Final Cut filename/reference, confirm the export handoff, and verify the recorded actor, time, and snapshot before designing any publishing action.
 
 ## Questions requiring Tulio
 
-- After deployment, review the accepted variant content and decide when it is ready to submit for owner review.
+- What final caption and exported filename/reference should be recorded for `CWS-AI-E0104603` after deployment?
 
 ## Project-memory files updated
 
@@ -106,13 +107,13 @@ Have Tulio open the accepted variant and click Request review. Verify the pendin
 
 ## Reusable learnings added
 
-- Approval records for mutable artifacts must capture an immutable review snapshot or freeze the artifact; a foreign key alone cannot prove what was reviewed.
+- Terminal artifact handoffs need immutable final evidence and honest markers for unreconstructable history.
 
 ## Memory updates withheld
 
-- The exact snapshot fields, lifecycle status mapping, approved-item resubmission rule, and UI wording remain task-level choices rather than approved permanent decisions.
-- No automatic approval, publishing, n8n integration, or execution behavior was added to permanent memory.
+- Required caption/reference, latest-approved-review selection, allowed terminal status transitions, field locking, and exact UI wording remain task-level implementation choices rather than approved permanent decisions.
+- File storage, checksums, export versions, publication wiring, and n8n behavior remain deferred and were not added to permanent memory.
 
 ## Git diff summary
 
-PR #15 merged as `4cbf31a`; Production deployment `dpl_DyUEfC4Gmz7oTXnDtFWf3M5cQzV7` is Ready. The task adds one applied migration, immutable approval snapshots, atomic approval/variant status synchronization, one UI regression test, updated Variant Detail feedback, and required project-memory updates. The real accepted draft and all publishing paths remain untouched pending Tulio's explicit request.
+One applied migration adds audited export evidence and a guarded approved-to-exported transition. The Variant Detail page adds a non-publishing confirmation and locked terminal view, two UI tests cover the new boundary, and the required memory files document the completed local/staging work. No unrelated pre-existing local changes were present.
