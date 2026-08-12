@@ -160,3 +160,15 @@ can begin by hardcoding strategy into an unversioned prompt. The retired
 pipeline's operating strategy could not be reconstructed after the fact;
 independent, versioned channel-and-language briefs make the strategy that
 produced each recorded post durable and traceable from the start.
+
+## Persist prompt-source snapshots when referenced records remain editable
+
+Date: 2026-08-11
+
+Verified by: CWS-GENERATION-TEST-009
+
+A version reference does not reconstruct the exact prompt context when the
+referenced version's editable fields can still change. Persist the exact source
+snapshot in an immutable agent-run input alongside its record ID and version.
+This preserves generation provenance without freezing ordinary strategy edits
+or duplicating the source as another mutable business record.

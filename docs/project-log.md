@@ -1017,3 +1017,28 @@ ID and `created: false`. The synthetic publish row and temporary secret files
 were deleted; all four real briefs remain active. Next: review brief wording,
 then build a non-publishing generation path that reads the active brief and
 records its version.
+
+## 2026-08-11 — CWS-GENERATION-TEST-009 non-publishing draft generation
+
+Agent: Codex
+Status: Completed locally; deployment pending
+
+Added authenticated `POST /api/generate-draft` and a Cicero Web Studio English
+test form on `/admin/agent-runs`. The server validates the Supabase session and
+active workspace membership, loads the active channel brief, creates a
+`propose` agent run, calls OpenAI Responses once, and stores either a
+`needs_review` draft or a failed run. The immutable run input includes both the
+brief version and exact editable brief snapshot. No campaign, variant,
+approval, publishing, webhook, legacy table, or n8n path is mutated.
+
+Created the OpenAI key through the secure Platform flow and wrote it only to
+the ignored local `.env.local`. A minimal live request returned HTTP 200 from
+`gpt-5.6-sol`. Focused tests pass 5/5, the full suite passes 87/87, lint passes
+with the existing `useDrafts` warning, the production build passes with 432
+modules, and whitespace validation passes. Next: configure the three
+server-only Production variables, deploy, and verify one signed-in generated
+draft and its saved `needs_review` run before designing promotion behavior.
+
+On 2026-08-12, `OPENAI_API_KEY`, `GENERATION_SUPABASE_URL`, and
+`GENERATION_SUPABASE_SERVICE_ROLE_KEY` were added as hidden Vercel Production
+values without printing or exporting their contents. Deployment remains next.

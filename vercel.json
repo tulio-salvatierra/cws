@@ -3,6 +3,9 @@
   "functions": {
     "api/client-portal-intake.js": {
       "maxDuration": 60
+    },
+    "api/generate-draft.js": {
+      "maxDuration": 60
     }
   },
   "rewrites": [

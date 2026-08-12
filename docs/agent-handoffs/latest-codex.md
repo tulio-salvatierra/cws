@@ -1,32 +1,43 @@
 # Latest Codex Handoff
 
-Task ID: CWS-CHANNEL-BRIEF-008
+Task ID: CWS-GENERATION-TEST-009
 Agent: Codex
-Objective: Add independent, versioned channel briefs before any generation workflow and let publish records identify the brief version that produced them.
+Objective: Add the first protected, non-publishing content-generation test for the Cicero Web Studio English channel brief.
 
 ## Files inspected
 
 - `.agents/codex-project-instructions.md`
+- `.env.example`
+- `.gitignore`
 - `docs/product-definition.md`
 - `docs/technical-conventions.md`
 - `docs/decisions.md`
 - `docs/learnings.md`
-- `docs/n8n-assessment.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `supabase/migrations/008_channels.sql`
-- `supabase/migrations/015_published_posts_return_path.sql`
-- Existing migration filenames and live staging migration history
 - `api/published.js`
 - `api/__tests__/published.test.js`
-- Live staging channels, active workspace membership, security advisor, RLS behavior, constraints, and persistence
+- `src/pages/admin/AgentRunsPage.jsx`
+- `src/pages/admin/__tests__/WorkspacePagesSmoke.test.jsx`
+- `src/lib/supabase.js`
+- `src/Hooks/useAuth.js`
+- `src/components/admin/AdminLayout.jsx`
+- `supabase/migrations/008_channels.sql`
+- `supabase/migrations/011_agent_runs.sql`
+- `supabase/migrations/20260809195932_016_channel_brief.sql`
+- `package.json`
+- `vercel.json`
+- Current OpenAI GPT-5.6/Responses guidance and Supabase Auth/Data API guidance
 
 ## Files changed
 
-- `supabase/migrations/20260809195932_016_channel_brief.sql`
-- `api/published.js`
-- `api/__tests__/published.test.js`
+- `.env.example`
+- `api/generate-draft.js`
+- `api/__tests__/generate-draft.test.js`
+- `src/pages/admin/AgentRunsPage.jsx`
+- `src/pages/admin/__tests__/AgentRunsPage.test.jsx`
+- `vercel.json`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
@@ -34,128 +45,65 @@ Objective: Add independent, versioned channel briefs before any generation workf
 
 ## Database or API changes
 
-- Applied staging migration `20260809200028` (`016_channel_brief`).
-- Added `public.channel_brief`, one independently authored row per channel, language, and version, with workspace/channel ownership, optional strategy fields, active state, authorship, and timestamps.
-- Enforced `en`/`es`, positive versions, unique `(channel_id, language, version)`, and at most one active row per `(channel_id, language)`.
-- Added the requested active workspace/channel/language index and a nullable-creator index.
-- Kept identity fields immutable while allowing members to update editable brief content and active state.
-- Added nullable positive `published_posts.brief_version` and made it immutable with the other publication identity fields.
-- `POST /api/published` now accepts an optional positive integer `brief_version`, retains it in `raw_payload`, and persists it to `published_posts`. Absent remains valid.
-- English and Spanish have no parent, translation, inheritance, or defaulting relationship.
+- Added authenticated `POST /api/generate-draft` as a Vercel function with a 60-second maximum duration and a 45-second outbound model timeout.
+- The endpoint validates the Supabase access token, requires an active workspace membership, resolves the workspace-owned channel and active language brief, and never trusts a client-supplied workspace ID.
+- Each request creates an immutable `propose` agent run, transitions it from `queued` to `running`, then to `needs_review` or `failed`.
+- The run input records the channel, language, topic, brief ID, brief version, and exact brief snapshot used. The output records the draft, model, OpenAI response ID, channel identity, language, brief identity/version, and generation timestamp.
+- OpenAI Responses uses `gpt-5.6-sol` by default with low reasoning, `store: false`, a hashed safety identifier, and no tools.
+- No schema migration, campaign mutation, content-variant mutation, approval mutation, publish call, webhook, or n8n integration was added.
 
 ## Security decisions
 
-- `channel_brief` follows migration 015's access model: `anon` receives no access; active workspace members may select and update; inserts and deletes remain service-role/SQL operations.
-- RLS uses `private.is_workspace_member(workspace_id)` under `TO authenticated`, with both `USING` and `WITH CHECK` on update.
-- Composite `(channel_id, workspace_id)` ownership prevents cross-workspace channel references.
-- Identity protection prevents moving a brief between workspaces/channels/languages/versions and prevents changing a recorded post's `brief_version` after publication.
-- The security advisor reported the same two pre-existing warnings before and after migration 016; no new warning was introduced:
-  - [Authenticated SECURITY DEFINER function executable](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable) for the intentional `create_workspace` RPC.
-  - [Leaked password protection disabled](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+- `OPENAI_API_KEY` and the Supabase service-role key remain server-only and are never exposed through `VITE_` variables or returned to the browser.
+- The OpenAI key named `CWS content generator` was created through the secure Platform flow for Tulio's Default project and stored only in the ignored local `.env.local` file.
+- Authentication uses `supabase.auth.getUser(accessToken)` server-side; authorization then checks the user's active `workspace_members` row before any service-role database action.
+- The client sends only its current bearer token, channel/language selection, and topic. Workspace ownership is resolved server-side.
+- Model instructions explicitly define the result as a proposal and prohibit claims of approval, scheduling, or publication.
 
 ## Decisions made
 
 - No permanent decision was added.
-- Applied existing DEC-007, DEC-008, and DEC-025 without expanding them.
-- Kept English and Spanish briefs as independent siblings, as required by the product definition and ticket.
+- Task-level defaults are the existing `cicero-web-studio` channel, English, `gpt-5.6-sol`, low reasoning, and a human-review terminal state.
+- The first implementation persists the proposal in `agent_runs.output` only; it does not promote the text into a content variant or approval record.
 
 ## Assumptions
 
-- `channel_brief` is singular because the ticket names the table explicitly.
-- `created_by` remains nullable for SQL/service-authored setup rows, matching the ticket.
-- Brief content may be edited in place while active, but channel/language/version ownership and any post's recorded brief version are historical identity.
-- Tulio's `go` authorized a best-judgment first content pass derived from the approved live channel audience, voice, formats, production, revenue, and success fields. English and Spanish were written independently rather than translated.
+- The signed-in pilot account has one relevant active workspace membership and the Cicero Web Studio channel slug remains `cicero-web-studio`.
+- The existing `agent_runs` lifecycle is the smallest safe persistence boundary for a first generation test.
+- A later ticket will decide whether reviewed generated text becomes a content variant, approval request, or another first-class record.
 
 ## Tests added
 
-- Optional `brief_version` absent: request remains valid and the insert omits the column.
-- Optional `brief_version` present: a positive integer is persisted.
-- Invalid versions: zero, negative, fractional, string, and null values return HTTP 400 before a database client is created.
+- Missing bearer token is rejected before a Supabase client is created.
+- An authenticated user without active membership is denied and OpenAI is not called.
+- A successful request records a brief-grounded `propose` run, exact brief snapshot, low-reasoning Responses request, and `needs_review` output.
+- An OpenAI rejection records a terminal failed run and safe error message.
+- The Agent Runs UI sends the current access token and displays the generated draft with its brief version.
 
 ## Tests run
 
-- `npm ci` — passed.
-- Focused API test — 1 file, 12 tests passed.
-- Production build with valid placeholder `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` — passed; import casing passed and 432 modules transformed.
-- `npm run lint` — passed with the existing `src/Hooks/useDrafts.js` dependency warning.
-- `npx vitest run` — 24 files, 82 tests passed.
-- Pre-migration security advisor — two existing warnings.
-- Post-migration security advisor — the same two warnings; no new findings.
-- Staging migration history — `20260809200028 016_channel_brief` is applied after migration 015.
-- Manual staging briefs — active English version 1 and active Spanish version 1 coexisted for the Cicero Web Studio channel.
-- Duplicate active Spanish brief — rejected by `channel_brief_one_active_language_uidx` with Postgres `23505`.
-- RLS — the active member saw both verification briefs; a fabricated non-member saw zero.
-- Persistence — staging stored and returned `published_posts.brief_version = 1`; a member attempt to change it afterward was rejected as immutable.
-- Cleanup — all temporary brief and published-post rows were deleted and confirmed at zero.
-- Real brief seed — four active version-1 rows now exist: Cicero Web Studio English/Spanish and Drum Practice English/Spanish. CWS cadence is 7 days; Drum cadence is 3 days.
-- Production endpoint — the first signed request with `brief_version: 1` returned 201; the identical retry returned 200 with the same row ID and `created: false`.
-- Production cleanup — the synthetic publish row was deleted and confirmed at zero; all four real briefs remain active.
-
-## Ready-to-run brief insert template
-
-Create English and Spanish rows separately. Replace every placeholder with independently authored content; do not copy or derive one language from the other.
-
-```sql
-insert into public.channel_brief (
-  id,
-  workspace_id,
-  channel_id,
-  language,
-  version,
-  audience,
-  geography,
-  tone,
-  topics_allowed,
-  topics_forbidden,
-  cta,
-  example_good,
-  example_bad,
-  target_cadence_days,
-  is_active,
-  created_by,
-  created_at,
-  updated_at
-)
-values (
-  uuid_generate_v4(),
-  '<workspace-uuid>'::uuid,
-  '<channel-uuid>'::uuid,
-  '<en-or-es>'::text,
-  1,
-  '<independently authored audience>'::text,
-  '<geography>'::text,
-  '<tone>'::text,
-  array['<allowed topic 1>', '<allowed topic 2>']::text[],
-  array['<forbidden topic 1>']::text[],
-  '<call to action>'::text,
-  '<good example>'::text,
-  '<bad example>'::text,
-  7,
-  true,
-  '<creator auth user uuid>'::uuid,
-  now(),
-  now()
-);
-```
-
-Before activating a later version for the same channel and language, deactivate the current row in the same transaction; the partial unique index deliberately rejects two active versions.
+- Focused generation tests: 2 files, 5 tests passed.
+- Full Vitest suite: 26 files, 87 tests passed.
+- `npm run lint`: passed with the unchanged `src/Hooks/useDrafts.js` dependency warning.
+- `npm run build`: passed; import casing passed and 432 modules transformed.
+- `git diff --check`: passed.
+- Live OpenAI smoke request: HTTP 200 from `gpt-5.6-sol` with the expected `CWS generation ready` response.
 
 ## Known issues
 
-- Production Sensitive values remain non-exportable by design. The unused webhook secret was rotated once, retained only in Vercel, and activated by redeployment so the first end-to-end test could run.
-- Migration 015 already added the `content_variants` outcome columns referenced by the ticket. This task did not modify them.
-- Migration 014, UI, workflow, cadence, generation, publishing, CWS-001, and retired n8n assets remain untouched.
-- The existing hook, build chunk-size, and third-party `eval` warnings remain unchanged.
-- The Vercel install audit reports 19 dependency vulnerabilities; dependency remediation remains outside this ticket.
+- The feature is local and uncommitted. It has not been pushed or deployed.
+- Production has `OPENAI_API_KEY`, `GENERATION_SUPABASE_URL`, and `GENERATION_SUPABASE_SERVICE_ROLE_KEY` configured as hidden Vercel values. Deployment and signed-in live verification remain pending.
+- The visible first-cycle form is intentionally fixed to Cicero Web Studio English. Channel/language selection can be added after this path is live-verified.
+- A generated proposal can be reviewed in Agent Runs but cannot yet be promoted, approved, or copied into a content variant through this workflow.
+- Existing build chunk-size, third-party `eval`, dependency audit, and `useDrafts` lint warnings remain unchanged.
 
 ## Recommended next task
 
-Review the four live brief records for wording changes, then design the first generation path to read the active channel/language brief and record its version without hardcoding strategy or enabling outbound publishing.
+Deploy the feature, run one signed-in Cicero English generation, verify the saved `needs_review` run and brief snapshot, then decide the reviewed-proposal promotion path.
 
 ## Questions requiring Tulio
 
-- Does Tulio want any wording, topic, CTA, or cadence changes to the four version-1 briefs before generation work begins?
-- Which channel and language should run the first non-publishing generation test?
+- After live verification, should an accepted generated draft create a new content variant, update a selected existing variant, or remain a reviewed agent-run proposal until a later workflow is designed?
 
 ## Project-memory files updated
 
@@ -166,17 +114,17 @@ Review the four live brief records for wording changes, then design the first ge
 
 ## Permanent decisions added
 
-- None. DEC-021 through DEC-024 and DEC-026 remain unratified; DEC-025 was already recorded.
+- None.
 
 ## Reusable learnings added
 
-- Create the strategy table before any generation workflow so strategy cannot begin as an unversioned, hardcoded prompt that later becomes impossible to reconstruct.
+- Persist an immutable snapshot of editable prompt-source records in the agent run; a version reference alone cannot reconstruct the exact generation context when that version's content can still change.
 
 ## Memory updates withheld
 
-- No brief wording, audience definition, cadence, topic list, generation contract, workflow choice, or publishing scope was added to permanent memory because none was approved or verified by this task.
-- No new decision was added.
+- The model choice, reasoning effort, hard-coded first channel/language, prompt wording, and future promotion behavior remain task-level implementation choices rather than approved permanent decisions.
+- No automatic publishing, n8n integration, variant promotion, or approval behavior was added to permanent memory.
 
 ## Git diff summary
 
-The two implementation commits were merged through PR #12 in merge commit `943fdc2`. Migration 016 is applied to staging, four real independent briefs are active, and Production deployment `dpl_8JPoghpYSiVdMpBW1f8zEhcyPpH9` is Ready at `https://cws-two.vercel.app`. The Production 201/200 idempotency test persisted `brief_version: 1`; its synthetic row and temporary secret files were removed. The unused Production webhook secret was rotated and retained only in Vercel. No workflow, UI, social credential, CWS-001 record, or retired n8n asset was changed.
+The local diff adds one protected generation endpoint, five focused API/UI tests, the non-publishing Agent Runs form and result display, server-only environment documentation, a bounded function duration, and required project-memory updates. The three required Production variables are configured and hidden in Vercel. No migration, seed, legacy table, n8n workflow, publishing route, commit, push, or deployment is included yet.
