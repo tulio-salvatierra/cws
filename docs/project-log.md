@@ -1126,3 +1126,9 @@ all 97 tests, lint, build, import-casing, and whitespace checks pass, and the
 real approved variant remains unexported. Next: publish the UI, enter its final
 caption and Final Cut filename/reference, then explicitly confirm the first
 real handoff.
+
+PR #16 merged into `main` as `391693d`. Production deployment
+`dpl_6NdNSzSRfBViQ5zJMfaUR4sgmcMB` reached Ready and owns
+`https://cws-two.vercel.app`; safe HTTP checks returned 200 for the login and
+real variant routes. The real approved variant remains unchanged pending
+Tulio's final caption, filename/reference, and explicit export confirmation.

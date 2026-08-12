@@ -82,13 +82,14 @@ Objective: Add the smallest explicit, audited, non-publishing handoff from an ap
 ## Known issues
 
 - The real approved variant has no caption or export reference yet and remains deliberately unexported.
+- PR #16 merged into `main` as `391693d`, and Production deployment `dpl_6NdNSzSRfBViQ5zJMfaUR4sgmcMB` is Ready at `https://cws-two.vercel.app`.
 - File upload, checksum, storage URL, export version modeling, and outbound publishing remain deferred.
 - Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
 - Existing historical local/remote migration naming mismatches remain unchanged.
 
 ## Recommended next task
 
-Publish this change, open the real approved variant, add the final caption and Final Cut filename/reference, confirm the export handoff, and verify the recorded actor, time, and snapshot before designing any publishing action.
+Open the real approved variant, add the final caption and Final Cut filename/reference, confirm the export handoff, and verify the recorded actor, time, and snapshot before designing any publishing action.
 
 ## Questions requiring Tulio
 
@@ -116,4 +117,4 @@ Publish this change, open the real approved variant, add the final caption and F
 
 ## Git diff summary
 
-One applied migration adds audited export evidence and a guarded approved-to-exported transition. The Variant Detail page adds a non-publishing confirmation and locked terminal view, two UI tests cover the new boundary, and the required memory files document the completed local/staging work. No unrelated pre-existing local changes were present.
+PR #16 merged as `391693d`, and Production deployment `dpl_6NdNSzSRfBViQ5zJMfaUR4sgmcMB` is Ready. One applied migration adds audited export evidence and a guarded approved-to-exported transition. The Variant Detail page adds a non-publishing confirmation and locked terminal view, two UI tests cover the new boundary, and the required memory files document the completed work. No unrelated pre-existing local changes were present.
