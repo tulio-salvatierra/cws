@@ -136,3 +136,19 @@ The current staging state has not begun that run: both variants are still
   approved?
 - Which export filename, version, outcome, and publication fields should be
   approved for the final migration design?
+
+## 2026-08-12 historical status reconciliation
+
+The approval-status synchronization trigger does not retroactively repair rows
+created before it existed. A live audit found three non-exported mismatches and
+migration `20260812193142_reconcile_historical_approval_status.sql` reconciled
+only those proven stale-state shapes:
+
+- `CWS-001-EN-MASTER`: approved approval, `ready_for_review` variant → `approved`
+- `CWS-003-TEST`: approved approval, `ready_for_review` variant → `approved`
+- `CWS-TEST-2`: revision requested, `ready_for_review` variant → `draft`
+
+`CWS-001-ES-MASTER` remains exported with its historical evidence untouched.
+The English variant is no longer lifecycle-blocked, but its content and approval
+snapshot contain test placeholders. It must enter a new explicit revision and
+approval cycle before being treated as a real export-ready pilot deliverable.
