@@ -116,4 +116,4 @@ Use the new owner-confirmed revision control on `CWS-001-EN-MASTER`, replace the
 
 ## Git diff summary
 
-The feature and two staging migrations are implemented, validated, committed, and pushed on `agent/approved-content-rereview`; the exact commit is reported in the task result. Two older migration files are represented as filename-only renames to match the versions already present in staging. Deployment remains pending. No pilot content, approval, export evidence, publishing record, legacy table, or n8n workflow was changed by validation.
+PR #22 merged into `main` as `2d6ce5f`. Production deployment `dpl_CHoK2C5YctygbfbH7cbY3Ee5wbwi` reached Ready and is aliased to `https://cws-two.vercel.app`. Two older migration files are represented as filename-only renames to match the versions already present in staging. No pilot content, approval, export evidence, publishing record, legacy table, or n8n workflow was changed by validation or deployment.

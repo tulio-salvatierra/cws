@@ -1202,7 +1202,7 @@ reconciliation before the approved-content revision work began.
 ## 2026-08-12 — CWS-APPROVED-REVISION-015 approved-content re-review
 
 Agent: Codex
-Status: Completed and pushed; staging migrations applied; deployment pending
+Status: Completed, merged, deployed, and staging migrations applied
 
 Added an explicit owner-confirmed revision event for approved, non-exported
 content. The event preserves the completed approval, derives its owner and
@@ -1220,6 +1220,7 @@ older return-path/channel-brief migration filenames were aligned locally to
 their existing remote versions without reverting or re-running schema. All 99
 tests pass, lint has only the existing hook warning, build/import casing pass,
 and the new table has RLS, minimal browser grants, non-executable trigger
-functions, and complete foreign-key indexes. The feature branch is published;
-next: merge and deploy, then use
-the control to replace and freshly approve the English CWS-001 test content.
+functions, and complete foreign-key indexes. PR #22 merged into `main` as
+`2d6ce5f`; Production deployment `dpl_CHoK2C5YctygbfbH7cbY3Ee5wbwi` reached
+Ready and is aliased to `https://cws-two.vercel.app`. Next: use the control to
+replace and freshly approve the English CWS-001 test content.
