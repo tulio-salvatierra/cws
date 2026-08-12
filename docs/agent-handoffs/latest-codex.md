@@ -38,7 +38,7 @@ Objective: Add the smallest explicit, audited, non-publishing handoff from an ap
 - Added `content_variants.exported_by`, `exported_at`, and `export_snapshot` so a confirmed handoff records the authenticated actor, time, approved review, and exact final content and delivery reference.
 - Added a security-invoker update trigger that permits a new export only from `approved`, requires an approved review plus nonblank caption and export reference, blocks direct `published` bypasses, and makes captured export evidence and content immutable.
 - Preserved the two historical exported records with an explicit unavailable-evidence marker instead of inventing an actor or timestamp.
-- The Variant Detail page now provides a separate confirmation step, removes approval/export/publication states from ordinary manual selection, locks captured exports, and explicitly states that no publishing or n8n action occurs.
+- The Variant Detail page now provides a separate confirmation step, removes approval/export/publication states from ordinary manual selection, locks captured exports, explicitly states that no publishing or n8n action occurs, and names missing required fields when export confirmation is attempted.
 - No endpoint, webhook, social API, legacy table, n8n workflow, or outbound publication behavior was added or changed.
 
 ## Security decisions
@@ -63,8 +63,8 @@ Objective: Add the smallest explicit, audited, non-publishing handoff from an ap
 ## Tests added
 
 - Approved export requires a separate confirmation and records the final caption/reference without publishing.
-- The export action remains disabled until both caption and reference are present.
 - Captured exported fields render locked.
+- A missing caption/reference produces visible validation without opening the confirmation; completing both fields then opens it.
 
 ## Tests run
 
@@ -82,6 +82,7 @@ Objective: Add the smallest explicit, audited, non-publishing handoff from an ap
 ## Known issues
 
 - The real approved variant has no caption or export reference yet and remains deliberately unexported.
+- Live verification found that a silently disabled export button looked nonfunctional when the filename existed but the caption was blank. The local follow-up replaces silent disabling with actionable validation and is pending release.
 - PR #16 merged into `main` as `391693d`, and Production deployment `dpl_6NdNSzSRfBViQ5zJMfaUR4sgmcMB` is Ready at `https://cws-two.vercel.app`.
 - File upload, checksum, storage URL, export version modeling, and outbound publishing remain deferred.
 - Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
@@ -109,6 +110,7 @@ Open the real approved variant, add the final caption and Final Cut filename/ref
 ## Reusable learnings added
 
 - Terminal artifact handoffs need immutable final evidence and honest markers for unreconstructable history.
+- Required-action controls must respond with visible prerequisite guidance rather than silently staying disabled.
 
 ## Memory updates withheld
 
