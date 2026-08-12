@@ -1048,3 +1048,26 @@ PR #13 merged into `main` as `2a1e1cd`. Production deployment
 `api/generate-draft` function and aliases including `https://cws-two.vercel.app`
 and `https://cicerowebstudio.xyz`. The remaining release check is one
 user-initiated signed-in generation that creates a real review-only agent run.
+
+## 2026-08-12 — CWS-GENERATION-REVIEW-010 owner draft review
+
+Agent: Codex
+Status: Completed locally; staging migration applied; deployment pending
+
+Added an owner-only, explicit-confirmation review path for generated proposals.
+Acceptance atomically and idempotently creates one new draft content variant,
+links it to the source run with workspace-consistent immutable provenance, and
+completes the run. Rejection supersedes the run and creates no content. The
+authenticated API validates the current user and the database function is
+executable only by the service role; no approval, publish, webhook, legacy
+table, or n8n path is involved.
+
+Managed staging tests verified owner acceptance, retry idempotency, non-owner
+denial, rejection without content creation, and service-role-only function
+execution; all synthetic data was rolled back. The new migration
+`20260812153257` matches locally and remotely. All 94 tests, lint, the
+production build, import-casing, and whitespace checks pass; lint retains the
+existing hook warning. The first real generated run remains `needs_review` for
+Tulio's Production decision. Next: deploy, accept or reject that proposal in
+`/admin/agent-runs`, and verify the resulting linked draft before designing a
+separate approval-request step.

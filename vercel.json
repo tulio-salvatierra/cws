@@ -6,6 +6,9 @@
     },
     "api/generate-draft.js": {
       "maxDuration": 60
+    },
+    "api/review-generated-draft.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [

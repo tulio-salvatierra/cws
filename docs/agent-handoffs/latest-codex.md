@@ -1,14 +1,12 @@
 # Latest Codex Handoff
 
-Task ID: CWS-GENERATION-TEST-009
+Task ID: CWS-GENERATION-REVIEW-010
 Agent: Codex
-Objective: Add the first protected, non-publishing content-generation test for the Cicero Web Studio English channel brief.
+Objective: Add the smallest owner-only review path that can accept or reject a generated proposal without publishing it or overwriting an existing content variant.
 
 ## Files inspected
 
 - `.agents/codex-project-instructions.md`
-- `.env.example`
-- `.gitignore`
 - `docs/product-definition.md`
 - `docs/technical-conventions.md`
 - `docs/decisions.md`
@@ -16,27 +14,24 @@ Objective: Add the first protected, non-publishing content-generation test for t
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `api/published.js`
-- `api/__tests__/published.test.js`
-- `src/pages/admin/AgentRunsPage.jsx`
-- `src/pages/admin/__tests__/WorkspacePagesSmoke.test.jsx`
-- `src/lib/supabase.js`
-- `src/Hooks/useAuth.js`
-- `src/components/admin/AdminLayout.jsx`
-- `supabase/migrations/008_channels.sql`
-- `supabase/migrations/011_agent_runs.sql`
-- `supabase/migrations/20260809195932_016_channel_brief.sql`
-- `package.json`
-- `vercel.json`
-- Current OpenAI GPT-5.6/Responses guidance and Supabase Auth/Data API guidance
-
-## Files changed
-
-- `.env.example`
 - `api/generate-draft.js`
 - `api/__tests__/generate-draft.test.js`
 - `src/pages/admin/AgentRunsPage.jsx`
 - `src/pages/admin/__tests__/AgentRunsPage.test.jsx`
+- `supabase/migrations/009_campaigns_content_variants.sql`
+- `supabase/migrations/011_agent_runs.sql`
+- `supabase/migrations/20260809195932_016_channel_brief.sql`
+- `vercel.json`
+- Current Supabase Data API, function, and RLS guidance
+
+## Files changed
+
+- `supabase/migrations/20260812153257_generated_draft_review.sql`
+- `api/review-generated-draft.js`
+- `api/__tests__/review-generated-draft.test.js`
+- `src/components/admin/GeneratedDraftReviewCard.jsx`
+- `src/components/admin/__tests__/GeneratedDraftReviewCard.test.jsx`
+- `src/pages/admin/AgentRunsPage.jsx`
 - `vercel.json`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
@@ -45,66 +40,70 @@ Objective: Add the first protected, non-publishing content-generation test for t
 
 ## Database or API changes
 
-- Added authenticated `POST /api/generate-draft` as a Vercel function with a 60-second maximum duration and a 45-second outbound model timeout.
-- The endpoint validates the Supabase access token, requires an active workspace membership, resolves the workspace-owned channel and active language brief, and never trusts a client-supplied workspace ID.
-- Each request creates an immutable `propose` agent run, transitions it from `queued` to `running`, then to `needs_review` or `failed`.
-- The run input records the channel, language, topic, brief ID, brief version, and exact brief snapshot used. The output records the draft, model, OpenAI response ID, channel identity, language, brief identity/version, and generation timestamp.
-- OpenAI Responses uses `gpt-5.6-sol` by default with low reasoning, `store: false`, a hashed safety identifier, and no tools.
-- No schema migration, campaign mutation, content-variant mutation, approval mutation, publish call, webhook, or n8n integration was added.
+- Added nullable immutable `content_variants.source_agent_run_id` with a workspace-consistent composite foreign key to `agent_runs` and a unique partial index, so a generated run can create at most one promoted variant.
+- Added service-role-only `review_generated_draft` as a security-invoker database function. It locks the run, verifies the generated-run type and active owner actor, and performs each review atomically.
+- Accepting creates one new `draft` content variant from the owner-edited title, code, and copy, records immutable run provenance, and changes the run from `needs_review` to `completed`.
+- Rejecting creates no content variant and changes the run from `needs_review` to `superseded`.
+- Repeating the same terminal decision is idempotent; incompatible or unauthorized decisions fail.
+- Added authenticated `POST /api/review-generated-draft`, which validates the Supabase user before calling the restricted function and translates duplicate variant codes into a friendly HTTP 409 response.
+- Added the owner review card to `/admin/agent-runs`, including same-channel campaign selection, editable draft fields, an explicit confirmation boundary, accept, and reject.
+- No approval record, publish event, webhook call, legacy-table mutation, or n8n integration was added.
 
 ## Security decisions
 
-- `OPENAI_API_KEY` and the Supabase service-role key remain server-only and are never exposed through `VITE_` variables or returned to the browser.
-- The OpenAI key named `CWS content generator` was created through the secure Platform flow for Tulio's Default project and stored only in the ignored local `.env.local` file.
-- Authentication uses `supabase.auth.getUser(accessToken)` server-side; authorization then checks the user's active `workspace_members` row before any service-role database action.
-- The client sends only its current bearer token, channel/language selection, and topic. Workspace ownership is resolved server-side.
-- Model instructions explicitly define the result as a proposal and prohibit claims of approval, scheduling, or publication.
+- Only a current active workspace owner may accept or reject a generated proposal.
+- The browser never receives or sends the service-role key; it supplies only its access token and review input.
+- The function's execute privilege is revoked from public, anonymous, and authenticated roles and granted only to the service role.
+- Workspace provenance is enforced by a composite foreign key, not only application logic.
+- Acceptance creates a new variant instead of overwriting an existing record, preserving history and preventing an AI proposal from silently replacing authored work.
+- The Supabase security advisor reported the same two pre-existing warnings before and after the migration: intentional authenticated access to `create_workspace` and disabled leaked-password protection.
 
 ## Decisions made
 
 - No permanent decision was added.
-- Task-level defaults are the existing `cicero-web-studio` channel, English, `gpt-5.6-sol`, low reasoning, and a human-review terminal state.
-- The first implementation persists the proposal in `agent_runs.output` only; it does not promote the text into a content variant or approval record.
+- The approved task-level workflow is owner review with accept or reject; acceptance creates a new draft content variant and remains disconnected from approvals and publishing.
 
 ## Assumptions
 
-- The signed-in pilot account has one relevant active workspace membership and the Cicero Web Studio channel slug remains `cicero-web-studio`.
-- The existing `agent_runs` lifecycle is the smallest safe persistence boundary for a first generation test.
-- A later ticket will decide whether reviewed generated text becomes a content variant, approval request, or another first-class record.
+- A generated proposal must remain review-only until an owner makes an explicit decision.
+- Campaign selection is required at acceptance because the generation run is channel-scoped but not campaign-scoped.
+- The current one-run-to-one-promoted-variant model is the smallest viable provenance boundary.
 
 ## Tests added
 
-- Missing bearer token is rejected before a Supabase client is created.
-- An authenticated user without active membership is denied and OpenAI is not called.
-- A successful request records a brief-grounded `propose` run, exact brief snapshot, low-reasoning Responses request, and `needs_review` output.
-- An OpenAI rejection records a terminal failed run and safe error message.
-- The Agent Runs UI sends the current access token and displays the generated draft with its brief version.
+- API authentication is required before a review call.
+- Acceptance requires campaign, code, title, and draft.
+- Edited acceptance input is forwarded with the authenticated actor ID.
+- Rejection sends no variant fields.
+- Duplicate variant codes return a friendly 409 response.
+- The review UI filters campaigns to the generated run's channel and disables acceptance until explicit confirmation.
+- The edited draft is submitted and the page refresh callback runs after acceptance.
 
 ## Tests run
 
-- Focused generation tests: 2 files, 5 tests passed.
-- Full Vitest suite: 26 files, 87 tests passed.
+- Managed staging transaction: owner acceptance created one linked draft variant; retry returned the same result and retained one variant; non-owner review failed; owner rejection created no variant; all synthetic rows were rolled back.
+- Function privileges: anonymous false, authenticated false, service role true.
+- Focused Vitest review tests: 3 files, 8 tests passed.
+- Full Vitest suite: 28 files, 94 tests passed.
 - `npm run lint`: passed with the unchanged `src/Hooks/useDrafts.js` dependency warning.
-- `npm run build`: passed; import casing passed and 432 modules transformed.
+- `npm run build`: passed; import-casing check passed and 433 modules transformed.
 - `git diff --check`: passed.
-- Live OpenAI smoke request: HTTP 200 from `gpt-5.6-sol` with the expected `CWS generation ready` response.
+- `npx supabase migration list`: new migration `20260812153257` matches locally and remotely.
 
 ## Known issues
 
-- Production has `OPENAI_API_KEY`, `GENERATION_SUPABASE_URL`, and `GENERATION_SUPABASE_SERVICE_ROLE_KEY` configured as hidden Vercel values.
-- PR #13 is merged into `main`, and Production deployment `dpl_FkKgAMycjwAtKnAeVWFFT8B3YQEL` is Ready at `https://cws-two.vercel.app` with the new function included.
-- Signed-in generation remains a user validation step because it intentionally creates a real `needs_review` agent run under the user's account.
-- The visible first-cycle form is intentionally fixed to Cicero Web Studio English. Channel/language selection can be added after this path is live-verified.
-- A generated proposal can be reviewed in Agent Runs but cannot yet be promoted, approved, or copied into a content variant through this workflow.
-- Existing build chunk-size, third-party `eval`, dependency audit, and `useDrafts` lint warnings remain unchanged.
+- The real generated run `e0104603-d197-461e-8ae3-780e1bb2ef35` remains `needs_review` and has no linked variant so Tulio can make the first real decision in the UI.
+- Existing migration-history mismatches for local `015`, remote `20260809191332`, local `20260809195932`, and remote `20260809200028` remain unchanged and require a separate reconciliation task.
+- Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
+- Acceptance creates a draft variant only; approval requests and publishing remain separate later steps.
 
 ## Recommended next task
 
-Run one signed-in Cicero English generation, verify the saved `needs_review` run and brief snapshot, then decide the reviewed-proposal promotion path.
+Deploy the review workflow, then have Tulio accept or reject the real generated proposal on `/admin/agent-runs`. If accepted, verify the linked draft variant and then design the separate approval-request step.
 
 ## Questions requiring Tulio
 
-- After live verification, should an accepted generated draft create a new content variant, update a selected existing variant, or remain a reviewed agent-run proposal until a later workflow is designed?
+- Choose Accept or Reject for the first real generated proposal after reviewing and editing it in Production.
 
 ## Project-memory files updated
 
@@ -119,13 +118,13 @@ Run one signed-in Cicero English generation, verify the saved `needs_review` run
 
 ## Reusable learnings added
 
-- Persist an immutable snapshot of editable prompt-source records in the agent run; a version reference alone cannot reconstruct the exact generation context when that version's content can still change.
+- Promote a generated proposal through one atomic, idempotent database operation and enforce workspace-consistent provenance with a composite foreign key.
 
 ## Memory updates withheld
 
-- The model choice, reasoning effort, hard-coded first channel/language, prompt wording, and future promotion behavior remain task-level implementation choices rather than approved permanent decisions.
-- No automatic publishing, n8n integration, variant promotion, or approval behavior was added to permanent memory.
+- The one-run-to-one-variant rule, terminal run statuses, UI wording, and requirement to select a campaign at review time remain task-level choices rather than approved permanent decisions.
+- No automatic approval, publishing, n8n integration, or existing-variant overwrite behavior was added to permanent memory.
 
 ## Git diff summary
 
-PR #13 merged as `2a1e1cd`; Production deployment `dpl_FkKgAMycjwAtKnAeVWFFT8B3YQEL` is Ready and aliased to `https://cws-two.vercel.app`, `https://cicerowebstudio.xyz`, and their companion aliases. The release adds one protected generation endpoint, five focused API/UI tests, the non-publishing Agent Runs form and result display, server-only environment documentation, a bounded function duration, and required project-memory updates. No migration, seed, legacy table, n8n workflow, or publishing route changed.
+The task adds one migration, one authenticated review endpoint, one owner review component, seven focused API/UI tests, Agent Runs integration, a 30-second Vercel function limit, and required project-memory updates. The migration is applied and validated in staging; publishing, n8n, legacy social tables, existing variants, approvals, and the real generated run remain untouched pending deployment and Tulio's review decision.
