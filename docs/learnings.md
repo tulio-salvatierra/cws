@@ -185,3 +185,16 @@ the promoted record to its source run with a workspace-consistent composite
 foreign key, and make that provenance immutable. This prevents partial review
 states, duplicate promotion on retry, and cross-workspace attribution even if
 an API or client validation regresses.
+
+## Approval records need immutable evidence of mutable content
+
+Date: 2026-08-12
+
+Verified by: CWS-GENERATION-APPROVAL-011
+
+A foreign key from an approval to a mutable artifact proves which record was
+reviewed but not what content the reviewer saw. Capture an immutable content
+snapshot when review is requested, or freeze the artifact for the entire
+approval lifetime. For historical approvals whose original content cannot be
+reconstructed, store an explicit unavailable marker rather than presenting the
+artifact's current state as historical evidence.

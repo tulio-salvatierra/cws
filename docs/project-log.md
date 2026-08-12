@@ -1077,3 +1077,27 @@ PR #14 merged into `main` as `8290694`. Production deployment
 The live endpoint returned HTTP 401 without a bearer token, and
 `/admin/agent-runs` returned HTTP 200. The real proposal remains unchanged for
 Tulio's explicit owner decision.
+
+## 2026-08-12 — CWS-GENERATION-APPROVAL-011 durable approval request
+
+Agent: Codex
+Status: Completed locally; staging migration applied; deployment pending
+
+Hardened the existing Variant Detail request-review step with an immutable
+snapshot of the exact content presented for review and atomic content-variant
+status synchronization. A request moves the variant to `ready_for_review`, an
+approval moves it to `approved`, and revision or rejection returns it to
+`draft`; review decisions remain separate and owner-only. Historical approvals
+receive an honest marker that their original snapshot is unavailable rather
+than copied current content.
+
+Managed staging tests verified snapshot evidence, duplicate protection, owner
+approval, immutable evidence after current-content edits, revision and
+resubmission, approved-item resubmission denial, and non-member denial; all
+synthetic rows were rolled back. Migration `20260812155214` matches locally
+and remotely, both trigger functions are not directly executable by browser
+roles, the security advisor retained the same two pre-existing warnings, and
+all 95 tests, lint, build, import-casing, and whitespace checks pass. The real
+accepted generated variant remains a draft with zero approvals. Next: deploy,
+submit that variant for review, and verify the pending snapshot before the
+separate owner decision.

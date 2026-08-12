@@ -56,7 +56,7 @@ export default function VariantDetailPage() {
 
       const [variant, approval] = await Promise.all([
         supabase.from('content_variants').select(VARIANT_FIELDS).eq('id', variantId).eq('workspace_id', membership.data.workspace_id).single(),
-        supabase.from('approvals').select('id, status, feedback, reviewed_at').eq('content_variant_id', variantId).eq('workspace_id', membership.data.workspace_id).order('created_at', { ascending: false }).limit(1),
+        supabase.from('approvals').select('id, status, feedback, reviewed_at, content_snapshot').eq('content_variant_id', variantId).eq('workspace_id', membership.data.workspace_id).order('created_at', { ascending: false }).limit(1),
       ])
 
       if (variant.error) throw variant.error
@@ -106,11 +106,12 @@ export default function VariantDetailPage() {
       return
     }
 
-    const result = await supabase.from('approvals').insert({ workspace_id: state.workspaceId, content_variant_id: variantId, created_by: data.user.id, status: 'pending' }).select('id, status, feedback, reviewed_at').single()
+    const result = await supabase.from('approvals').insert({ workspace_id: state.workspaceId, content_variant_id: variantId, created_by: data.user.id, status: 'pending' }).select('id, status, feedback, reviewed_at, content_snapshot').single()
     if (result.error) {
       setApprovalError(result.error.message)
     } else {
-      setState((current) => ({ ...current, approval: result.data }))
+      setState((current) => ({ ...current, approval: result.data, variant: { ...current.variant, status: 'ready_for_review' } }))
+      setForm((current) => ({ ...current, status: 'ready_for_review' }))
       setFeedback('')
       setReviewDecision(null)
     }
@@ -120,11 +121,13 @@ export default function VariantDetailPage() {
   async function review(status) {
     setApprovalError('')
     setReviewing(true)
-    const result = await supabase.from('approvals').update({ status, feedback: feedback || null }).eq('id', state.approval.id).select('id, status, feedback, reviewed_at').single()
+    const result = await supabase.from('approvals').update({ status, feedback: feedback || null }).eq('id', state.approval.id).select('id, status, feedback, reviewed_at, content_snapshot').single()
     if (result.error) {
       setApprovalError(result.error.message)
     } else {
-      setState((current) => ({ ...current, approval: result.data }))
+      const variantStatus = status === 'approved' ? 'approved' : 'draft'
+      setState((current) => ({ ...current, approval: result.data, variant: { ...current.variant, status: variantStatus } }))
+      setForm((current) => ({ ...current, status: variantStatus }))
       setFeedback('')
       setReviewDecision(null)
     }
@@ -178,12 +181,12 @@ export default function VariantDetailPage() {
       <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Approval</p>
       <p className="mt-3 text-lg font-semibold">{statusLabel(state.approval?.status || 'not_requested')}</p>
       {state.approval?.feedback && <p className="mt-2 text-slate-300">{state.approval.feedback}</p>}
-      {!state.approval && <button disabled={approvalActionPending} onClick={requestApproval} className="mt-4 rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Requesting…' : 'Request review'}</button>}
+      {!state.approval && <div className="mt-4"><p className="mb-3 text-sm text-slate-400">Submitting captures an immutable snapshot of the current variant and moves it to ready for review. It does not approve or publish anything.</p><button disabled={approvalActionPending} onClick={requestApproval} className="rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Requesting…' : 'Request review'}</button></div>}
       {state.approval?.status === 'revision_requested' && <button disabled={approvalActionPending} onClick={requestApproval} className="mt-4 rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{approvalActionPending ? 'Re-submitting…' : 'Re-submit for review'}</button>}
       {state.approval?.status === 'pending' && <div className="mt-4 space-y-4 rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4">
         <div>
           <p className="font-semibold text-amber-100">Submitted for owner review</p>
-          <p className="mt-1 text-sm text-slate-400">No approval decision has been recorded yet. The controls below perform a separate owner review.</p>
+          <p className="mt-1 text-sm text-slate-400">An immutable content snapshot was captured. No approval decision has been recorded yet. The controls below perform a separate owner review.</p>
         </div>
         <label className="block text-sm text-slate-300">Reviewer feedback
           <textarea aria-label="Reviewer feedback" value={feedback} onChange={(event) => setFeedback(event.target.value)} placeholder="Optional feedback for this review decision" rows="3" className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white" />
