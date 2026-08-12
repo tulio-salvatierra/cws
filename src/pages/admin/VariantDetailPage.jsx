@@ -174,6 +174,20 @@ export default function VariantDetailPage() {
     setExporting(false)
   }
 
+  function beginExport() {
+    const missingFields = []
+    if (!form?.caption_text.trim()) missingFields.push('the final caption')
+    if (!form?.export_reference.trim()) missingFields.push('an export filename or reference')
+
+    if (missingFields.length > 0) {
+      setExportError(`Add ${missingFields.join(' and ')} before recording the export.`)
+      return
+    }
+
+    setExportError('')
+    setExportConfirm(true)
+  }
+
   if (state.loading) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Loading content variant…</div>
   if (state.error) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><p className="text-rose-200">{state.error}</p><Link className="mt-4 inline-block text-orange-300" to="/admin/workspace">Back to workspace</Link></main>
 
@@ -251,7 +265,7 @@ export default function VariantDetailPage() {
 
     {(variant.status === 'approved' || exportLocked) && <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-300/[0.04] p-6">
       <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Export handoff</p>
-      {variant.status === 'approved' && <><h2 className="mt-3 text-xl font-semibold">Prepare the approved variant for external export</h2><p className="mt-2 text-sm text-slate-400">Add the final caption and Final Cut filename or delivery reference above. Confirming saves the current fields, captures an immutable handoff snapshot, and marks the variant exported. It does not publish or contact n8n.</p><button type="button" disabled={!form?.caption_text.trim() || !form?.export_reference.trim()} onClick={() => setExportConfirm(true)} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Mark exported</button></>}
+      {variant.status === 'approved' && <><h2 className="mt-3 text-xl font-semibold">Prepare the approved variant for external export</h2><p className="mt-2 text-sm text-slate-400">Add the final caption and Final Cut filename or delivery reference above. Confirming saves the current fields, captures an immutable handoff snapshot, and marks the variant exported. It does not publish or contact n8n.</p><button type="button" disabled={exporting} onClick={beginExport} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Mark exported</button></>}
       {exportLocked && <><h2 className="mt-3 text-xl font-semibold">Export recorded</h2><p className="mt-2 text-sm text-slate-300">{variant.export_reference}</p>{variant.exported_at && <time className="mt-2 block text-xs text-slate-500">Recorded {new Date(variant.exported_at).toLocaleString()}</time>}<p className="mt-3 text-sm text-slate-400">No publication action was triggered.</p></>}
       {exportError && <p role="alert" className="mt-4 text-sm text-rose-300">{exportError}</p>}
       {exportConfirm && <div role="alertdialog" aria-label="Confirm export handoff" className="mt-4 rounded-2xl border border-emerald-300/30 bg-slate-950/70 p-4"><p className="font-semibold">Confirm export handoff</p><p className="mt-1 text-sm text-slate-400">This locks the current content, caption, and export reference as the final exported handoff. It will not publish anything.</p><div className="mt-4 flex flex-wrap gap-3"><button type="button" disabled={exporting} onClick={recordExport} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{exporting ? 'Recording…' : 'Confirm exported'}</button><button type="button" disabled={exporting} onClick={() => setExportConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button></div></div>}

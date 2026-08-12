@@ -211,3 +211,14 @@ fields, delivery reference, actor, timestamp, and upstream approval together at
 the transition, then prevent later content edits from rewriting that evidence.
 For older terminal records that cannot be reconstructed, retain an explicit
 unavailable marker rather than inventing attribution or copying current data.
+
+## Required-action controls must explain unmet prerequisites
+
+Date: 2026-08-12
+
+Verified by: CWS-EXPORT-HANDOFF-012
+
+A silently disabled action can look broken when its required fields are located
+elsewhere on the page. Let the user invoke the action, block the state change
+in validation, and name the missing prerequisites in visible accessible
+feedback. Preserve database constraints as the final enforcement boundary.

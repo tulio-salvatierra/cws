@@ -270,7 +270,7 @@ describe('VariantDetailPage', () => {
     expect(screen.getByRole('textbox', { name: 'Export filename or reference' })).toBeDisabled()
   })
 
-  it('keeps the export action disabled until caption and reference are present', async () => {
+  it('explains which required export fields are missing before confirmation', async () => {
     const approvedVariant = {
       ...variant,
       status: 'approved',
@@ -296,6 +296,18 @@ describe('VariantDetailPage', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByRole('button', { name: 'Mark exported' })).toBeDisabled()
+    const user = userEvent.setup()
+    const exportButton = await screen.findByRole('button', { name: 'Mark exported' })
+    expect(exportButton).toBeEnabled()
+    await user.click(exportButton)
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Add the final caption and an export filename or reference before recording the export.')
+    expect(screen.queryByRole('alertdialog', { name: 'Confirm export handoff' })).not.toBeInTheDocument()
+
+    await user.type(screen.getByRole('textbox', { name: 'Caption text' }), 'Final caption')
+    await user.type(screen.getByRole('textbox', { name: 'Export filename or reference' }), 'CWS-AI-E0104603-v1.mp4')
+    await user.click(exportButton)
+
+    expect(screen.getByRole('alertdialog', { name: 'Confirm export handoff' })).toBeInTheDocument()
   })
 })

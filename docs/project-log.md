@@ -1132,3 +1132,10 @@ PR #16 merged into `main` as `391693d`. Production deployment
 `https://cws-two.vercel.app`; safe HTTP checks returned 200 for the login and
 real variant routes. The real approved variant remains unchanged pending
 Tulio's final caption, filename/reference, and explicit export confirmation.
+
+Live testing then exposed a UX failure: the real filename was present but the
+caption was blank, so `Mark exported` stayed silently disabled and appeared
+broken. The follow-up makes the control respond with the exact missing fields
+and opens confirmation after both are completed; the focused test, all 97
+tests, lint, build, import-casing, and whitespace checks pass. Deployment of
+this feedback fix is pending.
