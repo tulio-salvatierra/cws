@@ -80,13 +80,14 @@ Objective: Harden the separate request-approval step so each review has durable 
 ## Known issues
 
 - The real accepted generated variant `5cf97ebf-54fa-4277-ac13-c51d4862e436` remains `draft` with zero approvals so Tulio can perform the first real request after deployment.
+- PR #15 is merged into `main` as `4cbf31a`, and Production deployment `dpl_DyUEfC4Gmz7oTXnDtFWf3M5cQzV7` is Ready.
 - The first staging apply attempt rolled back because an UPDATE backfill correctly hit completed-approval immutability. The final migration uses a constant default marker for legacy history and applied successfully without rewriting completed approvals.
 - Existing migration-history mismatches for local `015`, remote `20260809191332`, local `20260809195932`, and remote `20260809200028` remain unchanged.
 - Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
 
 ## Recommended next task
 
-Deploy the request-approval hardening, then have Tulio open the accepted variant and click Request review. Verify the pending snapshot and `ready_for_review` status before making the separate owner approval or revision decision.
+Have Tulio open the accepted variant and click Request review. Verify the pending snapshot and `ready_for_review` status before making the separate owner approval or revision decision.
 
 ## Questions requiring Tulio
 
@@ -114,4 +115,4 @@ Deploy the request-approval hardening, then have Tulio open the accepted variant
 
 ## Git diff summary
 
-The task adds one applied migration, immutable approval snapshots, atomic approval/variant status synchronization, one UI regression test, updated Variant Detail feedback, and required project-memory updates. The real accepted draft and all publishing paths remain untouched pending deployment and Tulio's explicit request.
+PR #15 merged as `4cbf31a`; Production deployment `dpl_DyUEfC4Gmz7oTXnDtFWf3M5cQzV7` is Ready. The task adds one applied migration, immutable approval snapshots, atomic approval/variant status synchronization, one UI regression test, updated Variant Detail feedback, and required project-memory updates. The real accepted draft and all publishing paths remain untouched pending Tulio's explicit request.

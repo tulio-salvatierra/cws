@@ -1101,3 +1101,8 @@ all 95 tests, lint, build, import-casing, and whitespace checks pass. The real
 accepted generated variant remains a draft with zero approvals. Next: deploy,
 submit that variant for review, and verify the pending snapshot before the
 separate owner decision.
+
+PR #15 merged into `main` as `4cbf31a`. Production deployment
+`dpl_DyUEfC4Gmz7oTXnDtFWf3M5cQzV7` reached Ready. The real accepted variant
+remains a draft with no approval request so Tulio can initiate and verify the
+first durable review cycle in Production.
