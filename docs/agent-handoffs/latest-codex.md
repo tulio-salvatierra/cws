@@ -105,4 +105,4 @@ Design and implement an explicit owner-confirmed “Revise approved content” t
 
 ## Git diff summary
 
-One new migration and five project-memory files are changed locally on `agent/reconcile-historical-approval-status`. The migration is applied to staging and aligned to remote version `20260812193142`. No application code, approval evidence, export evidence, publishing record, legacy table, or n8n workflow changed. Nothing is committed or pushed.
+Commit `6c5d49e` is pushed on `agent/reconcile-historical-approval-status`. The migration is applied to staging and aligned to remote version `20260812193142`. No application code, approval evidence, export evidence, publishing record, legacy table, or n8n workflow changed. Pull request, merge, and deployment remain pending.

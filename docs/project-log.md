@@ -1181,7 +1181,7 @@ reference, and correction reason, then verify versions 1 and 2 in Production.
 ## 2026-08-12 — CWS-PILOT-STATUS-RECONCILE-014 historical approval status
 
 Agent: Codex
-Status: Completed locally; staging migration applied; push pending
+Status: Completed and pushed; staging migration applied; merge pending
 
 Found three non-exported variants whose completed approval decisions predated
 the status-synchronization trigger. Added and applied bounded migration
@@ -1191,3 +1191,7 @@ untouched. English CWS-001 is now lifecycle-consistent, Spanish remains
 exported, all 98 tests pass, lint has only the existing hook warning, and the
 security advisor is unchanged. Next: add an explicit approved-content
 revision/re-review path before replacing the English test placeholders.
+
+Commit `6c5d49e` was pushed to
+`agent/reconcile-historical-approval-status`. Pull request, merge, and deployment
+remain pending.
