@@ -93,13 +93,14 @@ Objective: Add the smallest owner-only review path that can accept or reject a g
 ## Known issues
 
 - The real generated run `e0104603-d197-461e-8ae3-780e1bb2ef35` remains `needs_review` and has no linked variant so Tulio can make the first real decision in the UI.
+- PR #14 is merged into `main` as `8290694`, and Production deployment `dpl_Aa1SQQVr13pNzcs9W3pD7DpyDvEW` is Ready. The live endpoint rejects an unauthenticated review with HTTP 401, and `/admin/agent-runs` returns HTTP 200.
 - Existing migration-history mismatches for local `015`, remote `20260809191332`, local `20260809195932`, and remote `20260809200028` remain unchanged and require a separate reconciliation task.
 - Existing chunk-size, third-party `eval`, dependency-audit, and `useDrafts` lint warnings remain unchanged.
 - Acceptance creates a draft variant only; approval requests and publishing remain separate later steps.
 
 ## Recommended next task
 
-Deploy the review workflow, then have Tulio accept or reject the real generated proposal on `/admin/agent-runs`. If accepted, verify the linked draft variant and then design the separate approval-request step.
+Have Tulio accept or reject the real generated proposal on `/admin/agent-runs`. If accepted, verify the linked draft variant and then design the separate approval-request step.
 
 ## Questions requiring Tulio
 
@@ -127,4 +128,4 @@ Deploy the review workflow, then have Tulio accept or reject the real generated 
 
 ## Git diff summary
 
-The task adds one migration, one authenticated review endpoint, one owner review component, seven focused API/UI tests, Agent Runs integration, a 30-second Vercel function limit, and required project-memory updates. The migration is applied and validated in staging; publishing, n8n, legacy social tables, existing variants, approvals, and the real generated run remain untouched pending deployment and Tulio's review decision.
+PR #14 merged as `8290694`; Production deployment `dpl_Aa1SQQVr13pNzcs9W3pD7DpyDvEW` is Ready. The task adds one migration, one authenticated review endpoint, one owner review component, seven focused API/UI tests, Agent Runs integration, a 30-second Vercel function limit, and required project-memory updates. Publishing, n8n, legacy social tables, existing variants, approvals, and the real generated run remain untouched pending Tulio's review decision.

@@ -1071,3 +1071,9 @@ existing hook warning. The first real generated run remains `needs_review` for
 Tulio's Production decision. Next: deploy, accept or reject that proposal in
 `/admin/agent-runs`, and verify the resulting linked draft before designing a
 separate approval-request step.
+
+PR #14 merged into `main` as `8290694`. Production deployment
+`dpl_Aa1SQQVr13pNzcs9W3pD7DpyDvEW` reached Ready with the review function.
+The live endpoint returned HTTP 401 without a bearer token, and
+`/admin/agent-runs` returned HTTP 200. The real proposal remains unchanged for
+Tulio's explicit owner decision.
