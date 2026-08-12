@@ -1147,3 +1147,26 @@ the approved review, and caption `test` at `2026-08-12 18:47:13.374327+00`.
 A signed-in Production reload showed `Export recorded`, locked evidence, and
 the explicit no-publication notice. Next: decide whether the test caption is
 acceptable pilot evidence or requires a new versioned correction workflow.
+
+## 2026-08-12 — CWS-EXPORT-REVISION-013 versioned export corrections
+
+Agent: Codex
+Status: Completed locally; staging migrations applied; deployment pending
+
+Added append-only export versions and a confirmed correction workflow that
+preserves the first real handoff exactly while permitting a new caption,
+filename/reference, and reason as version 2 or later. The database derives the
+version, actor, time, approved review, superseded record, and immutable content
+snapshot. Workspace members may read and insert, but browser roles cannot
+update or delete history or execute the trigger functions directly. No
+publishing, n8n, webhook, social API, or legacy-table behavior changed.
+
+Managed staging tests verified the unchanged real version 1, invalid and
+non-member denials, a valid temporary version 2, immutable mutation privileges,
+RLS visibility, and automatic version-1 capture for future exports; all
+synthetic changes rolled back. Testing found and corrected both a broad default
+grant risk and PostgreSQL `UPDATE OF` trigger behavior. Migrations
+`20260812190342`, `20260812190521`, and `20260812190917` are applied and aligned.
+All 98 tests, lint, build, import-casing, and whitespace checks pass; lint keeps
+the existing hook warning. Next: push and deploy the UI, then create and verify
+the real corrected version 2 without invoking publication.

@@ -18,6 +18,7 @@ const VARIANT_STATUSES = [
 ]
 
 const VARIANT_FIELDS = 'id, code, locale, working_title, status, transcript, tone, editing_notes, caption_text, export_reference, exported_by, exported_at, export_snapshot, campaign_id'
+const EXPORT_FIELDS = 'id, version, caption_text, export_reference, correction_reason, approved_approval_id, supersedes_export_id, content_snapshot, is_historical, created_by, exported_at'
 
 const MANUAL_VARIANT_STATUSES = VARIANT_STATUSES.filter(
   (status) => !['ready_for_review', 'approved', 'exported', 'published'].includes(status),
@@ -46,7 +47,7 @@ function statusLabel(status) {
 
 export default function VariantDetailPage() {
   const { variantId } = useParams()
-  const [state, setState] = useState({ loading: true, error: '', variant: null, approval: null, workspaceId: null })
+  const [state, setState] = useState({ loading: true, error: '', variant: null, approval: null, exports: [], workspaceId: null })
   const [form, setForm] = useState(null)
   const [feedback, setFeedback] = useState('')
   const [saveError, setSaveError] = useState('')
@@ -59,6 +60,11 @@ export default function VariantDetailPage() {
   const [exportConfirm, setExportConfirm] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState('')
+  const [correctionOpen, setCorrectionOpen] = useState(false)
+  const [correctionConfirm, setCorrectionConfirm] = useState(false)
+  const [correctionForm, setCorrectionForm] = useState({ caption_text: '', export_reference: '', correction_reason: '' })
+  const [correctionError, setCorrectionError] = useState('')
+  const [correcting, setCorrecting] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -67,16 +73,25 @@ export default function VariantDetailPage() {
       const membership = await supabase.from('workspace_members').select('workspace_id').eq('status', 'active').order('created_at').limit(1).single()
       if (membership.error) throw membership.error
 
-      const [variant, approval] = await Promise.all([
+      const [variant, approval, exportHistory] = await Promise.all([
         supabase.from('content_variants').select(VARIANT_FIELDS).eq('id', variantId).eq('workspace_id', membership.data.workspace_id).single(),
         supabase.from('approvals').select('id, status, feedback, reviewed_at, content_snapshot').eq('content_variant_id', variantId).eq('workspace_id', membership.data.workspace_id).order('created_at', { ascending: false }).limit(1),
+        supabase.from('content_variant_exports').select(EXPORT_FIELDS).eq('content_variant_id', variantId).eq('workspace_id', membership.data.workspace_id).order('version', { ascending: false }),
       ])
 
       if (variant.error) throw variant.error
       if (approval.error) throw approval.error
+      if (exportHistory.error) throw exportHistory.error
       if (active) {
-        setState({ loading: false, error: '', variant: variant.data, approval: approval.data?.[0] || null, workspaceId: membership.data.workspace_id })
+        const exports = exportHistory.data || []
+        const latestExport = exports[0]
+        setState({ loading: false, error: '', variant: variant.data, approval: approval.data?.[0] || null, exports, workspaceId: membership.data.workspace_id })
         setForm(formFromVariant(variant.data))
+        setCorrectionForm({
+          caption_text: latestExport?.caption_text || variant.data.caption_text || '',
+          export_reference: '',
+          correction_reason: '',
+        })
       }
     }
 
@@ -188,11 +203,65 @@ export default function VariantDetailPage() {
     setExportConfirm(true)
   }
 
+  function beginCorrection() {
+    const missingFields = []
+    if (!correctionForm.caption_text.trim()) missingFields.push('the corrected caption')
+    if (!correctionForm.export_reference.trim()) missingFields.push('a new export filename or reference')
+    if (!correctionForm.correction_reason.trim()) missingFields.push('a correction reason')
+
+    if (missingFields.length > 0) {
+      setCorrectionError(`Add ${missingFields.join(', ')} before recording a corrected export.`)
+      return
+    }
+
+    if (correctionForm.export_reference.trim() === state.exports[0]?.export_reference) {
+      setCorrectionError('Use a new export filename or reference for the corrected version.')
+      return
+    }
+
+    setCorrectionError('')
+    setCorrectionConfirm(true)
+  }
+
+  async function recordCorrection() {
+    setCorrectionError('')
+    setCorrecting(true)
+    const result = await supabase
+      .from('content_variant_exports')
+      .insert({
+        workspace_id: state.workspaceId,
+        content_variant_id: variantId,
+        caption_text: correctionForm.caption_text.trim(),
+        export_reference: correctionForm.export_reference.trim(),
+        correction_reason: correctionForm.correction_reason.trim(),
+      })
+      .select(EXPORT_FIELDS)
+      .single()
+
+    if (result.error) {
+      setCorrectionError(result.error.message)
+    } else {
+      setState((current) => ({ ...current, exports: [result.data, ...current.exports] }))
+      setCorrectionForm({ caption_text: result.data.caption_text, export_reference: '', correction_reason: '' })
+      setCorrectionConfirm(false)
+      setCorrectionOpen(false)
+    }
+    setCorrecting(false)
+  }
+
   if (state.loading) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Loading content variant…</div>
   if (state.error) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><p className="text-rose-200">{state.error}</p><Link className="mt-4 inline-block text-orange-300" to="/admin/workspace">Back to workspace</Link></main>
 
   const variant = state.variant
   const exportLocked = Boolean(variant.export_snapshot)
+  const latestExport = state.exports[0]
+  const currentExport = latestExport || (exportLocked ? {
+    version: 1,
+    caption_text: variant.caption_text,
+    export_reference: variant.export_reference,
+    exported_at: variant.exported_at,
+    is_historical: Boolean(variant.export_snapshot?.unavailable_reason),
+  } : null)
   return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-4xl">
     <Link className="text-sm font-semibold text-orange-300" to={`/admin/campaigns/${variant.campaign_id}`}>← Campaign</Link>
     <p className="mt-10 text-xs font-semibold uppercase tracking-[0.25em] text-orange-200">Content variant · {variant.locale}</p>
@@ -265,10 +334,80 @@ export default function VariantDetailPage() {
 
     {(variant.status === 'approved' || exportLocked) && <section className="mt-6 rounded-3xl border border-emerald-300/20 bg-emerald-300/[0.04] p-6">
       <p className="text-xs uppercase tracking-[0.2em] text-emerald-200">Export handoff</p>
-      {variant.status === 'approved' && <><h2 className="mt-3 text-xl font-semibold">Prepare the approved variant for external export</h2><p className="mt-2 text-sm text-slate-400">Add the final caption and Final Cut filename or delivery reference above. Confirming saves the current fields, captures an immutable handoff snapshot, and marks the variant exported. It does not publish or contact n8n.</p><button type="button" disabled={exporting} onClick={beginExport} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Mark exported</button></>}
-      {exportLocked && <><h2 className="mt-3 text-xl font-semibold">Export recorded</h2><p className="mt-2 text-sm text-slate-300">{variant.export_reference}</p>{variant.exported_at && <time className="mt-2 block text-xs text-slate-500">Recorded {new Date(variant.exported_at).toLocaleString()}</time>}<p className="mt-3 text-sm text-slate-400">No publication action was triggered.</p></>}
+
+      {variant.status === 'approved' && <>
+        <h2 className="mt-3 text-xl font-semibold">Prepare the approved variant for external export</h2>
+        <p className="mt-2 text-sm text-slate-400">Add the final caption and Final Cut filename or delivery reference above. Confirming saves the current fields, captures an immutable handoff snapshot, and marks the variant exported. It does not publish or contact n8n.</p>
+        <button type="button" disabled={exporting} onClick={beginExport} className="mt-4 rounded-full bg-emerald-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Mark exported</button>
+      </>}
+
+      {exportLocked && currentExport && <>
+        <h2 className="mt-3 text-xl font-semibold">Current export · version {currentExport.version}</h2>
+        <p className="mt-2 text-sm text-slate-300">{currentExport.export_reference || 'Reference unavailable'}</p>
+        {currentExport.exported_at && <time className="mt-2 block text-xs text-slate-500">Recorded {new Date(currentExport.exported_at).toLocaleString()}</time>}
+        <p className="mt-3 text-sm text-slate-400">No publication action was triggered.</p>
+        {variant.status === 'exported' && <button type="button" onClick={() => {
+          setCorrectionError('')
+          setCorrectionOpen((open) => !open)
+          setCorrectionConfirm(false)
+        }} className="mt-4 rounded-full border border-emerald-300/40 px-5 py-3 text-sm font-semibold text-emerald-100">
+          {correctionOpen ? 'Cancel correction' : 'Create corrected export'}
+        </button>}
+      </>}
+
+      {correctionOpen && <div className="mt-5 space-y-4 rounded-2xl border border-emerald-300/20 bg-slate-950/50 p-4">
+        <div>
+          <h3 className="font-semibold">Prepare version {(latestExport?.version || 1) + 1}</h3>
+          <p className="mt-1 text-sm text-slate-400">The existing versions stay locked. This records a new handoff only; it does not publish or contact n8n.</p>
+        </div>
+        <label className="block text-sm text-slate-300">Corrected caption
+          <textarea aria-label="Corrected caption" rows="4" value={correctionForm.caption_text} onChange={(event) => setCorrectionForm({ ...correctionForm, caption_text: event.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+        </label>
+        <label className="block text-sm text-slate-300">New export filename or reference
+          <input aria-label="New export filename or reference" value={correctionForm.export_reference} onChange={(event) => setCorrectionForm({ ...correctionForm, export_reference: event.target.value })} placeholder="Use a new filename, version, or delivery reference" className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+        </label>
+        <label className="block text-sm text-slate-300">Correction reason
+          <textarea aria-label="Correction reason" rows="3" value={correctionForm.correction_reason} onChange={(event) => setCorrectionForm({ ...correctionForm, correction_reason: event.target.value })} placeholder="What changed and why?" className="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-white" />
+        </label>
+        <button type="button" disabled={correcting} onClick={beginCorrection} className="rounded-full bg-emerald-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Review corrected export</button>
+      </div>}
+
       {exportError && <p role="alert" className="mt-4 text-sm text-rose-300">{exportError}</p>}
-      {exportConfirm && <div role="alertdialog" aria-label="Confirm export handoff" className="mt-4 rounded-2xl border border-emerald-300/30 bg-slate-950/70 p-4"><p className="font-semibold">Confirm export handoff</p><p className="mt-1 text-sm text-slate-400">This locks the current content, caption, and export reference as the final exported handoff. It will not publish anything.</p><div className="mt-4 flex flex-wrap gap-3"><button type="button" disabled={exporting} onClick={recordExport} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{exporting ? 'Recording…' : 'Confirm exported'}</button><button type="button" disabled={exporting} onClick={() => setExportConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button></div></div>}
+      {correctionError && <p role="alert" className="mt-4 text-sm text-rose-300">{correctionError}</p>}
+
+      {exportConfirm && <div role="alertdialog" aria-label="Confirm export handoff" className="mt-4 rounded-2xl border border-emerald-300/30 bg-slate-950/70 p-4">
+        <p className="font-semibold">Confirm export handoff</p>
+        <p className="mt-1 text-sm text-slate-400">This locks the current content, caption, and export reference as the final exported handoff. It will not publish anything.</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button type="button" disabled={exporting} onClick={recordExport} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{exporting ? 'Recording…' : 'Confirm exported'}</button>
+          <button type="button" disabled={exporting} onClick={() => setExportConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button>
+        </div>
+      </div>}
+
+      {correctionConfirm && <div role="alertdialog" aria-label="Confirm corrected export" className="mt-4 rounded-2xl border border-emerald-300/30 bg-slate-950/70 p-4">
+        <p className="font-semibold">Confirm export version {(latestExport?.version || 1) + 1}</p>
+        <p className="mt-1 text-sm text-slate-400">This appends a corrected immutable handoff and preserves every earlier version. It will not publish anything.</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button type="button" disabled={correcting} onClick={recordCorrection} className="rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{correcting ? 'Recording…' : 'Confirm corrected export'}</button>
+          <button type="button" disabled={correcting} onClick={() => setCorrectionConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button>
+        </div>
+      </div>}
+
+      {state.exports.length > 0 && <div className="mt-6 border-t border-white/10 pt-5">
+        <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">Export history</h3>
+        <ol className="mt-4 space-y-3">
+          {state.exports.map((exportVersion, index) => <li key={exportVersion.id} className="rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-semibold">Version {exportVersion.version}{index === 0 ? ' · Current' : ''}</p>
+              {exportVersion.exported_at && <time className="text-xs text-slate-500">{new Date(exportVersion.exported_at).toLocaleString()}</time>}
+            </div>
+            <p className="mt-2 text-sm text-slate-300">{exportVersion.export_reference || 'Reference unavailable'}</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm text-slate-400">{exportVersion.caption_text || 'Caption unavailable'}</p>
+            {exportVersion.correction_reason && <p className="mt-2 text-xs text-amber-200">Reason: {exportVersion.correction_reason}</p>}
+            {exportVersion.is_historical && <p className="mt-2 text-xs text-slate-500">Original evidence predates audited export capture.</p>}
+          </li>)}
+        </ol>
+      </div>}
     </section>}
   </div></main>
 }

@@ -264,7 +264,7 @@ describe('VariantDetailPage', () => {
       export_reference: 'CWS-AI-E0104603-v1.mp4',
       status: 'exported',
     }))
-    expect(await screen.findByRole('heading', { name: 'Export recorded' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Current export · version 1' })).toBeInTheDocument()
     expect(screen.getByText('No publication action was triggered.')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Caption text' })).toBeDisabled()
     expect(screen.getByRole('textbox', { name: 'Export filename or reference' })).toBeDisabled()
@@ -309,5 +309,89 @@ describe('VariantDetailPage', () => {
     await user.click(exportButton)
 
     expect(screen.getByRole('alertdialog', { name: 'Confirm export handoff' })).toBeInTheDocument()
+  })
+
+  it('appends a corrected export version while preserving the original history', async () => {
+    const exportedVariant = {
+      ...variant,
+      status: 'exported',
+      caption_text: 'test',
+      export_reference: 'CWS-AI-E0104603-v1.mp4',
+      exported_by: 'user-1',
+      exported_at: '2026-08-12T18:47:13Z',
+      export_snapshot: { snapshot_version: 1, approved_approval_id: 'approval-1' },
+    }
+    const versionOne = {
+      id: 'export-1',
+      version: 1,
+      caption_text: 'test',
+      export_reference: 'CWS-AI-E0104603-v1.mp4',
+      correction_reason: null,
+      exported_at: '2026-08-12T18:47:13Z',
+      is_historical: false,
+    }
+    const versionTwo = {
+      id: 'export-2',
+      version: 2,
+      caption_text: 'Final corrected caption',
+      export_reference: 'CWS-AI-E0104603-v2.mp4',
+      correction_reason: 'Replace the pilot caption.',
+      exported_at: '2026-08-12T19:00:00Z',
+      is_historical: false,
+    }
+    let exportQueryCount = 0
+
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1' } })
+      if (table === 'content_variants') return query({ singleData: exportedVariant })
+      if (table === 'approvals') return query({ data: [{ id: 'approval-1', status: 'approved' }] })
+      if (table === 'content_variant_exports') {
+        exportQueryCount += 1
+        return exportQueryCount === 1
+          ? query({ data: [versionOne] })
+          : query({ singleData: versionTwo })
+      }
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const user = userEvent.setup()
+    expect(await screen.findByRole('heading', { name: 'Current export · version 1' })).toBeInTheDocument()
+    expect(screen.getByText('Version 1 · Current')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Create corrected export' }))
+    await user.clear(screen.getByRole('textbox', { name: 'Corrected caption' }))
+    await user.type(screen.getByRole('textbox', { name: 'Corrected caption' }), 'Final corrected caption')
+    await user.type(screen.getByRole('textbox', { name: 'New export filename or reference' }), 'CWS-AI-E0104603-v1.mp4')
+    await user.type(screen.getByRole('textbox', { name: 'Correction reason' }), 'Replace the pilot caption.')
+    await user.click(screen.getByRole('button', { name: 'Review corrected export' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Use a new export filename or reference for the corrected version.')
+    expect(screen.queryByRole('alertdialog', { name: 'Confirm corrected export' })).not.toBeInTheDocument()
+
+    await user.clear(screen.getByRole('textbox', { name: 'New export filename or reference' }))
+    await user.type(screen.getByRole('textbox', { name: 'New export filename or reference' }), 'CWS-AI-E0104603-v2.mp4')
+    await user.click(screen.getByRole('button', { name: 'Review corrected export' }))
+    expect(screen.getByRole('alertdialog', { name: 'Confirm corrected export' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Confirm corrected export' }))
+
+    expect(mockInsert).toHaveBeenCalledWith({
+      workspace_id: 'workspace-1',
+      content_variant_id: 'variant-1',
+      caption_text: 'Final corrected caption',
+      export_reference: 'CWS-AI-E0104603-v2.mp4',
+      correction_reason: 'Replace the pilot caption.',
+    })
+    expect(await screen.findByRole('heading', { name: 'Current export · version 2' })).toBeInTheDocument()
+    expect(screen.getByText('Version 2 · Current')).toBeInTheDocument()
+    expect(screen.getByText('Version 1')).toBeInTheDocument()
+    expect(screen.getByText('Reason: Replace the pilot caption.')).toBeInTheDocument()
+    expect(screen.getByText('No publication action was triggered.')).toBeInTheDocument()
   })
 })
