@@ -222,3 +222,27 @@ A silently disabled action can look broken when its required fields are located
 elsewhere on the page. Let the user invoke the action, block the state change
 in validation, and name the missing prerequisites in visible accessible
 feedback. Preserve database constraints as the final enforcement boundary.
+
+## Narrow existing table privileges with revoke first
+
+Date: 2026-08-12
+
+Verified by: CWS-EXPORT-REVISION-013
+
+Granting only the desired privileges in a new migration does not remove broader
+privileges already inherited from platform defaults or older migrations. For a
+read-and-append API, revoke existing table privileges from every exposed role,
+grant back only the required operations, and verify the effective result with
+`has_table_privilege`. RLS and SQL privileges are complementary boundaries.
+
+## Use row transitions when another trigger supplies the changed column
+
+Date: 2026-08-12
+
+Verified by: CWS-EXPORT-REVISION-013
+
+PostgreSQL `UPDATE OF column` triggers respond to columns named in the original
+`SET` list, not merely to values changed later by a `BEFORE UPDATE` trigger. If
+one trigger derives a column and another must capture its first transition,
+attach the latter to the broader update event and guard it with an `OLD`/`NEW`
+condition. Verify the complete trigger chain with a realistic transaction.
