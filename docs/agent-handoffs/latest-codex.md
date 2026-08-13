@@ -6,7 +6,12 @@ Objective: Prove the Production publication return endpoint end to end, restore 
 
 ## Ready-to-run command
 
-The recording command is pending commit 2. No real publication row was created by this verification commit.
+```bash
+./scripts/record-published.sh instagram es "https://instagram.com/p/REAL_POST_ID"
+```
+
+Set `PUBLISHED_WEBHOOK_SECRET` for the terminal session first, and run the
+command only after the post has actually been published.
 
 ## Files inspected
 
@@ -28,12 +33,22 @@ The recording command is pending commit 2. No real publication row was created b
 ## Files changed
 
 - `docs/agent-handoffs/latest-codex.md`
+- `scripts/record-published.sh`
+- `scripts/README.md`
+- `scripts/__tests__/record-published.test.js`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+- `docs/learnings.md`
 
 ## Database or API changes
 
 - No endpoint, schema, or permanent database change.
 - Production was redeployed after the webhook secret was updated.
 - One temporary `published_posts` row was inserted through the live endpoint, verified through an identical retry, and deleted by `external_post_id`.
+- Added a local one-command wrapper that validates platform/language/version,
+  defaults publication time and source, derives an external post ID when
+  possible, calls the unchanged Production endpoint, and reports creation or
+  idempotent reuse.
 
 ## Security decisions
 
@@ -52,7 +67,9 @@ The recording command is pending commit 2. No real publication row was created b
 
 ## Tests added
 
-- None in commit 1.
+- Four script tests cover missing-secret failure, local platform validation,
+  successful row reporting with derived identity, and idempotent reuse
+  reporting.
 
 ## Tests run
 
@@ -98,14 +115,30 @@ returning id, external_post_id;
 
 It returned exactly the created ID. The subsequent count query returned `0`.
 
+Repository checks:
+
+- `npm ci`: completed from the lockfile; npm reported 19 existing audit findings.
+- Focused recorder suite: 1 file, 4 tests passed.
+- Full Vitest suite: 29 files, 103 tests passed.
+- `npm run lint`: no errors; the existing `src/Hooks/useDrafts.js` hook warning remains.
+- `npm run build`: passed with Production client variables, including import-casing validation.
+- `bash -n scripts/record-published.sh`: passed.
+- `git diff --check`: passed.
+- Supabase security advisor: unchanged; only the pre-existing
+  `create_workspace` executable-function warning and disabled leaked-password
+  protection remain.
+
 ## Known issues
 
-- The one-command recording script and its documentation remain for commit 2.
 - The canonical checkout's ignored `.env.local` was accidentally overwritten during manual secret transfer and needs separate restoration. No secret was committed.
+- Existing npm-audit, hook, bundle-size, third-party `eval`, and advisor
+  warnings remain outside this ticket.
 
 ## Recommended next task
 
-- Complete commit 2, then use the documented command only after a real post has actually been published.
+- After an actual manual publication, run the ready-to-run command with the real
+  platform, language, URL, and optional brief version. Confirm the returned row
+  in `/admin/published`; do not create a record before publication.
 
 ## Questions requiring Tulio
 
@@ -114,6 +147,9 @@ It returned exactly the created ID. The subsequent count query returned `0`.
 ## Project-memory files updated
 
 - `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+- `docs/learnings.md`
 
 ## Permanent decisions added
 
@@ -121,7 +157,8 @@ It returned exactly the created ID. The subsequent count query returned `0`.
 
 ## Reusable learnings added
 
-- Pending commit 2.
+- Added the verified rule to exercise the lowest durable Production layer
+  before stacking more capability above it.
 
 ## Memory updates withheld
 
@@ -130,5 +167,7 @@ It returned exactly the created ID. The subsequent count query returned `0`.
 
 ## Git diff summary
 
-- Commit 1 changes only this handoff to preserve the exact live verification and cleanup evidence.
+- Commit 1 records the exact Production verification and cleanup evidence.
+- Commit 2 adds the executable recorder, usage documentation, four tests, and
+  final project-memory updates.
 - The isolated branch is `agent/first-record-011`; the unrelated uncommitted archive work in the canonical checkout remains untouched.
