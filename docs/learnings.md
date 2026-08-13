@@ -259,3 +259,17 @@ Audit existing parent/child states when deploying synchronization logic, define
 the smallest proven stale-state predicates, exclude terminal evidence, and
 validate the exact affected rows inside a rollback-only transaction before
 applying a one-time backfill.
+
+## Verify the lowest real layer before stacking capability above it
+
+Date: 2026-08-13
+
+Verified by: CWS-FIRST-RECORD-011
+
+Four consecutive tickets built a publication return endpoint, channel briefs,
+generation, and owner review while `published_posts` still had no row proving
+that the lowest durable path worked end to end in Production. Before adding
+more capability above a storage or integration boundary, exercise that boundary
+in the real environment, verify error handling and idempotency, clean up the
+synthetic evidence, and leave a short repeatable command for the first real
+operation.

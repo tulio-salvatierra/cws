@@ -1224,3 +1224,24 @@ functions, and complete foreign-key indexes. PR #22 merged into `main` as
 `2d6ce5f`; Production deployment `dpl_CHoK2C5YctygbfbH7cbY3Ee5wbwi` reached
 Ready and is aliased to `https://cws-two.vercel.app`. Next: use the control to
 replace and freshly approve the English CWS-001 test content.
+
+## 2026-08-13 — CWS-FIRST-RECORD-011 publication return verification
+
+Agent: Codex
+Status: Completed locally in two commits; do not push
+
+Redeployed Production after rotating the server-only webhook secret, then
+verified all eight `POST /api/published` contract checks against
+`https://cws-two.vercel.app`: unauthenticated and wrong-secret requests
+returned 401, GET returned 405, authenticated invalid input returned the
+expected 400 responses, the temporary manual record returned 201, its identical
+retry returned 200 with the same ID and `created: false`, and
+`brief_version: 1` persisted. Deleted `VERIFY-DELETE-ME-001` by
+`external_post_id` and confirmed `published_posts` returned to zero rows.
+
+Added `scripts/record-published.sh` and concise usage documentation. The
+script keeps the secret out of arguments, validates locally, defaults source
+and time, derives external identity when possible, and reports the resulting
+row. All 103 tests, lint with the existing hook warning, build/import casing,
+shell syntax, whitespace, and the unchanged security advisor pass. The first
+real row remains reserved for an actual publication.
