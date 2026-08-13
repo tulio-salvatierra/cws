@@ -48,8 +48,8 @@ export default function WorkspacePage() {
       const [workspaceResult, channelsResult, campaignsResult, variantsResult, approvalsResult] = await Promise.all([
         supabase.from('workspaces').select('id, name, slug').eq('id', membership.workspace_id).single(),
         supabase.from('channels').select('id, name, slug, audience, voice').eq('workspace_id', membership.workspace_id).order('name'),
-        supabase.from('campaigns').select('id, code, title, status, description, channel_id').eq('workspace_id', membership.workspace_id).order('updated_at', { ascending: false }),
-        supabase.from('content_variants').select('id, code, locale, working_title, status, campaign_id').eq('workspace_id', membership.workspace_id).order('code'),
+        supabase.from('campaigns').select('id, code, title, status, description, channel_id, is_test, test_archived').eq('workspace_id', membership.workspace_id).order('updated_at', { ascending: false }),
+        supabase.from('content_variants').select('id, code, locale, working_title, status, campaign_id, is_test, test_archived').eq('workspace_id', membership.workspace_id).order('code'),
         supabase.from('approvals').select('content_variant_id, status, feedback, reviewed_at').eq('workspace_id', membership.workspace_id).order('created_at', { ascending: false }),
       ])
 
@@ -57,13 +57,16 @@ export default function WorkspacePage() {
       if (failed?.error) throw failed.error
 
       if (active) {
+        const operationalCampaigns = (campaignsResult.data || []).filter((campaign) => !campaign.test_archived)
+        const operationalCampaignIds = new Set(operationalCampaigns.map((campaign) => campaign.id))
+        const operationalVariants = (variantsResult.data || []).filter((variant) => !variant.test_archived && operationalCampaignIds.has(variant.campaign_id))
         setState({
           loading: false,
           error: '',
           workspace: workspaceResult.data,
           channels: channelsResult.data || [],
-          campaigns: campaignsResult.data || [],
-          variants: variantsResult.data || [],
+          campaigns: operationalCampaigns,
+          variants: operationalVariants,
           approvals: approvalsResult.data || [],
         })
       }

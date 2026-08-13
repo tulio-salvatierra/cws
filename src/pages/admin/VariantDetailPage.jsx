@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import TestDataControls from '../../components/admin/TestDataControls'
 
 const VARIANT_STATUSES = [
   'draft',
@@ -17,7 +18,7 @@ const VARIANT_STATUSES = [
   'archived',
 ]
 
-const VARIANT_FIELDS = 'id, code, locale, working_title, status, transcript, tone, editing_notes, caption_text, export_reference, exported_by, exported_at, export_snapshot, campaign_id'
+const VARIANT_FIELDS = 'id, code, locale, working_title, status, transcript, tone, editing_notes, caption_text, export_reference, exported_by, exported_at, export_snapshot, campaign_id, is_test, test_archived, test_archived_at, test_archived_by'
 const EXPORT_FIELDS = 'id, version, caption_text, export_reference, correction_reason, approved_approval_id, supersedes_export_id, content_snapshot, is_historical, created_by, exported_at'
 
 const MANUAL_VARIANT_STATUSES = VARIANT_STATUSES.filter(
@@ -313,8 +314,9 @@ export default function VariantDetailPage() {
   return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-4xl">
     <Link className="text-sm font-semibold text-orange-300" to={`/admin/campaigns/${variant.campaign_id}`}>← Campaign</Link>
     <p className="mt-10 text-xs font-semibold uppercase tracking-[0.25em] text-orange-200">Content variant · {variant.locale}</p>
-    <h1 className="mt-3 text-4xl font-semibold">{variant.working_title}</h1>
-    <p className="mt-2 text-sm text-slate-500">{variant.code}</p>
+      <h1 className="mt-3 text-4xl font-semibold">{variant.working_title}</h1>
+      <p className="mt-2 text-sm text-slate-500">{variant.code}</p>
+      {variant.is_test && <p className="mt-4 inline-flex rounded-full border border-amber-300/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-200">Test data{variant.test_archived ? ' · archived' : ''}</p>}
 
     <form onSubmit={saveVariant} className="mt-10 space-y-5 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -350,6 +352,14 @@ export default function VariantDetailPage() {
       {approvedContentLocked && <p className="text-sm text-amber-100">Reviewed content is locked. The caption and export reference above may be finalized only through the confirmed export handoff, or an owner can start a revision below.</p>}
       {exportLocked && <p className="text-sm text-emerald-200">The exported content and handoff evidence are locked.</p>}
     </form>
+
+    <TestDataControls
+      resourceType="variant"
+      record={variant}
+      workspaceId={state.workspaceId}
+      isOwner={state.membershipRole === 'owner'}
+      onUpdated={(classification) => setState((current) => ({ ...current, variant: { ...current.variant, ...classification } }))}
+    />
 
     <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6">
       <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Approval</p>

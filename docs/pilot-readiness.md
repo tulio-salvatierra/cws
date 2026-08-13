@@ -168,3 +168,17 @@ Rollback-only staging probes completed the full revision and fresh-approval
 cycle without changing the real pilot rows. The next human pilot action is to
 deploy this UI, revise `CWS-001-EN-MASTER` with final content, save it, request a
 new review, and inspect the new snapshot before approval and export.
+
+## 2026-08-12 test-data classification and operational archive
+
+Migration `20260812220705_add_test_data_archive.sql` adds explicit test labels
+and a reversible owner-only archive state to campaigns and content variants.
+Archived test rows are hidden by default from normal operating lists, counts,
+and task selection, but can be deliberately revealed and restored. Archiving
+does not alter lifecycle status or remove approval, revision, export, or
+export-version evidence.
+
+The migration intentionally classified no existing record. A workspace owner
+must decide which rows are temporary tests, label them, and then archive them.
+This cleanup improves the operating view but does not replace the outstanding
+real-content revision and fresh approval of `CWS-001-EN-MASTER`.

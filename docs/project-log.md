@@ -1245,3 +1245,26 @@ and time, derives external identity when possible, and reports the resulting
 row. All 103 tests, lint with the existing hook warning, build/import casing,
 shell syntax, whitespace, and the unchanged security advisor pass. The first
 real row remains reserved for an actual publication.
+
+## 2026-08-13 — CWS-TEST-DATA-ARCHIVE-016 test-data classification
+
+Agent: Codex
+Status: Completed and release-validated; merge and Production verification pending
+
+Added explicit owner-only test labels and reversible operational archiving to
+campaigns and content variants. Archived tests are hidden by default from
+normal workspace, campaign, overview, task-selection, and variant views while
+remaining revealable and restorable. Lifecycle state and immutable approval,
+revision, export, and export-version evidence are untouched.
+
+Migration `20260812220705` is applied to staging and did not classify existing
+rows. A rollback-only probe verified member denial, owner label/archive/restore,
+derived protected attribution, exported-state preservation, and retention of
+both export versions. After rebasing onto the publication recorder, all 106
+tests pass; lint has no errors and the existing hook warning; build, import
+casing, recorder syntax, whitespace, migration alignment, constraints,
+indexes, grants, and security checks pass. A webhook secret briefly exposed in
+the unmerged branch was removed from reachable branch history, rotated in
+Vercel Production, and verified after redeployment; no secret value is stored
+in Git. Next: merge/deploy, deliberately classify only known temporary rows,
+and visually verify hidden/reveal/restore behavior.
