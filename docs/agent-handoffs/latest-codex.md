@@ -1,173 +1,83 @@
 # Latest Codex Handoff
 
-Task ID: CWS-FIRST-RECORD-011
+Task ID: CWS-TEST-DATA-ARCHIVE-016
 Agent: Codex
-Objective: Prove the Production publication return endpoint end to end, restore an empty publication log, and reduce recording the first real post to one command.
-
-## Ready-to-run command
-
-```bash
-./scripts/record-published.sh instagram es "https://instagram.com/p/REAL_POST_ID"
-```
-
-Set `PUBLISHED_WEBHOOK_SECRET` for the terminal session first, and run the
-command only after the post has actually been published.
+Objective: Keep pilot/test records and their immutable lifecycle evidence available while removing archived test data from normal operating views.
 
 ## Files inspected
 
 - `.agents/codex-project-instructions.md`
-- `docs/product-definition.md`
-- `docs/technical-conventions.md`
-- `docs/decisions.md` including DEC-025
-- `docs/learnings.md`
-- `docs/agent-handoffs/latest-codex.md`
-- `docs/project-log.md`
-- `docs/task-ledger.md`
-- `api/published.js`
-- `api/__tests__/published.test.js`
-- `supabase/migrations/20260809191332_015_published_posts_return_path.sql`
-- Current Production Vercel environment-variable names and deployment
-- Managed Supabase staging `published_posts`
-- Current Supabase security guidance and changelog
+- Product, technical, decision, learning, pilot-readiness, project-log, task-ledger, and prior handoff documentation
+- Existing campaign, content-variant, approval, revision, export, membership, and RLS migrations
+- Workspace, campaign, variant, task, and admin overview UI and tests
+- Managed staging schema, migration history, grants, data, and database advisors
+- Current Supabase RLS, grants, trigger, and Data API guidance
 
 ## Files changed
 
+- `supabase/migrations/20260812220705_add_test_data_archive.sql`
+- `src/components/admin/TestDataControls.jsx`
+- `src/components/admin/__tests__/TestDataControls.test.jsx`
+- `src/pages/admin/AdminOverview.jsx`
+- `src/pages/admin/CampaignDetailPage.jsx`
+- `src/pages/admin/CampaignsPage.jsx`
+- `src/pages/admin/TasksPage.jsx`
+- `src/pages/admin/VariantDetailPage.jsx`
+- `src/pages/admin/WorkspacePage.jsx`
+- `src/pages/admin/__tests__/CampaignsPage.test.jsx`
+- `docs/pilot-readiness.md`
 - `docs/agent-handoffs/latest-codex.md`
-- `scripts/record-published.sh`
-- `scripts/README.md`
-- `scripts/__tests__/record-published.test.js`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
-- `docs/learnings.md`
 
-## Database or API changes
+## Database and UI changes
 
-- No endpoint, schema, or permanent database change.
-- Production was redeployed after the webhook secret was updated.
-- One temporary `published_posts` row was inserted through the live endpoint, verified through an identical retry, and deleted by `external_post_id`.
-- Added a local one-command wrapper that validates platform/language/version,
-  defaults publication time and source, derives an external post ID when
-  possible, calls the unchanged Production endpoint, and reports creation or
-  idempotent reuse.
+- Added explicit `is_test` and reversible `test_archived` classification to campaigns and content variants, with database-derived archive actor/time and integrity checks.
+- Added owner-only database enforcement for labeling, archiving, restoring, and removing labels. Active members retain their existing record access but cannot change classification.
+- Added workspace/filter and actor foreign-key indexes. Direct browser execution of the trigger function is revoked.
+- Added reusable controls and clear test/archive badges on campaign and variant detail pages.
+- Archived tests are hidden by default from campaign lists, workspace activity/counts, overview counts, and task campaign selection. Campaign and variant views include an explicit reveal control for recovery.
+- Archive/restore does not change lifecycle status, approvals, revisions, export snapshots, or export versions. No publishing, n8n, webhook, social API, or legacy publishing table changed.
 
-## Security decisions
+## Staging state and validation
 
-- The webhook secret remained server-side and was never printed, committed, passed as a command-line argument, or stored in the handoff.
-- The Production endpoint retained its existing constant-time shared-secret authentication.
-- The temporary local secret file was deleted immediately after verification.
-
-## Decisions made
-
-- None. The live probe used the endpoint-supported `source: "manual"`; `source: "test"` is not an accepted API/database value.
-
-## Assumptions
-
-- `VERIFY-DELETE-ME-001` was reserved exclusively for this temporary verification row.
-- The configured default workspace is the staging CWS workspace named by `PUBLISHED_WORKSPACE_ID`.
-
-## Tests added
-
-- Four script tests cover missing-secret failure, local platform validation,
-  successful row reporting with derived identity, and idempotent reuse
-  reporting.
+- Migration `20260812220705` is applied to managed staging.
+- No existing campaign or variant was automatically labeled or archived; both classified counts remain zero.
+- A rollback-only lifecycle probe verified non-owner denial, unlabeled-archive denial, owner label/archive/restore for campaigns and exported variants, derived/protected attribution, and preservation of exported status plus both immutable export versions.
+- All four new indexes and both archive integrity constraints are present. `anon` and `authenticated` cannot directly execute the trigger function.
+- The security advisor retains the same two pre-existing warnings: intentional authenticated execution of `create_workspace` and disabled leaked-password protection. No new relevant performance finding was reported.
+- The release branch was rebased onto the merged publication-recorder change. A server-only webhook secret that briefly appeared in the unmerged branch's example environment file was removed from reachable branch history, rotated in Vercel Production, and verified after redeployment. The replacement value is not stored in Git, and the authenticated endpoint reached its expected 400 validation response.
 
 ## Tests run
 
-Production endpoint `https://cws-two.vercel.app/api/published`:
-
-1. No auth header → **401**
-
-   `{"ok":false,"error":"Unauthorized"}`
-
-2. Wrong secret → **401**
-
-   `{"ok":false,"error":"Unauthorized"}`
-
-3. GET instead of POST → **405**
-
-   `{"ok":false,"error":"Method not allowed"}`
-
-4. Unknown platform `tiktok` with valid secret → **400**
-
-   `{"ok":false,"error":"Invalid platform. Accepted values: instagram, facebook, x, linkedin, pinterest, whatsapp, youtube."}`
-
-5. Missing `published_at` → **400**
-
-   `{"ok":false,"error":"published_at is required."}`
-
-6. Valid manual insert with `external_post_id: "VERIFY-DELETE-ME-001"` and `brief_version: 1` → **201**
-
-   `{"ok":true,"created":true,"id":"c8a490af-0e22-4a13-aead-eb0789b5be70","record":{"id":"c8a490af-0e22-4a13-aead-eb0789b5be70","workspace_id":"a0eb078c-8ea5-44b6-b3cb-a7ba9ca23293","channel_id":null,"campaign_id":null,"content_variant_id":null,"platform":"instagram","external_post_id":"VERIFY-DELETE-ME-001","external_url":"https://instagram.com/p/VERIFY-DELETE-ME-001","published_at":"2026-08-13T11:51:27.094+00:00","language":null,"source":"manual","outcome_score":null,"outcome_note":null,"outcome_recorded_at":null,"raw_payload":{"source":"manual","platform":"instagram","external_url":"https://instagram.com/p/VERIFY-DELETE-ME-001","published_at":"2026-08-13T11:51:27.094Z","brief_version":1,"external_post_id":"VERIFY-DELETE-ME-001"},"created_by":null,"created_at":"2026-08-13T11:51:27.944462+00:00","updated_at":"2026-08-13T11:51:27.944462+00:00","brief_version":1}}`
-
-7. Identical repeat → **200**, `created: false`, same ID
-
-   `{"ok":true,"created":false,"id":"c8a490af-0e22-4a13-aead-eb0789b5be70","record":{"id":"c8a490af-0e22-4a13-aead-eb0789b5be70","workspace_id":"a0eb078c-8ea5-44b6-b3cb-a7ba9ca23293","channel_id":null,"campaign_id":null,"content_variant_id":null,"platform":"instagram","external_post_id":"VERIFY-DELETE-ME-001","external_url":"https://instagram.com/p/VERIFY-DELETE-ME-001","published_at":"2026-08-13T11:51:27.094+00:00","language":null,"source":"manual","outcome_score":null,"outcome_note":null,"outcome_recorded_at":null,"raw_payload":{"source":"manual","platform":"instagram","external_url":"https://instagram.com/p/VERIFY-DELETE-ME-001","published_at":"2026-08-13T11:51:27.094Z","brief_version":1,"external_post_id":"VERIFY-DELETE-ME-001"},"created_by":null,"created_at":"2026-08-13T11:51:27.944462+00:00","updated_at":"2026-08-13T11:51:27.944462+00:00","brief_version":1}}`
-
-8. `brief_version` → persisted as integer `1` on both responses.
-
-Cleanup statement executed:
-
-```sql
-delete from public.published_posts
-where external_post_id = 'VERIFY-DELETE-ME-001'
-returning id, external_post_id;
-```
-
-It returned exactly the created ID. The subsequent count query returned `0`.
-
-Repository checks:
-
-- `npm ci`: completed from the lockfile; npm reported 19 existing audit findings.
-- Focused recorder suite: 1 file, 4 tests passed.
-- Full Vitest suite: 29 files, 103 tests passed.
-- `npm run lint`: no errors; the existing `src/Hooks/useDrafts.js` hook warning remains.
-- `npm run build`: passed with Production client variables, including import-casing validation.
+- Focused classification/list/detail/smoke suites: 5 files, 23 tests passed.
+- Full combined Vitest suite after rebase: 31 files, 106 tests passed.
+- `npm run lint`: no errors; unchanged `src/Hooks/useDrafts.js` dependency warning remains.
+- `npm run build`: passed, including import-casing validation.
 - `bash -n scripts/record-published.sh`: passed.
 - `git diff --check`: passed.
-- Supabase security advisor: unchanged; only the pre-existing
-  `create_workspace` executable-function warning and disabled leaked-password
-  protection remain.
+- Managed staging migration alignment, schema/grant inspection, and rollback-only security/lifecycle probes: passed.
 
-## Known issues
+## Decisions and learnings
 
-- The canonical checkout's ignored `.env.local` was accidentally overwritten during manual secret transfer and needs separate restoration. No secret was committed.
-- Existing npm-audit, hook, bundle-size, third-party `eval`, and advisor
-  warnings remain outside this ticket.
+- No permanent decision or reusable learning was added. This owner-only reversible classification is an approved task implementation, but its exact archive UX and fields remain task-scoped until production use confirms the model.
+
+## Known issues and deferred scope
+
+- Existing test rows remain visible until an owner deliberately labels and archives them; the migration intentionally performs no heuristic data mutation.
+- Restore clears current archive attribution. A permanent history of repeated archive/restore events would require a separate append-only event table and is deferred.
+- The real English replacement-content and re-review cycle remains outstanding. Archiving must not substitute for correcting the actual pilot deliverable.
+- Existing hook, bundle-size, third-party `eval`, advisor, and leaked-password warnings remain outside this task.
 
 ## Recommended next task
 
-- After an actual manual publication, run the ready-to-run command with the real
-  platform, language, URL, and optional brief version. Confirm the returned row
-  in `/admin/published`; do not create a record before publication.
+Deploy the UI, then use the owner controls to label/archive only the clearly temporary test campaign and variants. Verify normal lists are clean and archived records can be revealed/restored. After that, complete the real `CWS-001-EN-MASTER` revision, fresh review, approval, and confirmed export without invoking publication or n8n.
 
 ## Questions requiring Tulio
 
-- None for commit 1.
+- Which currently visible campaign/variant records should be classified as temporary test data after deployment?
 
-## Project-memory files updated
+## Git state
 
-- `docs/agent-handoffs/latest-codex.md`
-- `docs/project-log.md`
-- `docs/task-ledger.md`
-- `docs/learnings.md`
-
-## Permanent decisions added
-
-- None, as required.
-
-## Reusable learnings added
-
-- Added the verified rule to exercise the lowest durable Production layer
-  before stacking more capability above it.
-
-## Memory updates withheld
-
-- DEC-021 through DEC-024 and DEC-026 remain unratified and were not added or changed.
-- No n8n, outbound publishing, social API, OAuth, UI, or schema work was performed.
-
-## Git diff summary
-
-- Commit 1 records the exact Production verification and cleanup evidence.
-- Commit 2 adds the executable recorder, usage documentation, four tests, and
-  final project-memory updates.
-- The isolated branch is `agent/first-record-011`; the unrelated uncommitted archive work in the canonical checkout remains untouched.
+- Branch: `agent/test-data-archive`
+- Release validation is complete on top of `origin/main`; push, pull request, merge, and Production verification are the remaining release actions.
