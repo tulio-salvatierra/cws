@@ -214,3 +214,34 @@ All future publishers must call the authenticated return path and successfully
 record the platform, publication time, source, and available external identity
 before the pipeline is considered complete. Publishing capability remains out
 of scope until that contract is wired and tested.
+
+---
+
+## DEC-026 — Revive n8n through an isolated authenticated dry-run bridge
+
+Date: 2026-08-13
+Status: Approved
+
+### Decision
+
+The first revived CWS-to-n8n path uses a separate authenticated workflow and
+the current CWS Supabase project as its authoritative operating record. The
+initial path is acknowledgement-only: it may accept an exported archived test
+handoff and record an agent run, but it may not call a social platform or create
+a publication record.
+
+The failing legacy WF1 and WF5 schedules remain unpublished while their
+definitions and execution history are preserved.
+
+### Reason
+
+The legacy workflows target an obsolete database and can spend external API
+resources before failing. An isolated dry run proves authentication, payload,
+correlation, and durable CWS evidence without restoring uncontrolled publishing.
+
+### Consequence
+
+New n8n integration work must originate from the CWS app through a server-side
+secret and must preserve an auditable `agent_runs` record. Outbound publishing
+remains disabled until a separately approved workflow implements `DEC-025`,
+including the authenticated publication return path and idempotent verification.

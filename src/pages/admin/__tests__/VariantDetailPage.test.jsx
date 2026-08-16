@@ -1,11 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-const { mockFrom, mockGetUser, mockInsert, mockUpdate } = vi.hoisted(() => ({
+const { mockFrom, mockGetUser, mockGetSession, mockInsert, mockUpdate } = vi.hoisted(() => ({
   mockFrom: vi.fn(),
   mockGetUser: vi.fn(),
+  mockGetSession: vi.fn(),
   mockInsert: vi.fn(),
   mockUpdate: vi.fn(),
 }))
@@ -13,7 +14,7 @@ const { mockFrom, mockGetUser, mockInsert, mockUpdate } = vi.hoisted(() => ({
 vi.mock('../../../lib/supabase', () => ({
   supabase: {
     from: mockFrom,
-    auth: { getUser: mockGetUser },
+    auth: { getUser: mockGetUser, getSession: mockGetSession },
   },
 }))
 
@@ -63,6 +64,10 @@ function query({ data = [], error = null, singleData = data } = {}) {
 describe('VariantDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   it('saves editable content and an independent lifecycle status', async () => {
@@ -459,5 +464,61 @@ describe('VariantDetailPage', () => {
     expect(screen.getByText('Version 1')).toBeInTheDocument()
     expect(screen.getByText('Reason: Replace the pilot caption.')).toBeInTheDocument()
     expect(screen.getByText('No publication action was triggered.')).toBeInTheDocument()
+  })
+
+  it('requires owner confirmation before sending an archived test export to n8n', async () => {
+    const archivedTestVariant = {
+      ...variant,
+      status: 'exported',
+      is_test: true,
+      test_archived: true,
+      exported_by: 'user-1',
+      exported_at: '2026-08-12T19:00:00Z',
+      export_snapshot: { snapshot_version: 1 },
+    }
+    const exportVersion = {
+      id: 'export-2',
+      version: 2,
+      caption_text: 'Dry run caption',
+      export_reference: 'corrected.mp4',
+      correction_reason: 'Testing the bridge.',
+      exported_at: '2026-08-12T19:00:00Z',
+      is_historical: false,
+    }
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ ok: true, mode: 'dry_run', run_id: 'run-1' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    mockGetSession.mockResolvedValue({ data: { session: { access_token: 'session-token' } } })
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1', role: 'owner' } })
+      if (table === 'content_variants') return query({ singleData: archivedTestVariant })
+      if (table === 'approvals') return query({ data: [{ id: 'approval-1', status: 'approved' }] })
+      if (table === 'content_variant_exports') return query({ data: [exportVersion] })
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const user = userEvent.setup()
+    const testButton = await screen.findByRole('button', { name: 'Test n8n handoff' })
+    await user.click(testButton)
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('alertdialog', { name: 'Confirm n8n dry run' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Confirm dry run' }))
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/n8n-dry-run', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer session-token', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variant_id: 'variant-1' }),
+    })
+    expect(await screen.findByRole('status')).toHaveTextContent('n8n acknowledged dry run run-1. No publication occurred.')
   })
 })

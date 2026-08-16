@@ -1,83 +1,94 @@
 # Latest Codex Handoff
 
-Task ID: CWS-TEST-DATA-ARCHIVE-016
+Task ID: CWS-N8N-DRY-RUN-017
 Agent: Codex
-Objective: Keep pilot/test records and their immutable lifecycle evidence available while removing archived test data from normal operating views.
+Objective: Retire the failing legacy schedules and establish the first authenticated, non-publishing CWS-to-n8n invocation path.
 
-## Files inspected
-
+Files inspected:
 - `.agents/codex-project-instructions.md`
-- Product, technical, decision, learning, pilot-readiness, project-log, task-ledger, and prior handoff documentation
-- Existing campaign, content-variant, approval, revision, export, membership, and RLS migrations
-- Workspace, campaign, variant, task, and admin overview UI and tests
-- Managed staging schema, migration history, grants, data, and database advisors
-- Current Supabase RLS, grants, trigger, and Data API guidance
-
-## Files changed
-
-- `supabase/migrations/20260812220705_add_test_data_archive.sql`
-- `src/components/admin/TestDataControls.jsx`
-- `src/components/admin/__tests__/TestDataControls.test.jsx`
-- `src/pages/admin/AdminOverview.jsx`
-- `src/pages/admin/CampaignDetailPage.jsx`
-- `src/pages/admin/CampaignsPage.jsx`
-- `src/pages/admin/TasksPage.jsx`
-- `src/pages/admin/VariantDetailPage.jsx`
-- `src/pages/admin/WorkspacePage.jsx`
-- `src/pages/admin/__tests__/CampaignsPage.test.jsx`
-- `docs/pilot-readiness.md`
+- `docs/product-definition.md`
+- `docs/technical-conventions.md`
+- `docs/decisions.md`
+- `docs/learnings.md`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+- Existing generation, approval, export, agent-run, and publication-return APIs and tests
+- Live n8n workflow definitions, credentials, and recent execution failures
+- Vercel Production and Preview environment configuration
 
-## Database and UI changes
+Files changed:
+- `.env.example`
+- `api/n8n-dry-run.js`
+- `api/__tests__/n8n-dry-run.test.js`
+- `n8n/cws-dry-run-bridge.json`
+- `src/pages/admin/VariantDetailPage.jsx`
+- `src/pages/admin/__tests__/VariantDetailPage.test.jsx`
+- `vercel.json`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+- `docs/decisions.md`
 
-- Added explicit `is_test` and reversible `test_archived` classification to campaigns and content variants, with database-derived archive actor/time and integrity checks.
-- Added owner-only database enforcement for labeling, archiving, restoring, and removing labels. Active members retain their existing record access but cannot change classification.
-- Added workspace/filter and actor foreign-key indexes. Direct browser execution of the trigger function is revoked.
-- Added reusable controls and clear test/archive badges on campaign and variant detail pages.
-- Archived tests are hidden by default from campaign lists, workspace activity/counts, overview counts, and task campaign selection. Campaign and variant views include an explicit reveal control for recovery.
-- Archive/restore does not change lifecycle status, approvals, revisions, export snapshots, or export versions. No publishing, n8n, webhook, social API, or legacy publishing table changed.
+Database or API changes:
+- Added authenticated `POST /api/n8n-dry-run` for active workspace owners.
+- The first cycle accepts only exported, archived test variants and loads the latest immutable export version.
+- Each app invocation creates an `agent_runs` record, advances it through queued/running/completed or failed, and sends a minimized handoff to n8n.
+- Added a dedicated published n8n workflow, `CWS OS — Dry Run Bridge` (`95kVRFWAVKMqhEuh`), with header authentication, payload validation, and a correlation-bound acknowledgement.
+- No schema migration was required. No `published_posts` row is created and no social API is called.
 
-## Staging state and validation
+Security decisions:
+- The browser never receives the n8n URL or shared secret; the Vercel function invokes n8n server-side.
+- The endpoint verifies the Supabase session and requires an active workspace owner before using the service-role client.
+- The shared secret is stored only in n8n credentials and Vercel server-side Production/Preview variables; no value is stored in Git.
+- The initial bridge is additionally limited to exported records explicitly classified and archived as tests.
 
-- Migration `20260812220705` is applied to managed staging.
-- No existing campaign or variant was automatically labeled or archived; both classified counts remain zero.
-- A rollback-only lifecycle probe verified non-owner denial, unlabeled-archive denial, owner label/archive/restore for campaigns and exported variants, derived/protected attribution, and preservation of exported status plus both immutable export versions.
-- All four new indexes and both archive integrity constraints are present. `anon` and `authenticated` cannot directly execute the trigger function.
-- The security advisor retains the same two pre-existing warnings: intentional authenticated execution of `create_workspace` and disabled leaked-password protection. No new relevant performance finding was reported.
-- The release branch was rebased onto the merged publication-recorder change. A server-only webhook secret that briefly appeared in the unmerged branch's example environment file was removed from reachable branch history, rotated in Vercel Production, and verified after redeployment. The replacement value is not stored in Git, and the authenticated endpoint reached its expected 400 validation response.
+Decisions made:
+- Unpublished failing legacy workflows WF1 and WF5 while preserving their definitions and execution history.
+- Made the current CWS Supabase project authoritative for revived integration work.
+- Activated only a separate acknowledgement workflow; outbound publishing remains disabled.
 
-## Tests run
+Assumptions:
+- `CWS-001-EN-FINALTEST` remains the approved disposable first-cycle record even though it is hidden from normal views by the archive filter.
+- `command_level = propose` is the correct existing database-supported level for this technical dry run; generalized execute authority remains blocked.
 
-- Focused classification/list/detail/smoke suites: 5 files, 23 tests passed.
-- Full combined Vitest suite after rebase: 31 files, 106 tests passed.
-- `npm run lint`: no errors; unchanged `src/Hooks/useDrafts.js` dependency warning remains.
-- `npm run build`: passed, including import-casing validation.
-- `bash -n scripts/record-published.sh`: passed.
-- `git diff --check`: passed.
-- Managed staging migration alignment, schema/grant inspection, and rollback-only security/lifecycle probes: passed.
+Tests added:
+- Five API tests covering authentication, owner authorization, archived-test restriction, successful correlation-bound invocation, and failure recording.
+- One UI test proving explicit owner confirmation is required before dispatch.
 
-## Decisions and learnings
+Tests run:
+- Full Vitest suite: 32 files and 112 tests passed.
+- ESLint: zero errors and one pre-existing `useDrafts.js` hook warning.
+- Production-configured Vite build and import-casing check: passed.
+- Version-controlled n8n workflow JSON parse: passed.
+- Direct authenticated production n8n webhook verification: HTTP 200 with `ok: true`, `mode: dry_run`, and matching `N8N-DIRECT-VERIFY-001` correlation ID.
+- Temporary local verification credential and response files were deleted immediately after the check.
 
-- No permanent decision or reusable learning was added. This owner-only reversible classification is an approved task implementation, but its exact archive UX and fields remain task-scoped until production use confirms the model.
+Known issues:
+- The application route and button are not live until the local changes are committed, pushed, and Production is redeployed.
+- The Vercel environment-variable update explicitly requires a new deployment before the function can read it.
+- The direct n8n probe validated the workflow but intentionally bypassed the app API, so the first durable `agent_runs` end-to-end record remains pending after deployment.
 
-## Known issues and deferred scope
+Recommended next task:
+- Commit and push this task, redeploy Production, reveal archived test variants, run `CWS-001-EN-FINALTEST` through the new button, and verify one completed `n8n-dry-run-bridge` agent run with no publication row.
 
-- Existing test rows remain visible until an owner deliberately labels and archives them; the migration intentionally performs no heuristic data mutation.
-- Restore clears current archive attribution. A permanent history of repeated archive/restore events would require a separate append-only event table and is deferred.
-- The real English replacement-content and re-review cycle remains outstanding. Archiving must not substitute for correcting the actual pilot deliverable.
-- Existing hook, bundle-size, third-party `eval`, advisor, and leaked-password warnings remain outside this task.
+Questions requiring Tulio:
+- Approve commit, push, and Production redeploy for the completed local implementation.
 
-## Recommended next task
+Project-memory files updated:
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
+- `docs/decisions.md`
 
-Deploy the UI, then use the owner controls to label/archive only the clearly temporary test campaign and variants. Verify normal lists are clean and archived records can be revealed/restored. After that, complete the real `CWS-001-EN-MASTER` revision, fresh review, approval, and confirmed export without invoking publication or n8n.
+Permanent decisions added:
+- `DEC-026` records the approved authenticated dry-run revival boundary and keeps legacy/social publishing disabled.
 
-## Questions requiring Tulio
+Reusable learnings added:
+- None.
 
-- Which currently visible campaign/variant records should be classified as temporary test data after deployment?
+Memory updates withheld:
+- The individual legacy execution failures and direct test correlation are task evidence, not reusable permanent learnings.
 
-## Git state
-
-- Branch: `agent/test-data-archive`
-- Release validation is complete on top of `origin/main`; push, pull request, merge, and Production verification are the remaining release actions.
+Git diff summary:
+- Added one server-side bridge API, six focused tests, one version-controlled n8n workflow, an owner-confirmed archived-test UI action, Vercel function/env documentation, and the required project-memory updates. No SQL or schema file changed.
