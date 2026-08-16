@@ -9,6 +9,9 @@
     },
     "api/review-generated-draft.js": {
       "maxDuration": 30
+    },
+    "api/n8n-dry-run.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [

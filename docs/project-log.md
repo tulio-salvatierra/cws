@@ -1268,3 +1268,37 @@ the unmerged branch was removed from reachable branch history, rotated in
 Vercel Production, and verified after redeployment; no secret value is stored
 in Git. Next: merge/deploy, deliberately classify only known temporary rows,
 and visually verify hidden/reveal/restore behavior.
+
+## 2026-08-13 — CWS-TEST-DATA-ARCHIVE-016 Production classification
+
+Agent: Codex
+Status: Completed in Production; project-memory update uncommitted
+
+After Tulio approved the exact read-only inventory, classified and archived
+five test campaigns and six test variants in one exact-count-guarded
+transaction. No lifecycle status changed and no record was deleted. The normal
+operating set now contains only campaign `CWS-001` and its canonical EN/ES
+master variants. All seven approvals and seven immutable export-version rows
+attached to archived variants remain intact and recoverable through the
+archived-data view. Next: replace the English master placeholder through
+revision, fresh review, approval, and confirmed export without publishing or
+n8n.
+
+## 2026-08-13 — CWS-N8N-DRY-RUN-017 authenticated n8n invocation
+
+Agent: Codex
+Status: Implemented locally; n8n published and directly verified; app deployment pending
+
+Unpublished the failing WF1 and WF5 schedules while preserving their definitions
+and history, then published a separate authenticated `CWS OS — Dry Run Bridge`
+workflow. Added an owner-only server-side app endpoint and explicit UI confirmation
+that restrict the first cycle to exported archived tests, record the attempt in
+`agent_runs`, and never call a social platform or create `published_posts`.
+
+Vercel Production and Preview now contain the server-only bridge URL and secret;
+the dedicated n8n credential contains the matching header secret. A direct
+authenticated request returned HTTP 200 with a matching dry-run correlation ID.
+All 112 tests, lint without errors, import casing, build, workflow JSON validation,
+and whitespace checks pass. Next: commit/push, redeploy Production, invoke the
+archived `CWS-001-EN-FINALTEST` record through the UI, and verify one completed
+durable agent run with no publication row.

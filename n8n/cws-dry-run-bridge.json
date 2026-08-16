@@ -1,0 +1,61 @@
+{
+  "name": "CWS OS — Dry Run Bridge",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cws-os-dry-run",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "cws-dry-run-webhook",
+      "name": "Authenticated CWS Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "cws-os-dry-run"
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $input.first().json;\nconst body = request.body ?? request;\n\nif (body.mode !== 'dry_run') {\n  throw new Error('Only dry_run mode is accepted.');\n}\n\nif (!body.correlation_id || !body.content_variant_id || !body.export_reference) {\n  throw new Error('The CWS handoff payload is incomplete.');\n}\n\nreturn [{\n  json: {\n    ok: true,\n    mode: 'dry_run',\n    workflow: 'CWS OS — Dry Run Bridge',\n    correlation_id: body.correlation_id,\n    received: {\n      workspace_id: body.workspace_id,\n      campaign_id: body.campaign_id,\n      campaign_code: body.campaign_code,\n      content_variant_id: body.content_variant_id,\n      variant_code: body.variant_code,\n      locale: body.locale,\n      export_version: body.export_version,\n      export_reference: body.export_reference\n    }\n  }\n}];"
+      },
+      "id": "validate-cws-dry-run",
+      "name": "Validate Dry Run",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-cws-dry-run",
+      "name": "Acknowledge Dry Run",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [740, 300]
+    }
+  ],
+  "connections": {
+    "Authenticated CWS Webhook": {
+      "main": [[{"node": "Validate Dry Run", "type": "main", "index": 0}]]
+    },
+    "Validate Dry Run": {
+      "main": [[{"node": "Acknowledge Dry Run", "type": "main", "index": 0}]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
