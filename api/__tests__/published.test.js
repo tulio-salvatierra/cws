@@ -22,10 +22,14 @@ function createSupabaseMock({ existing = null, inserted = null, insertError = nu
   const single = vi.fn().mockResolvedValue({ data: inserted, error: insertError })
   const selectInserted = vi.fn(() => ({ single }))
   const insert = vi.fn(() => ({ select: selectInserted }))
+  const agentRunUpdate = vi.fn().mockResolvedValue({ data: null, error: null })
+  const agentRunUpdateEq = vi.fn(() => agentRunUpdate())
+  const agentRunUpdateQuery = vi.fn(() => ({ eq: agentRunUpdateEq }))
+  const agentRuns = { update: agentRunUpdateQuery }
   const client = {
-    from: vi.fn(() => ({ select: selectExisting, insert })),
+    from: vi.fn((table) => table === 'agent_runs' ? agentRuns : { select: selectExisting, insert }),
   }
-  return { client, insert }
+  return { client, insert, agentRunUpdate, agentRunUpdateQuery }
 }
 
 function request(body, secret = 'test-secret') {
@@ -178,5 +182,29 @@ describe('published posts API', () => {
       record: existing,
     })
     expect(database.insert).not.toHaveBeenCalled()
+  })
+
+  it('persists agent_run_id and completes the linked run', async () => {
+    const body = {
+      platform: 'linkedin',
+      published_at: '2026-08-09T12:00:00Z',
+      external_post_id: 'linkedin-1',
+      agent_run_id: '50cddc54-6447-4530-9a36-6770300c5fd4',
+      source: 'n8n',
+    }
+    const inserted = { id: 'published-2', ...body, workspace_id: 'workspace-1' }
+    const database = createSupabaseMock({ inserted })
+    createClientMock.mockReturnValue(database.client)
+    const response = createResponse()
+
+    await handler(request(body), response)
+
+    expect(response.status).toHaveBeenCalledWith(201)
+    expect(database.insert).toHaveBeenCalledWith(expect.objectContaining({ agent_run_id: body.agent_run_id }))
+    expect(database.client.from).toHaveBeenCalledWith('agent_runs')
+    expect(database.agentRunUpdateQuery).toHaveBeenCalledWith(expect.objectContaining({
+      status: 'completed',
+      output: expect.objectContaining({ publication_id: 'published-2' }),
+    }))
   })
 })
