@@ -16,6 +16,7 @@ export const PUBLISHED_PLATFORMS = [
 
 const PUBLISHED_SOURCES = ['manual', 'n8n', 'cws-os']
 const OUTCOME_SCORES = ['worked', 'flat', 'flopped']
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -51,11 +52,16 @@ export default async function handler(req, res) {
 
   const client = createServiceClient()
   const externalPostId = normalizeOptionalText(body.external_post_id)
+  const agentRunId = normalizeOptionalUuid(body.agent_run_id)
 
   if (externalPostId) {
     const existing = await findExistingRecord(client, body.platform, externalPostId)
     if (existing.error) return databaseError(res, existing.error)
     if (existing.data) {
+      if (agentRunId) {
+        const completed = await completeAgentRun(client, agentRunId, existing.data)
+        if (completed.error) return databaseError(res, completed.error)
+      }
       return res.status(200).json({
         ok: true,
         created: false,
@@ -71,6 +77,10 @@ export default async function handler(req, res) {
   if (created.error?.code === '23505' && externalPostId) {
     const existing = await findExistingRecord(client, body.platform, externalPostId)
     if (existing.error || !existing.data) return databaseError(res, existing.error || created.error)
+    if (agentRunId) {
+      const completed = await completeAgentRun(client, agentRunId, existing.data)
+      if (completed.error) return databaseError(res, completed.error)
+    }
     return res.status(200).json({
       ok: true,
       created: false,
@@ -80,6 +90,11 @@ export default async function handler(req, res) {
   }
 
   if (created.error) return databaseError(res, created.error)
+
+  if (agentRunId) {
+    const completed = await completeAgentRun(client, agentRunId, created.data)
+    if (completed.error) return databaseError(res, completed.error)
+  }
 
   return res.status(201).json({
     ok: true,
@@ -149,6 +164,9 @@ function validatePayload(body) {
   if (body.source && !PUBLISHED_SOURCES.includes(body.source)) {
     return `Invalid source. Accepted values: ${PUBLISHED_SOURCES.join(', ')}.`
   }
+  if (body.agent_run_id !== undefined && !UUID_PATTERN.test(body.agent_run_id || '')) {
+    return 'agent_run_id must be a valid UUID.'
+  }
   if (
     body.brief_version !== undefined
     && (!Number.isInteger(body.brief_version) || body.brief_version <= 0)
@@ -173,6 +191,7 @@ function buildInsertPayload(body, workspaceId, externalPostId) {
     'outcome_note',
     'outcome_recorded_at',
     'created_by',
+    'agent_run_id',
   ]
   const payload = {
     workspace_id: workspaceId,
@@ -199,6 +218,28 @@ function buildInsertPayload(body, workspaceId, externalPostId) {
 function normalizeOptionalText(value) {
   if (typeof value !== 'string') return value || null
   return value.trim() || null
+}
+
+function normalizeOptionalUuid(value) {
+  if (value === undefined || value === null || value === '') return null
+  return UUID_PATTERN.test(value) ? value : null
+}
+
+function completeAgentRun(client, agentRunId, record) {
+  return client
+    .from('agent_runs')
+    .update({
+      status: 'completed',
+      finished_at: new Date().toISOString(),
+      output: {
+        publication_id: record.id,
+        platform: record.platform,
+        external_post_id: record.external_post_id || null,
+        external_url: record.external_url || null,
+      },
+      error_message: null,
+    })
+    .eq('id', agentRunId)
 }
 
 function findExistingRecord(client, platform, externalPostId) {
