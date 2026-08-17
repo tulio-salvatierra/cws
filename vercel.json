@@ -12,6 +12,9 @@
     },
     "api/n8n-dry-run.js": {
       "maxDuration": 30
+    },
+    "api/publish-linkedin.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [

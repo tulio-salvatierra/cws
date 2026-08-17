@@ -1302,3 +1302,22 @@ All 112 tests, lint without errors, import casing, build, workflow JSON validati
 and whitespace checks pass. Next: commit/push, redeploy Production, invoke the
 archived `CWS-001-EN-FINALTEST` record through the UI, and verify one completed
 durable agent run with no publication row.
+
+## 2026-08-16 — CWS-PUBLISH-EXECUTE-018 server-side dispatch
+
+Agent: Codex
+Status: Implemented and staging-validated; deployment pending
+
+Added the authenticated `POST /api/publish/linkedin` dispatch endpoint. It
+requires active workspace membership and an exported immutable content handoff,
+creates an execute/running `agent_runs` record, sends a bounded server-side
+n8n request, and records failure before returning 502. Added nullable
+`published_posts.agent_run_id` linkage and additive completion handling in the
+existing publication return path. Staging migrations were applied and verified;
+no n8n or LinkedIn call was made. All 118 tests, lint, and build pass with the
+existing hook warning. Next: commit/push/deploy, then implement the separate
+n8n webhook conversion and UI action.
+
+The new run link is also protected as immutable publication identity by a
+follow-up trigger migration; all three staging migration versions are aligned
+with the local filenames.
