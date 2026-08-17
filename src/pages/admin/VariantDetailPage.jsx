@@ -76,6 +76,10 @@ export default function VariantDetailPage() {
   const [bridgeRunning, setBridgeRunning] = useState(false)
   const [bridgeError, setBridgeError] = useState('')
   const [bridgeMessage, setBridgeMessage] = useState('')
+  const [publishConfirm, setPublishConfirm] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  const [publishError, setPublishError] = useState('')
+  const [publishMessage, setPublishMessage] = useState('')
 
   useEffect(() => {
     let active = true
@@ -331,6 +335,36 @@ export default function VariantDetailPage() {
     }
   }
 
+  async function publishToLinkedIn() {
+    setPublishError('')
+    setPublishMessage('')
+    setPublishing(true)
+
+    const { data } = await supabase.auth.getSession()
+    const token = data.session?.access_token
+    if (!token) {
+      setPublishError('Your session expired. Sign in again.')
+      setPublishing(false)
+      return
+    }
+
+    try {
+      const response = await fetch('/api/publish/linkedin', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content_variant_id: variantId, platform: 'linkedin' }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'The LinkedIn handoff failed.')
+      setPublishMessage(`LinkedIn handoff accepted as agent run ${result.agent_run_id}. n8n will report the publication result separately.`)
+      setPublishConfirm(false)
+    } catch (error) {
+      setPublishError(error instanceof Error ? error.message : 'The LinkedIn handoff failed.')
+    } finally {
+      setPublishing(false)
+    }
+  }
+
   if (state.loading) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">Loading content variant…</div>
   if (state.error) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><p className="text-rose-200">{state.error}</p><Link className="mt-4 inline-block text-orange-300" to="/admin/workspace">Back to workspace</Link></main>
 
@@ -474,6 +508,15 @@ export default function VariantDetailPage() {
             setBridgeConfirm(true)
           }} className="mt-4 rounded-full bg-sky-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Test n8n handoff</button>
         </div>}
+        {variant.status === 'exported' && <div className="mt-5 rounded-2xl border border-orange-300/20 bg-orange-300/[0.04] p-4">
+          <p className="font-semibold text-orange-100">Publish to LinkedIn</p>
+          <p className="mt-1 text-sm text-slate-400">Send this immutable export handoff to the configured n8n LinkedIn workflow. Confirm only when the workflow is ready to publish; the app cannot retrieve or expose LinkedIn credentials.</p>
+          <button type="button" disabled={publishing} onClick={() => {
+            setPublishError('')
+            setPublishMessage('')
+            setPublishConfirm(true)
+          }} className="mt-4 rounded-full bg-orange-300 px-5 py-3 text-sm font-semibold text-slate-950 disabled:opacity-50">Publish to LinkedIn</button>
+        </div>}
         {variant.status === 'exported' && <button type="button" onClick={() => {
           setCorrectionError('')
           setCorrectionOpen((open) => !open)
@@ -504,6 +547,8 @@ export default function VariantDetailPage() {
       {correctionError && <p role="alert" className="mt-4 text-sm text-rose-300">{correctionError}</p>}
       {bridgeError && <p role="alert" className="mt-4 text-sm text-rose-300">{bridgeError}</p>}
       {bridgeMessage && <p role="status" className="mt-4 text-sm text-emerald-300">{bridgeMessage}</p>}
+      {publishError && <p role="alert" className="mt-4 text-sm text-rose-300">{publishError}</p>}
+      {publishMessage && <p role="status" className="mt-4 text-sm text-emerald-300">{publishMessage}</p>}
 
       {bridgeConfirm && <div role="alertdialog" aria-label="Confirm n8n dry run" className="mt-4 rounded-2xl border border-sky-300/30 bg-slate-950/70 p-4">
         <p className="font-semibold">Confirm n8n dry run</p>
@@ -511,6 +556,15 @@ export default function VariantDetailPage() {
         <div className="mt-4 flex flex-wrap gap-3">
           <button type="button" disabled={bridgeRunning} onClick={runN8nDryRun} className="rounded-full bg-sky-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{bridgeRunning ? 'Testing n8n…' : 'Confirm dry run'}</button>
           <button type="button" disabled={bridgeRunning} onClick={() => setBridgeConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button>
+        </div>
+      </div>}
+
+      {publishConfirm && <div role="alertdialog" aria-label="Confirm LinkedIn publish" className="mt-4 rounded-2xl border border-orange-300/30 bg-slate-950/70 p-4">
+        <p className="font-semibold">Confirm LinkedIn publish</p>
+        <p className="mt-1 text-sm text-slate-400">This sends the immutable export handoff to n8n. If its LinkedIn workflow is live, it can publish this content. The result will be recorded through the publication return path.</p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button type="button" disabled={publishing} onClick={publishToLinkedIn} className="rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-50">{publishing ? 'Sending to n8n…' : 'Confirm publish'}</button>
+          <button type="button" disabled={publishing} onClick={() => setPublishConfirm(false)} className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 disabled:opacity-50">Cancel</button>
         </div>
       </div>}
 
