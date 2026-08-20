@@ -1,5 +1,5 @@
-import { getFromEmail, sendResendEmail } from '../lib/resend.js'
-import { authenticateWorkspace, cleanText, missingOutreachEnv, parseBody } from '../lib/outreach.js'
+import { getFromEmail, sendResendEmail } from '../../api/lib/resend.js'
+import { authenticateWorkspace, cleanText, missingOutreachEnv, parseBody } from './shared.js'
 
 const SEND_TYPES = ['intro', 'follow_up', 'cold']
 

@@ -1,4 +1,4 @@
-import { authenticateWorkspace, interpolateTemplate, missingOutreachEnv, parseBody } from '../lib/outreach.js'
+import { authenticateWorkspace, interpolateTemplate, missingOutreachEnv, parseBody } from './shared.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' })

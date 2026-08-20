@@ -1,4 +1,4 @@
-import { authenticateWorkspace, cleanText, missingOutreachEnv } from '../lib/outreach.js'
+import { authenticateWorkspace, cleanText, missingOutreachEnv } from './shared.js'
 
 const TYPES = ['intro', 'follow_up', 'cold']
 

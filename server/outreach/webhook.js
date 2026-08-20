@@ -1,7 +1,7 @@
 /* global process */
 
 import { Resend } from 'resend'
-import { createOutreachClient, missingOutreachEnv } from '../lib/outreach.js'
+import { createOutreachClient, missingOutreachEnv } from './shared.js'
 
 const STATUS_BY_EVENT = {
   'email.delivered': 'delivered',
