@@ -2,9 +2,8 @@ import draft from '../server/outreach/draft.js'
 import leads from '../server/outreach/leads.js'
 import send from '../server/outreach/send.js'
 import templates from '../server/outreach/templates.js'
-import webhook from '../server/outreach/webhook.js'
 
-const handlers = { '/draft': draft, '/leads': leads, '/send': send, '/templates': templates, '/webhook': webhook }
+const handlers = { '/draft': draft, '/leads': leads, '/send': send, '/templates': templates }
 
 export default async function handler(req, res) {
   const rewrittenPath = Array.isArray(req.query?.path) ? req.query.path.join('/') : req.query?.path

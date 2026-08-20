@@ -1,5 +1,6 @@
 /* global process */
 
+import { Buffer } from 'node:buffer'
 import { Resend } from 'resend'
 import { createOutreachClient, missingOutreachEnv } from './shared.js'
 
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
   const missing = missingOutreachEnv('RESEND_API_KEY', 'RESEND_WEBHOOK_SECRET')
   if (missing.length) return res.status(500).json({ ok: false, error: `Missing outreach environment variables: ${missing.join(', ')}` })
 
-  const payload = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {})
+  const payload = await readPayload(req)
   let event
   try {
     event = new Resend(process.env.RESEND_API_KEY).webhooks.verify({
@@ -38,4 +39,12 @@ export default async function handler(req, res) {
   return updated.error
     ? res.status(502).json({ ok: false, error: updated.error.message })
     : res.status(200).json({ ok: true })
+}
+
+async function readPayload(req) {
+  if (typeof req.body === 'string') return req.body
+  if (Buffer.isBuffer(req.body)) return req.body.toString('utf8')
+  const chunks = []
+  for await (const chunk of req) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+  return Buffer.concat(chunks).toString('utf8')
 }
