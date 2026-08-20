@@ -1321,3 +1321,18 @@ n8n webhook conversion and UI action.
 The new run link is also protected as immutable publication identity by a
 follow-up trigger migration; all three staging migration versions are aligned
 with the local filenames.
+
+## 2026-08-20 — CWS-DEC-027 content variant channel ownership
+
+Agent: Codex
+Status: Implemented and staging-validated; commit/push pending
+
+Added `content_variants.channel_id` with a workspace-scoped composite foreign
+key to `channels`, backfilled it through each existing campaign, enforced NOT
+NULL, and added the supporting index. Made `campaign_id` nullable while
+preserving its existing composite foreign key. Staging applied migration
+`20260820213137_content_variant_channel_id` successfully. The ticket expected
+12 existing variants, but staging contained 13; all 13 had unambiguous campaign
+and channel mappings and were verified with zero null channel or campaign IDs.
+Security advisors show only the two pre-existing warnings and no new RLS gap.
+No campaigns, channels, published_posts, legacy tables, or UI were changed.
