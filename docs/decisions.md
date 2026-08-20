@@ -245,3 +245,48 @@ New n8n integration work must originate from the CWS app through a server-side
 secret and must preserve an auditable `agent_runs` record. Outbound publishing
 remains disabled until a separately approved workflow implements `DEC-025`,
 including the authenticated publication return path and idempotent verification.
+
+
+# DEC-027 — Channel-Centric Restructure of Content Operations
+
+**Status:** approved
+**Date:** 2026-08-20
+**Scope:** Content Operations / Channels module only. Does not govern Goals, Initiatives, or Projects navigation — that IA is being defined separately by Tulio.
+
+## Context
+
+Publishing infrastructure work has produced capability without moving `published_posts` off zero across multiple tickets (see prior handoffs). Part of the root cause: the app's navigation and data model are Campaign-first, but a large share of real content (routine social posts, text content) doesn't originate from a campaign and doesn't fit the video-oriented Content Variant status ladder.
+
+A UI flow proposal for a Channels menu (per-platform pages: LinkedIn, YouTube, Instagram, Facebook) surfaced this directly: `content_variants.campaign_id` is NOT NULL and `content_variants` has no `channel_id` at all, so a variant can only reach its channel by way of a campaign. Making channel posting genuinely campaign-optional requires a schema change, not just a UI change.
+
+Separately, Tulio clarified this is a solo-operator workspace — the operator drafts and publishes their own content — so an approval gate between the operator and themselves adds process without adding value.
+
+## Decision
+
+1. **`content_variants.channel_id`** — new column, NOT NULL. Every content variant belongs to a channel directly, independent of whether it also belongs to a campaign.
+2. **`content_variants.campaign_id`** — becomes nullable. Campaigns become an optional grouping across variants, not a mandatory container.
+3. **Approvals decouple from publish, for all content types (video and social).** Clicking Post fires the publish action directly — nothing blocks on approval status. A row is still auto-written to `approvals` (status `approved`, `reviewed_by` = operator, timestamped) at publish time, purely as a self-tracking log. This preserves DEC-025 ("every publish must be recorded") without a review cycle.
+4. **Channels becomes the top-level nav spine for Content Operations.** All existing features — video pipeline and social/text — move to live under their channel, side by side, rather than under separate Campaign-first flows.
+5. **Shell-first build order.** The Channels nav and routing ship first, with real data reads wherever the underlying table already exists (post history, channel brief, topics) and an honest "not built yet" state for anything that isn't (analytics, AI generation, trend recommendations, scheduling). Each later ticket replaces one stub with a real feature.
+6. **Testing is owned by each feature ticket, not the shell ticket.** The shell ticket has no functional feature to test beyond routing/data-read correctness.
+7. **Legacy n8n-era tables (`media_assets`, `content_drafts`, `research_topics`, `keywords`) are out of scope for this restructure.** They belong to the retired n8n pipeline (DEC-021) and are candidates for later cleanup, not touched here.
+
+## Explicit Non-Goals
+
+- No video file upload or storage in CWS OS at any point in this workflow. Final Cut Pro remains the sole editing environment; the dashboard continues to store only references (`export_reference`, `transcript`, `editing_notes`, `caption_text`), per the existing Final Cut Pro constraints in product-definition.md. This was already the design, not a new restriction.
+- No change to Goals / Initiatives / Projects navigation structure. That is being worked separately by Tulio and this decision does not presume where Channels docks relative to it.
+- DEC-026 (one platform fully working before starting a second) still applies to feature-polish tickets after the shell exists — this decision unifies the navigation, not the platform build sequence.
+
+## Consequences
+
+- Two schema migrations required before the shell ticket can be built: add `content_variants.channel_id` (NOT NULL), alter `content_variants.campaign_id` to nullable.
+- product-definition.md requires a scoped patch: Core Structure tree, approval-model note, and moving "social publishing" / "social OAuth integrations" from "Do not build yet" to "Build now" (already true in practice, doc is catching up).
+- Content Variant status ladder needs a `type` split (short ladder for text: `draft → ready_for_review → approved → published`; full ladder retained for video) — tracked as follow-up, not blocking this decision.
+- Approval bypass is scoped to this solo-operator context. If CWS OS is ever used by more than one person, or extended to client-facing use where a second reviewer matters, this decision should be revisited rather than assumed to still hold.
+
+## Follow-ups
+
+- [ ] Migration ticket: `content_variants.channel_id` + nullable `campaign_id`
+- [ ] product-definition.md patch (Core Structure, approval model, scope-list correction)
+- [ ] Shell-nav ticket (Channels menu, per-channel routing, stub states) — blocked on migration ticket and on Tulio confirming where Channels docks in the higher-level nav
+- [ ] Content Variant `type` field / short status ladder for text content — separate ticket, not blocking

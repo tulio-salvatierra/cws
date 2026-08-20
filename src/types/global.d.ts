@@ -69,4 +69,38 @@ declare module "*.svg?url" {
   const src: string;
   export default src;
 }
+
+interface ImportMetaEnv {
+  readonly VITE_GOOGLE_MAPS_API_KEY?: string;
+  readonly VITE_GOOGLE_MAPS_MAP_ID?: string;
+}
+
+interface Window {
+  google?: {
+    maps: {
+      importLibrary: (name: string) => Promise<unknown>;
+    };
+  };
+}
+
+declare namespace JSX {
+  interface IntrinsicElements {
+    "gmp-map": {
+      center?: string;
+      zoom?: string;
+      "map-id"?: string;
+      style?: {
+        display?: string;
+        width?: string;
+        height?: string;
+        minHeight?: string;
+      };
+      children?: unknown;
+    };
+    "gmp-advanced-marker": {
+      position?: string;
+      title?: string;
+    };
+  }
+}
   

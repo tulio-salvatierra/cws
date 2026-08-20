@@ -16,6 +16,7 @@ import { useScramble } from "../../Hooks/useScramble";
 import MaskedLines from "../MaskedLines/MaskedLines";
 import { useFadeIn } from "../../Hooks/useFadeIn";
 import Banner from "../Banner/Banner";
+import StudioMap from "./StudioMap";
 
 export default function Contact() {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
@@ -143,19 +144,9 @@ export default function Contact() {
             </div>
             <div
               ref={fadeInRef}
-              className="w-full h-auto mt-8 rounded-xl overflow-hidden"
+              className="mt-8 h-[20rem] w-full overflow-hidden rounded-xl sm:h-[24rem]"
             >
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d252.5880090363163!2d-87.7509307390869!3d41.95077474768748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880fcde85586be3d%3A0x88f84b57cb03f35b!2sCicero%20Web%20Studio!5e1!3m2!1sen!2sus!4v1761046047715!5m2!1sen!2sus"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen={true}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Cicero Web Studio Location"
-                className="rounded-xl p-4 sm:p-0"
-              />
+              <StudioMap />
             </div>
           </div>
         </div>
