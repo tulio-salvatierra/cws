@@ -61,8 +61,9 @@ export async function authenticateWorkspace(req) {
   return { client, user, workspaceId: membership.data.workspace_id }
 }
 
-export function interpolateTemplate(value, lead) {
+export function interpolateTemplate(value, recipient = {}) {
   return value
-    .replaceAll('{{name}}', lead.name || 'there')
-    .replaceAll('{{company}}', lead.company || 'your business')
+    .replaceAll('{{name}}', recipient.name || 'there')
+    .replaceAll('{{company}}', recipient.company || 'your business')
+    .replaceAll('{{unsubscribe_url}}', recipient.unsubscribeUrl || '{{unsubscribe_url}}')
 }

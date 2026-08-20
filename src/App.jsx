@@ -34,6 +34,7 @@ const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
 const LeadsPage = lazy(() => import("./pages/admin/LeadsPage"));
+const MailingListPage = lazy(() => import("./pages/admin/MailingListPage"));
 const WorkspacePage = lazy(() => import("./pages/admin/WorkspacePage"));
 const ChannelsPage = lazy(() => import("./pages/admin/ChannelsPage"));
 const CampaignDetailPage = lazy(() => import("./pages/admin/CampaignDetailPage"));
@@ -163,6 +164,7 @@ function App() {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="leads" element={<LeadsPage />} />
+              <Route path="mailing-list" element={<MailingListPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="workspace" element={<WorkspacePage />} />
               <Route path="channels" element={<ChannelsPage />} />
