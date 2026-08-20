@@ -12,6 +12,7 @@ const NAV = [
   { to: '/admin/knowledge', label: 'Knowledge' },
   { to: '/admin/agent-runs', label: 'Agent runs' },
   { to: '/admin/clients', label: 'Clients' },
+  { to: '/admin/leads', label: 'Leads' },
   { to: '/admin/calendar', label: '📅 Calendar' },
   { to: '/admin/keywords', label: '🔑 Keywords' },
   { to: '/admin/analytics', label: '📊 Analytics' },
