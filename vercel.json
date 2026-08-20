@@ -19,6 +19,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/outreach/webhook",
+      "destination": "/api/outreach-webhook"
+    },
+    {
       "source": "/api/outreach/:path*",
       "destination": "/api/outreach"
     },
