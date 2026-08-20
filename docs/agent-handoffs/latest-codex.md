@@ -35,8 +35,12 @@ Decisions / discrepancies:
 - Used the live count of 13 as authoritative rather than the ticket's expected count of 12; no rows were modified other than the new backfill column.
 - Retained existing table RLS and grants; adding a column/FK does not change row-policy intent.
 
+Deployment:
+- Preview deployment is READY at `https://cws-7yjer3kyw-t00lio-s-team.vercel.app`.
+- Vercel metadata identifies it as a CLI upload from the local checkout (`gitDirty=1`), not a clean Git-linked deployment; the uploaded files include this migration.
+
 Next:
-- Deploy the pushed branch when requested.
+- Create a clean Git-linked Preview/Production deployment from the pushed branch before relying on deployment metadata for release traceability.
 - The follow-up UI/shell work may begin only after this migration is landed and verified.
 
 Permanent decisions added: None.

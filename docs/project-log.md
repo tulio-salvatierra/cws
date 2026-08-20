@@ -1336,3 +1336,7 @@ preserving its existing composite foreign key. Staging applied migration
 and channel mappings and were verified with zero null channel or campaign IDs.
 Security advisors show only the two pre-existing warnings and no new RLS gap.
 No campaigns, channels, published_posts, legacy tables, or UI were changed.
+
+Preview deployment is READY at `https://cws-7yjer3kyw-t00lio-s-team.vercel.app`.
+Vercel reports the deployment as a CLI upload from a dirty local checkout, so a
+clean Git-linked deployment remains the release-traceability follow-up.
