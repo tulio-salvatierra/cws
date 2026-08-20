@@ -106,6 +106,7 @@ export default function ChannelsPage() {
                   </div>
                   <span className="text-2xl text-orange-300" aria-hidden="true">◌</span>
                 </div>
+                <Link className="mt-5 inline-flex rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950" to={`/admin/channels/${channel.id}/variants/new`}>+ New variant</Link>
 
                 <div className="mt-6 grid gap-5 border-t border-white/10 pt-5 sm:grid-cols-2">
                   <Detail label="Audience" value={channel.audience} />

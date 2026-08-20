@@ -1340,3 +1340,14 @@ No campaigns, channels, published_posts, legacy tables, or UI were changed.
 Preview deployment from clean pushed commit `1d9754222fa0cbb532b2cae90f8a97deb1a1fbc3`
 is READY at `https://cws-5buma5s0o-t00lio-s-team.vercel.app`; build and import-
 casing checks passed.
+
+## 2026-08-20 — CWS-CHANNEL-AWARE-028 channel-aware variant creation
+
+Agent: Codex
+Status: Implemented locally; verification passed; connector push and Preview deployment pending
+
+Added channel-scoped variant creation routes and a required channel selector with
+optional same-channel campaign selection. Existing campaign-scoped creation now
+preselects its channel. Workspace cards retain campaign-less variants and show
+channel/campaign context; variant detail falls back to Channels when no campaign
+exists. Focused tests (23), lint, import-casing, and production build pass.

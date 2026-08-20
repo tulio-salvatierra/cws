@@ -1,15 +1,19 @@
 # Latest Codex Handoff
 
-Task ID: CWS-DEC-027
+Task ID: CWS-CHANNEL-AWARE-028
 Agent: Codex
-Objective: Add workspace-scoped channel ownership to `content_variants` and make `campaign_id` nullable without changing campaigns, channels, legacy tables, or UI behavior.
+Objective: Make content-variant creation channel-aware while preserving optional campaign association.
 
 Repository:
 - `/Users/tuliosalvatierra/CWS`
 - Branch: `agent/n8n-dry-run-bridge`
 
 Files changed:
-- `supabase/migrations/20260820200000_content_variant_channel_id.sql`
+- `src/pages/admin/NewVariantPage.jsx`
+- `src/pages/admin/ChannelsPage.jsx`
+- `src/pages/admin/WorkspacePage.jsx`
+- `src/pages/admin/VariantDetailPage.jsx`
+- `src/App.jsx`
 - `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
@@ -39,9 +43,20 @@ Deployment:
 - A clean worktree from pushed commit `1d9754222fa0cbb532b2cae90f8a97deb1a1fbc3` deployed successfully to Preview at `https://cws-5buma5s0o-t00lio-s-team.vercel.app`.
 - Build and import-casing checks passed; deployment state is READY.
 
+Implementation:
+- Added `/admin/channels/:channelId/variants/new` and `/admin/variants/new` routes.
+- New variant creation requires a workspace channel and permits an optional campaign filtered to that channel.
+- Existing campaign-scoped creation continues to preselect its channel.
+- Workspace content cards now retain campaign-less variants and show channel/campaign context.
+- Variant detail includes `channel_id` and falls back to Channels when no campaign exists.
+
+Verification:
+- Focused admin tests: 23 passed.
+- `npm run lint`: passed with one pre-existing exhaustive-deps warning in `src/Hooks/useDrafts.js`.
+- `npm run build`: passed, including import-casing check.
+
 Next:
-- Smoke-test the clean Preview, then promote to Production only when explicitly requested.
-- The follow-up UI/shell work may begin only after this migration is landed and verified.
+- Push this UI follow-up through the GitHub connector, deploy a clean Preview, and smoke-test channel-scoped and campaign-less creation before Production promotion.
 
 Permanent decisions added: None.
 Reusable learnings added: None.
