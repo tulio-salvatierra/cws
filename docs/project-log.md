@@ -1337,6 +1337,6 @@ and channel mappings and were verified with zero null channel or campaign IDs.
 Security advisors show only the two pre-existing warnings and no new RLS gap.
 No campaigns, channels, published_posts, legacy tables, or UI were changed.
 
-Preview deployment is READY at `https://cws-7yjer3kyw-t00lio-s-team.vercel.app`.
-Vercel reports the deployment as a CLI upload from a dirty local checkout, so a
-clean Git-linked deployment remains the release-traceability follow-up.
+Preview deployment from clean pushed commit `1d9754222fa0cbb532b2cae90f8a97deb1a1fbc3`
+is READY at `https://cws-5buma5s0o-t00lio-s-team.vercel.app`; build and import-
+casing checks passed.

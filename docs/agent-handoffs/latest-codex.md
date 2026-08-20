@@ -36,11 +36,11 @@ Decisions / discrepancies:
 - Retained existing table RLS and grants; adding a column/FK does not change row-policy intent.
 
 Deployment:
-- Preview deployment is READY at `https://cws-7yjer3kyw-t00lio-s-team.vercel.app`.
-- Vercel metadata identifies it as a CLI upload from the local checkout (`gitDirty=1`), not a clean Git-linked deployment; the uploaded files include this migration.
+- A clean worktree from pushed commit `1d9754222fa0cbb532b2cae90f8a97deb1a1fbc3` deployed successfully to Preview at `https://cws-5buma5s0o-t00lio-s-team.vercel.app`.
+- Build and import-casing checks passed; deployment state is READY.
 
 Next:
-- Create a clean Git-linked Preview/Production deployment from the pushed branch before relying on deployment metadata for release traceability.
+- Smoke-test the clean Preview, then promote to Production only when explicitly requested.
 - The follow-up UI/shell work may begin only after this migration is landed and verified.
 
 Permanent decisions added: None.
