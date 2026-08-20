@@ -55,8 +55,11 @@ Verification:
 - `npm run lint`: passed with one pre-existing exhaustive-deps warning in `src/Hooks/useDrafts.js`.
 - `npm run build`: passed, including import-casing check.
 
+Deployment:
+- Clean Preview from commit `9a06ee41a8b0cc86ed9babc69ac015ed19d5968c` is READY at `https://cws-hj7n597z5-t00lio-s-team.vercel.app`.
+
 Next:
-- Push this UI follow-up through the GitHub connector, deploy a clean Preview, and smoke-test channel-scoped and campaign-less creation before Production promotion.
+- Smoke-test channel-scoped and campaign-less creation on Preview before Production promotion.
 
 Permanent decisions added: None.
 Reusable learnings added: None.

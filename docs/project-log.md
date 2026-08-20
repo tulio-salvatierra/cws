@@ -1344,10 +1344,13 @@ casing checks passed.
 ## 2026-08-20 — CWS-CHANNEL-AWARE-028 channel-aware variant creation
 
 Agent: Codex
-Status: Implemented locally; verification passed; connector push and Preview deployment pending
+Status: Pushed and clean Preview deployed
 
 Added channel-scoped variant creation routes and a required channel selector with
 optional same-channel campaign selection. Existing campaign-scoped creation now
 preselects its channel. Workspace cards retain campaign-less variants and show
 channel/campaign context; variant detail falls back to Channels when no campaign
 exists. Focused tests (23), lint, import-casing, and production build pass.
+
+Clean Preview from commit `9a06ee41a8b0cc86ed9babc69ac015ed19d5968c` is READY at
+`https://cws-hj7n597z5-t00lio-s-team.vercel.app`.
