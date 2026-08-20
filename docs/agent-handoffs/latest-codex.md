@@ -36,7 +36,7 @@ Decisions / discrepancies:
 - Retained existing table RLS and grants; adding a column/FK does not change row-policy intent.
 
 Next:
-- Commit and push the migration through the connected GitHub workflow, preserving the exact local file contents; then deploy the branch when requested.
+- Deploy the pushed branch when requested.
 - The follow-up UI/shell work may begin only after this migration is landed and verified.
 
 Permanent decisions added: None.

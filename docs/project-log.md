@@ -1325,7 +1325,7 @@ with the local filenames.
 ## 2026-08-20 — CWS-DEC-027 content variant channel ownership
 
 Agent: Codex
-Status: Implemented and staging-validated; commit/push pending
+Status: Implemented, staging-validated, and pushed; deployment pending
 
 Added `content_variants.channel_id` with a workspace-scoped composite foreign
 key to `channels`, backfilled it through each existing campaign, enforced NOT
