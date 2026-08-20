@@ -3,7 +3,7 @@ import {
   cleanText,
   missingOutreachEnv,
   parseBody,
-} from '../lib/outreach.js'
+} from './shared.js'
 
 export default async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ ok: false, error: 'Method not allowed' })
