@@ -1368,6 +1368,10 @@ send flow is live at `https://cws-two.vercel.app`. The full suite passes with
 verification that each recipient produced its own subscriber-only `outreach_sends`
 row and delivery evidence.
 
+Controlled verification completed: Production contains exactly two recent
+`mailing_list` outreach rows, each for a distinct subscriber, and both are
+`delivered`. Recipient addresses were not copied into project documentation.
+
 ## 2026-08-21 — CWS-VERCEL-CASING-029 Production casing repair
 
 Agent: Codex
