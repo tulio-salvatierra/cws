@@ -1394,3 +1394,7 @@ requires authentication. Mailing-list links now default to this API URL and
 can be overridden with `OUTREACH_UNSUBSCRIBE_BASE_URL`. Two endpoint tests were
 added; the full suite passes with 121 tests, and Preview deployment
 `dpl_AUDZ7WjevYqXAWaQf9SUcUShdheV` is READY.
+
+The flow was promoted to Production as deployment
+`dpl_2EuunUvp929DY7MkyM4CeDgLWnPB`. A malformed-input probe returned the
+expected 400 validation response without touching subscriber data.

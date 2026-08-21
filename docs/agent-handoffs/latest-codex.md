@@ -72,9 +72,11 @@ Verification:
 - Lint passed with the existing `useDrafts` exhaustive-deps warning.
 - Import-casing check and Vite build passed.
 - Clean Preview `https://cws-i96twoh0r-t00lio-s-team.vercel.app` is READY.
+- Production deployment `dpl_2EuunUvp929DY7MkyM4CeDgLWnPB` is READY at `https://cws-two.vercel.app`.
+- Production malformed-input probe returned `{ ok: false, error: "A valid subscriber_id is required." }`.
 
 Next:
-- Test one unsubscribe link against a controlled subscriber in Preview, then decide on Production promotion.
+- Test one unsubscribe link against a controlled subscriber in Production, then verify the subscriber is excluded from future sends.
 
 Permanent decisions added: None.
 Reusable learnings added: None.
