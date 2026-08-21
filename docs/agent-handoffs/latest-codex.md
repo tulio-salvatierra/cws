@@ -1,8 +1,8 @@
 # Latest Codex Handoff
 
-Task ID: CWS-MAILING-LIST-022
+Task ID: CWS-VERCEL-CASING-029
 Agent: Codex
-Objective: Verify the deployed subscriber-only mailing-list send path before Ticket 4.
+Objective: Restore the complete Git tree and eliminate Vercel import-casing failures.
 
 Repository:
 - `/Users/tuliosalvatierra/CWS`
@@ -56,14 +56,14 @@ Verification:
 - `npm run build`: passed, including import-casing check.
 
 Deployment:
-- Production is READY at `https://cws-two.vercel.app` (deployment `dpl_GbCMd7XneeAUGiR4aXHErANcftZP`).
+- Production is READY at `https://cws-two.vercel.app` (deployment `dpl_FcANnh5MqnsHpfedighJpgFDY7zS`), built from commit `70bf33f`.
 
 Verification:
 - Full Vitest suite: 119 tests passed.
 - Lint and build were already passed for the deployed commit.
 
 Next:
-- Add two controlled test subscribers in Production, send one selected mailing-list message, and verify two distinct subscriber-only `outreach_sends` rows plus delivery evidence. Do not use real contacts.
+- Confirm the live `/admin/mailing-list` route loads, then resume controlled subscriber testing.
 
 Permanent decisions added: None.
 Reusable learnings added: None.

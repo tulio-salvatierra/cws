@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const DEFAULT_CHANNEL_SLUG = 'cicero-web-studio'
 const DEFAULT_LANGUAGE = 'en'
-const DEFAULT_MODEL = 'gpt-5.6'
+const DEFAULT_MODEL = 'gpt-5.6-sol'
 const AGENT_KEY = 'channel-draft-generator'
 const MAX_TOPIC_LENGTH = 500
 

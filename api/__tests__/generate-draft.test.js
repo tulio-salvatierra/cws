@@ -132,7 +132,7 @@ describe('non-publishing draft generation API', () => {
       ok: true,
       json: vi.fn().mockResolvedValue({
         id: 'response-1',
-        model: 'gpt-5.6',
+        model: 'gpt-5.6-sol',
         output: [{
           type: 'message',
           content: [{ type: 'output_text', text: 'Clear websites help customers act.' }],
@@ -171,7 +171,7 @@ describe('non-publishing draft generation API', () => {
     }))
     const openAiRequest = JSON.parse(fetch.mock.calls[0][1].body)
     expect(openAiRequest).toEqual(expect.objectContaining({
-      model: 'gpt-5.6',
+      model: 'gpt-5.6-sol',
       store: false,
       reasoning: { effort: 'low' },
     }))

@@ -1367,3 +1367,14 @@ send flow is live at `https://cws-two.vercel.app`. The full suite passes with
 119 tests. The next action is a controlled send to two test subscribers, then
 verification that each recipient produced its own subscriber-only `outreach_sends`
 row and delivery evidence.
+
+## 2026-08-21 — CWS-VERCEL-CASING-029 Production casing repair
+
+Agent: Codex
+Status: Fixed, pushed, and deployed
+
+The connector tree had omitted existing Leads/Mailing List and outreach files,
+causing Vercel to rely on stale cached artifacts and report casing failures.
+Commit `70bf33f` restored the complete local tree. Import-casing and production
+build passed, and deployment `dpl_FcANnh5MqnsHpfedighJpgFDY7zS` is READY at
+`https://cws-two.vercel.app`.
