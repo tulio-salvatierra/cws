@@ -1353,4 +1353,6 @@ channel/campaign context; variant detail falls back to Channels when no campaign
 exists. Focused tests (23), lint, import-casing, and production build pass.
 
 Clean Preview from commit `9a06ee41a8b0cc86ed9babc69ac015ed19d5968c` is READY at
-`https://cws-hj7n597z5-t00lio-s-team.vercel.app`.
+`https://cws-hj7n597z5-t00lio-s-team.vercel.app`. The same change is now READY
+in Production at `https://cws-two.vercel.app` as deployment
+`dpl_GbCMd7XneeAUGiR4aXHErANcftZP`.

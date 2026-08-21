@@ -57,9 +57,10 @@ Verification:
 
 Deployment:
 - Clean Preview from commit `9a06ee41a8b0cc86ed9babc69ac015ed19d5968c` is READY at `https://cws-hj7n597z5-t00lio-s-team.vercel.app`.
+- The same pushed change is now READY in Production at `https://cws-two.vercel.app` (deployment `dpl_GbCMd7XneeAUGiR4aXHErANcftZP`).
 
 Next:
-- Smoke-test channel-scoped and campaign-less creation on Preview before Production promotion.
+- Smoke-test channel-scoped and campaign-less creation in Production.
 
 Permanent decisions added: None.
 Reusable learnings added: None.
