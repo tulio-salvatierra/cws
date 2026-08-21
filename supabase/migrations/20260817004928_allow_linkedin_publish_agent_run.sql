@@ -64,4 +64,3 @@ end;
 $$;
 
 revoke all on function public.protect_agent_run_lifecycle() from public;
-

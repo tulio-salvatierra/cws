@@ -9,4 +9,3 @@ create index published_posts_agent_run_id_idx
 
 grant select, update on public.published_posts to authenticated;
 grant all on public.published_posts to service_role;
-

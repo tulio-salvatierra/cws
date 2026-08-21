@@ -39,4 +39,3 @@ end;
 $$;
 
 revoke all on function public.protect_published_post_identity() from public;
-

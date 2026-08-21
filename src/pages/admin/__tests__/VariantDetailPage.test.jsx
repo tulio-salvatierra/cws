@@ -521,4 +521,48 @@ describe('VariantDetailPage', () => {
     })
     expect(await screen.findByRole('status')).toHaveTextContent('n8n acknowledged dry run run-1. No publication occurred.')
   })
+
+  it('requires confirmation before sending an exported variant to the LinkedIn handoff', async () => {
+    const exportedVariant = {
+      ...variant,
+      status: 'exported',
+      exported_by: 'user-1',
+      exported_at: '2026-08-12T19:00:00Z',
+      export_snapshot: { snapshot_version: 1 },
+    }
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ ok: true, agent_run_id: 'linkedin-run-1' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    mockGetSession.mockResolvedValue({ data: { session: { access_token: 'session-token' } } })
+    mockFrom.mockImplementation((table) => {
+      if (table === 'workspace_members') return query({ singleData: { workspace_id: 'workspace-1', role: 'member' } })
+      if (table === 'content_variants') return query({ singleData: exportedVariant })
+      if (table === 'approvals') return query({ data: [{ id: 'approval-1', status: 'approved' }] })
+      if (table === 'content_variant_exports') return query({ data: [{ id: 'export-1', version: 1, caption_text: 'Caption', export_reference: 'final.mp4' }] })
+      return query({ data: [], singleData: null })
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/admin/variants/variant-1']}>
+        <Routes>
+          <Route path="/admin/variants/:variantId" element={<VariantDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: 'Publish to LinkedIn' }))
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('alertdialog', { name: 'Confirm LinkedIn publish' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Confirm publish' }))
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/publish/linkedin', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer session-token', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content_variant_id: 'variant-1', platform: 'linkedin' }),
+    })
+    expect(await screen.findByRole('status')).toHaveTextContent('LinkedIn handoff accepted as agent run linkedin-run-1.')
+  })
 })
