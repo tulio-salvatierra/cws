@@ -1,8 +1,8 @@
 # Latest Codex Handoff
 
-Task ID: CWS-MAILING-LIST-022
+Task ID: CWS-OUTREACH-UNSUBSCRIBE-030
 Agent: Codex
-Objective: Verify the deployed subscriber-only mailing-list send path before Ticket 4.
+Objective: Add and verify a public idempotent unsubscribe path for mailing-list recipients.
 
 Repository:
 - `/Users/tuliosalvatierra/CWS`
@@ -62,13 +62,19 @@ Verification:
 - Full Vitest suite: 119 tests passed.
 - Lint and build were already passed for the deployed commit.
 
+Implementation:
+- Added `GET`/`POST /api/outreach/unsubscribe` with UUID validation and idempotent `unsubscribed_at` updates.
+- Mailing-list messages now use the unsubscribe API URL by default, configurable through `OUTREACH_UNSUBSCRIBE_BASE_URL`.
+- Added environment-key wiring and two endpoint tests.
+
 Verification:
-- Production query found exactly two recent `mailing_list` outreach rows.
-- Each row has a distinct subscriber ID and Resend message ID.
-- Both rows are `delivered`.
+- Full suite: 121 tests passed.
+- Lint passed with the existing `useDrafts` exhaustive-deps warning.
+- Import-casing check and Vite build passed.
+- Clean Preview `https://cws-i96twoh0r-t00lio-s-team.vercel.app` is READY.
 
 Next:
-- Proceed to Ticket 4 planning; do not send to non-test contacts without a separate approval.
+- Test one unsubscribe link against a controlled subscriber in Preview, then decide on Production promotion.
 
 Permanent decisions added: None.
 Reusable learnings added: None.

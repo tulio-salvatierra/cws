@@ -1382,3 +1382,15 @@ causing Vercel to rely on stale cached artifacts and report casing failures.
 Commit `70bf33f` restored the complete local tree. Import-casing and production
 build passed, and deployment `dpl_FcANnh5MqnsHpfedighJpgFDY7zS` is READY at
 `https://cws-two.vercel.app`.
+
+## 2026-08-21 — CWS-OUTREACH-UNSUBSCRIBE-030
+
+Agent: Codex
+Status: Implemented, tested, and Preview deployed
+
+Added the public `GET`/`POST /api/outreach/unsubscribe` route. It validates the
+subscriber UUID, records `unsubscribed_at` with an idempotent update, and never
+requires authentication. Mailing-list links now default to this API URL and
+can be overridden with `OUTREACH_UNSUBSCRIBE_BASE_URL`. Two endpoint tests were
+added; the full suite passes with 121 tests, and Preview deployment
+`dpl_AUDZ7WjevYqXAWaQf9SUcUShdheV` is READY.
