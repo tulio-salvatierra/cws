@@ -1356,3 +1356,14 @@ Clean Preview from commit `9a06ee41a8b0cc86ed9babc69ac015ed19d5968c` is READY at
 `https://cws-hj7n597z5-t00lio-s-team.vercel.app`. The same change is now READY
 in Production at `https://cws-two.vercel.app` as deployment
 `dpl_GbCMd7XneeAUGiR4aXHErANcftZP`.
+
+## 2026-08-21 — CWS-MAILING-LIST-022 verification readiness
+
+Agent: Codex
+Status: Deployed; full suite verified; controlled production test pending
+
+The authenticated subscriber list/create and selected-recipient mailing-list
+send flow is live at `https://cws-two.vercel.app`. The full suite passes with
+119 tests. The next action is a controlled send to two test subscribers, then
+verification that each recipient produced its own subscriber-only `outreach_sends`
+row and delivery evidence.

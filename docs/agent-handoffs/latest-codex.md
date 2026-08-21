@@ -1,8 +1,8 @@
 # Latest Codex Handoff
 
-Task ID: CWS-CHANNEL-AWARE-028
+Task ID: CWS-MAILING-LIST-022
 Agent: Codex
-Objective: Make content-variant creation channel-aware while preserving optional campaign association.
+Objective: Verify the deployed subscriber-only mailing-list send path before Ticket 4.
 
 Repository:
 - `/Users/tuliosalvatierra/CWS`
@@ -56,11 +56,14 @@ Verification:
 - `npm run build`: passed, including import-casing check.
 
 Deployment:
-- Clean Preview from commit `9a06ee41a8b0cc86ed9babc69ac015ed19d5968c` is READY at `https://cws-hj7n597z5-t00lio-s-team.vercel.app`.
-- The same pushed change is now READY in Production at `https://cws-two.vercel.app` (deployment `dpl_GbCMd7XneeAUGiR4aXHErANcftZP`).
+- Production is READY at `https://cws-two.vercel.app` (deployment `dpl_GbCMd7XneeAUGiR4aXHErANcftZP`).
+
+Verification:
+- Full Vitest suite: 119 tests passed.
+- Lint and build were already passed for the deployed commit.
 
 Next:
-- Smoke-test channel-scoped and campaign-less creation in Production.
+- Add two controlled test subscribers in Production, send one selected mailing-list message, and verify two distinct subscriber-only `outreach_sends` rows plus delivery evidence. Do not use real contacts.
 
 Permanent decisions added: None.
 Reusable learnings added: None.
