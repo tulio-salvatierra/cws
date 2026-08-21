@@ -76,7 +76,7 @@ Verification:
 - Production malformed-input probe returned `{ ok: false, error: "A valid subscriber_id is required." }`.
 
 Next:
-- Test one unsubscribe link against a controlled subscriber in Production, then verify the subscriber is excluded from future sends.
+- Ticket 4 verification is complete. The controlled subscriber is unsubscribed and excluded from future sends.
 
 Permanent decisions added: None.
 Reusable learnings added: None.

@@ -1398,3 +1398,7 @@ added; the full suite passes with 121 tests, and Preview deployment
 The flow was promoted to Production as deployment
 `dpl_2EuunUvp929DY7MkyM4CeDgLWnPB`. A malformed-input probe returned the
 expected 400 validation response without touching subscriber data.
+
+Controlled unsubscribe verification completed in Production: the endpoint
+returned success, the test subscriber received an `unsubscribed_at` timestamp,
+and the active-send eligibility query returned zero rows for that subscriber.
