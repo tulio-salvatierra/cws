@@ -1402,3 +1402,16 @@ expected 400 validation response without touching subscriber data.
 Controlled unsubscribe verification completed in Production: the endpoint
 returned success, the test subscriber received an `unsubscribed_at` timestamp,
 and the active-send eligibility query returned zero rows for that subscriber.
+
+## 2026-08-21 — CWS-OUTREACH-SUPPRESSION-031
+
+Agent: Codex
+Status: Implemented and locally verified; Production deployment pending
+
+Extended the existing signed Resend webhook handler so `email.bounced` and
+`email.complained` events suppress linked mailing-list subscribers by setting
+`unsubscribed_at` idempotently. Lead-backed sends retain status tracking without
+changing lead lifecycle state. Added two focused tests; the full suite passes
+with 123 tests, lint passes with the existing warning, and the production build
+passes including import-casing validation. No real webhook or recipient send
+was used.

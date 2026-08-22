@@ -1,83 +1,69 @@
-# Latest Codex Handoff
-
-Task ID: CWS-OUTREACH-UNSUBSCRIBE-030
+Task ID: CWS-OUTREACH-SUPPRESSION-031
 Agent: Codex
-Objective: Add and verify a public idempotent unsubscribe path for mailing-list recipients.
+Objective: Suppress mailing-list recipients after Resend bounce or complaint events.
 
-Repository:
-- `/Users/tuliosalvatierra/CWS`
-- Branch: `agent/n8n-dry-run-bridge`
+Files inspected:
+- server/outreach/webhook.js
+- server/outreach/mailing-list-send.js
+- server/outreach/subscribers.js
+- supabase/migrations/20260820150455_clients_leads_outreach_foundation.sql
+- .agents/codex-project-instructions.md
+- docs/product-definition.md
+- docs/technical-conventions.md
+- docs/decisions.md
+- docs/learnings.md
 
 Files changed:
-- `src/pages/admin/NewVariantPage.jsx`
-- `src/pages/admin/ChannelsPage.jsx`
-- `src/pages/admin/WorkspacePage.jsx`
-- `src/pages/admin/VariantDetailPage.jsx`
-- `src/App.jsx`
-- `docs/agent-handoffs/latest-codex.md`
-- `docs/project-log.md`
-- `docs/task-ledger.md`
+- server/outreach/webhook.js
+- api/__tests__/outreach-webhook.test.js
+- docs/agent-handoffs/latest-codex.md
+- docs/project-log.md
+- docs/task-ledger.md
 
-Migration:
-- Adds nullable `content_variants.channel_id uuid`.
-- Backfills it from each variant's workspace-scoped `campaign_id -> campaigns.channel_id` relationship.
-- Fails if any row remains without a channel, then sets `channel_id` NOT NULL.
-- Adds `content_variants_channel_id_workspace_id_fkey` referencing `(channels.id, channels.workspace_id)` with `ON DELETE RESTRICT`, matching the existing campaign composite-FK pattern.
-- Adds `content_variants_channel_id_workspace_id_idx`.
-- Drops NOT NULL from `content_variants.campaign_id`; its existing composite FK remains intact and now permits campaign-less variants.
-- Does not touch campaigns, channels, published_posts, or legacy tables.
+Database or API changes:
+- Resend webhook processing now looks up the matching outreach send before updating it.
+- Bounce and complaint events for subscriber-backed sends set `mailing_list_subscribers.unsubscribed_at` idempotently.
+- Lead-backed sends continue to update delivery status only; no lead lifecycle is changed.
+- Unknown message IDs remain a successful ignored response.
 
-Staging verification:
-- Project: `cws-os-staging` / `ddbhxqkckzpwzwvnoxqt`.
-- Migration `20260820213137_content_variant_channel_id` is listed as applied.
-- Staging currently contains 13 variants, not the 12 stated in DEC-027. All 13 had campaigns and resolved channels; all 13 were backfilled.
-- Spot-check: `total_variants = 13`, `channel_nulls = 0`, `campaign_nulls = 0`.
-- The new FK definition is present and uses `(channel_id, workspace_id) -> channels(id, workspace_id)`.
-- Security advisors show only the two pre-existing warnings: callable `public.create_workspace` SECURITY DEFINER and disabled leaked-password protection. No new RLS warning was introduced.
+Security decisions:
+- Suppression runs only after the existing signed Resend webhook verification succeeds.
+- The existing service-role client and webhook secret requirements are unchanged.
+- No new public route, credential, migration, or policy was added.
 
-Decisions / discrepancies:
-- Used the live count of 13 as authoritative rather than the ticket's expected count of 12; no rows were modified other than the new backfill column.
-- Retained existing table RLS and grants; adding a column/FK does not change row-policy intent.
+Decisions made:
+- Treat Resend `email.bounced` and `email.complained` as permanent mailing-list suppression signals.
 
-Deployment:
-- A clean worktree from pushed commit `1d9754222fa0cbb532b2cae90f8a97deb1a1fbc3` deployed successfully to Preview at `https://cws-5buma5s0o-t00lio-s-team.vercel.app`.
-- Build and import-casing checks passed; deployment state is READY.
+Assumptions:
+- `outreach_sends.subscriber_id` is the authoritative link for mailing-list suppression.
+- Existing `unsubscribed_at` is the approved suppression field.
 
-Implementation:
-- Added `/admin/channels/:channelId/variants/new` and `/admin/variants/new` routes.
-- New variant creation requires a workspace channel and permits an optional campaign filtered to that channel.
-- Existing campaign-scoped creation continues to preselect its channel.
-- Workspace content cards now retain campaign-less variants and show channel/campaign context.
-- Variant detail includes `channel_id` and falls back to Channels when no campaign exists.
+Tests added:
+- Bounce event updates send status and suppresses the linked subscriber.
+- Lead delivery event updates send status without subscriber suppression.
 
-Verification:
-- Focused admin tests: 23 passed.
-- `npm run lint`: passed with one pre-existing exhaustive-deps warning in `src/Hooks/useDrafts.js`.
-- `npm run build`: passed, including import-casing check.
+Tests run:
+- Full Vitest suite: 35 files, 123 tests passed.
+- `npm run lint`: passed with the existing `useDrafts` exhaustive-deps warning.
+- `npm run build`: passed, including import-casing validation.
 
-Deployment:
-- Production is READY at `https://cws-two.vercel.app` (deployment `dpl_FcANnh5MqnsHpfedighJpgFDY7zS`), built from commit `70bf33f`.
+Known issues:
+- No real Resend webhook was invoked; tests use mocked verification and Supabase calls.
 
-Verification:
-- Full Vitest suite: 119 tests passed.
-- Lint and build were already passed for the deployed commit.
+Recommended next task:
+- Deploy this suppression change to Production and send a controlled test webhook or use a Resend test event to verify the suppression path without contacting a real recipient.
 
-Implementation:
-- Added `GET`/`POST /api/outreach/unsubscribe` with UUID validation and idempotent `unsubscribed_at` updates.
-- Mailing-list messages now use the unsubscribe API URL by default, configurable through `OUTREACH_UNSUBSCRIBE_BASE_URL`.
-- Added environment-key wiring and two endpoint tests.
+Questions requiring Tulio:
+- None for implementation; Production verification should remain limited to approved/test recipients.
 
-Verification:
-- Full suite: 121 tests passed.
-- Lint passed with the existing `useDrafts` exhaustive-deps warning.
-- Import-casing check and Vite build passed.
-- Clean Preview `https://cws-i96twoh0r-t00lio-s-team.vercel.app` is READY.
-- Production deployment `dpl_2EuunUvp929DY7MkyM4CeDgLWnPB` is READY at `https://cws-two.vercel.app`.
-- Production malformed-input probe returned `{ ok: false, error: "A valid subscriber_id is required." }`.
-
-Next:
-- Ticket 4 verification is complete. The controlled subscriber is unsubscribed and excluded from future sends.
+Project-memory files updated:
+- docs/agent-handoffs/latest-codex.md
+- docs/project-log.md
+- docs/task-ledger.md
 
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: The 13-versus-12 staging count discrepancy is task-specific until the source specification is reconciled.
+Memory updates withheld: None.
+
+Git diff summary:
+- Added bounce/complaint suppression to the existing signed webhook handler and two focused tests. Other pre-existing local changes remain untouched.
