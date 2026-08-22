@@ -42,6 +42,10 @@ Tests added:
 - Bounce event updates send status and suppresses the linked subscriber.
 - Lead delivery event updates send status without subscriber suppression.
 
+Deployment:
+- Production deployment `dpl_DX1V5pfjmX5Ftxyn6afWwBmSxh3i` is READY at
+  `https://cws-two.vercel.app`.
+
 Tests run:
 - Full Vitest suite: 35 files, 123 tests passed.
 - `npm run lint`: passed with the existing `useDrafts` exhaustive-deps warning.
@@ -51,7 +55,7 @@ Known issues:
 - No real Resend webhook was invoked; tests use mocked verification and Supabase calls.
 
 Recommended next task:
-- Deploy this suppression change to Production and send a controlled test webhook or use a Resend test event to verify the suppression path without contacting a real recipient.
+- Use a Resend test event or controlled staging webhook to verify suppression without contacting a real recipient.
 
 Questions requiring Tulio:
 - None for implementation; Production verification should remain limited to approved/test recipients.

@@ -1414,4 +1414,5 @@ Extended the existing signed Resend webhook handler so `email.bounced` and
 changing lead lifecycle state. Added two focused tests; the full suite passes
 with 123 tests, lint passes with the existing warning, and the production build
 passes including import-casing validation. No real webhook or recipient send
-was used.
+was used. Production deployment `dpl_DX1V5pfjmX5Ftxyn6afWwBmSxh3i` is READY at
+`https://cws-two.vercel.app`.
