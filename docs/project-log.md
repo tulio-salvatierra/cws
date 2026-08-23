@@ -1403,6 +1403,19 @@ Controlled unsubscribe verification completed in Production: the endpoint
 returned success, the test subscriber received an `unsubscribed_at` timestamp,
 and the active-send eligibility query returned zero rows for that subscriber.
 
+## 2026-08-23 — CWS-PUBLISH-ROUTE-FIX-032
+
+Agent: Codex
+Status: Fixed, pushed, and Preview deployed
+
+The LinkedIn UI called `/api/publish/linkedin`, while Vercel only had the
+existing `api/publish-linkedin.js` file route. Added a thin wrapper at
+`api/publish/linkedin.js` so the UI reuses the existing authenticated handler.
+Full tests (123), lint, import-casing, and build pass. Preview deployment
+`dpl_3b3fPAvgQycTzk9wFGbaj16TsZ1S` is READY at
+`https://cws-aes5wo8n1-t00lio-s-team.vercel.app`. The separate approvals 400
+occurred on an already-approved variant and was not changed.
+
 ## 2026-08-21 — CWS-OUTREACH-SUPPRESSION-031
 
 Agent: Codex
