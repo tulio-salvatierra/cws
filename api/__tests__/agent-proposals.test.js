@@ -7,6 +7,8 @@ vi.mock('@supabase/supabase-js', () => ({ createClient: createClientMock }))
 
 import handler from '../agent-proposals'
 
+const PROPOSAL_ID = '50cddc54-6447-4530-9a36-6770300c5fd4'
+
 function createResponse() {
   const response = {
     status: vi.fn(() => response),
@@ -27,23 +29,44 @@ function createQuery(result) {
   return query
 }
 
-function createClient({ proposals = [], membership = { workspace_id: 'workspace-1' } } = {}) {
-  const membershipQuery = createQuery({ data: membership, error: null })
-  const proposalsQuery = createQuery({ data: proposals, error: null })
-  const client = {
-    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
-    from: vi.fn((table) => ({
-      workspace_members: membershipQuery,
-      agent_runs: proposalsQuery,
-    })[table]),
+function createUpdateQuery(result) {
+  const query = {
+    update: vi.fn(() => query),
+    eq: vi.fn(() => query),
+    select: vi.fn(() => query),
+    maybeSingle: vi.fn().mockResolvedValue(result),
   }
-  return { client, membershipQuery, proposalsQuery }
+  return query
 }
 
-function request(method = 'GET', token = 'valid-token') {
+function createClient({
+  proposals = [],
+  membership = { workspace_id: 'workspace-1' },
+  updatedProposal = null,
+} = {}) {
+  const membershipQuery = createQuery({ data: membership, error: null })
+  const proposalsQuery = createQuery({ data: proposals, error: null })
+  const updateQuery = createUpdateQuery({ data: updatedProposal, error: null })
+  const agentRuns = {
+    select: proposalsQuery.select,
+    update: updateQuery.update,
+  }
+  const client = {
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
+    from: vi.fn((table) => {
+      if (table === 'workspace_members') return membershipQuery
+      if (table === 'agent_runs') return agentRuns
+      return null
+    }),
+  }
+  return { client, membershipQuery, proposalsQuery, updateQuery }
+}
+
+function request(method = 'GET', token = 'valid-token', body) {
   return {
     method,
     headers: token ? { authorization: `Bearer ${token}` } : {},
+    body,
   }
 }
 
@@ -51,15 +74,19 @@ describe('agent proposals API', () => {
   beforeEach(() => {
     process.env.VITE_SUPABASE_URL = 'https://project.supabase.co'
     process.env.VITE_SUPABASE_ANON_KEY = 'anon-key'
+    process.env.GENERATION_SUPABASE_URL = 'https://project.supabase.co'
+    process.env.GENERATION_SUPABASE_SERVICE_ROLE_KEY = 'service-role-key'
     createClientMock.mockReset()
   })
 
   afterEach(() => {
     delete process.env.VITE_SUPABASE_URL
     delete process.env.VITE_SUPABASE_ANON_KEY
+    delete process.env.GENERATION_SUPABASE_URL
+    delete process.env.GENERATION_SUPABASE_SERVICE_ROLE_KEY
   })
 
-  it('rejects mutation methods', async () => {
+  it('rejects unsupported methods', async () => {
     const response = createResponse()
     await handler(request('POST'), response)
     expect(response.status).toHaveBeenCalledWith(405)
@@ -138,5 +165,48 @@ describe('agent proposals API', () => {
       workspace_id: null,
       proposals: [],
     })
+  })
+
+  it('marks only a current-workspace pending proposal as discussed', async () => {
+    const updatedProposal = {
+      id: PROPOSAL_ID,
+      agent_key: 'marketing',
+      status: 'completed',
+      created_at: '2026-08-23T18:00:00Z',
+      output: { summary: 'Discussed.' },
+    }
+    const database = createClient({ updatedProposal })
+    createClientMock.mockReturnValue(database.client)
+    const response = createResponse()
+
+    await handler(request('PATCH', 'valid-token', { proposal_id: PROPOSAL_ID }), response)
+
+    expect(createClientMock).toHaveBeenCalledWith(
+      process.env.GENERATION_SUPABASE_URL,
+      process.env.GENERATION_SUPABASE_SERVICE_ROLE_KEY,
+      { auth: { persistSession: false, autoRefreshToken: false } },
+    )
+    expect(database.membershipQuery.eq).toHaveBeenCalledWith('user_id', 'user-1')
+    expect(database.updateQuery.update).toHaveBeenCalledWith({ status: 'completed' })
+    expect(database.updateQuery.eq).toHaveBeenCalledWith('id', PROPOSAL_ID)
+    expect(database.updateQuery.eq).toHaveBeenCalledWith('workspace_id', 'workspace-1')
+    expect(database.updateQuery.eq).toHaveBeenCalledWith('command_level', 'propose')
+    expect(database.updateQuery.eq).toHaveBeenCalledWith('status', 'needs_review')
+    expect(response.status).toHaveBeenCalledWith(200)
+    expect(response.json).toHaveBeenCalledWith({ ok: true, proposal: updatedProposal })
+  })
+
+  it('does not update rows outside the current workspace or pending proposal scope', async () => {
+    const database = createClient({ updatedProposal: null })
+    createClientMock.mockReturnValue(database.client)
+    const response = createResponse()
+
+    await handler(request('PATCH', 'valid-token', { proposal_id: PROPOSAL_ID }), response)
+
+    expect(database.updateQuery.eq).toHaveBeenCalledWith('workspace_id', 'workspace-1')
+    expect(database.updateQuery.eq).toHaveBeenCalledWith('command_level', 'propose')
+    expect(database.updateQuery.eq).toHaveBeenCalledWith('status', 'needs_review')
+    expect(response.status).toHaveBeenCalledWith(404)
+    expect(response.json).toHaveBeenCalledWith({ ok: false, error: 'Pending proposal not found.' })
   })
 })

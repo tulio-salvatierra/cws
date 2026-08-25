@@ -32,6 +32,7 @@ function LoadingState() {
 
 export default function AgentProposalsPage() {
   const [state, setState] = useState({ loading: true, error: '', proposals: [] })
+  const [discussingId, setDiscussingId] = useState('')
 
   useEffect(() => {
     let active = true
@@ -66,6 +67,40 @@ export default function AgentProposalsPage() {
     return () => { active = false }
   }, [])
 
+  async function markDiscussed(proposalId) {
+    setDiscussingId(proposalId)
+    setState((current) => ({ ...current, error: '' }))
+
+    try {
+      const { data } = await supabase.auth.getSession()
+      const token = data.session?.access_token
+      if (!token) throw new Error('Your session expired. Sign in again.')
+
+      const response = await fetch('/api/agent-proposals', {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ proposal_id: proposalId }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Unable to mark proposal discussed.')
+
+      setState((current) => ({
+        ...current,
+        proposals: current.proposals.filter((proposal) => proposal.id !== proposalId),
+      }))
+    } catch (error) {
+      setState((current) => ({
+        ...current,
+        error: error instanceof Error ? error.message : 'Unable to mark proposal discussed.',
+      }))
+    } finally {
+      setDiscussingId('')
+    }
+  }
+
   if (state.loading) return <LoadingState />
 
   return (
@@ -94,6 +129,14 @@ export default function AgentProposalsPage() {
                 <p className="mt-5 whitespace-pre-wrap text-sm leading-6 text-slate-200">
                   {getProposalSummary(proposal.output)}
                 </p>
+                <button
+                  type="button"
+                  disabled={discussingId === proposal.id}
+                  onClick={() => markDiscussed(proposal.id)}
+                  className="mt-5 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-orange-300/60 hover:text-orange-200 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {discussingId === proposal.id ? 'Marking...' : 'Mark discussed'}
+                </button>
               </article>
             )) : <p className="text-slate-500">no pending proposals</p>}
           </section>
