@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { SERVER_ENV_KEYS } from './env.keys.js'
+import { ALL_ENV_KEYS } from './env.keys.js'
 import validateProductionClientEnv from './scripts/validate-production-client-env.mjs'
 import {
   GoogleSheetsWebhookTimeoutError,
@@ -23,6 +23,10 @@ const LOCAL_SERVERLESS_HANDLERS = [
   {
     route: '/api/lead-outreach',
     handlerUrl: new URL('./api/lead-outreach.js', import.meta.url).href,
+  },
+  {
+    route: '/api/agent-proposals',
+    handlerUrl: new URL('./api/agent-proposals.js', import.meta.url).href,
   },
 ]
 
@@ -144,7 +148,7 @@ function mountServerlessHandler(server, route, handlerUrl, env) {
 }
 
 function applyLocalServerEnv(env) {
-  SERVER_ENV_KEYS.forEach((key) => {
+  ALL_ENV_KEYS.forEach((key) => {
     if (env[key]) {
       process.env[key] = env[key]
     }
