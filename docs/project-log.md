@@ -1359,3 +1359,14 @@ Safe probes now return 405 for GET and 401 for unauthenticated POST, without
 exposing missing server variable names or contacting n8n. Resend webhook config
 was inspected separately and its exact custom-domain endpoint rejects invalid
 signatures with 400, confirming route/env readiness without data mutation.
+
+## 2026-08-26 — CWS-VERCEL-CLEANUP-034
+
+Agent: Codex
+Status: Completed
+
+After Tulio explicitly approved cleanup, verified that the accidental Vercel
+project `cws-publish-guard-prod` existed under `t00lio's Team`, deleted only
+that project, and verified a follow-up inspect returned `project_not_found`.
+No repository code, real `cws` Vercel project, Production alias, Supabase data,
+n8n workflow, or secret configuration was changed.
