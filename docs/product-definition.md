@@ -11,7 +11,7 @@ It should help the owner:
 - Track decisions and learnings
 - Produce content for Cicero Web Studio and a separate drum-practice channel
 - Use AI to recommend, organize, and prepare work
-- Keep human approval over important decisions and actions
+- Keep human control over important decisions and actions
 
 The first active module is **Content Operations**.
 
@@ -40,13 +40,13 @@ Build now:
 - Learnings
 - Agent runs
 - Approvals
+- Automatic social publishing
+- Social OAuth integrations
 - CWS intro advertisement pilot
 - Future-ready AI command architecture
 
 Do not build yet:
 
-- Automatic social publishing
-- Social OAuth integrations
 - Video rendering
 - Final Cut Pro automation
 - Client portals
@@ -57,13 +57,19 @@ Do not build yet:
 
 ## Core Structure
 
+*(Content Operations / Channels module — see DEC-027. Does not govern Goals, Initiatives, or Projects navigation, which is defined separately.)*
+
 ```text
 Workspace
+├── Channels
+│   ├── Channel Brief (voice/tone per locale)
+│   ├── Topics & Proposals
+│   ├── Content Variants (video track + social/text track)
+│   └── Published Posts (per platform)
 ├── Goals
 │   └── Initiatives
 ├── Projects
-├── Campaigns
-│   └── Content Variants
+├── Campaigns (optional grouping across variants)
 ├── Tasks
 ├── Decisions
 ├── Learnings
@@ -71,7 +77,7 @@ Workspace
 └── Approvals
 ```
 
-Campaigns are one type of work inside the workspace, not the entire product.
+Every Content Variant belongs to a Channel directly (`content_variants.channel_id`, required). Campaigns are an optional grouping across variants (`content_variants.campaign_id`, nullable), not a required container. A variant may exist under a Channel with no Campaign at all — this is the normal case for routine social/text content, not an exception.
 
 ## Initial Workspace
 
@@ -149,6 +155,8 @@ English and Spanish must remain independent variants with separate:
 
 `draft`, `script_ready`, `ready_to_record`, `recorded`, `rough_cut`, `fine_cut`, `captions_pending`, `ready_for_review`, `approved`, `exported`, `published`, `archived`
 
+*(A shorter status ladder for social/text content is tracked as a follow-up ticket per DEC-027 and not yet implemented.)*
+
 ### Tasks
 
 `todo`, `in_progress`, `blocked`, `review`, `completed`, `cancelled`
@@ -160,6 +168,8 @@ English and Spanish must remain independent variants with separate:
 ### Approvals
 
 `pending`, `approved`, `revision_requested`, `rejected`
+
+Approvals are recorded automatically at publish time as a traceability log, for both video and social/text content — they do not block publishing. This reflects solo-operator use, where the same person drafts and publishes; see DEC-027.
 
 ### Decisions
 
@@ -197,8 +207,7 @@ Every action must be:
 
 - Validated
 - Authorized
-- Traceable
-- Linked to approval
+- Traceable, including an automatic approval log entry
 - Reversible where practical
 
 The AI must never directly mutate important business data from an open-ended chat response.
@@ -228,12 +237,14 @@ The dashboard must not initially:
 - Render video
 - Replace the human editing process
 
+No video file is ever uploaded to or stored in CWS OS, at any point in the workflow — only references. This is a permanent constraint, not a phase-one limitation.
+
 ## Product Principles
 
 Favor:
 
 - Structured data
-- Human approval
+- Human control at the point of action
 - Reversible decisions
 - Clear agent boundaries
 - Small implementation tickets
