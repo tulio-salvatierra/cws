@@ -1321,3 +1321,20 @@ n8n webhook conversion and UI action.
 The new run link is also protected as immutable publication identity by a
 follow-up trigger migration; all three staging migration versions are aligned
 with the local filenames.
+
+## 2026-08-25 — CWS-PUBLISH-ROUTE-FIX-032 Production rewrite
+
+Agent: Codex
+Status: Fixed, tested, and Production-verified
+
+Production still returned Vercel `404 NOT_FOUND` for
+`GET /api/publish/linkedin`, proving the UI route was not live. The first fix
+attempt committed a thin wrapper function, but the production deployment failed
+because the Vercel Hobby plan allows no more than 12 serverless functions.
+
+The final fix uses a `vercel.json` rewrite from `/api/publish/linkedin` to the
+existing `/api/publish-linkedin` function, avoiding another lambda while
+preserving the UI URL. Added `api/__tests__/publish-linkedin-rewrite.test.js`.
+Focused publish tests, lint, import-casing, and build pass. Production
+deployment `dpl_ELbCbyFjiJNXHEiydWc2FmYDuDMX` is READY at
+`https://cws-two.vercel.app`, and the safe production route probe now returns

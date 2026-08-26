@@ -149,6 +149,19 @@ state impossible to determine from within the system. A durable return record
 gives every later manual or automated publisher a common evidence contract from
 its first execution.
 
+## Use rewrites for API aliases near Vercel function limits
+
+Date: 2026-08-25
+
+Verified by: CWS-PUBLISH-ROUTE-FIX-032
+
+On Vercel Hobby, adding a tiny wrapper file under `/api` still counts as an
+additional serverless function. When a route alias only needs to preserve an
+existing UI URL and delegate to an existing handler, prefer a `vercel.json`
+rewrite so the alias does not consume another function slot. Verify the alias
+with a safe non-mutating method: for a POST-only handler, `GET` should return
+the handler's `405 Method not allowed`, not Vercel's `404 NOT_FOUND`.
+
 ## Create versioned strategy before generation workflows
 
 Date: 2026-08-09
