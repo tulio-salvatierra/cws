@@ -19,6 +19,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/publish/linkedin",
+      "destination": "/api/publish-linkedin"
+    },
+    {
       "source": "/api/outreach/webhook",
       "destination": "/api/outreach-webhook"
     },
