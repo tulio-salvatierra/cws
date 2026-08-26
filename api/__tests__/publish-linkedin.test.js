@@ -86,6 +86,34 @@ describe('LinkedIn publish dispatch API', () => {
     expect(createClientMock).not.toHaveBeenCalled()
   })
 
+  it('does not reveal missing n8n environment variables to unauthenticated callers', async () => {
+    delete process.env.N8N_PUBLISH_WEBHOOK_URL
+    delete process.env.N8N_PUBLISH_WEBHOOK_SECRET
+    const response = createResponse()
+
+    await handler(request(undefined, ''), response)
+
+    expect(response.status).toHaveBeenCalledWith(401)
+    expect(response.json).toHaveBeenCalledWith({ ok: false, error: 'Authentication required.' })
+    expect(createClientMock).not.toHaveBeenCalled()
+  })
+
+  it('reports missing publishing configuration only after authentication', async () => {
+    delete process.env.N8N_PUBLISH_WEBHOOK_URL
+    delete process.env.N8N_PUBLISH_WEBHOOK_SECRET
+    const database = createDatabase()
+    createClientMock.mockReturnValue(database.client)
+    const response = createResponse()
+
+    await handler(request(), response)
+
+    expect(response.status).toHaveBeenCalledWith(503)
+    expect(response.json).toHaveBeenCalledWith({ ok: false, error: 'LinkedIn publishing is not configured.' })
+    expect(database.client.auth.getUser).toHaveBeenCalledWith('valid-token')
+    expect(database.client.from).not.toHaveBeenCalled()
+    expect(database.insert).not.toHaveBeenCalled()
+  })
+
   it('rejects a non-member', async () => {
     const database = createDatabase({ member: false })
     createClientMock.mockReturnValue(database.client)

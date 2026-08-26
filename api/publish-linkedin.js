@@ -13,13 +13,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Method not allowed' })
   }
 
-  const missingEnv = getMissingEnv()
-  if (missingEnv.length) {
-    return res.status(500).json({
-      ok: false,
-      error: `Missing LinkedIn publishing environment variables: ${missingEnv.join(', ')}`,
-    })
-  }
+  if (getMissingAuthEnv().length) return publishingNotConfigured(res)
 
   const accessToken = getBearerToken(req)
   if (!accessToken) return res.status(401).json({ ok: false, error: 'Authentication required.' })
@@ -34,6 +28,8 @@ export default async function handler(req, res) {
   if (authenticated.error || !user) {
     return res.status(401).json({ ok: false, error: 'The session is invalid or expired.' })
   }
+
+  if (getMissingPublishEnv().length) return publishingNotConfigured(res, 503)
 
   const variant = await client
     .from('content_variants')
@@ -149,10 +145,15 @@ function createServiceClient() {
   )
 }
 
-function getMissingEnv() {
+function getMissingAuthEnv() {
   const missing = []
   if (!process.env.GENERATION_SUPABASE_URL) missing.push('GENERATION_SUPABASE_URL')
   if (!process.env.GENERATION_SUPABASE_SERVICE_ROLE_KEY) missing.push('GENERATION_SUPABASE_SERVICE_ROLE_KEY')
+  return missing
+}
+
+function getMissingPublishEnv() {
+  const missing = []
   if (!process.env.N8N_PUBLISH_WEBHOOK_URL) missing.push('N8N_PUBLISH_WEBHOOK_URL')
   if (!process.env.N8N_PUBLISH_WEBHOOK_SECRET) missing.push('N8N_PUBLISH_WEBHOOK_SECRET')
   return missing
@@ -217,4 +218,8 @@ function safeErrorMessage(error) {
 
 function databaseError(res, error) {
   return res.status(502).json({ ok: false, error: error?.message || 'LinkedIn publishing database request failed.' })
+}
+
+function publishingNotConfigured(res, status = 500) {
+  return res.status(status).json({ ok: false, error: 'LinkedIn publishing is not configured.' })
 }
