@@ -1,60 +1,74 @@
-Task ID: CWS-PUBLISH-ROUTE-FIX-032
+Task ID: CWS-PUBLISH-CONFIG-GUARD-033
 Agent: Codex
-Objective: Repair and production-verify the missing Vercel route used by the LinkedIn publish UI.
+Objective: Harden the LinkedIn publish endpoint configuration guard after production verification showed missing n8n publish env variables.
 
 Files inspected:
+- .agents/codex-project-instructions.md
 - docs/product-definition.md
 - docs/technical-conventions.md
 - docs/decisions.md
 - docs/learnings.md
 - docs/agent-handoffs/latest-codex.md
 - docs/task-ledger.md
+- docs/project-log.md
+- docs/n8n-assessment.md
 - vercel.json
 - api/publish-linkedin.js
 - api/__tests__/publish-linkedin.test.js
+- api/__tests__/publish-linkedin-rewrite.test.js
+- server/outreach/webhook.js
+- api/outreach-webhook.js
 
 Files changed:
-- vercel.json
-- api/__tests__/publish-linkedin-rewrite.test.js
+- api/publish-linkedin.js
+- api/__tests__/publish-linkedin.test.js
 - docs/agent-handoffs/latest-codex.md
 - docs/project-log.md
 - docs/task-ledger.md
 - docs/learnings.md
 
 Database or API changes:
-- Added a Vercel rewrite from `/api/publish/linkedin` to the existing `/api/publish-linkedin` serverless function.
-- Removed the attempted wrapper-function approach from the final implementation because it exceeded the Vercel Hobby 12-function deployment limit.
-- No publishing logic, credentials, database schema, n8n workflow, or Supabase data changed.
+- Split the LinkedIn publish endpoint configuration checks into Supabase-auth prerequisites and n8n-publish prerequisites.
+- Unauthenticated production POST requests now stop at `401 Authentication required` instead of exposing missing server environment variable names.
+- Authenticated requests still fail closed with `503 LinkedIn publishing is not configured` when the n8n publish webhook URL or secret is absent.
+- No database schema, n8n workflow, Resend webhook, or Supabase data changed.
 
 Security decisions:
-- Production testing used safe unauthenticated `GET` probes only. A production `POST` probe was not run because it could trigger publishing if guards failed.
-- The rewrite preserves the existing POST-only authenticated handler and its session, exported-status, workspace-membership, and environment checks.
+- Did not trigger a production LinkedIn publish POST with credentials or a signed-in browser because DEC-026 still requires outbound publishing to remain disabled until a separately approved workflow implements the return path.
+- Used only safe unauthenticated production probes for publish-route verification.
+- Did not pull production Vercel secrets into a local file after the approval reviewer correctly rejected the broad secret download.
 
 Decisions made:
-- Use a rewrite for this API alias instead of creating another Vercel function.
+- Keep missing server variable names out of unauthenticated publish responses.
+- Keep production publish blocked until the n8n publish workflow URL/secret are intentionally configured.
 
 Assumptions:
-- `/api/publish/linkedin` is the UI path to preserve because `VariantDetailPage` already calls it.
-- A `405 Method not allowed` response to `GET /api/publish/linkedin` is the safe production proof that the alias reaches the existing POST-only handler.
+- The missing `N8N_PUBLISH_WEBHOOK_URL` and `N8N_PUBLISH_WEBHOOK_SECRET` in Production are a readiness blocker, not an invitation to point publish traffic at the dry-run workflow.
+- `https://www.cicerowebstudio.xyz/api/outreach/webhook` is the active Resend webhook endpoint because the Resend connector lists it as enabled for delivered, bounced, and complained events.
 
 Tests added:
-- `api/__tests__/publish-linkedin-rewrite.test.js`
+- Two publish endpoint tests covering unauthenticated missing-env non-disclosure and authenticated missing-publish-config behavior.
 
 Tests run:
-- `npm run test:run -- api/__tests__/publish-linkedin.test.js api/__tests__/publish-linkedin-rewrite.test.js`: passed, 2 files and 6 tests.
+- `npm run test:run -- api/__tests__/publish-linkedin.test.js api/__tests__/publish-linkedin-rewrite.test.js`: passed, 2 files and 8 tests.
 - `npm run lint`: passed with the existing `src/Hooks/useDrafts.js` exhaustive-deps warning.
 - `npm run build`: passed, including import-casing validation.
+- Production safe `GET /api/publish/linkedin`: returned `405 Method not allowed`.
+- Production safe unauthenticated `POST /api/publish/linkedin`: returned `401 Authentication required` after hardening.
+- Resend-configured production webhook invalid-signature probe: returned `400 Invalid Resend webhook signature`, confirming route/env readiness without changing data.
 
 Known issues:
-- `src/Hooks/useDrafts.js` still has the pre-existing exhaustive-deps lint warning.
-- Production authenticated publish was not executed from Codex because that would be a real publishing action.
+- Production LinkedIn publish remains intentionally blocked until `N8N_PUBLISH_WEBHOOK_URL` and `N8N_PUBLISH_WEBHOOK_SECRET` are configured for a separately approved publishing workflow.
+- A failed temp-directory deploy created an accidental Vercel project named `cws-publish-guard-prod`; deletion was not attempted after approval review rejected remote project removal without explicit user approval.
 - The local working tree still contains unrelated pre-existing dirty files.
+- `src/Hooks/useDrafts.js` still has the pre-existing exhaustive-deps lint warning.
 
 Recommended next task:
-- In the signed-in production UI, retry the LinkedIn action only for the intended exported variant. If n8n accepts it, verify the resulting `agent_runs` record and publish return-path completion.
+- Either explicitly approve deletion of the accidental Vercel project `cws-publish-guard-prod`, or configure the real n8n LinkedIn publish webhook and secret only after confirming the workflow is approved to publish and report through `/api/published`.
 
 Questions requiring Tulio:
-- None.
+- Do you want me to delete the accidental Vercel project `cws-publish-guard-prod`?
+- Are the real n8n LinkedIn publish webhook URL and shared secret ready to configure in Production?
 
 Project-memory files updated:
 - docs/agent-handoffs/latest-codex.md
@@ -66,13 +80,12 @@ Permanent decisions added:
 - None.
 
 Reusable learnings added:
-- Use Vercel rewrites for API aliases when a wrapper function would consume another Hobby-plan function slot.
+- Clean Vercel archive deploys must include `.vercel/project.json` or explicitly target the existing project to avoid creating a new project from the archive directory name.
 
 Memory updates withheld:
-- None.
+- No publish workflow approval or env values were inferred from the production-testing preference.
 
 Git diff summary:
-- Committed `a29f8e2` first with a wrapper function, but the production deploy failed because the Hobby plan allows no more than 12 serverless functions.
-- Committed `f0a49d9` to replace the wrapper with a rewrite and regression test.
-- Final production deployment for this route fix is `dpl_ELbCbyFjiJNXHEiydWc2FmYDuDMX`.
-- A safe production `GET /api/publish/linkedin` returns `405 Method not allowed`, proving the alias reaches the existing POST-only handler.
+- Committed `aa5b397` to harden the LinkedIn publish configuration guard.
+- Production deployment `dpl_5dZc1myaaqgBtnuJeRk3MVpBtPyv` is READY and aliased to `https://cws-two.vercel.app`.
+- The exact Resend webhook endpoint configured in Resend is enabled and reaches the production handler, but a real signed suppression event was not generated from Codex.

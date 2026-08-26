@@ -286,3 +286,15 @@ more capability above a storage or integration boundary, exercise that boundary
 in the real environment, verify error handling and idempotency, clean up the
 synthetic evidence, and leave a short repeatable command for the first real
 operation.
+
+## Include Vercel project link metadata in clean archive deploys
+
+Date: 2026-08-25
+
+Verified by: CWS-PUBLISH-CONFIG-GUARD-033
+
+Deploying a clean `git archive` from a temporary directory can make Vercel infer
+a new project from the directory name if `.vercel/project.json` is absent. When
+using archive-based deploys to avoid unrelated local dirty files, copy only the
+non-secret `.vercel/project.json` into the archive or pass an explicit project
+scope so the deployment targets the intended existing project.

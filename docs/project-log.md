@@ -1338,3 +1338,24 @@ preserving the UI URL. Added `api/__tests__/publish-linkedin-rewrite.test.js`.
 Focused publish tests, lint, import-casing, and build pass. Production
 deployment `dpl_ELbCbyFjiJNXHEiydWc2FmYDuDMX` is READY at
 `https://cws-two.vercel.app`, and the safe production route probe now returns
+`405 Method not allowed` instead of `404`, confirming the alias reaches the
+existing POST-only authenticated handler without executing a publish.
+
+## 2026-08-25 — CWS-PUBLISH-CONFIG-GUARD-033
+
+Agent: Codex
+Status: Fixed, tested, and Production-deployed
+
+Safe production verification found that unauthenticated `POST /api/publish/linkedin`
+returned a 500 listing missing `N8N_PUBLISH_WEBHOOK_URL` and
+`N8N_PUBLISH_WEBHOOK_SECRET`. Hardened `api/publish-linkedin.js` so Supabase auth
+env is checked separately, unauthenticated requests stop at 401, and authenticated
+requests fail closed with a generic 503 when the n8n publish workflow is not
+configured. Added tests for both cases.
+
+Focused publish tests, lint, import-casing, and build pass. Production deployment
+`dpl_5dZc1myaaqgBtnuJeRk3MVpBtPyv` is READY at `https://cws-two.vercel.app`.
+Safe probes now return 405 for GET and 401 for unauthenticated POST, without
+exposing missing server variable names or contacting n8n. Resend webhook config
+was inspected separately and its exact custom-domain endpoint rejects invalid
+signatures with 400, confirming route/env readiness without data mutation.
