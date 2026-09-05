@@ -1322,6 +1322,114 @@ The new run link is also protected as immutable publication identity by a
 follow-up trigger migration; all three staging migration versions are aligned
 with the local filenames.
 
+## 2026-08-20 — CWS-DEC-027 content variant channel ownership
+
+Agent: Codex
+Status: Implemented, staging-validated, and pushed; deployment pending
+
+Added `content_variants.channel_id` with a workspace-scoped composite foreign
+key to `channels`, backfilled it through each existing campaign, enforced NOT
+NULL, and added the supporting index. Made `campaign_id` nullable while
+preserving its existing composite foreign key. Staging applied migration
+`20260820213137_content_variant_channel_id` successfully. The ticket expected
+12 existing variants, but staging contained 13; all 13 had unambiguous campaign
+and channel mappings and were verified with zero null channel or campaign IDs.
+Security advisors show only the two pre-existing warnings and no new RLS gap.
+No campaigns, channels, published_posts, legacy tables, or UI were changed.
+
+Preview deployment from clean pushed commit `1d9754222fa0cbb532b2cae90f8a97deb1a1fbc3`
+is READY at `https://cws-5buma5s0o-t00lio-s-team.vercel.app`; build and import-
+casing checks passed.
+
+## 2026-08-20 — CWS-CHANNEL-AWARE-028 channel-aware variant creation
+
+Agent: Codex
+Status: Pushed and clean Preview deployed
+
+Added channel-scoped variant creation routes and a required channel selector with
+optional same-channel campaign selection. Existing campaign-scoped creation now
+preselects its channel. Workspace cards retain campaign-less variants and show
+channel/campaign context; variant detail falls back to Channels when no campaign
+exists. Focused tests (23), lint, import-casing, and production build pass.
+
+Clean Preview from commit `9a06ee41a8b0cc86ed9babc69ac015ed19d5968c` is READY at
+`https://cws-hj7n597z5-t00lio-s-team.vercel.app`. The same change is now READY
+in Production at `https://cws-two.vercel.app` as deployment
+`dpl_GbCMd7XneeAUGiR4aXHErANcftZP`.
+
+## 2026-08-21 — CWS-MAILING-LIST-022 verification readiness
+
+Agent: Codex
+Status: Deployed; full suite verified; controlled production test pending
+
+The authenticated subscriber list/create and selected-recipient mailing-list
+send flow is live at `https://cws-two.vercel.app`. The full suite passes with
+119 tests. The next action is a controlled send to two test subscribers, then
+verification that each recipient produced its own subscriber-only `outreach_sends`
+row and delivery evidence.
+
+Controlled verification completed: Production contains exactly two recent
+`mailing_list` outreach rows, each for a distinct subscriber, and both are
+`delivered`. Recipient addresses were not copied into project documentation.
+
+## 2026-08-21 — CWS-VERCEL-CASING-029 Production casing repair
+
+Agent: Codex
+Status: Fixed, pushed, and deployed
+
+The connector tree had omitted existing Leads/Mailing List and outreach files,
+causing Vercel to rely on stale cached artifacts and report casing failures.
+Commit `70bf33f` restored the complete local tree. Import-casing and production
+build passed, and deployment `dpl_FcANnh5MqnsHpfedighJpgFDY7zS` is READY at
+`https://cws-two.vercel.app`.
+
+## 2026-08-21 — CWS-OUTREACH-UNSUBSCRIBE-030
+
+Agent: Codex
+Status: Implemented, tested, and Preview deployed
+
+Added the public `GET`/`POST /api/outreach/unsubscribe` route. It validates the
+subscriber UUID, records `unsubscribed_at` with an idempotent update, and never
+requires authentication. Mailing-list links now default to this API URL and
+can be overridden with `OUTREACH_UNSUBSCRIBE_BASE_URL`. Two endpoint tests were
+added; the full suite passes with 121 tests, and Preview deployment
+`dpl_AUDZ7WjevYqXAWaQf9SUcUShdheV` is READY.
+
+The flow was promoted to Production as deployment
+`dpl_2EuunUvp929DY7MkyM4CeDgLWnPB`. A malformed-input probe returned the
+expected 400 validation response without touching subscriber data.
+
+Controlled unsubscribe verification completed in Production: the endpoint
+returned success, the test subscriber received an `unsubscribed_at` timestamp,
+and the active-send eligibility query returned zero rows for that subscriber.
+
+## 2026-08-23 — CWS-PUBLISH-ROUTE-FIX-032
+
+Agent: Codex
+Status: Fixed, pushed, and Preview deployed
+
+The LinkedIn UI called `/api/publish/linkedin`, while Vercel only had the
+existing `api/publish-linkedin.js` file route. Added a thin wrapper at
+`api/publish/linkedin.js` so the UI reuses the existing authenticated handler.
+Full tests (123), lint, import-casing, and build pass. Preview deployment
+`dpl_3b3fPAvgQycTzk9wFGbaj16TsZ1S` is READY at
+`https://cws-aes5wo8n1-t00lio-s-team.vercel.app`. The separate approvals 400
+occurred on an already-approved variant and was not changed.
+
+## 2026-08-21 — CWS-OUTREACH-SUPPRESSION-031
+
+Agent: Codex
+Status: Implemented and locally verified; Production deployment pending
+
+Extended the existing signed Resend webhook handler so `email.bounced` and
+`email.complained` events suppress linked mailing-list subscribers by setting
+`unsubscribed_at` idempotently. Lead-backed sends retain status tracking without
+changing lead lifecycle state. Added two focused tests; the full suite passes
+with 123 tests, lint passes with the existing warning, and the production build
+passes including import-casing validation. No real webhook or recipient send
+was used. Production deployment `dpl_DX1V5pfjmX5Ftxyn6afWwBmSxh3i` is READY at
+`https://cws-two.vercel.app`.
+
 ## 2026-08-25 — CWS-PUBLISH-ROUTE-FIX-032 Production rewrite
 
 Agent: Codex
@@ -1370,3 +1478,18 @@ project `cws-publish-guard-prod` existed under `t00lio's Team`, deleted only
 that project, and verified a follow-up inspect returned `project_not_found`.
 No repository code, real `cws` Vercel project, Production alias, Supabase data,
 n8n workflow, or secret configuration was changed.
+
+## 2026-09-04 — CWS-BRANCH-RECONCILE-035
+
+Agent: Codex
+Status: Reconciled and release-verified locally
+
+Reconciled `agent/n8n-dry-run-bridge`, which had diverged by 18 local and 20
+remote commits while its working tree also contained partially duplicated remote
+work. Preserved the fail-closed LinkedIn configuration guard and merged the
+unsubscribe, bounce/complaint suppression, and channel-aware variant work. No
+database migration was applied and no external message or publish was sent.
+
+The combined tree passes 136 Vitest tests, import-casing/build validation, and
+`git diff --cached --check`. Lint has no errors and retains only the existing
+`useDrafts` exhaustive-deps warning.

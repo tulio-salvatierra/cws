@@ -18,7 +18,7 @@ const VARIANT_STATUSES = [
   'archived',
 ]
 
-const VARIANT_FIELDS = 'id, code, locale, working_title, status, transcript, tone, editing_notes, caption_text, export_reference, exported_by, exported_at, export_snapshot, campaign_id, is_test, test_archived, test_archived_at, test_archived_by'
+const VARIANT_FIELDS = 'id, code, locale, working_title, status, transcript, tone, editing_notes, caption_text, export_reference, exported_by, exported_at, export_snapshot, channel_id, campaign_id, is_test, test_archived, test_archived_at, test_archived_by'
 const EXPORT_FIELDS = 'id, version, caption_text, export_reference, correction_reason, approved_approval_id, supersedes_export_id, content_snapshot, is_historical, created_by, exported_at'
 
 const MANUAL_VARIANT_STATUSES = VARIANT_STATUSES.filter(
@@ -380,7 +380,7 @@ export default function VariantDetailPage() {
     is_historical: Boolean(variant.export_snapshot?.unavailable_reason),
   } : null)
   return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-4xl">
-    <Link className="text-sm font-semibold text-orange-300" to={`/admin/campaigns/${variant.campaign_id}`}>← Campaign</Link>
+    <Link className="text-sm font-semibold text-orange-300" to={variant.campaign_id ? `/admin/campaigns/${variant.campaign_id}` : '/admin/channels'}>← {variant.campaign_id ? 'Campaign' : 'Channels'}</Link>
     <p className="mt-10 text-xs font-semibold uppercase tracking-[0.25em] text-orange-200">Content variant · {variant.locale}</p>
       <h1 className="mt-3 text-4xl font-semibold">{variant.working_title}</h1>
       <p className="mt-2 text-sm text-slate-500">{variant.code}</p>

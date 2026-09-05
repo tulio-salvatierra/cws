@@ -1,52 +1,55 @@
-Task ID: CWS-VERCEL-CLEANUP-034
+Task ID: CWS-BRANCH-RECONCILE-035
 Agent: Codex
-Objective: Record cleanup of the accidental Vercel project created during the clean archive deployment attempt.
+Objective: Reconcile the divergent `agent/n8n-dry-run-bridge` histories without losing approved security, outreach, or channel-aware work.
 
 Files inspected:
+- git status, branch divergence, merge base, and conflict diffs
 - docs/agent-handoffs/latest-codex.md
 - docs/project-log.md
 - docs/task-ledger.md
-- docs/learnings.md
-- git status
-- Vercel project inspection output for `cws-publish-guard-prod`
+- api/outreach.js
+- api/publish-linkedin.js
+- server/outreach/mailing-list-send.js
+- server/outreach/webhook.js
+- env.keys.js
+- Supabase publish and content-variant migrations
 
 Files changed:
-- docs/agent-handoffs/latest-codex.md
-- docs/project-log.md
-- docs/task-ledger.md
+- Merge reconciliation across tracked application, test, environment, channel-aware UI, migration, and project-memory files.
 
 Database or API changes:
-- None.
+- No new database migration was applied and no API request was sent. The existing channel-ownership migration and outreach unsubscribe/suppression routes were reconciled into the branch history.
 
 Security decisions:
-- Deleted only the verified accidental Vercel project `cws-publish-guard-prod` after Tulio explicitly approved cleanup.
-- Verified deletion by inspecting the same project name and receiving `project_not_found`.
-- Did not touch the real Vercel project `cws`, production alias `https://cws-two.vercel.app`, Supabase data, n8n workflows, or secrets.
+- Retained the fail-closed authenticated LinkedIn publish configuration guard.
+- Retained subscriber suppression for signed Resend bounce/complaint events and public UUID-validated unsubscribe handling.
+- No social publishing, recipient send, or production database mutation was performed.
 
 Decisions made:
-- Treat the accidental Vercel project as cleaned up and remove it from the active known-issues list.
+- Reconcile the remote branch into the local branch instead of deploying a partially duplicated dirty tree.
 
 Assumptions:
-- Tulio's approval message authorized deletion of `cws-publish-guard-prod`, the exact accidental project named in the prior handoff.
+- Tulio’s “go” authorized the requested branch reconciliation and release verification, but not an outbound publish or recipient contact.
 
 Tests added:
-- None.
+- None in this reconciliation; retained outreach unsubscribe and webhook coverage from the merged branch.
 
 Tests run:
-- `npx vercel@59.6.2 project inspect cws-publish-guard-prod`: first verified the project existed and belonged to `t00lio's Team`.
-- `printf 'y\\n' | npx vercel@59.6.2 project remove cws-publish-guard-prod`: removed the project successfully.
-- `npx vercel@59.6.2 project inspect cws-publish-guard-prod`: returned `project_not_found` after removal.
+- `npm run test:run` — 136 passing tests.
+- `npm run lint` — no errors; existing `useDrafts` exhaustive-deps warning remains.
+- `npm run build` — passed, including import-casing validation.
+- `git diff --cached --check` — passed.
 
 Known issues:
-- Production LinkedIn publish remains intentionally blocked until `N8N_PUBLISH_WEBHOOK_URL` and `N8N_PUBLISH_WEBHOOK_SECRET` are configured for a separately approved publishing workflow.
-- The local working tree still contains unrelated pre-existing dirty files.
-- `src/Hooks/useDrafts.js` still has the pre-existing exhaustive-deps lint warning.
+- LinkedIn publishing remains blocked until an approved n8n publish URL and secret are configured.
+- Controlled Resend bounce/complaint verification remains pending.
+- Build retains existing large-chunk and dependency-eval warnings.
 
 Recommended next task:
-- Run controlled Resend suppression verification for `CWS-OUTREACH-SUPPRESSION-031`, or configure the real n8n LinkedIn publish webhook only after confirming the workflow is approved to publish and report through `/api/published`.
+- Push/deploy the reconciled branch, then validate either controlled Resend suppression or the separately approved n8n dry-run bridge.
 
 Questions requiring Tulio:
-- Are the real n8n LinkedIn publish webhook URL and shared secret ready to configure in Production?
+- None for the completed reconciliation.
 
 Project-memory files updated:
 - docs/agent-handoffs/latest-codex.md
@@ -60,7 +63,7 @@ Reusable learnings added:
 - None.
 
 Memory updates withheld:
-- No new publish workflow approval or env values were inferred from the cleanup approval.
+- No new production workflow approval, n8n secret, or database state was inferred.
 
 Git diff summary:
-- Documentation-only housekeeping update records that accidental project `cws-publish-guard-prod` was deleted and verified gone.
+- Reconciled 20 remote commits with 18 local commits and restored the staged unsubscribe, suppression, channel-aware variant, and documentation changes without conflicts remaining.

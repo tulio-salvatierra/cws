@@ -35,10 +35,28 @@ export default async function handler(req, res) {
   const status = STATUS_BY_EVENT[event.type]
   const messageId = event.data?.email_id
   if (!status || !messageId) return res.status(200).json({ ok: true, ignored: true })
-  const updated = await createOutreachClient().from('outreach_sends').update({ status }).eq('resend_message_id', messageId)
-  return updated.error
-    ? res.status(502).json({ ok: false, error: updated.error.message })
-    : res.status(200).json({ ok: true })
+  const client = createOutreachClient()
+  const send = await client
+    .from('outreach_sends')
+    .select('id, subscriber_id')
+    .eq('resend_message_id', messageId)
+    .maybeSingle()
+  if (send.error) return res.status(502).json({ ok: false, error: send.error.message })
+  if (!send.data) return res.status(200).json({ ok: true, ignored: true })
+
+  const updated = await client.from('outreach_sends').update({ status }).eq('id', send.data.id)
+  if (updated.error) return res.status(502).json({ ok: false, error: updated.error.message })
+
+  if (['bounced', 'complained'].includes(status) && send.data.subscriber_id) {
+    const suppressed = await client
+      .from('mailing_list_subscribers')
+      .update({ unsubscribed_at: new Date().toISOString() })
+      .eq('id', send.data.subscriber_id)
+      .is('unsubscribed_at', null)
+    if (suppressed.error) return res.status(502).json({ ok: false, error: suppressed.error.message })
+  }
+
+  return res.status(200).json({ ok: true, suppressed: ['bounced', 'complained'].includes(status) && Boolean(send.data.subscriber_id) })
 }
 
 async function readPayload(req) {

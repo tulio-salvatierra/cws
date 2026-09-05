@@ -169,10 +169,12 @@ function App() {
               <Route path="settings" element={<SettingsPage />} />
               <Route path="workspace" element={<WorkspacePage />} />
               <Route path="channels" element={<ChannelsPage />} />
+              <Route path="channels/:channelId/variants/new" element={<NewVariantPage />} />
               <Route path="campaigns" element={<CampaignsPage />} />
               <Route path="campaigns/new" element={<NewCampaignPage />} />
               <Route path="campaigns/:campaignId" element={<CampaignDetailPage />} />
               <Route path="campaigns/:campaignId/variants/new" element={<NewVariantPage />} />
+              <Route path="variants/new" element={<NewVariantPage />} />
               <Route path="variants/:variantId" element={<VariantDetailPage />} />
               <Route path="tasks" element={<TasksPage />} />
               <Route path="planning" element={<PlanningPage />} />

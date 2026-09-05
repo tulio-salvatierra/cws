@@ -49,7 +49,7 @@ export default function WorkspacePage() {
         supabase.from('workspaces').select('id, name, slug').eq('id', membership.workspace_id).single(),
         supabase.from('channels').select('id, name, slug, audience, voice').eq('workspace_id', membership.workspace_id).order('name'),
         supabase.from('campaigns').select('id, code, title, status, description, channel_id, is_test, test_archived').eq('workspace_id', membership.workspace_id).order('updated_at', { ascending: false }),
-        supabase.from('content_variants').select('id, code, locale, working_title, status, campaign_id, is_test, test_archived').eq('workspace_id', membership.workspace_id).order('code'),
+        supabase.from('content_variants').select('id, code, locale, working_title, status, channel_id, campaign_id, is_test, test_archived').eq('workspace_id', membership.workspace_id).order('code'),
         supabase.from('approvals').select('content_variant_id, status, feedback, reviewed_at').eq('workspace_id', membership.workspace_id).order('created_at', { ascending: false }),
       ])
 
@@ -59,7 +59,7 @@ export default function WorkspacePage() {
       if (active) {
         const operationalCampaigns = (campaignsResult.data || []).filter((campaign) => !campaign.test_archived)
         const operationalCampaignIds = new Set(operationalCampaigns.map((campaign) => campaign.id))
-        const operationalVariants = (variantsResult.data || []).filter((variant) => !variant.test_archived && operationalCampaignIds.has(variant.campaign_id))
+        const operationalVariants = (variantsResult.data || []).filter((variant) => !variant.test_archived && (!variant.campaign_id || operationalCampaignIds.has(variant.campaign_id)))
         setState({
           loading: false,
           error: '',
@@ -101,6 +101,7 @@ export default function WorkspacePage() {
   }
 
   const campaignById = new Map(state.campaigns.map((campaign) => [campaign.id, campaign]))
+  const channelById = new Map(state.channels.map((channel) => [channel.id, channel]))
 
   return (
     <main className="min-h-screen bg-slate-950 px-5 py-6 text-white md:px-10 md:py-10">
@@ -188,13 +189,14 @@ export default function WorkspacePage() {
             {state.variants.map((variant) => {
               const approval = variantApproval.get(variant.id)
               const campaign = campaignById.get(variant.campaign_id)
+              const channel = channelById.get(variant.channel_id)
               return (
                 <article className="rounded-2xl border border-white/10 bg-slate-900/60 p-5" key={variant.id}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-200">{variant.locale}</p>
                       <Link className="mt-2 block text-lg font-semibold hover:text-orange-200" to={`/admin/variants/${variant.id}`}>{variant.working_title}</Link>
-                      <p className="mt-1 text-xs text-slate-500">{campaign?.code} · {variant.code}</p>
+                      <p className="mt-1 text-xs text-slate-500">{channel?.name || 'Channel'} · {campaign?.code || 'No campaign'} · {variant.code}</p>
                     </div>
                     <StatusPill status={variant.status} />
                   </div>

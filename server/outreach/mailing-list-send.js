@@ -1,3 +1,5 @@
+/* global process */
+
 import { getFromEmail, sendResendEmail } from '../../api/lib/resend.js'
 import {
   authenticateWorkspace,
@@ -7,7 +9,7 @@ import {
 } from './shared.js'
 
 const MAX_RECIPIENTS = 100
-const UNSUBSCRIBE_BASE_URL = 'https://www.cicerowebstudio.xyz/unsubscribe'
+const UNSUBSCRIBE_BASE_URL = process.env.OUTREACH_UNSUBSCRIBE_BASE_URL || 'https://www.cicerowebstudio.xyz/api/outreach/unsubscribe'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' })

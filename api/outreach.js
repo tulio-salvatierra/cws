@@ -4,6 +4,7 @@ import mailingListSend from '../server/outreach/mailing-list-send.js'
 import send from '../server/outreach/send.js'
 import subscribers from '../server/outreach/subscribers.js'
 import templates from '../server/outreach/templates.js'
+import unsubscribe from '../server/outreach/unsubscribe.js'
 
 const handlers = {
   '/draft': draft,
@@ -12,6 +13,7 @@ const handlers = {
   '/send': send,
   '/subscribers': subscribers,
   '/templates': templates,
+  '/unsubscribe': unsubscribe,
 }
 
 export default async function handler(req, res) {
