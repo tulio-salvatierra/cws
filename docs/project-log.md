@@ -1493,3 +1493,9 @@ database migration was applied and no external message or publish was sent.
 The combined tree passes 136 Vitest tests, import-casing/build validation, and
 `git diff --cached --check`. Lint has no errors and retains only the existing
 `useDrafts` exhaustive-deps warning.
+
+The automatic Preview build then completed but output deployment failed because
+the merge had restored a redundant `/api/publish/linkedin` wrapper while the
+existing Vercel rewrite already maps that route to `api/publish-linkedin.js`.
+The wrapper was removed to stay within the Hobby serverless-function limit; the
+rewrite and its test remain the authoritative route contract.

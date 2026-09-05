@@ -18,7 +18,7 @@ Files changed:
 - Merge reconciliation across tracked application, test, environment, channel-aware UI, migration, and project-memory files.
 
 Database or API changes:
-- No new database migration was applied and no API request was sent. The existing channel-ownership migration and outreach unsubscribe/suppression routes were reconciled into the branch history.
+- No new database migration was applied and no API request was sent. The existing channel-ownership migration and outreach unsubscribe/suppression routes were reconciled into the branch history. The redundant `/api/publish/linkedin` wrapper was removed; the existing rewrite remains the route alias.
 
 Security decisions:
 - Retained the fail-closed authenticated LinkedIn publish configuration guard.
@@ -35,7 +35,7 @@ Tests added:
 - None in this reconciliation; retained outreach unsubscribe and webhook coverage from the merged branch.
 
 Tests run:
-- `npm run test:run` — 136 passing tests.
+- `npm run test:run` — 136 passing tests before the wrapper removal; the rewrite test remains present for the retained route.
 - `npm run lint` — no errors; existing `useDrafts` exhaustive-deps warning remains.
 - `npm run build` — passed, including import-casing validation.
 - `git diff --cached --check` — passed.
@@ -66,4 +66,4 @@ Memory updates withheld:
 - No new production workflow approval, n8n secret, or database state was inferred.
 
 Git diff summary:
-- Reconciled 20 remote commits with 18 local commits and restored the staged unsubscribe, suppression, channel-aware variant, and documentation changes without conflicts remaining.
+- Reconciled 20 remote commits with 18 local commits, restored the staged unsubscribe, suppression, channel-aware variant, and documentation changes, then removed the redundant publish wrapper that exceeded the Vercel Hobby function cap.
