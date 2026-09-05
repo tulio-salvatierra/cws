@@ -46,7 +46,7 @@ Known issues:
 - Build retains existing large-chunk and dependency-eval warnings.
 
 Recommended next task:
-- Push/deploy the reconciled branch, then validate either controlled Resend suppression or the separately approved n8n dry-run bridge.
+- Validate either controlled Resend suppression or the separately approved n8n dry-run bridge from the ready Preview.
 
 Questions requiring Tulio:
 - None for the completed reconciliation.
@@ -66,4 +66,4 @@ Memory updates withheld:
 - No new production workflow approval, n8n secret, or database state was inferred.
 
 Git diff summary:
-- Reconciled 20 remote commits with 18 local commits, restored the staged unsubscribe, suppression, channel-aware variant, and documentation changes, then removed the redundant publish wrapper that exceeded the Vercel Hobby function cap.
+- Reconciled 20 remote commits with 18 local commits, restored the staged unsubscribe, suppression, channel-aware variant, and documentation changes, then removed the redundant publish wrapper that exceeded the Vercel Hobby function cap. Preview deployment `cws-kbs216nav-t00lio-s-team.vercel.app` is READY.

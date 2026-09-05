@@ -1499,3 +1499,6 @@ the merge had restored a redundant `/api/publish/linkedin` wrapper while the
 existing Vercel rewrite already maps that route to `api/publish-linkedin.js`.
 The wrapper was removed to stay within the Hobby serverless-function limit; the
 rewrite and its test remain the authoritative route contract.
+
+The follow-up Preview deployment `cws-kbs216nav-t00lio-s-team.vercel.app` is
+READY. Production was not changed.
