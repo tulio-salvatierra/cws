@@ -176,17 +176,19 @@ async function verifyDestination() {
     throw error
   }
 
-  if (connected?.type !== 'LINKEDIN'
-    || !Array.isArray(connected.channels)
-    || !connected.channels.some(channel => matchesCwsCompanyPage(channel))) {
+  const selectedChannel = Array.isArray(connected?.channels)
+    ? connected.channels.find(channel => matchesCwsCompanyPage(channel))
+    : null
+  const selectedDestination = selectedChannel || connected
+
+  if (connected?.type !== 'LINKEDIN' || !matchesCwsCompanyPage(selectedDestination)) {
     throw missingCwsDestination()
   }
 
-  const selectedChannel = connected.channels.find(channel => matchesCwsCompanyPage(channel))
   return {
     ready: true,
     name: EXPECTED_DESTINATION,
-    channel_name: selectedChannel.name || EXPECTED_DESTINATION,
+    channel_name: selectedChannel?.name || connected.displayName || connected.username || EXPECTED_DESTINATION,
   }
 }
 
@@ -195,7 +197,7 @@ function missingCwsDestination() {
 }
 
 function matchesCwsCompanyPage(channel) {
-  const candidates = [channel?.name, channel?.username, channel?.address, channel?.id]
+  const candidates = [channel?.name, channel?.displayName, channel?.username, channel?.address, channel?.id, channel?.externalId]
   return candidates.some(value => normalizeIdentifier(value).includes('cicerowebstudio'))
 }
 

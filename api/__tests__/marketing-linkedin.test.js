@@ -112,8 +112,9 @@ function request({ method = 'GET', body, token = 'owner-token' } = {}) {
 
 const connectedCompanyPage = {
   type: 'LINKEDIN',
-  displayName: 'Owner profile',
-  channels: [{ id: 'channel-1', name: 'Cicero Web Studio', username: 'cicero-web-studio' }],
+  displayName: 'Cicero Web Studio',
+  username: 'cicero-web-studio',
+  channels: [],
 }
 
 describe('marketing LinkedIn endpoint', () => {
@@ -145,7 +146,11 @@ describe('marketing LinkedIn endpoint', () => {
     await handler(request(), response)
 
     expect(response.statusCode).toBe(200)
-    expect(response.body.destination).toMatchObject({ ready: true, name: 'LinkedIn — Cicero Web Studio Company Page' })
+    expect(response.body.destination).toMatchObject({
+      ready: true,
+      name: 'LinkedIn — Cicero Web Studio Company Page',
+      channel_name: 'Cicero Web Studio',
+    })
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
     expect(globalThis.fetch).toHaveBeenCalledWith(
       'https://api.bundle.social/api/v1/social-account/by-type?type=LINKEDIN&teamId=team-1',
