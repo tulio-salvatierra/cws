@@ -23,6 +23,7 @@
     "@paper-design/shaders-react": "^0.0.68",
     "@supabase/supabase-js": "^2.100.1",
     "@vercel/functions": "^3.9.1",
+    "bundlesocial-mcp": "^1.2.0",
     "gsap": "^3.12.7",
     "lenis": "^1.1.20",
     "lottie-web": "^5.13.0",
