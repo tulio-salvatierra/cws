@@ -188,7 +188,12 @@ async function verifyDestination() {
   return {
     ready: true,
     name: EXPECTED_DESTINATION,
-    channel_name: selectedChannel?.name || connected.displayName || connected.username || EXPECTED_DESTINATION,
+    channel_name: selectedChannel?.name
+      || connected.displayName
+      || connected.username
+      || connected.userDisplayName
+      || connected.userUsername
+      || EXPECTED_DESTINATION,
   }
 }
 
@@ -197,7 +202,16 @@ function missingCwsDestination() {
 }
 
 function matchesCwsCompanyPage(channel) {
-  const candidates = [channel?.name, channel?.displayName, channel?.username, channel?.address, channel?.id, channel?.externalId]
+  const candidates = [
+    channel?.name,
+    channel?.displayName,
+    channel?.username,
+    channel?.userDisplayName,
+    channel?.userUsername,
+    channel?.address,
+    channel?.id,
+    channel?.externalId,
+  ]
   return candidates.some(value => normalizeIdentifier(value).includes('cicerowebstudio'))
 }
 

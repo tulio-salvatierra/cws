@@ -112,8 +112,8 @@ function request({ method = 'GET', body, token = 'owner-token' } = {}) {
 
 const connectedCompanyPage = {
   type: 'LINKEDIN',
-  displayName: 'Cicero Web Studio',
-  username: 'cicero-web-studio',
+  userDisplayName: 'Cicero Web Studio',
+  userUsername: 'cicero-web-studio',
   channels: [],
 }
 
