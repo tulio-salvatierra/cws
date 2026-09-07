@@ -1626,3 +1626,11 @@ also timed out, so the migration was not applied to an unproven/inactive
 Supabase project. Vercel shows the two bundle.social variables in Production,
 but live account verification must occur through the deployed owner-only
 preflight before Confirm is used.
+
+The three scoped commits were then pushed to `main` through `f33bda4`; Vercel
+Production deployment `dpl_9SPBjoxnSmViDtZRLprnYyd79sR9` is READY. A safe
+unauthenticated probe of the new endpoint returned `401 Authentication required`
+before any provider work. A cold browser visit to the protected Marketing page
+remained on the application's existing full-page loader for 45 seconds, so the
+owner-only provider preflight was not reached and no provider request/upload/post
+was made.

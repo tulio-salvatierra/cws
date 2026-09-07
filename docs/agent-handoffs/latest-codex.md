@@ -41,11 +41,12 @@ Tests and verification:
 
 Live provider verification status:
 - Vercel lists `BUNDLE_SOCIAL_API_KEY` and `BUNDLE_SOCIAL_TEAM_ID` as encrypted Production values, but the local Vercel environment pull had empty values. A direct local provider check therefore could not identify the connected Company Page.
+- Commit `f33bda4` was pushed to `main` and Vercel Production deployment `dpl_9SPBjoxnSmViDtZRLprnYyd79sR9` is Ready. A safe unauthenticated request to `/api/marketing-linkedin` returned `401 Authentication required` before any provider work.
 - The deployed authenticated endpoint will block before upload/post creation unless bundle.social returns a LinkedIn channel whose returned name, username, address, or ID identifies Cicero Web Studio. A signed-in owner must load `/admin/marketing` after deployment and see “Destination verified” before using Confirm.
 
 Known limitations:
 - The exact connected Company Page and the remote database schema remain unverified until the correct Production deployment is live and its database migration is applied.
-- The no-publish GET preflight requires an authenticated owner session by design; no owner browser session was available to independently run it here.
+- The no-publish GET preflight requires an authenticated owner session by design. A cold signed-in-browser attempt could not reach it because the application's existing full-page loader remained black after 45 seconds; no provider request, upload, or post occurred.
 
 Recommended next step:
 - After the commit reaches Production, apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`. Then, as workspace owner, open `/admin/marketing`. If the page shows “Destination verified,” review the caption and click Confirm yourself to make the one controlled LinkedIn post. If it shows “Not ready,” do not click Confirm; reconnect/select the Cicero Web Studio Company Page in bundle.social.
