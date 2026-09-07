@@ -59,10 +59,10 @@ Latest upload-contract finding:
 
 Known limitations:
 - The failed owner-authorized upload attempt is intentionally immutable. A new real post requires explicit owner direction after the corrected deployment; no automatic retry is permitted.
-- The remote database schema remains unverified until the Production database migration is applied.
+- The persisted attempt confirms the Production table supports this route's reads and writes, although its migration history was not independently listed.
 
 Recommended next step:
-- Deploy the upload-contract correction. Keep the retained failed attempt as audit history unless Tulio explicitly authorizes a new owner-confirmed attempt. Apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`; do not create another provider post until the explicit retry decision is made.
+- Keep the retained failed attempt as audit history unless Tulio explicitly authorizes a new owner-confirmed attempt. Do not create another provider post until the explicit retry decision is made.
 
 Permanent decisions added:
 - None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.

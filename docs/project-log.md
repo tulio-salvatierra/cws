@@ -1731,6 +1731,11 @@ route. All 35 Vitest files (127 tests), lint (no errors; existing `useDrafts`
 warning), import-casing validation, and production build pass. This correction
 does not retry, delete, or publish the retained failed attempt.
 
+The retained attempt proves the Production persistence table and the required
+read/write fields are operating for this route. The exact remote migration
+history was not independently listed, but applying the migration again is not
+required before addressing this specific retained attempt.
+
 Deploy the correction, then decide explicitly whether to retain the immutable
 failed attempt as audit history or authorize a new owner-confirmed publish
 attempt. Do not use the old Confirm flow for the existing failed record; its
