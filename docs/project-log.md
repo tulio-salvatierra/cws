@@ -1669,3 +1669,18 @@ and ID did not match the Cicero Web Studio identifier. The nonmatching provider
 name is intentionally not sent to the browser. Tulio must connect or
 reauthenticate LinkedIn in bundle.social and select the official CWS Company
 Page before the preflight can become ready.
+
+Screenshot evidence then confirmed the intended connection is LinkedIn “Cicero
+Web Studio” with `cicero-web-studio`. Added the remaining documented top-level
+identity fields (`displayName`/`username` and `userDisplayName`/`userUsername`)
+to the same fail-closed matcher; the corresponding mocked test, full test suite,
+lint, and production build pass. Commit `ea5e9e1` is deployed as
+`dpl_8wDfWdX8p7aNLUiyFeRF6RF79mFW`.
+
+The authenticated Production preflight still says Not ready after that update.
+Since the screenshot identifier matches every accepted field, the configured
+Production team does not resolve to the bundle.social team in the screenshot,
+or the configured API key cannot access it. No upload or publish was made.
+Tulio must set `BUNDLE_SOCIAL_TEAM_ID` to the exact team containing that LinkedIn
+connection (not the organization ID) and ensure the API key belongs to the same
+organization before repeating the read-only preflight.
