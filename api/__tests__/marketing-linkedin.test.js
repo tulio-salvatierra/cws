@@ -186,7 +186,7 @@ describe('marketing LinkedIn endpoint', () => {
     readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
     globalThis.fetch
       .mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-      .mockResolvedValueOnce(providerResponse(200, { uploadId: 'upload-1' }))
+      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-1' }))
       .mockResolvedValueOnce(providerResponse(200, { id: 'provider-post-1', status: 'PROCESSING', externalData: {} }))
 
     const response = makeResponse()
@@ -210,7 +210,7 @@ describe('marketing LinkedIn endpoint', () => {
       provider_status: 'processing',
     })])
     expect(globalThis.fetch).toHaveBeenCalledTimes(3)
-    expect(globalThis.fetch.mock.calls[1][0]).toContain('/upload')
+    expect(globalThis.fetch.mock.calls[1][0]).toBe('https://api.bundle.social/api/v1/upload/')
     const createCall = globalThis.fetch.mock.calls[2]
     expect(createCall[0]).toContain('/post')
     expect(JSON.parse(createCall[1].body)).toMatchObject({
@@ -256,7 +256,7 @@ describe('marketing LinkedIn endpoint', () => {
     readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
     globalThis.fetch
       .mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-      .mockResolvedValueOnce(providerResponse(200, { uploadId: 'upload-1' }))
+      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-1' }))
       .mockRejectedValueOnce(new Error('socket closed'))
       .mockResolvedValueOnce(providerResponse(200, { id: 'provider-post-1', status: 'PROCESSING', externalData: {} }))
 

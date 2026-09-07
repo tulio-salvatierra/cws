@@ -1711,3 +1711,27 @@ the Cicero Web Studio Company Page as the active LinkedIn destination in
 bundle.social. The Production database migration
 `20260907163842_marketing_publish_attempts.sql` is also still required before
 Confirm can be used safely.
+
+## 2026-09-07 — CWS-MARKETING-M2 upload contract correction
+
+Agent: Codex
+Status: Corrected locally; failed owner-authorized attempt is retained and requires explicit retry direction
+
+Production now verifies the active Cicero Web Studio LinkedIn Company Page. It
+also shows one existing terminal error: bundle.social returned a successful
+media record but the endpoint expected a nonexistent `uploadId` property, so
+the attempt stopped before the create-post call. The authenticated handler can
+create that durable attempt only through its POST/Confirm path; ordinary page
+loads and polling are read-only. No LinkedIn post ID or permalink was created.
+
+The official upload contract returns the media record's `id` from
+`POST /api/v1/upload/`. The implementation and mocked provider tests now use
+that ID as the post `uploadIds` value and use the canonical trailing-slash
+route. All 35 Vitest files (127 tests), lint (no errors; existing `useDrafts`
+warning), import-casing validation, and production build pass. This correction
+does not retry, delete, or publish the retained failed attempt.
+
+Deploy the correction, then decide explicitly whether to retain the immutable
+failed attempt as audit history or authorize a new owner-confirmed publish
+attempt. Do not use the old Confirm flow for the existing failed record; its
+duplicate guard intentionally prevents a second provider create call.

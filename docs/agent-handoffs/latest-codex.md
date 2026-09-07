@@ -52,12 +52,17 @@ Latest Production safety finding:
 - The previous verifier incorrectly accepted an expected Company Page found anywhere in `channels`. The current scoped change accepts only the provider's active top-level account identity, so the page will return 409 and keep Confirm disabled until the Company Page is explicitly selected in bundle.social.
 - The new mocked regression case mirrors that provider response. All 35 Vitest files (127 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, and the production build pass. No provider mutation, upload, or social post was made.
 
+Latest upload-contract finding:
+- Production now reports the CWS Company Page as the active destination. It also reports one retained terminal error, “bundle.social did not return an upload ID.” The handler can only have created that attempt through an authenticated POST from Confirm; the GET preflight and polling paths do not create attempts.
+- The official `POST /api/v1/upload/` response is an upload record with an `id`, not an `uploadId`. The owner-authorized attempt therefore uploaded media successfully but stopped before `POST /post`; no provider post ID or permalink exists.
+- The current scoped correction reads the upload record `id`, targets the documented trailing-slash upload route, and updates provider mocks accordingly. It passes all 35 Vitest files (127 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, and the production build. It does not retry, delete, or publish the retained failed attempt.
+
 Known limitations:
-- The CWS LinkedIn Company Page must still be selected as the active bundle.social integration channel; its presence in the available channel list is insufficient.
+- The failed owner-authorized upload attempt is intentionally immutable. A new real post requires explicit owner direction after the corrected deployment; no automatic retry is permitted.
 - The remote database schema remains unverified until the Production database migration is applied.
 
 Recommended next step:
-- Deploy the active-destination guard. In bundle.social, select the “Cicero Web Studio / cicero-web-studio” LinkedIn Company Page as the active integration channel, then reopen `/admin/marketing`; it must remain Not ready until that selection is reflected by the provider. Apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`. Do not use Confirm unless the page then changes to “Destination verified.”
+- Deploy the upload-contract correction. Keep the retained failed attempt as audit history unless Tulio explicitly authorizes a new owner-confirmed attempt. Apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`; do not create another provider post until the explicit retry decision is made.
 
 Permanent decisions added:
 - None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.

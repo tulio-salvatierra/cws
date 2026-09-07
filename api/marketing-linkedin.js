@@ -223,8 +223,9 @@ async function uploadLogo() {
   form.set('file', new Blob([image], { type: 'image/png' }), 'cicero-web-studio-logo.png')
   form.set('teamId', process.env.BUNDLE_SOCIAL_TEAM_ID)
 
-  const body = await providerRequest('/upload', { method: 'POST', body: form })
-  const id = typeof body?.uploadId === 'string' ? body.uploadId : ''
+  const body = await providerRequest('/upload/', { method: 'POST', body: form })
+  // The upload API returns the media record, whose identifier is `id`.
+  const id = typeof body?.id === 'string' ? body.id : ''
   if (!id) throw new ProviderError(502, 'bundle.social did not return an upload ID.')
   return { id }
 }
