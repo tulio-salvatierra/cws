@@ -176,20 +176,18 @@ async function verifyDestination() {
     throw error
   }
 
-  const selectedChannel = Array.isArray(connected?.channels)
-    ? connected.channels.find(channel => matchesCwsCompanyPage(channel))
-    : null
-  const selectedDestination = selectedChannel || connected
-
-  if (connected?.type !== 'LINKEDIN' || !matchesCwsCompanyPage(selectedDestination)) {
+  // `channels` is the list of available LinkedIn destinations. It is not proof
+  // that bundle.social has selected the Company Page for this integration.
+  // Only accept the provider's active account identity so an available page
+  // cannot make a selected personal profile look publishable.
+  if (connected?.type !== 'LINKEDIN' || !matchesCwsCompanyPage(connected)) {
     throw missingCwsDestination()
   }
 
   return {
     ready: true,
     name: EXPECTED_DESTINATION,
-    channel_name: selectedChannel?.name
-      || connected.displayName
+    channel_name: connected.displayName
       || connected.username
       || connected.userDisplayName
       || connected.userUsername

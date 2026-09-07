@@ -1684,3 +1684,30 @@ or the configured API key cannot access it. No upload or publish was made.
 Tulio must set `BUNDLE_SOCIAL_TEAM_ID` to the exact team containing that LinkedIn
 connection (not the organization ID) and ensure the API key belongs to the same
 organization before repeating the read-only preflight.
+
+## 2026-09-07 — CWS-MARKETING-M2 selected-destination safety hardening
+
+Agent: Codex
+Status: Implemented locally; Production redeploy and final destination selection pending
+
+The corrected Production team configuration now reaches bundle.social and the
+authenticated Marketing page displays “Destination verified.” A read-only
+provider inspection established that the active LinkedIn integration is still
+the personal profile while the official Cicero Web Studio Company Page is only
+an available channel. The old preflight treated that available-channel list as
+proof that the Company Page was selected, which could have permitted a post to
+the wrong destination.
+
+The preflight now accepts only the provider's active LinkedIn account identity;
+available `channels` cannot make a personal profile appear publishable. A
+regression test covers the exact personal-profile-plus-available-Company-Page
+response and expects a 409 before any database insert, upload, or post. All 35
+Vitest files (127 tests), lint (no errors; the existing `useDrafts` warning),
+import-casing validation, and production build pass. No provider mutation,
+upload, or social post was made.
+
+After deployment, `/admin/marketing` must return Not ready until Tulio selects
+the Cicero Web Studio Company Page as the active LinkedIn destination in
+bundle.social. The Production database migration
+`20260907163842_marketing_publish_attempts.sql` is also still required before
+Confirm can be used safely.

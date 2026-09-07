@@ -47,12 +47,17 @@ Live provider verification status:
 - An authenticated owner re-ran Production `/admin/marketing` after the identity-field update. It still returned “Not ready: The bundle.social team does not have the selected Cicero Web Studio LinkedIn Company Page.” Confirm remained disabled; no upload or post was made.
 - Because the screenshot identifier matches every supported field, the Production API key/team configuration does not resolve to the dashboard team in the screenshot (or the key cannot access that team). The request remains strictly `type=LINKEDIN` and the fail-closed matcher does not expose a nonmatching account name to the browser.
 
+Latest Production safety finding:
+- A read-only bundle.social check located the correct CWS team and confirms the provider's active LinkedIn integration is a personal profile. The Cicero Web Studio Company Page is available as a channel but is not the active destination.
+- The previous verifier incorrectly accepted an expected Company Page found anywhere in `channels`. The current scoped change accepts only the provider's active top-level account identity, so the page will return 409 and keep Confirm disabled until the Company Page is explicitly selected in bundle.social.
+- The new mocked regression case mirrors that provider response. All 35 Vitest files (127 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, and the production build pass. No provider mutation, upload, or social post was made.
+
 Known limitations:
-- The Production `BUNDLE_SOCIAL_TEAM_ID` is not the team containing the screenshot's selected Cicero Web Studio LinkedIn connection, or the Production API key cannot access that team.
+- The CWS LinkedIn Company Page must still be selected as the active bundle.social integration channel; its presence in the available channel list is insufficient.
 - The remote database schema remains unverified until the Production database migration is applied.
 
 Recommended next step:
-- In bundle.social, identify the team that contains the screenshot's “Cicero Web Studio / cicero-web-studio” LinkedIn connection. Set Production `BUNDLE_SOCIAL_TEAM_ID` to that team ID (not the organization ID) and ensure `BUNDLE_SOCIAL_API_KEY` belongs to the same organization. Apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`. Then, as workspace owner, reopen `/admin/marketing`. Do not use Confirm unless it changes to “Destination verified.”
+- Deploy the active-destination guard. In bundle.social, select the “Cicero Web Studio / cicero-web-studio” LinkedIn Company Page as the active integration channel, then reopen `/admin/marketing`; it must remain Not ready until that selection is reflected by the provider. Apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`. Do not use Confirm unless the page then changes to “Destination verified.”
 
 Permanent decisions added:
 - None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.

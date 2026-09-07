@@ -159,12 +159,17 @@ describe('marketing LinkedIn endpoint', () => {
     expect(database.state.inserts).toEqual([])
   })
 
-  it('blocks publishing when LinkedIn is connected to the wrong channel', async () => {
+  it('blocks publishing when the selected LinkedIn profile is personal even if the Company Page is available', async () => {
     const database = createDatabase()
     createClientMock.mockReturnValue(database.client)
     globalThis.fetch.mockResolvedValueOnce(providerResponse(200, {
       type: 'LINKEDIN',
-      channels: [{ id: 'personal-1', name: 'Tulio Salvatierra' }],
+      displayName: 'Tulio Salvatierra',
+      username: 'tuliosalvatierra',
+      channels: [
+        { id: 'personal-1', name: 'Tulio Salvatierra' },
+        { id: 'company-1', name: 'Cicero Web Studio', username: 'cicero-web-studio' },
+      ],
     }))
 
     const response = makeResponse()
