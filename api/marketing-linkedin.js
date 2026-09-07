@@ -165,15 +165,21 @@ async function reconcileAttempt(client, attempt) {
 }
 
 async function verifyDestination() {
-  const body = await providerRequest(`/social-account?teamId=${encodeURIComponent(process.env.BUNDLE_SOCIAL_TEAM_ID)}`)
-  const accounts = Array.isArray(body?.socialAccounts) ? body.socialAccounts : []
-  const connected = accounts.find(account => {
-    if (account?.type !== 'LINKEDIN') return false
-    return Array.isArray(account.channels) && account.channels.some(channel => matchesCwsCompanyPage(channel))
-  })
+  let connected
+  try {
+    // bundle.social's current OpenAPI exposes the type-specific lookup, not the former account-list route.
+    connected = await providerRequest(`/social-account/by-type?type=LINKEDIN&teamId=${encodeURIComponent(process.env.BUNDLE_SOCIAL_TEAM_ID)}`)
+  } catch (error) {
+    if (error instanceof ProviderError && error.status === 404) {
+      throw missingCwsDestination()
+    }
+    throw error
+  }
 
-  if (!connected) {
-    throw new ProviderError(409, 'The bundle.social team does not have the selected Cicero Web Studio LinkedIn Company Page.')
+  if (connected?.type !== 'LINKEDIN'
+    || !Array.isArray(connected.channels)
+    || !connected.channels.some(channel => matchesCwsCompanyPage(channel))) {
+    throw missingCwsDestination()
   }
 
   const selectedChannel = connected.channels.find(channel => matchesCwsCompanyPage(channel))
@@ -182,6 +188,10 @@ async function verifyDestination() {
     name: EXPECTED_DESTINATION,
     channel_name: selectedChannel.name || EXPECTED_DESTINATION,
   }
+}
+
+function missingCwsDestination() {
+  return new ProviderError(409, 'The bundle.social team does not have the selected Cicero Web Studio LinkedIn Company Page.')
 }
 
 function matchesCwsCompanyPage(channel) {

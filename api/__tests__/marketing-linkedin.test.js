@@ -111,11 +111,9 @@ function request({ method = 'GET', body, token = 'owner-token' } = {}) {
 }
 
 const connectedCompanyPage = {
-  socialAccounts: [{
-    type: 'LINKEDIN',
-    displayName: 'Owner profile',
-    channels: [{ id: 'channel-1', name: 'Cicero Web Studio', username: 'cicero-web-studio' }],
-  }],
+  type: 'LINKEDIN',
+  displayName: 'Owner profile',
+  channels: [{ id: 'channel-1', name: 'Cicero Web Studio', username: 'cicero-web-studio' }],
 }
 
 describe('marketing LinkedIn endpoint', () => {
@@ -149,7 +147,10 @@ describe('marketing LinkedIn endpoint', () => {
     expect(response.statusCode).toBe(200)
     expect(response.body.destination).toMatchObject({ ready: true, name: 'LinkedIn — Cicero Web Studio Company Page' })
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
-    expect(globalThis.fetch.mock.calls[0][0]).toContain('/social-account?teamId=team-1')
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      'https://api.bundle.social/api/v1/social-account/by-type?type=LINKEDIN&teamId=team-1',
+      expect.objectContaining({ headers: expect.objectContaining({ 'x-api-key': 'bundle-key' }) }),
+    )
     expect(database.state.inserts).toEqual([])
   })
 
@@ -157,7 +158,8 @@ describe('marketing LinkedIn endpoint', () => {
     const database = createDatabase()
     createClientMock.mockReturnValue(database.client)
     globalThis.fetch.mockResolvedValueOnce(providerResponse(200, {
-      socialAccounts: [{ type: 'LINKEDIN', channels: [{ id: 'personal-1', name: 'Tulio Salvatierra' }] }],
+      type: 'LINKEDIN',
+      channels: [{ id: 'personal-1', name: 'Tulio Salvatierra' }],
     }))
 
     const response = makeResponse()
