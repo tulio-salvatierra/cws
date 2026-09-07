@@ -1634,3 +1634,38 @@ before any provider work. A cold browser visit to the protected Marketing page
 remained on the application's existing full-page loader for 45 seconds, so the
 owner-only provider preflight was not reached and no provider request/upload/post
 was made.
+
+## 2026-09-07 — CWS-MARKETING-M2 bundle.social account-lookup correction
+
+Agent: Codex
+Status: Deployed; owner-only destination verification pending
+
+The Production failure was not caused by a browser request or a relative URL:
+the server already used `https://api.bundle.social/api/v1`, but the former
+`GET /social-account?teamId=…` route returns 404 at that host. The current
+bundle.social OpenAPI exposes the read-only type-specific route
+`GET /social-account/by-type?type=LINKEDIN&teamId=…`. Changed only the
+server-side preflight request and response handling; the Company Page matcher,
+authentication, persistence, upload/create flow, and schema remain unchanged.
+
+All 127 Vitest tests, lint (no errors; existing `useDrafts` warning), and the
+production build pass. Commit `2f86f98` is deployed in Production as
+`dpl_HBqkqFVBmHJSU6EXESbpuoHsHei5`. The test asserts the full provider URL and
+server-only API-key header. No real provider upload or social post was made.
+
+The available browser profile is not signed in to CWS and redirects the
+protected Marketing page to login. Vercel's local environment pull provided
+empty secret values to this execution environment, so its direct read-only
+provider call returned 401; credentials were never shown and the temporary file
+was removed. The exact LinkedIn account name/channel must therefore be read by
+an authenticated workspace owner from the deployed Marketing preflight.
+
+The owner-side Production preflight was completed after deployment. It reached
+the supported server-side LinkedIn type lookup and failed closed with “The
+bundle.social team does not have the selected Cicero Web Studio LinkedIn Company
+Page.” Confirm stayed disabled and no provider upload/post was made. The lookup
+was specifically for `LINKEDIN`; its returned channel name, username, address,
+and ID did not match the Cicero Web Studio identifier. The nonmatching provider
+name is intentionally not sent to the browser. Tulio must connect or
+reauthenticate LinkedIn in bundle.social and select the official CWS Company
+Page before the preflight can become ready.

@@ -40,16 +40,18 @@ Tests and verification:
 - `npx supabase test db` could not run because local Postgres is not running. The migration has not been applied or checked against a managed database: the linked migration-list request repeatedly timed out, and the available Supabase project is inactive and was not proven to be the Production database.
 
 Live provider verification status:
-- Vercel lists `BUNDLE_SOCIAL_API_KEY` and `BUNDLE_SOCIAL_TEAM_ID` as encrypted Production values, but the local Vercel environment pull had empty values. A direct local provider check therefore could not identify the connected Company Page.
-- Commit `f33bda4` was pushed to `main` and Vercel Production deployment `dpl_9SPBjoxnSmViDtZRLprnYyd79sR9` is Ready. A safe unauthenticated request to `/api/marketing-linkedin` returned `401 Authentication required` before any provider work.
-- The deployed authenticated endpoint will block before upload/post creation unless bundle.social returns a LinkedIn channel whose returned name, username, address, or ID identifies Cicero Web Studio. A signed-in owner must load `/admin/marketing` after deployment and see “Destination verified” before using Confirm.
+- The former `GET /api/v1/social-account?teamId=…` provider request returned `404 Cannot GET` at the correct `https://api.bundle.social` host. The current public OpenAPI exposes the supported, read-only `GET /api/v1/social-account/by-type?type=LINKEDIN&teamId=…` route instead.
+- Commit `2f86f98` replaces only that server-side lookup and its response shape. Vercel Production deployment `dpl_HBqkqFVBmHJSU6EXESbpuoHsHei5` is Ready. The new test asserts the complete provider URL and the server-side `x-api-key` header; it does not expose a real credential.
+- Vercel's local Production environment pull supplied empty secret values to this execution environment. A direct read-only provider lookup therefore returned 401 and was not used to infer anything about Vercel runtime configuration. The temporary credentials file was deleted.
+- An authenticated owner loaded Production `/admin/marketing`. The new server-side lookup completed and the page returned “Not ready: The bundle.social team does not have the selected Cicero Web Studio LinkedIn Company Page.” Confirm remained disabled; no upload or post was made.
+- The request was strictly `type=LINKEDIN`. The fail-closed matcher found no returned channel name, username, address, or ID identifying Cicero Web Studio. The provider response does not expose the nonmatching account name to the browser, so only the requested account type (`LINKEDIN`) can be reported safely from this flow.
 
 Known limitations:
-- The exact connected Company Page and the remote database schema remain unverified until the correct Production deployment is live and its database migration is applied.
-- The no-publish GET preflight requires an authenticated owner session by design. A cold signed-in-browser attempt could not reach it because the application's existing full-page loader remained black after 45 seconds; no provider request, upload, or post occurred.
+- The Production bundle.social connection is not the selected Cicero Web Studio LinkedIn Company Page. The exact nonmatching account name is intentionally not returned by this fail-closed browser response.
+- The remote database schema remains unverified until the Production database migration is applied.
 
 Recommended next step:
-- After the commit reaches Production, apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`. Then, as workspace owner, open `/admin/marketing`. If the page shows “Destination verified,” review the caption and click Confirm yourself to make the one controlled LinkedIn post. If it shows “Not ready,” do not click Confirm; reconnect/select the Cicero Web Studio Company Page in bundle.social.
+- In bundle.social, connect or reauthenticate the LinkedIn account for the Production team, then select the official Cicero Web Studio Company Page as its channel. Apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`. Then, as workspace owner, reopen `/admin/marketing`. Do not use Confirm unless it changes to “Destination verified.”
 
 Permanent decisions added:
 - None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.
