@@ -16,7 +16,6 @@ import Blog from "./components/Blog";
 import BlogPost from "./components/BlogPost";
 import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
-import ClientPortalPage from "./pages/clientPortal/ClientPortalPage";
 import Gallery from "./components/Gallery";
 import LegacyWorkspaceRedirect from "./components/admin/LegacyWorkspaceRedirect";
 import { getLandingPageData } from "./data/landingPagesData";
@@ -121,7 +120,7 @@ function App() {
               <Route path="blog/:slug" element={<BlogPost />} />
               <Route path="contact" element={<Contact />} />
               <Route path="gallery" element={<Gallery />} />
-              <Route path="client-portal" element={<ClientPortalPage />} />
+              <Route path="client-portal" element={<Navigate to="/" replace />} />
               {/* Dynamic landing page routes inside layout so providers apply */}
               <Route path="landing/:id" element={<LandingPageWrapper />} />
             </Route>
