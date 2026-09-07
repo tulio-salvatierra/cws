@@ -17,6 +17,7 @@ describe('AdminLayout navigation', () => {
     )
 
     expect(screen.getByRole('link', { name: 'Channels' })).toHaveAttribute('href', '/admin/channels')
+    expect(screen.getByRole('link', { name: 'Marketing V1' })).toHaveAttribute('href', '/admin/marketing')
     expect(screen.getByRole('link', { name: /Workspace/ })).toHaveAttribute('href', '/admin/workspace')
     expect(screen.getByText('content')).toBeInTheDocument()
   })

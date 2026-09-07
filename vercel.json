@@ -15,6 +15,10 @@
     },
     "api/publish-linkedin.js": {
       "maxDuration": 30
+    },
+    "api/marketing-linkedin.js": {
+      "maxDuration": 30,
+      "includeFiles": "public/images/logo.png"
     }
   },
   "rewrites": [

@@ -4,6 +4,7 @@ import { useAuth } from '../../Hooks/useAuth'
 const NAV = [
   { to: '/admin', label: '◈ Overview', end: true },
   { to: '/admin/legacy-queue', label: '📋 Legacy queue' },
+  { to: '/admin/marketing', label: 'Marketing V1' },
   { to: '/admin/workspace', label: '🧭 Workspace' },
   { to: '/admin/channels', label: 'Channels' },
   { to: '/admin/campaigns', label: 'Campaigns' },

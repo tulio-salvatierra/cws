@@ -1523,3 +1523,106 @@ schema/data counts were not asserted. The recommended next task is a no-publish
 bundle.social media/quota/callback preflight and protected inventory of one
 English CWS asset, without reviving n8n or adding Campaign/Variant/Approval
 dependencies.
+
+## 2026-09-06 — CWS-SAFETY-001 browser-fixture containment
+
+Agent: Codex
+Status: Containment deployed; one external admin-auth verification gap recorded
+
+Committed the Task 001 documentation baseline separately, then removed the
+former client/project/payment fixture from the public Vite entry path. The
+public `/client-portal` URL now redirects to the homepage and the remaining
+legacy fixture is explicitly synthetic, with fictitious identities, `example.com`
+links, zero-value demo payments, and no cloud-storage link. No client schema,
+API, external tracker, Marketing architecture, n8n workflow, or database data
+was changed.
+
+Vitest (136 tests), lint (no errors; existing `useDrafts` warning), and the
+production build pass. Production deployment `dpl_G4LuF73Ba64axgHhrphhajqW7HJB`
+is READY. Public Production entry and client-admin chunks were checked for the
+former record's identifiers, payment fragments, Drive URL, and portal view; all
+were absent, and `/client-portal` redirects home. This verification environment
+could not resolve the configured Supabase auth host, so the existing authenticated
+Production admin flow was not independently completed and was not altered.
+
+## 2026-09-06 — CWS-MARKETING-M0 provider and asset preflight
+
+Agent: Codex
+Status: M1 ready; M2 configuration and vendor quota confirmation pending
+
+Completed an official-docs, no-publish bundle.social preflight. The current API
+uses `https://api.bundle.social/api/v1`, an organization API key in `x-api-key`,
+and a required team ID for uploads, account selection, and posts. It supports
+reusable uploads, multi-platform posts, reference-key lookup, per-platform
+status/error/permalink data, and either polling or organization-level signed
+webhooks. M1 should not call the provider; M2 can use a server-side key, an
+explicit CWS team ID, and polling while the result view is open.
+
+The repository has no bundle.social configuration or connected-account evidence.
+The proposed first M2 target is the official Cicero Web Studio LinkedIn Company
+Page, after Tulio connects and selects it in bundle.social. `public/images/logo.png`
+is selected for M1: a 1000x629 PNG (80,036 bytes) that meets the documented
+LinkedIn, Facebook, and Instagram feed image limits. It is an existing CWS brand
+graphic rather than a priced offer creative; logo ownership must be confirmed
+before a real post.
+
+The Free plan advertises 20 posts/month and 3 social accounts, but public
+documentation does not explicitly define whether a three-destination post uses
+one or three monthly units. That vendor answer is required before assuming the
+two-post-per-week, three-network cadence fits. No code, asset, credential,
+provider, database, Campaign, Variant, Approval, or n8n change was made.
+
+## 2026-09-06 — CWS-MARKETING-M1 isolated local preview
+
+Agent: Codex
+Status: Completed — M2 intentionally not implemented
+
+Added the authenticated `/admin/marketing` Marketing V1 page within the
+existing admin guard and navigation shell. It presents the existing
+`public/images/logo.png` CWS asset, an editable local-only caption, a live
+LinkedIn-style preview, and the displayed destination “LinkedIn — Cicero Web
+Studio Company Page.” The visible Confirm button is disabled and unwired.
+
+The page has no database, Supabase, bundle.social, webhook, n8n, Campaign,
+Channel, Variant, Approval, Export, or event/signal dependency. It imports only
+React state and the public image path. A focused component test verifies the
+asset, destination, caption-preview behavior, character count, and disabled
+Confirm state; the admin-layout test now verifies its navigation link.
+
+All 137 Vitest tests pass. Lint has no errors and retains the existing
+`useDrafts` exhaustive-deps warning; import-casing and the production build
+pass with pre-existing lottie `eval` and large-chunk warnings. A local browser
+visit to `/admin/marketing` without a session correctly redirected to
+`/admin/login`; no signed-in browser session was available for a final visual
+capture of the protected page.
+
+## 2026-09-07 — CWS-MARKETING-M2 controlled LinkedIn implementation
+
+Agent: Codex
+Status: Implemented locally; Production account and database verification pending
+
+Added an isolated owner-confirmed `/admin/marketing` posting path for exactly
+one CWS logo image and one LinkedIn destination. The new server-only
+`/api/marketing-linkedin` endpoint authenticates the session, requires an
+active workspace owner, checks the connected bundle.social LinkedIn Company
+Page before every attempt, uploads `public/images/logo.png`, and requests one
+LinkedIn post. It persists a standalone immutable attempt identity, provider
+upload/post IDs, status, error, permalink, and provider data; the browser has
+no direct table access and no provider credential.
+
+The Confirm flow uses a durable UUID reference key, a unique database
+constraint, UI lock, existing-attempt lookup, and provider reference-key
+lookup after an ambiguous failure. It does not replay provider create-post.
+While an attempt is not terminal, the protected page polls its server endpoint
+every 30 seconds; there is no scheduler UI, webhook, n8n, Campaign, Channel,
+Variant, Approval, Export, or generic event feature. No upload or post was
+made during implementation.
+
+All 127 Vitest tests pass, including mocked provider safety/duplicate cases;
+lint has no errors beyond the pre-existing `useDrafts` warning, and the Vite
+production build passes. The standalone migration test could not run because
+the local Postgres service is unavailable. The linked managed migration check
+also timed out, so the migration was not applied to an unproven/inactive
+Supabase project. Vercel shows the two bundle.social variables in Production,
+but live account verification must occur through the deployed owner-only
+preflight before Confirm is used.

@@ -1,67 +1,60 @@
-Task ID: CWS-MIGRATION-001
+Task ID: CWS-MARKETING-M2
 Agent: Codex
-Objective: Read-only audit of the current CWS OS and safe Marketing V1 migration path against the frozen product-reset brief.
+Objective: Deliver the smallest isolated, owner-confirmed path for one CWS LinkedIn post through bundle.social, without extending legacy Content Operations.
 
 Files inspected:
-- User-supplied CWS OS Migration Task 001 brief
-- Application routes, admin shell, authentication, legacy queue, workspace, channel, campaign, variant, published-post, planning, knowledge, client, lead, and mailing-list views
-- Vercel API handlers, outreach server handlers, n8n definitions, client-portal Google Sheets integration, environment key registry, and Vercel configuration
-- Every repository Supabase migration, relevant SQL test, existing product/technical/decision/learning documentation, prior n8n assessment, project log, and task ledger
-- Linked Supabase CLI migration-list capability and Vercel environment variable names (without reading values)
+- The frozen M1/M2 tickets, Task 001/M0 documentation, current admin auth and API patterns, legacy publish route, Vercel configuration, database conventions, and the existing CWS logo asset
+- Official bundle.social account, upload, post, reference-key, and status documentation
 
 Files changed:
-- docs/agent-handoffs/latest-codex.md
-- docs/project-log.md
-- docs/task-ledger.md
+- `api/marketing-linkedin.js`
+- `api/__tests__/marketing-linkedin.test.js`
+- `src/pages/admin/MarketingPage.jsx`
+- `src/pages/admin/__tests__/MarketingPage.test.jsx`
+- `src/App.jsx`
+- `src/components/admin/AdminLayout.jsx`
+- `src/components/admin/__tests__/AdminLayout.test.jsx`
+- `supabase/migrations/20260907163842_marketing_publish_attempts.sql`
+- `supabase/tests/marketing_publish_attempts_test.sql`
+- `vercel.json`
+- `docs/agent-handoffs/latest-codex.md`
+- `docs/project-log.md`
+- `docs/task-ledger.md`
 
-Database or API changes:
-- None. No migration, database request, API request with side effects, external message, publish, or configuration update was made.
-- A read-only linked Supabase migration-list attempt timed out while creating the login role, so live database contents and applied-history state were not asserted.
+Database and API changes:
+- Added the standalone `marketing_publish_attempts` migration. It stores the immutable owner/workspace/reference/caption/asset/destination identity plus upload ID, provider post ID, status, error, permalink, and provider response data. The table has no browser-role grants or RLS policies; only the server service role can use it.
+- Added authenticated `GET`/`POST /api/marketing-linkedin`. It requires a valid session and active workspace owner, performs the read-only bundle.social Company Page verification before every post attempt, uploads only `public/images/logo.png`, sends only the LinkedIn request shape, and polls provider status while the page is open.
+- The function includes the exact public logo file in its Vercel bundle. Provider credentials remain server-side environment variables and no `VITE_*` provider value was added.
 
-Security decisions:
-- Did not expose or read secret values; only configuration names and environment scopes were inspected.
-- Flagged the client portal's source-embedded client, project, and payment information as data that must be preserved and removed from browser-shipped static fixtures before future operational use.
+Safety and duplicate protection:
+- Confirm creates one UUID-backed `reference_key`; the UI locks after an attempt is created.
+- The endpoint writes the durable intent before provider side effects and the database enforces a unique reference key.
+- A repeated request returns the existing attempt without uploading or creating another post. If create-post has an ambiguous timeout/failure, the endpoint looks up the same reference key and never replays create-post.
+- No real provider upload or social post was made by this task. The API uses the provider-required near-immediate scheduled timestamp internally, but exposes no scheduling control or scheduler.
 
-Decisions made:
-- None. The supplied frozen Marketing V1 brief was treated as authoritative audit scope; no existing architecture was extended.
+Tests and verification:
+- `npm run test:run` — 35 files and 127 tests passed. The provider tests mock every provider call and never contact bundle.social.
+- `npm run lint` — no errors; the pre-existing `src/Hooks/useDrafts.js` exhaustive-deps warning remains.
+- `npm run build` — import-casing validation and Vite production build passed. Existing lottie `eval` and large-chunk warnings remain.
+- `git diff --check` — passed.
+- `npx supabase test db` could not run because local Postgres is not running. The migration has not been applied or checked against a managed database: the linked migration-list request repeatedly timed out, and the available Supabase project is inactive and was not proven to be the Production database.
 
-Assumptions:
-- CWS-MIGRATION-001 denotes the supplied Migration Task 001.
-- Earlier n8n live findings are historical evidence only; no current n8n instance state was claimed without a new external inspection.
+Live provider verification status:
+- Vercel lists `BUNDLE_SOCIAL_API_KEY` and `BUNDLE_SOCIAL_TEAM_ID` as encrypted Production values, but the local Vercel environment pull had empty values. A direct local provider check therefore could not identify the connected Company Page.
+- The deployed authenticated endpoint will block before upload/post creation unless bundle.social returns a LinkedIn channel whose returned name, username, address, or ID identifies Cicero Web Studio. A signed-in owner must load `/admin/marketing` after deployment and see “Destination verified” before using Confirm.
 
-Tests added:
-- None.
+Known limitations:
+- The exact connected Company Page and the remote database schema remain unverified until the correct Production deployment is live and its database migration is applied.
+- The no-publish GET preflight requires an authenticated owner session by design; no owner browser session was available to independently run it here.
 
-Tests run:
-- npm run test:run — 38 files and 136 tests passed.
-- npm run lint — no errors; existing useDrafts exhaustive-deps warning remains.
-- npx supabase migration list --linked — read-only attempt blocked by a connection timeout while initializing the login role.
-
-Known issues:
-- The current product definition and much of the admin navigation still describe the suspended Channels/Campaigns/Variants/Approvals model.
-- Legacy n8n workflow documentation is stale and historical n8n evidence shows no operational social publisher; no bundle.social code or configuration exists.
-- Vercel Preview has browser Supabase configuration but not the server-side generation/publishing database credentials, so Preview cannot exercise the current server-side Marketing flow.
-- The live Supabase schema/data snapshot remains unverified in this audit because of the CLI connection timeout.
-
-Recommended next task:
-- CWS-MARKETING-M0: perform a no-publish bundle.social vendor/media/quota/callback preflight and create a protected inventory of one existing English CWS graphic. Do not build a Campaign, Variant, Approval, n8n, or generic workflow dependency.
-
-Questions requiring Tulio:
-- Provide or confirm a bundle.social test workspace/account and one explicitly permitted test social destination before a real-publish milestone is started.
-
-Project-memory files updated:
-- docs/agent-handoffs/latest-codex.md
-- docs/project-log.md
-- docs/task-ledger.md
+Recommended next step:
+- After the commit reaches Production, apply migration `20260907163842_marketing_publish_attempts.sql` to the database identified by the Production `GENERATION_SUPABASE_URL`. Then, as workspace owner, open `/admin/marketing`. If the page shows “Destination verified,” review the caption and click Confirm yourself to make the one controlled LinkedIn post. If it shows “Not ready,” do not click Confirm; reconnect/select the Cicero Web Studio Company Page in bundle.social.
 
 Permanent decisions added:
-- None.
+- None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.
 
 Reusable learnings added:
 - None.
 
-Memory updates withheld:
-- The product-reset brief was not converted into a repository decision record during this investigation-only task.
-
-Git diff summary:
-- Only the three required project-memory files changed. No application code, migration, environment file, provider configuration, or business data changed.
+Git summary:
+- M1 and M2 remain isolated from Campaigns, Channels, Variants, Approvals, Exports, n8n, webhooks, generic events, and the legacy Marketing publishing route. No old Marketing code was deleted.
