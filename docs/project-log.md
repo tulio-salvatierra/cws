@@ -1771,3 +1771,19 @@ Commit `778c0db` is deployed in Production as
 shows the preserved failure, the distinct new-attempt readiness message, and an
 enabled “Confirm new attempt” button. No Confirm click, upload, or post was
 made during this verification.
+
+## 2026-09-07 — CWS-MARKETING-M2 first controlled LinkedIn post
+
+Agent: Codex
+Status: Posted
+
+Tulio explicitly authorized the new owner-confirmed attempt. The original
+failed `marketing_publish_attempts` row remains unchanged as audit history.
+The new attempt received a fresh reference key, uploaded the CWS logo, and
+progressed through bundle.social from Scheduled to Processing to Posted. The
+provider returned the LinkedIn permalink:
+`https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832`.
+
+The Marketing page now displays Posted and locks the caption and action button.
+No Campaign, Variant, Approval, n8n, scheduler, webhook, or legacy publishing
+path was used.

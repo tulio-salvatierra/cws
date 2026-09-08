@@ -63,12 +63,17 @@ Authorized retry implementation:
 - `GET /api/marketing-linkedin` now returns the preserved failure separately from a new-attempt readiness flag. The Marketing page renders both states distinctly and generates a fresh UUID only when the owner clicks “Confirm new attempt.” There is no automatic retry or provider request during page load.
 - All 35 Vitest files (131 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, production build, and diff validation pass. New tests prove the preserved row is unchanged, the new key is fresh, and provider-evidenced rows cannot be retried.
 
+Published result:
+- Tulio explicitly authorized the fresh owner-confirmed attempt. The prior failed row was not modified.
+- bundle.social reported the new attempt as Scheduled, then Processing, then Posted. The provider permalink is `https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832`.
+- The protected Marketing page now shows Posted and disables the caption and action button. No other platform or legacy publishing path was used.
+
 Known limitations:
-- The next provider operation is intentionally gated behind the owner clicking “Confirm new attempt.”
+- M2 is intentionally limited to the one completed LinkedIn Company Page post.
 - The persisted attempt confirms the Production table supports this route's reads and writes, although its migration history was not independently listed.
 
 Recommended next step:
-- On `/admin/marketing`, Tulio may click “Confirm new attempt” to create the fresh durable attempt. The Production page has been visually verified to show the preserved failure and the distinct enabled control.
+- Keep M2 isolated. Any additional destination, scheduler, webhook, or content-workflow change requires a new scoped task.
 
 Permanent decisions added:
 - None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.
