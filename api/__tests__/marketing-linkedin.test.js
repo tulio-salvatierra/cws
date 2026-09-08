@@ -5,404 +5,208 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { createClientMock } = vi.hoisted(() => ({ createClientMock: vi.fn() }))
 vi.mock('@supabase/supabase-js', () => ({ createClient: createClientMock }))
-vi.mock('node:fs/promises', async importOriginal => ({
-  ...(await importOriginal()),
-  readFile: vi.fn(),
-}))
+vi.mock('node:fs/promises', async importOriginal => ({ ...(await importOriginal()), readFile: vi.fn() }))
 
 import handler from '../marketing-linkedin'
 
+const verifiedAccounts = [
+  { type: 'LINKEDIN', userDisplayName: 'Cicero Web Studio', userUsername: 'cicero-web-studio' },
+  { type: 'FACEBOOK', displayName: 'Cicero Web Studio', username: 'Cicero Web Studio' },
+  { type: 'INSTAGRAM', displayName: 'cicerowebstudio', username: 'cicerowebstudio' },
+]
+const legacyPostedAttempt = {
+  id: 'm2-posted', reference_key: 'cws-marketing-linkedin:dddddddd-dddd-4ddd-8ddd-dddddddddddd', caption: 'M2 posted.', asset_path: '/images/logo.png',
+  destination: 'linkedin:cicero-web-studio', provider_status: 'posted', provider_post_id: 'm2-provider-post', provider_permalink: 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832', provider_error: null, created_at: '2026-09-07T01:00:00.000Z',
+}
+
 function providerResponse(status, body) {
-  return {
-    ok: status >= 200 && status < 300,
-    status,
-    text: vi.fn().mockResolvedValue(JSON.stringify(body)),
-  }
+  return { ok: status >= 200 && status < 300, status, text: vi.fn().mockResolvedValue(JSON.stringify(body)) }
 }
 
 function makeResponse() {
   const response = { statusCode: 200, body: null }
-  response.status = vi.fn(code => {
-    response.statusCode = code
-    return response
-  })
-  response.json = vi.fn(body => {
-    response.body = body
-    return response
-  })
+  response.status = vi.fn(code => { response.statusCode = code; return response })
+  response.json = vi.fn(body => { response.body = body; return response })
   return response
 }
 
-function createDatabase({ currentAttempt = null, existingAttempt = null, attemptHistory = [] } = {}) {
-  const state = { inserts: [], updates: [] }
-  const workspaceResult = { data: { workspace_id: 'workspace-1', role: 'owner' }, error: null }
+function createDatabase({ latest = legacyPostedAttempt, existing = null, history = [legacyPostedAttempt], results = [] } = {}) {
+  const state = { attemptInserts: [], destinationInserts: [], attemptUpdates: [], destinationUpdates: [], results: [...results] }
+  const workspace = { data: { workspace_id: 'workspace-1', role: 'owner' }, error: null }
 
-  function query(result) {
+  function query(table) {
     const chain = {
+      table,
+      filters: {},
       select: vi.fn(() => chain),
-      eq: vi.fn((field, value) => {
-        if (field === 'reference_key') chain.referenceKey = value
-        return chain
-      }),
+      eq: vi.fn((field, value) => { chain.filters[field] = value; return chain }),
       order: vi.fn(() => chain),
-      limit: vi.fn(value => {
-        chain.limitValue = value
-        return chain
-      }),
-      insert: vi.fn(values => {
-        state.inserts.push(values)
-        chain.operation = 'insert'
-        return chain
-      }),
-      update: vi.fn(values => {
-        state.updates.push(values)
-        chain.operation = 'update'
-        return chain
-      }),
+      limit: vi.fn(value => { chain.limitValue = value; return chain }),
+      insert: vi.fn(values => { chain.operation = 'insert'; chain.values = values; return chain }),
+      update: vi.fn(values => { chain.operation = 'update'; chain.values = values; return chain }),
       maybeSingle: vi.fn(() => {
-        if (chain.referenceKey) return Promise.resolve({ data: existingAttempt, error: null })
-        return Promise.resolve(result)
+        if (table === 'workspace_members') return Promise.resolve(workspace)
+        if (chain.filters.reference_key) return Promise.resolve({ data: existing, error: null })
+        return Promise.resolve({ data: latest, error: null })
       }),
       single: vi.fn(() => {
-        if (chain.operation === 'insert') {
-          return Promise.resolve({
-            data: {
-              id: 'attempt-1',
-              ...state.inserts.at(-1),
-              created_at: '2026-09-07T00:00:00.000Z',
-              provider_error: null,
-              provider_permalink: null,
-            },
-            error: null,
-          })
+        if (table === 'marketing_publish_attempts' && chain.operation === 'insert') {
+          const data = { id: 'm4-attempt-1', ...chain.values, provider_error: null, provider_permalink: null, created_at: '2026-09-08T00:00:00.000Z' }
+          state.attemptInserts.push(data)
+          return Promise.resolve({ data, error: null })
         }
-        if (chain.operation === 'update') {
-          return Promise.resolve({
-            data: {
-              id: 'attempt-1',
-              ...(currentAttempt || existingAttempt),
-              ...state.updates.at(-1),
-              created_at: '2026-09-07T00:00:00.000Z',
-            },
-            error: null,
-          })
+        if (table === 'marketing_publish_attempts' && chain.operation === 'update') {
+          const data = { ...latest, id: chain.filters.id || latest?.id || 'm4-attempt-1', ...chain.values }
+          state.attemptUpdates.push(data)
+          return Promise.resolve({ data, error: null })
+        }
+        if (table === 'marketing_publish_destination_results' && chain.operation === 'update') {
+          const current = state.results.find(result => result.id === chain.filters.id) || { id: chain.filters.id, platform: 'LINKEDIN' }
+          const data = { ...current, ...chain.values }
+          state.results = state.results.map(result => result.id === data.id ? data : result)
+          state.destinationUpdates.push(data)
+          return Promise.resolve({ data, error: null })
         }
         return Promise.resolve({ data: null, error: null })
       }),
-      then: (resolve, reject) => Promise.resolve(
-        chain.limitValue === 10 ? { data: attemptHistory, error: null } : result,
-      ).then(resolve, reject),
+      then: (resolve, reject) => {
+        let response
+        if (table === 'marketing_publish_attempts') response = chain.limitValue === 10 ? { data: history, error: null } : { data: latest, error: null }
+        else if (table === 'marketing_publish_destination_results' && chain.operation === 'insert') {
+          const rows = chain.values.map((value, index) => ({ id: `destination-${index + 1}`, ...value, provider_error: null, provider_permalink: null, created_at: '2026-09-08T00:00:00.000Z' }))
+          state.destinationInserts.push(...rows); state.results = rows; response = { data: rows, error: null }
+        } else if (table === 'marketing_publish_destination_results') response = { data: state.results, error: null }
+        else response = { data: null, error: null }
+        return Promise.resolve(response).then(resolve, reject)
+      },
     }
     return chain
   }
 
-  const client = {
-    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'owner-1' } }, error: null }) },
-    from: vi.fn(table => {
-      if (table === 'workspace_members') return query(workspaceResult)
-      if (table === 'marketing_publish_attempts') return query({ data: currentAttempt, error: null })
-      throw new Error(`Unexpected table ${table}`)
-    }),
+  return {
+    client: {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'owner-1' } }, error: null }) },
+      from: vi.fn(table => query(table)),
+    },
+    state,
   }
-
-  return { client, state }
 }
 
 function request({ method = 'GET', body, token = 'owner-token' } = {}) {
-  return {
-    method,
-    headers: token ? { authorization: `Bearer ${token}` } : {},
-    body,
-  }
+  return { method, headers: token ? { authorization: `Bearer ${token}` } : {}, body }
 }
 
-const connectedCompanyPage = {
-  type: 'LINKEDIN',
-  userDisplayName: 'Cicero Web Studio',
-  userUsername: 'cicero-web-studio',
-  channels: [],
-}
+function queueVerifiedAccounts() { verifiedAccounts.forEach(account => globalThis.fetch.mockResolvedValueOnce(providerResponse(200, account))) }
+function m4Reference() { return 'cws-marketing-m4:11111111-1111-4111-8111-111111111111' }
+function m4Attempt(status = 'processing') { return { id: 'm4-attempt-1', reference_key: m4Reference(), caption: 'M4 caption.', asset_path: '/images/logo.png', destination: 'multi:cicero-web-studio', provider_post_id: 'bundle-post-1', provider_status: status, provider_error: null, created_at: '2026-09-08T00:00:00.000Z' } }
+function destinationResults(status = 'processing') { return ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'].map((platform, index) => ({ id: `destination-${index + 1}`, attempt_id: 'm4-attempt-1', platform, provider_status: status, provider_error: null, provider_permalink: null })) }
 
-const failedBeforeProviderPost = {
-  id: 'failed-attempt-1',
-  reference_key: 'cws-marketing-linkedin:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-  caption: 'A clear CWS message.',
-  asset_path: '/images/logo.png',
-  provider_status: 'error',
-  provider_post_id: null,
-  provider_permalink: null,
-  provider_error: 'bundle.social did not return an upload ID.',
-  created_at: '2026-09-07T00:00:00.000Z',
-}
-
-describe('marketing LinkedIn endpoint', () => {
+describe('M4 Marketing endpoint', () => {
   beforeEach(() => {
     process.env.GENERATION_SUPABASE_URL = 'https://project.supabase.co'
     process.env.GENERATION_SUPABASE_SERVICE_ROLE_KEY = 'service-role-key'
     process.env.BUNDLE_SOCIAL_API_KEY = 'bundle-key'
     process.env.BUNDLE_SOCIAL_TEAM_ID = 'team-1'
-    createClientMock.mockReset()
-    readFile.mockReset()
-    globalThis.fetch = vi.fn()
+    createClientMock.mockReset(); readFile.mockReset(); globalThis.fetch = vi.fn()
   })
 
-  it('requires authentication before it reads provider configuration', async () => {
+  it('requires authentication before provider discovery', async () => {
     const response = makeResponse()
     await handler(request({ token: '' }), response)
-
     expect(response.statusCode).toBe(401)
-    expect(createClientMock).not.toHaveBeenCalled()
     expect(globalThis.fetch).not.toHaveBeenCalled()
   })
 
-  it('returns a verified CWS LinkedIn Company Page without creating a post', async () => {
+  it('discovers and positively verifies all three active CWS destinations without publishing', async () => {
     const database = createDatabase()
-    createClientMock.mockReturnValue(database.client)
-    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-
-    const response = makeResponse()
-    await handler(request(), response)
-
+    createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    const response = makeResponse(); await handler(request(), response)
     expect(response.statusCode).toBe(200)
-    expect(response.body.destination).toMatchObject({
-      ready: true,
-      name: 'LinkedIn — Cicero Web Studio Company Page',
-      channel_name: 'Cicero Web Studio',
-    })
-    expect(response.body.can_start_new_attempt).toBe(true)
-    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
-    expect(globalThis.fetch).toHaveBeenCalledWith(
-      'https://api.bundle.social/api/v1/social-account/by-type?type=LINKEDIN&teamId=team-1',
-      expect.objectContaining({ headers: expect.objectContaining({ 'x-api-key': 'bundle-key' }) }),
-    )
-    expect(database.state.inserts).toEqual([])
-  })
-
-  it('preserves a failed pre-post attempt and marks a new attempt ready for owner confirmation', async () => {
-    const database = createDatabase({ currentAttempt: failedBeforeProviderPost })
-    createClientMock.mockReturnValue(database.client)
-    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-
-    const response = makeResponse()
-    await handler(request(), response)
-
-    expect(response.statusCode).toBe(200)
+    expect(response.body.destinations).toEqual(expect.arrayContaining([
+      expect.objectContaining({ platform: 'LINKEDIN', verification_state: 'verified', channel_name: 'Cicero Web Studio' }),
+      expect.objectContaining({ platform: 'FACEBOOK', verification_state: 'verified', channel_name: 'Cicero Web Studio' }),
+      expect.objectContaining({ platform: 'INSTAGRAM', verification_state: 'verified', channel_name: 'cicerowebstudio' }),
+    ]))
     expect(response.body.attempt).toBeNull()
-    expect(response.body.previous_failed_attempt).toMatchObject({
-      id: failedBeforeProviderPost.id,
-      reference_key: failedBeforeProviderPost.reference_key,
-      provider_status: 'error',
-    })
-    expect(response.body.can_start_new_attempt).toBe(true)
-    expect(database.state.inserts).toEqual([])
-    expect(database.state.updates).toEqual([])
-  })
-
-  it('returns a persisted posted result with the earlier failed attempt as history after reload', async () => {
-    const postedAttempt = {
-      id: 'posted-attempt-1',
-      reference_key: 'cws-marketing-linkedin:dddddddd-dddd-4ddd-8ddd-dddddddddddd',
-      caption: 'A clear CWS message.',
-      asset_path: '/images/logo.png',
-      provider_status: 'posted',
-      provider_post_id: 'provider-post-1',
-      provider_permalink: 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832',
-      provider_error: null,
-      created_at: '2026-09-07T01:00:00.000Z',
-    }
-    const database = createDatabase({
-      currentAttempt: postedAttempt,
-      attemptHistory: [postedAttempt, failedBeforeProviderPost],
-    })
-    createClientMock.mockReturnValue(database.client)
-    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-
-    const response = makeResponse()
-    await handler(request(), response)
-
-    expect(response.statusCode).toBe(200)
-    expect(response.body.attempt).toMatchObject({
-      id: postedAttempt.id,
-      provider_status: 'posted',
-      provider_permalink: postedAttempt.provider_permalink,
-    })
-    expect(response.body.attempt_history).toEqual([expect.objectContaining({
-      id: failedBeforeProviderPost.id,
-      provider_status: 'error',
-      provider_error: failedBeforeProviderPost.provider_error,
-    })])
-    expect(response.body.can_start_new_attempt).toBe(false)
-    expect(database.state.updates).toEqual([])
-    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
-  })
-
-  it('blocks publishing when the selected LinkedIn profile is personal even if the Company Page is available', async () => {
-    const database = createDatabase()
-    createClientMock.mockReturnValue(database.client)
-    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, {
-      type: 'LINKEDIN',
-      displayName: 'Tulio Salvatierra',
-      username: 'tuliosalvatierra',
-      channels: [
-        { id: 'personal-1', name: 'Tulio Salvatierra' },
-        { id: 'company-1', name: 'Cicero Web Studio', username: 'cicero-web-studio' },
-      ],
-    }))
-
-    const response = makeResponse()
-    await handler(request(), response)
-
-    expect(response.statusCode).toBe(409)
-    expect(response.body.error).toMatch(/Cicero Web Studio LinkedIn Company Page/)
-    expect(database.state.inserts).toEqual([])
-  })
-
-  it('persists an intent, uploads the static logo, and creates only a LinkedIn post', async () => {
-    const database = createDatabase()
-    createClientMock.mockReturnValue(database.client)
-    readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
-    globalThis.fetch
-      .mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-1' }))
-      .mockResolvedValueOnce(providerResponse(200, { id: 'provider-post-1', status: 'PROCESSING', externalData: {} }))
-
-    const response = makeResponse()
-    await handler(request({
-      method: 'POST',
-      body: {
-        caption: 'A clear CWS message.',
-        reference_key: 'cws-marketing-linkedin:11111111-1111-4111-8111-111111111111',
-      },
-    }), response)
-
-    expect(response.statusCode).toBe(202)
-    expect(database.state.inserts).toEqual([expect.objectContaining({
-      asset_path: '/images/logo.png',
-      destination: 'linkedin:cicero-web-studio',
-      provider_status: 'preparing',
-    })])
-    expect(database.state.updates).toEqual([expect.objectContaining({
-      upload_id: 'upload-1',
-      provider_post_id: 'provider-post-1',
-      provider_status: 'processing',
-    })])
+    expect(response.body.attempt_history).toEqual([expect.objectContaining({ id: legacyPostedAttempt.id, provider_permalink: legacyPostedAttempt.provider_permalink })])
+    expect(database.state.attemptInserts).toEqual([])
     expect(globalThis.fetch).toHaveBeenCalledTimes(3)
-    expect(globalThis.fetch.mock.calls[1][0]).toBe('https://api.bundle.social/api/v1/upload/')
-    const createCall = globalThis.fetch.mock.calls[2]
-    expect(createCall[0]).toContain('/post')
-    expect(JSON.parse(createCall[1].body)).toMatchObject({
-      socialAccountTypes: ['LINKEDIN'],
-      data: { LINKEDIN: { text: 'A clear CWS message.', uploadIds: ['upload-1'] } },
-    })
   })
 
-  it('creates a fresh attempt after a failed attempt that never received a provider post or permalink', async () => {
-    const database = createDatabase({ currentAttempt: failedBeforeProviderPost })
-    createClientMock.mockReturnValue(database.client)
-    readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
+  it('fails closed when an active Facebook account is not the CWS Page', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client)
     globalThis.fetch
-      .mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-2' }))
-      .mockResolvedValueOnce(providerResponse(200, { id: 'provider-post-2', status: 'PROCESSING', externalData: {} }))
-
+      .mockResolvedValueOnce(providerResponse(200, verifiedAccounts[0]))
+      .mockResolvedValueOnce(providerResponse(200, { type: 'FACEBOOK', displayName: 'Other Business', username: 'other-business' }))
+      .mockResolvedValueOnce(providerResponse(200, verifiedAccounts[2]))
     const response = makeResponse()
-    await handler(request({
-      method: 'POST',
-      body: {
-        caption: 'A clear CWS message.',
-        reference_key: 'cws-marketing-linkedin:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
-      },
-    }), response)
-
-    expect(response.statusCode).toBe(202)
-    expect(response.body.previous_failed_attempt).toMatchObject({ id: failedBeforeProviderPost.id })
-    expect(database.state.inserts).toEqual([expect.objectContaining({
-      reference_key: 'cws-marketing-linkedin:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
-    })])
-    expect(failedBeforeProviderPost).toMatchObject({
-      provider_status: 'error',
-      provider_post_id: null,
-      provider_permalink: null,
-    })
-  })
-
-  it('blocks a fresh attempt when the previous attempt has a provider post', async () => {
-    const database = createDatabase({
-      currentAttempt: { ...failedBeforeProviderPost, provider_post_id: 'provider-post-previous' },
-    })
-    createClientMock.mockReturnValue(database.client)
-    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-
-    const response = makeResponse()
-    await handler(request({
-      method: 'POST',
-      body: {
-        caption: 'A clear CWS message.',
-        reference_key: 'cws-marketing-linkedin:cccccccc-cccc-4ccc-8ccc-cccccccccccc',
-      },
-    }), response)
-
+    await handler(request({ method: 'POST', body: { caption: 'M4 caption.', reference_key: m4Reference() } }), response)
     expect(response.statusCode).toBe(409)
-    expect(response.body.can_start_new_attempt).toBe(false)
-    expect(database.state.inserts).toEqual([])
+    expect(response.body.destinations).toContainEqual(expect.objectContaining({ platform: 'FACEBOOK', verification_state: 'not_verified' }))
+    expect(database.state.attemptInserts).toEqual([])
     expect(readFile).not.toHaveBeenCalled()
-    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
   })
 
-  it('treats a repeated reference key as the same attempt without uploading or creating another post', async () => {
-    const existingAttempt = {
-      id: 'attempt-1',
-      reference_key: 'cws-marketing-linkedin:33333333-3333-4333-8333-333333333333',
-      provider_post_id: null,
-      provider_status: 'preparing',
-      caption: 'A clear CWS message.',
-      asset_path: '/images/logo.png',
-      provider_error: null,
-      provider_permalink: null,
-    }
-    const database = createDatabase({ existingAttempt })
-    createClientMock.mockReturnValue(database.client)
+  it('uses one owner-confirmed multi-platform provider post and one reusable upload', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts(); readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
     globalThis.fetch
-      .mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-      .mockResolvedValueOnce(providerResponse(404, { message: 'Not found' }))
-
+      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-1' }))
+      .mockResolvedValueOnce(providerResponse(200, { id: 'bundle-post-1', status: 'PROCESSING', externalData: {} }))
     const response = makeResponse()
-    await handler(request({
-      method: 'POST',
-      body: { caption: 'A clear CWS message.', reference_key: existingAttempt.reference_key },
-    }), response)
+    await handler(request({ method: 'POST', body: { caption: 'M4 caption.', reference_key: m4Reference() } }), response)
+    expect(response.statusCode).toBe(202)
+    expect(database.state.attemptInserts).toEqual([expect.objectContaining({ destination: 'multi:cicero-web-studio' })])
+    expect(database.state.destinationInserts).toHaveLength(3)
+    const createCall = globalThis.fetch.mock.calls.find(([url, options]) => url.endsWith('/post') && options?.method === 'POST')
+    expect(JSON.parse(createCall[1].body)).toMatchObject({
+      socialAccountTypes: ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'],
+      data: { LINKEDIN: { uploadIds: ['upload-1'] }, FACEBOOK: { type: 'POST', uploadIds: ['upload-1'] }, INSTAGRAM: { type: 'POST', uploadIds: ['upload-1'] } },
+    })
+  })
 
+  it('persists partial outcomes independently after one provider response', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts(); readFile.mockResolvedValue(new Uint8Array([1]))
+    globalThis.fetch
+      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-1' }))
+      .mockResolvedValueOnce(providerResponse(200, {
+        id: 'bundle-post-1', status: 'ERROR', errors: { INSTAGRAM: { errorMessage: 'Instagram permission expired.' } },
+        externalData: { LINKEDIN: { id: 'li-1', permalink: 'https://linkedin.test/post' }, FACEBOOK: { id: 'fb-1', permalink: 'https://facebook.test/post' } },
+      }))
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: { caption: 'M4 caption.', reference_key: m4Reference() } }), response)
+    expect(response.body.destination_results).toEqual(expect.arrayContaining([
+      expect.objectContaining({ platform: 'LINKEDIN', provider_status: 'posted', provider_permalink: 'https://linkedin.test/post' }),
+      expect.objectContaining({ platform: 'FACEBOOK', provider_status: 'posted', provider_permalink: 'https://facebook.test/post' }),
+      expect.objectContaining({ platform: 'INSTAGRAM', provider_status: 'error', provider_error: 'Instagram permission expired.' }),
+    ]))
+    expect(globalThis.fetch.mock.calls.filter(([url, options]) => url.endsWith('/post') && options?.method === 'POST')).toHaveLength(1)
+  })
+
+  it('reconciles unfinished destinations on reload without a second create-post', async () => {
+    const current = m4Attempt()
+    const database = createDatabase({ latest: current, history: [legacyPostedAttempt], results: destinationResults() })
+    createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, {
+      id: 'bundle-post-1', status: 'POSTED', externalData: {
+        LINKEDIN: { id: 'li-1', permalink: 'https://linkedin.test/post' }, FACEBOOK: { id: 'fb-1', permalink: 'https://facebook.test/post' }, INSTAGRAM: { id: 'ig-1', permalink: 'https://instagram.test/post' },
+      },
+    }))
+    const response = makeResponse(); await handler(request(), response)
+    expect(response.statusCode).toBe(200)
+    expect(response.body.destination_results.every(result => result.provider_status === 'posted')).toBe(true)
+    expect(globalThis.fetch.mock.calls.filter(([url, options]) => url.endsWith('/post') && options?.method === 'POST')).toHaveLength(0)
+    expect(database.state.destinationUpdates).toHaveLength(3)
+  })
+
+  it('returns an existing terminal M4 attempt without republishing posted destinations', async () => {
+    const current = m4Attempt('posted')
+    const database = createDatabase({ latest: current, existing: current, results: destinationResults('posted') })
+    createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: { caption: 'M4 caption.', reference_key: current.reference_key } }), response)
     expect(response.statusCode).toBe(200)
     expect(response.body.duplicate).toBe(true)
-    expect(database.state.inserts).toEqual([])
+    expect(globalThis.fetch.mock.calls.filter(([url, options]) => url.endsWith('/post') && options?.method === 'POST')).toHaveLength(0)
     expect(readFile).not.toHaveBeenCalled()
-    expect(globalThis.fetch).toHaveBeenCalledTimes(2)
-    expect(globalThis.fetch.mock.calls[1][0]).toContain('/post/reference-key/')
-  })
-
-  it('looks up the reference key after an ambiguous provider timeout instead of replaying create-post', async () => {
-    const database = createDatabase()
-    createClientMock.mockReturnValue(database.client)
-    readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
-    globalThis.fetch
-      .mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
-      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-1' }))
-      .mockRejectedValueOnce(new Error('socket closed'))
-      .mockResolvedValueOnce(providerResponse(200, { id: 'provider-post-1', status: 'PROCESSING', externalData: {} }))
-
-    const response = makeResponse()
-    await handler(request({
-      method: 'POST',
-      body: {
-        caption: 'A clear CWS message.',
-        reference_key: 'cws-marketing-linkedin:22222222-2222-4222-8222-222222222222',
-      },
-    }), response)
-
-    expect(response.statusCode).toBe(202)
-    const postCreates = globalThis.fetch.mock.calls.filter(([url, options]) => url.endsWith('/post') && options?.method === 'POST')
-    expect(postCreates).toHaveLength(1)
-    expect(globalThis.fetch.mock.calls[3][0]).toContain('/post/reference-key/')
-    expect(database.state.updates).toContainEqual(expect.objectContaining({ provider_post_id: 'provider-post-1' }))
   })
 })

@@ -6,145 +6,70 @@ vi.mock('../../../Hooks/useAuth', () => ({ useAuth: useAuthMock }))
 
 import MarketingPage from '../MarketingPage'
 
-describe('MarketingPage', () => {
+const verifiedDestinations = [
+  { platform: 'LINKEDIN', name: 'LinkedIn — Cicero Web Studio Company Page', verification_state: 'verified', channel_name: 'Cicero Web Studio' },
+  { platform: 'FACEBOOK', name: 'Facebook — Cicero Web Studio Page', verification_state: 'verified', channel_name: 'Cicero Web Studio' },
+  { platform: 'INSTAGRAM', name: 'Instagram — Cicero Web Studio Business Account', verification_state: 'verified', channel_name: 'cicerowebstudio' },
+]
+
+function response(body) { return { ok: true, json: vi.fn().mockResolvedValue(body) } }
+
+describe('MarketingPage M4', () => {
   beforeEach(() => {
     useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({
-        destination: { ready: true, channel_name: 'Cicero Web Studio' },
-        attempt: null,
-        can_start_new_attempt: true,
-      }),
-    })
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ destinations: verifiedDestinations, attempt: null, destination_results: [], attempt_history: [], storage_ready: true, can_start_new_attempt: true }))
   })
 
-  it('keeps composition local until the owner confirms and mirrors edits in the preview', async () => {
+  it('shows all three verified destinations and keeps composition local before one Confirm', async () => {
     render(<MarketingPage />)
-
-    expect(screen.getByRole('heading', { name: 'One post, clearly previewed.' })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'Cicero Web Studio wordmark' })).toHaveAttribute('src', '/images/logo.png')
-    expect(screen.getByText('LinkedIn — Cicero Web Studio Company Page')).toBeInTheDocument()
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled())
-
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm three destinations' })).toBeEnabled())
+    expect(screen.getByText('✓ LinkedIn — Cicero Web Studio Company Page')).toBeInTheDocument()
+    expect(screen.getByText('✓ Facebook — Cicero Web Studio Page')).toBeInTheDocument()
+    expect(screen.getByText('✓ Instagram — Cicero Web Studio Business Account')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Caption'), { target: { value: 'A clearer CWS message.' } })
-
     expect(screen.getByTestId('marketing-preview-caption')).toHaveTextContent('A clearer CWS message.')
-    expect(screen.getByText('22 characters')).toBeInTheDocument()
-    expect(globalThis.fetch).toHaveBeenCalledWith('/api/marketing-linkedin', expect.objectContaining({
-      method: 'GET',
-      headers: expect.objectContaining({ Authorization: 'Bearer access-token' }),
-    }))
+    expect(globalThis.fetch).toHaveBeenCalledWith('/api/marketing-linkedin', expect.objectContaining({ method: 'GET' }))
   })
 
-  it('sends the owner confirmation once with a browser-generated reference key', async () => {
+  it('uses one owner confirmation and displays independent partial outcomes', async () => {
     globalThis.fetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          destination: { ready: true, channel_name: 'Cicero Web Studio' },
-          attempt: null,
-          can_start_new_attempt: true,
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          destination: { ready: true, channel_name: 'Cicero Web Studio' },
-          attempt: { provider_status: 'processing', provider_error: null, provider_permalink: null },
-          can_start_new_attempt: false,
-        }),
-      })
-
-    render(<MarketingPage />)
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled())
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-
-    await waitFor(() => expect(screen.getByText('Provider status: Processing')).toBeInTheDocument())
-    const [, options] = globalThis.fetch.mock.calls[1]
-    expect(options).toMatchObject({ method: 'POST' })
-    expect(JSON.parse(options.body)).toMatchObject({
-      caption: 'Clear strategy. Thoughtful design. Websites built to move your business forward.',
-      reference_key: expect.stringMatching(/^cws-marketing-linkedin:/),
-    })
-  })
-
-  it('keeps a failed pre-post attempt visible while enabling a fresh owner-confirmed attempt', async () => {
-    const previousReferenceKey = 'cws-marketing-linkedin:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
-    globalThis.fetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          destination: { ready: true, channel_name: 'Cicero Web Studio' },
-          attempt: null,
-          previous_failed_attempt: {
-            reference_key: previousReferenceKey,
-            provider_status: 'error',
-            provider_error: 'bundle.social did not return an upload ID.',
-          },
-          can_start_new_attempt: true,
-        }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          destination: { ready: true, channel_name: 'Cicero Web Studio' },
-          attempt: { provider_status: 'processing', provider_error: null, provider_permalink: null },
-          previous_failed_attempt: { reference_key: previousReferenceKey, provider_status: 'error' },
-          can_start_new_attempt: false,
-        }),
-      })
-
-    render(<MarketingPage />)
-
-    await waitFor(() => expect(screen.getByText('Previous failed attempt preserved')).toBeInTheDocument())
-    expect(screen.getByText('New attempt ready for owner confirmation')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Confirm new attempt' })).toBeEnabled()
-    expect(screen.getByLabelText('Caption')).toBeEnabled()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm new attempt' }))
-
-    await waitFor(() => expect(screen.getByText('Provider status: Processing')).toBeInTheDocument())
-    const [, options] = globalThis.fetch.mock.calls[1]
-    const requestBody = JSON.parse(options.body)
-    expect(requestBody.reference_key).toMatch(/^cws-marketing-linkedin:/)
-    expect(requestBody.reference_key).not.toBe(previousReferenceKey)
-  })
-
-  it('shows a persisted posted result and preserved failed history after reload without offering Confirm', async () => {
-    globalThis.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: vi.fn().mockResolvedValue({
-        destination: { ready: true, channel_name: 'Cicero Web Studio' },
-        attempt: {
-          id: 'posted-attempt-1',
-          provider_status: 'posted',
-          provider_permalink: 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832',
-          provider_error: null,
-        },
-        attempt_history: [{
-          id: 'failed-attempt-1',
-          provider_status: 'error',
-          provider_error: 'bundle.social did not return an upload ID.',
-          provider_permalink: null,
-        }],
+      .mockResolvedValueOnce(response({ destinations: verifiedDestinations, attempt: null, destination_results: [], attempt_history: [], storage_ready: true, can_start_new_attempt: true }))
+      .mockResolvedValueOnce(response({
+        destinations: verifiedDestinations,
+        attempt: { id: 'm4-attempt-1', provider_status: 'error' },
+        destination_results: [
+          { id: 'li', platform: 'LINKEDIN', provider_status: 'posted', provider_permalink: 'https://linkedin.test/post' },
+          { id: 'fb', platform: 'FACEBOOK', provider_status: 'posted', provider_permalink: 'https://facebook.test/post' },
+          { id: 'ig', platform: 'INSTAGRAM', provider_status: 'error', provider_error: 'Instagram permission expired.' },
+        ],
+        storage_ready: true,
         can_start_new_attempt: false,
-      }),
-    })
-
+      }))
     render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm three destinations' })).toBeEnabled())
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm three destinations' }))
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Destination outcomes' })).toBeInTheDocument())
+    expect(screen.getAllByText('Posted')).toHaveLength(2)
+    expect(screen.getByText('Instagram permission expired.')).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'View post →' })).toHaveLength(2)
+    expect(screen.getByRole('button', { name: 'Post in progress' })).toBeDisabled()
+    const [, options] = globalThis.fetch.mock.calls[1]
+    expect(JSON.parse(options.body).reference_key).toMatch(/^cws-marketing-m4:/)
+  })
 
-    await waitFor(() => expect(screen.getByText('Provider status: Posted')).toBeInTheDocument())
-    expect(screen.getByText('Published on LinkedIn. This attempt is complete.')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Open LinkedIn post →' })).toHaveAttribute(
-      'href',
-      'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832',
-    )
-    expect(screen.getByRole('heading', { name: 'Previous attempts' })).toBeInTheDocument()
-    expect(screen.getAllByText('Provider status: Error')).toHaveLength(1)
-    expect(screen.getByText('bundle.social did not return an upload ID.')).toBeInTheDocument()
-    expect(screen.getByText('Preserved as audit history.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Post published' })).toBeDisabled()
-    expect(screen.queryByRole('button', { name: /Confirm/ })).not.toBeInTheDocument()
+  it('fails closed in the UI for an unverified destination while retaining M2 history', async () => {
+    globalThis.fetch.mockResolvedValueOnce(response({
+      destinations: [verifiedDestinations[0], { ...verifiedDestinations[1], verification_state: 'not_verified', channel_name: 'Other Business', error: 'The active provider account is not the intended CWS destination.' }, verifiedDestinations[2]],
+      attempt: null,
+      destination_results: [],
+      attempt_history: [{ id: 'm2-posted', provider_status: 'posted', provider_permalink: 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832' }],
+      storage_ready: true,
+      can_start_new_attempt: true,
+    }))
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByText('Not verified')).toBeInTheDocument())
+    expect(screen.getByRole('button', { name: 'Confirm three destinations' })).toBeDisabled()
+    expect(screen.getByText('The active provider account is not the intended CWS destination.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open LinkedIn post →' })).toHaveAttribute('href', 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832')
   })
 })
