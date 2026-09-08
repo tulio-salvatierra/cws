@@ -51,10 +51,14 @@ async function getMarketingStatus(res, client, context, destination) {
     attempt = refreshed.data
   }
 
+  const availability = getNewAttemptAvailability(attempt)
+
   return res.status(200).json({
     ok: true,
     destination,
-    attempt: serializeAttempt(attempt),
+    attempt: serializeAttempt(availability.previousFailedAttempt ? null : attempt),
+    previous_failed_attempt: serializeAttempt(availability.previousFailedAttempt),
+    can_start_new_attempt: availability.canStartNewAttempt,
     poll_after_ms: attempt && !TERMINAL_STATUS.has(attempt.provider_status)
       ? MARKETING_POLL_INTERVAL_MS
       : null,
@@ -69,6 +73,19 @@ async function createMarketingPost(req, res, client, context, destination) {
   const existing = await getAttemptByReferenceKey(client, body.reference_key)
   if (existing.error) return databaseFailure(res, existing.error)
   if (existing.data) return respondWithExistingAttempt(res, client, existing.data, destination)
+
+  const latest = await getLatestAttempt(client, context.workspaceId)
+  if (latest.error) return databaseFailure(res, latest.error)
+  const availability = getNewAttemptAvailability(latest.data)
+  if (!availability.canStartNewAttempt) {
+    return res.status(409).json({
+      ok: false,
+      error: 'A Marketing attempt already exists and cannot be retried.',
+      attempt: serializeAttempt(latest.data),
+      previous_failed_attempt: null,
+      can_start_new_attempt: false,
+    })
+  }
 
   const inserted = await client
     .from('marketing_publish_attempts')
@@ -104,6 +121,8 @@ async function createMarketingPost(req, res, client, context, destination) {
       ok: true,
       destination,
       attempt: serializeAttempt(updated.data),
+      previous_failed_attempt: serializeAttempt(availability.previousFailedAttempt),
+      can_start_new_attempt: false,
       poll_after_ms: MARKETING_POLL_INTERVAL_MS,
     })
   } catch (error) {
@@ -120,6 +139,8 @@ async function createMarketingPost(req, res, client, context, destination) {
         ok: true,
         destination,
         attempt: serializeAttempt(updated.data),
+        previous_failed_attempt: serializeAttempt(availability.previousFailedAttempt),
+        can_start_new_attempt: false,
         poll_after_ms: MARKETING_POLL_INTERVAL_MS,
       })
     }
@@ -143,6 +164,8 @@ async function respondWithExistingAttempt(res, client, attempt, destination) {
     duplicate: true,
     destination,
     attempt: serializeAttempt(current),
+    previous_failed_attempt: null,
+    can_start_new_attempt: false,
     poll_after_ms: !TERMINAL_STATUS.has(current.provider_status)
       ? MARKETING_POLL_INTERVAL_MS
       : null,
@@ -373,6 +396,20 @@ function getAttemptByReferenceKey(client, referenceKey) {
     .select('*')
     .eq('reference_key', referenceKey)
     .maybeSingle()
+}
+
+function getNewAttemptAvailability(attempt) {
+  const previousFailedAttempt = isRetryableFailedAttempt(attempt) ? attempt : null
+  return {
+    canStartNewAttempt: !attempt || Boolean(previousFailedAttempt),
+    previousFailedAttempt,
+  }
+}
+
+function isRetryableFailedAttempt(attempt) {
+  return attempt?.provider_status === 'error'
+    && !optionalText(attempt.provider_post_id)
+    && !optionalText(attempt.provider_permalink)
 }
 
 function updateAttempt(client, id, values) {

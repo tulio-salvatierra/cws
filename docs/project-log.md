@@ -1740,3 +1740,28 @@ Deploy the correction, then decide explicitly whether to retain the immutable
 failed attempt as audit history or authorize a new owner-confirmed publish
 attempt. Do not use the old Confirm flow for the existing failed record; its
 duplicate guard intentionally prevents a second provider create call.
+
+## 2026-09-07 — CWS-MARKETING-M2 authorized new-attempt path
+
+Agent: Codex
+Status: Ready to deploy; no provider action taken
+
+The owner authorized a new attempt while preserving the failed row exactly as
+audit history. No schema change is needed: each attempt already has its own
+immutable reference key and durable row. The server now permits a fresh key
+only when the latest attempt is terminal `error` and has neither a provider
+post ID nor a permalink. It rejects fresh attempts after an active, posted, or
+provider-created attempt, while an identical reference key still returns its
+original attempt without another upload or create-post call.
+
+The Marketing page now separates “Previous failed attempt preserved” from
+“New attempt ready for owner confirmation.” The caption remains editable and
+the owner must click “Confirm new attempt” to generate a fresh browser UUID;
+there is no automatic retry, deletion, provider call, Campaign, Variant,
+Approval, n8n, or legacy-path change. The previous provider error remains
+visible before confirmation.
+
+All 35 Vitest files (131 tests), lint (no errors; existing `useDrafts`
+warning), import-casing validation, production build, and diff validation pass.
+The new focused tests prove that the old row is unchanged, the fresh reference
+key differs, and an attempt with provider evidence cannot be retried.

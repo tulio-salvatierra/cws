@@ -14,6 +14,7 @@ describe('MarketingPage', () => {
       json: vi.fn().mockResolvedValue({
         destination: { ready: true, channel_name: 'Cicero Web Studio' },
         attempt: null,
+        can_start_new_attempt: true,
       }),
     })
   })
@@ -40,13 +41,18 @@ describe('MarketingPage', () => {
     globalThis.fetch
       .mockResolvedValueOnce({
         ok: true,
-        json: vi.fn().mockResolvedValue({ destination: { ready: true, channel_name: 'Cicero Web Studio' }, attempt: null }),
+        json: vi.fn().mockResolvedValue({
+          destination: { ready: true, channel_name: 'Cicero Web Studio' },
+          attempt: null,
+          can_start_new_attempt: true,
+        }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: vi.fn().mockResolvedValue({
           destination: { ready: true, channel_name: 'Cicero Web Studio' },
           attempt: { provider_status: 'processing', provider_error: null, provider_permalink: null },
+          can_start_new_attempt: false,
         }),
       })
 
@@ -61,5 +67,47 @@ describe('MarketingPage', () => {
       caption: 'Clear strategy. Thoughtful design. Websites built to move your business forward.',
       reference_key: expect.stringMatching(/^cws-marketing-linkedin:/),
     })
+  })
+
+  it('keeps a failed pre-post attempt visible while enabling a fresh owner-confirmed attempt', async () => {
+    const previousReferenceKey = 'cws-marketing-linkedin:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    globalThis.fetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: vi.fn().mockResolvedValue({
+          destination: { ready: true, channel_name: 'Cicero Web Studio' },
+          attempt: null,
+          previous_failed_attempt: {
+            reference_key: previousReferenceKey,
+            provider_status: 'error',
+            provider_error: 'bundle.social did not return an upload ID.',
+          },
+          can_start_new_attempt: true,
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: vi.fn().mockResolvedValue({
+          destination: { ready: true, channel_name: 'Cicero Web Studio' },
+          attempt: { provider_status: 'processing', provider_error: null, provider_permalink: null },
+          previous_failed_attempt: { reference_key: previousReferenceKey, provider_status: 'error' },
+          can_start_new_attempt: false,
+        }),
+      })
+
+    render(<MarketingPage />)
+
+    await waitFor(() => expect(screen.getByText('Previous failed attempt preserved')).toBeInTheDocument())
+    expect(screen.getByText('New attempt ready for owner confirmation')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Confirm new attempt' })).toBeEnabled()
+    expect(screen.getByLabelText('Caption')).toBeEnabled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm new attempt' }))
+
+    await waitFor(() => expect(screen.getByText('Provider status: processing')).toBeInTheDocument())
+    const [, options] = globalThis.fetch.mock.calls[1]
+    const requestBody = JSON.parse(options.body)
+    expect(requestBody.reference_key).toMatch(/^cws-marketing-linkedin:/)
+    expect(requestBody.reference_key).not.toBe(previousReferenceKey)
   })
 })

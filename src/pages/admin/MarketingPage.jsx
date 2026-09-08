@@ -7,7 +7,14 @@ const TERMINAL_STATUSES = new Set(['posted', 'error'])
 
 export default function MarketingPage() {
   const [caption, setCaption] = useState(INITIAL_CAPTION)
-  const [state, setState] = useState({ loading: true, destination: null, attempt: null, error: '' })
+  const [state, setState] = useState({
+    loading: true,
+    destination: null,
+    attempt: null,
+    previousFailedAttempt: null,
+    canStartNewAttempt: false,
+    error: '',
+  })
   const [confirming, setConfirming] = useState(false)
   const referenceKeyRef = useRef('')
   const { session } = useAuth()
@@ -19,7 +26,14 @@ export default function MarketingPage() {
       const response = await requestMarketing('/api/marketing-linkedin', session.access_token)
       const body = await readJson(response)
       if (!response.ok) throw new Error(body.error || 'Marketing destination could not be verified.')
-      setState({ loading: false, destination: body.destination, attempt: body.attempt, error: '' })
+      setState({
+        loading: false,
+        destination: body.destination,
+        attempt: body.attempt,
+        previousFailedAttempt: body.previous_failed_attempt || null,
+        canStartNewAttempt: body.can_start_new_attempt === true,
+        error: '',
+      })
     } catch (error) {
       setState(current => ({ ...current, loading: false, destination: null, error: error.message || 'Marketing destination could not be verified.' }))
     }
@@ -52,7 +66,14 @@ export default function MarketingPage() {
         setState(current => ({ ...current, attempt: body.attempt || current.attempt, error: body.error || 'The post could not be started.' }))
         return
       }
-      setState({ loading: false, destination: body.destination, attempt: body.attempt, error: '' })
+      setState(current => ({
+        loading: false,
+        destination: body.destination,
+        attempt: body.attempt,
+        previousFailedAttempt: body.previous_failed_attempt || current.previousFailedAttempt,
+        canStartNewAttempt: body.can_start_new_attempt === true,
+        error: '',
+      }))
     } catch (error) {
       setState(current => ({ ...current, error: error.message || 'The post could not be started.' }))
     } finally {
@@ -119,6 +140,15 @@ export default function MarketingPage() {
               </p>
             </div>
 
+            {state.previousFailedAttempt && !state.attempt && (
+              <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm" role="status">
+                <p className="font-medium text-amber-100">Previous failed attempt preserved</p>
+                <p className="mt-1 text-amber-100/80">{state.previousFailedAttempt.provider_error || 'The previous attempt ended before a provider post was created.'}</p>
+                <p className="mt-3 font-medium text-emerald-100">New attempt ready for owner confirmation</p>
+                <p className="mt-1 text-xs leading-5 text-emerald-100/75">Confirm will create a fresh, separately tracked attempt. The previous error remains audit history.</p>
+              </div>
+            )}
+
             <button
               type="button"
               disabled={confirmDisabled}
@@ -126,10 +156,12 @@ export default function MarketingPage() {
               aria-describedby="confirm-note"
               className="mt-6 w-full rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-45"
             >
-              {confirming ? 'Starting post…' : state.attempt?.provider_status === 'posted' ? 'Post published' : state.attempt?.provider_status === 'error' ? 'Post needs attention' : state.attempt ? 'Post in progress' : 'Confirm'}
+              {confirming ? 'Starting post…' : state.attempt?.provider_status === 'posted' ? 'Post published' : state.attempt?.provider_status === 'error' ? 'Post needs attention' : state.attempt ? 'Post in progress' : state.previousFailedAttempt ? 'Confirm new attempt' : 'Confirm'}
             </button>
             <p id="confirm-note" className="mt-2 text-center text-xs text-gray-500">
-              {isTerminal
+              {state.previousFailedAttempt && !state.attempt
+                ? 'Confirm is the human authorization for a new attempt. It does not overwrite or retry the previous record.'
+                : state.attempt && TERMINAL_STATUSES.has(state.attempt.provider_status)
                 ? 'This controlled M2 post is complete. Creating another post is intentionally unavailable here.'
                 : 'Confirm is the human authorization. The server re-checks the Company Page before it uploads or publishes.'}
             </p>
@@ -172,6 +204,7 @@ function canConfirm(state, caption) {
   return Boolean(
     state.destination?.ready
     && !state.attempt
+    && state.canStartNewAttempt
     && caption.trim()
     && caption.trim().length <= 3000,
   )

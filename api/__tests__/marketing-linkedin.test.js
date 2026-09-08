@@ -117,6 +117,18 @@ const connectedCompanyPage = {
   channels: [],
 }
 
+const failedBeforeProviderPost = {
+  id: 'failed-attempt-1',
+  reference_key: 'cws-marketing-linkedin:aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+  caption: 'A clear CWS message.',
+  asset_path: '/images/logo.png',
+  provider_status: 'error',
+  provider_post_id: null,
+  provider_permalink: null,
+  provider_error: 'bundle.social did not return an upload ID.',
+  created_at: '2026-09-07T00:00:00.000Z',
+}
+
 describe('marketing LinkedIn endpoint', () => {
   beforeEach(() => {
     process.env.GENERATION_SUPABASE_URL = 'https://project.supabase.co'
@@ -151,12 +163,33 @@ describe('marketing LinkedIn endpoint', () => {
       name: 'LinkedIn — Cicero Web Studio Company Page',
       channel_name: 'Cicero Web Studio',
     })
+    expect(response.body.can_start_new_attempt).toBe(true)
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
     expect(globalThis.fetch).toHaveBeenCalledWith(
       'https://api.bundle.social/api/v1/social-account/by-type?type=LINKEDIN&teamId=team-1',
       expect.objectContaining({ headers: expect.objectContaining({ 'x-api-key': 'bundle-key' }) }),
     )
     expect(database.state.inserts).toEqual([])
+  })
+
+  it('preserves a failed pre-post attempt and marks a new attempt ready for owner confirmation', async () => {
+    const database = createDatabase({ currentAttempt: failedBeforeProviderPost })
+    createClientMock.mockReturnValue(database.client)
+    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
+
+    const response = makeResponse()
+    await handler(request(), response)
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body.attempt).toBeNull()
+    expect(response.body.previous_failed_attempt).toMatchObject({
+      id: failedBeforeProviderPost.id,
+      reference_key: failedBeforeProviderPost.reference_key,
+      provider_status: 'error',
+    })
+    expect(response.body.can_start_new_attempt).toBe(true)
+    expect(database.state.inserts).toEqual([])
+    expect(database.state.updates).toEqual([])
   })
 
   it('blocks publishing when the selected LinkedIn profile is personal even if the Company Page is available', async () => {
@@ -217,6 +250,59 @@ describe('marketing LinkedIn endpoint', () => {
       socialAccountTypes: ['LINKEDIN'],
       data: { LINKEDIN: { text: 'A clear CWS message.', uploadIds: ['upload-1'] } },
     })
+  })
+
+  it('creates a fresh attempt after a failed attempt that never received a provider post or permalink', async () => {
+    const database = createDatabase({ currentAttempt: failedBeforeProviderPost })
+    createClientMock.mockReturnValue(database.client)
+    readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
+    globalThis.fetch
+      .mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
+      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-2' }))
+      .mockResolvedValueOnce(providerResponse(200, { id: 'provider-post-2', status: 'PROCESSING', externalData: {} }))
+
+    const response = makeResponse()
+    await handler(request({
+      method: 'POST',
+      body: {
+        caption: 'A clear CWS message.',
+        reference_key: 'cws-marketing-linkedin:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      },
+    }), response)
+
+    expect(response.statusCode).toBe(202)
+    expect(response.body.previous_failed_attempt).toMatchObject({ id: failedBeforeProviderPost.id })
+    expect(database.state.inserts).toEqual([expect.objectContaining({
+      reference_key: 'cws-marketing-linkedin:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    })])
+    expect(failedBeforeProviderPost).toMatchObject({
+      provider_status: 'error',
+      provider_post_id: null,
+      provider_permalink: null,
+    })
+  })
+
+  it('blocks a fresh attempt when the previous attempt has a provider post', async () => {
+    const database = createDatabase({
+      currentAttempt: { ...failedBeforeProviderPost, provider_post_id: 'provider-post-previous' },
+    })
+    createClientMock.mockReturnValue(database.client)
+    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
+
+    const response = makeResponse()
+    await handler(request({
+      method: 'POST',
+      body: {
+        caption: 'A clear CWS message.',
+        reference_key: 'cws-marketing-linkedin:cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+      },
+    }), response)
+
+    expect(response.statusCode).toBe(409)
+    expect(response.body.can_start_new_attempt).toBe(false)
+    expect(database.state.inserts).toEqual([])
+    expect(readFile).not.toHaveBeenCalled()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
   })
 
   it('treats a repeated reference key as the same attempt without uploading or creating another post', async () => {

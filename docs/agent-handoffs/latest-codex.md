@@ -57,12 +57,18 @@ Latest upload-contract finding:
 - The official `POST /api/v1/upload/` response is an upload record with an `id`, not an `uploadId`. The owner-authorized attempt therefore uploaded media successfully but stopped before `POST /post`; no provider post ID or permalink exists.
 - The current scoped correction reads the upload record `id`, targets the documented trailing-slash upload route, and updates provider mocks accordingly. It passes all 35 Vitest files (127 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, and the production build. It does not retry, delete, or publish the retained failed attempt.
 
+Authorized retry implementation:
+- The failed `marketing_publish_attempts` row remains immutable audit history. No migration or update to that row is needed.
+- A fresh attempt is accepted only if the latest row is terminal `error` with no provider post ID and no permalink. The server rejects a fresh attempt after a nonterminal, posted, or provider-created row, while matching reference keys retain their existing per-attempt duplicate behavior.
+- `GET /api/marketing-linkedin` now returns the preserved failure separately from a new-attempt readiness flag. The Marketing page renders both states distinctly and generates a fresh UUID only when the owner clicks “Confirm new attempt.” There is no automatic retry or provider request during page load.
+- All 35 Vitest files (131 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, production build, and diff validation pass. New tests prove the preserved row is unchanged, the new key is fresh, and provider-evidenced rows cannot be retried.
+
 Known limitations:
-- The failed owner-authorized upload attempt is intentionally immutable. A new real post requires explicit owner direction after the corrected deployment; no automatic retry is permitted.
+- The retry path must be deployed and visually verified before the owner clicks the new Confirm control.
 - The persisted attempt confirms the Production table supports this route's reads and writes, although its migration history was not independently listed.
 
 Recommended next step:
-- Keep the retained failed attempt as audit history unless Tulio explicitly authorizes a new owner-confirmed attempt. Do not create another provider post until the explicit retry decision is made.
+- Deploy the authorized retry path. Reopen `/admin/marketing` and verify that it displays both the preserved failure and “New attempt ready for owner confirmation.” Only then may Tulio click “Confirm new attempt.”
 
 Permanent decisions added:
 - None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.
