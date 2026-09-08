@@ -64,11 +64,11 @@ Authorized retry implementation:
 - All 35 Vitest files (131 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, production build, and diff validation pass. New tests prove the preserved row is unchanged, the new key is fresh, and provider-evidenced rows cannot be retried.
 
 Known limitations:
-- The retry path must be deployed and visually verified before the owner clicks the new Confirm control.
+- The next provider operation is intentionally gated behind the owner clicking “Confirm new attempt.”
 - The persisted attempt confirms the Production table supports this route's reads and writes, although its migration history was not independently listed.
 
 Recommended next step:
-- Deploy the authorized retry path. Reopen `/admin/marketing` and verify that it displays both the preserved failure and “New attempt ready for owner confirmation.” Only then may Tulio click “Confirm new attempt.”
+- On `/admin/marketing`, Tulio may click “Confirm new attempt” to create the fresh durable attempt. The Production page has been visually verified to show the preserved failure and the distinct enabled control.
 
 Permanent decisions added:
 - None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.

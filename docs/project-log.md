@@ -1744,7 +1744,7 @@ duplicate guard intentionally prevents a second provider create call.
 ## 2026-09-07 — CWS-MARKETING-M2 authorized new-attempt path
 
 Agent: Codex
-Status: Ready to deploy; no provider action taken
+Status: Production deployed and verified; awaiting owner Confirm
 
 The owner authorized a new attempt while preserving the failed row exactly as
 audit history. No schema change is needed: each attempt already has its own
@@ -1765,3 +1765,9 @@ All 35 Vitest files (131 tests), lint (no errors; existing `useDrafts`
 warning), import-casing validation, production build, and diff validation pass.
 The new focused tests prove that the old row is unchanged, the fresh reference
 key differs, and an attempt with provider evidence cannot be retried.
+
+Commit `778c0db` is deployed in Production as
+`cws-8izo698jh-t00lio-s-team.vercel.app`. An authenticated visual verification
+shows the preserved failure, the distinct new-attempt readiness message, and an
+enabled “Confirm new attempt” button. No Confirm click, upload, or post was
+made during this verification.
