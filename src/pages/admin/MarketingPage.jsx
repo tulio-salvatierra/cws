@@ -4,6 +4,32 @@ import { useAuth } from '../../Hooks/useAuth'
 const INITIAL_CAPTION = 'Clear strategy. Thoughtful design. Websites built to move your business forward.'
 const POLL_INTERVAL_MS = 30_000
 const TERMINAL_STATUSES = new Set(['posted', 'error'])
+const STATUS_DETAILS = {
+  preparing: {
+    label: 'Preparing',
+    detail: 'Preparing the publishing request.',
+  },
+  scheduled: {
+    label: 'Scheduled',
+    detail: 'bundle.social has accepted the post for delivery.',
+  },
+  processing: {
+    label: 'Processing',
+    detail: 'bundle.social is delivering the post to LinkedIn.',
+  },
+  retrying: {
+    label: 'Retrying',
+    detail: 'bundle.social is retrying delivery.',
+  },
+  posted: {
+    label: 'Posted',
+    detail: 'Published on LinkedIn. This attempt is complete.',
+  },
+  error: {
+    label: 'Error',
+    detail: 'This attempt ended with an error and remains preserved as history.',
+  },
+}
 
 export default function MarketingPage() {
   const [caption, setCaption] = useState(INITIAL_CAPTION)
@@ -12,6 +38,7 @@ export default function MarketingPage() {
     destination: null,
     attempt: null,
     previousFailedAttempt: null,
+    attemptHistory: [],
     canStartNewAttempt: false,
     error: '',
   })
@@ -31,6 +58,7 @@ export default function MarketingPage() {
         destination: body.destination,
         attempt: body.attempt,
         previousFailedAttempt: body.previous_failed_attempt || null,
+        attemptHistory: body.attempt_history || [],
         canStartNewAttempt: body.can_start_new_attempt === true,
         error: '',
       })
@@ -71,6 +99,7 @@ export default function MarketingPage() {
         destination: body.destination,
         attempt: body.attempt,
         previousFailedAttempt: body.previous_failed_attempt || current.previousFailedAttempt,
+        attemptHistory: body.attempt_history || mergeAttemptHistory(current.attemptHistory, body.previous_failed_attempt || current.previousFailedAttempt),
         canStartNewAttempt: body.can_start_new_attempt === true,
         error: '',
       }))
@@ -168,11 +197,30 @@ export default function MarketingPage() {
             {state.error && <p role="alert" className="mt-3 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-sm text-rose-200">{state.error}</p>}
             {state.attempt && (
               <div className="mt-4 rounded-xl border border-gray-800 bg-gray-950/60 p-4 text-sm">
-                <p className="font-medium capitalize text-white">Provider status: {state.attempt.provider_status}</p>
+                <p className="font-medium text-white">Provider status: {statusDetail(state.attempt.provider_status).label}</p>
+                <p className="mt-1 text-gray-400">{statusDetail(state.attempt.provider_status).detail}</p>
                 {state.attempt.provider_error && <p className="mt-2 text-rose-300">{state.attempt.provider_error}</p>}
                 {state.attempt.provider_permalink && <a className="mt-2 inline-block text-indigo-300 hover:text-indigo-200" href={state.attempt.provider_permalink} target="_blank" rel="noreferrer">Open LinkedIn post →</a>}
-                {!isTerminal && <p className="mt-2 text-xs text-gray-500">Checking bundle.social again every 30 seconds while this page stays open.</p>}
+                {!isTerminal && <p className="mt-2 text-xs text-gray-500">Checking bundle.social again every 30 seconds while this page stays open. Reopening this page also reconciles a non-terminal attempt.</p>}
               </div>
+            )}
+
+            {state.attemptHistory.length > 0 && (
+              <section aria-labelledby="marketing-history-heading" className="mt-4 rounded-xl border border-gray-800 bg-gray-950/40 p-4 text-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">History</p>
+                <h3 id="marketing-history-heading" className="mt-2 font-medium text-white">Previous attempts</h3>
+                <div className="mt-3 space-y-3">
+                  {state.attemptHistory.map(attempt => (
+                    <div key={attempt.id || attempt.reference_key} className="rounded-lg border border-gray-800 bg-gray-950/60 p-3">
+                      <p className="font-medium text-white">Provider status: {statusDetail(attempt.provider_status).label}</p>
+                      <p className="mt-1 text-xs leading-5 text-gray-500">{statusDetail(attempt.provider_status).detail}</p>
+                      {attempt.provider_error && <p className="mt-2 text-amber-200">{attempt.provider_error}</p>}
+                      {attempt.provider_permalink && <a className="mt-2 inline-block text-indigo-300 hover:text-indigo-200" href={attempt.provider_permalink} target="_blank" rel="noreferrer">Open LinkedIn post →</a>}
+                      <p className="mt-2 text-xs text-gray-500">Preserved as audit history.</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
           </section>
 
@@ -208,6 +256,16 @@ function canConfirm(state, caption) {
     && caption.trim()
     && caption.trim().length <= 3000,
   )
+}
+
+function statusDetail(status) {
+  return STATUS_DETAILS[status] || STATUS_DETAILS.processing
+}
+
+function mergeAttemptHistory(history, previousAttempt) {
+  if (!previousAttempt) return history
+  if (history.some(attempt => attempt.id === previousAttempt.id || attempt.reference_key === previousAttempt.reference_key)) return history
+  return [previousAttempt, ...history]
 }
 
 function requestMarketing(path, accessToken, body) {

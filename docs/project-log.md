@@ -1787,3 +1787,30 @@ provider returned the LinkedIn permalink:
 The Marketing page now displays Posted and locks the caption and action button.
 No Campaign, Variant, Approval, n8n, scheduler, webhook, or legacy publishing
 path was used.
+
+## 2026-09-07 — CWS-MARKETING-M3 durable LinkedIn result
+
+Agent: Codex
+Status: Complete locally; deployment follows normal GitHub credential recovery
+
+M3 makes the completed M2 result durable on the authenticated Marketing page.
+`GET /api/marketing-linkedin` continues to load the latest attempt from the
+server-only persistence table, reconciles it with bundle.social only while it
+is non-terminal, and now returns up to ten earlier attempts as read-only
+history. A terminal Posted result is returned directly from persistence, so a
+reload displays the final LinkedIn result and permalink without relying on a
+browser tab that remained open.
+
+The page maps the provider states Preparing, Scheduled, Processing, Retrying,
+Posted, and Error to distinct owner-facing labels and explanations. Posted is
+explicitly complete, retains its LinkedIn permalink, locks the caption, and
+keeps its action disabled. The original upload-contract failure appears under
+Previous attempts with its retained provider error and an audit-history label.
+No database migration, provider create/upload call, or new social post was
+made in M3.
+
+All 35 Vitest files (133 tests), lint (no errors; the existing `useDrafts`
+warning remains), import-casing validation, production build, and diff
+validation pass. The new API and UI regression tests prove reload rendering of
+the Posted result, permalink, preserved failed history, and absence of an
+available Confirm action.

@@ -60,7 +60,7 @@ describe('MarketingPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled())
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
 
-    await waitFor(() => expect(screen.getByText('Provider status: processing')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Provider status: Processing')).toBeInTheDocument())
     const [, options] = globalThis.fetch.mock.calls[1]
     expect(options).toMatchObject({ method: 'POST' })
     expect(JSON.parse(options.body)).toMatchObject({
@@ -104,10 +104,47 @@ describe('MarketingPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Confirm new attempt' }))
 
-    await waitFor(() => expect(screen.getByText('Provider status: processing')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Provider status: Processing')).toBeInTheDocument())
     const [, options] = globalThis.fetch.mock.calls[1]
     const requestBody = JSON.parse(options.body)
     expect(requestBody.reference_key).toMatch(/^cws-marketing-linkedin:/)
     expect(requestBody.reference_key).not.toBe(previousReferenceKey)
+  })
+
+  it('shows a persisted posted result and preserved failed history after reload without offering Confirm', async () => {
+    globalThis.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        destination: { ready: true, channel_name: 'Cicero Web Studio' },
+        attempt: {
+          id: 'posted-attempt-1',
+          provider_status: 'posted',
+          provider_permalink: 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832',
+          provider_error: null,
+        },
+        attempt_history: [{
+          id: 'failed-attempt-1',
+          provider_status: 'error',
+          provider_error: 'bundle.social did not return an upload ID.',
+          provider_permalink: null,
+        }],
+        can_start_new_attempt: false,
+      }),
+    })
+
+    render(<MarketingPage />)
+
+    await waitFor(() => expect(screen.getByText('Provider status: Posted')).toBeInTheDocument())
+    expect(screen.getByText('Published on LinkedIn. This attempt is complete.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open LinkedIn post →' })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832',
+    )
+    expect(screen.getByRole('heading', { name: 'Previous attempts' })).toBeInTheDocument()
+    expect(screen.getAllByText('Provider status: Error')).toHaveLength(1)
+    expect(screen.getByText('bundle.social did not return an upload ID.')).toBeInTheDocument()
+    expect(screen.getByText('Preserved as audit history.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Post published' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: /Confirm/ })).not.toBeInTheDocument()
   })
 })

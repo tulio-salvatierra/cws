@@ -51,6 +51,9 @@ async function getMarketingStatus(res, client, context, destination) {
     attempt = refreshed.data
   }
 
+  const history = await getAttemptHistory(client, context.workspaceId, attempt?.id)
+  if (history.error) return databaseFailure(res, history.error)
+
   const availability = getNewAttemptAvailability(attempt)
 
   return res.status(200).json({
@@ -58,6 +61,7 @@ async function getMarketingStatus(res, client, context, destination) {
     destination,
     attempt: serializeAttempt(availability.previousFailedAttempt ? null : attempt),
     previous_failed_attempt: serializeAttempt(availability.previousFailedAttempt),
+    attempt_history: history.data.map(serializeAttempt),
     can_start_new_attempt: availability.canStartNewAttempt,
     poll_after_ms: attempt && !TERMINAL_STATUS.has(attempt.provider_status)
       ? MARKETING_POLL_INTERVAL_MS
@@ -388,6 +392,21 @@ function getLatestAttempt(client, workspaceId) {
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
+}
+
+async function getAttemptHistory(client, workspaceId, currentAttemptId) {
+  const records = await client
+    .from('marketing_publish_attempts')
+    .select('*')
+    .eq('workspace_id', workspaceId)
+    .order('created_at', { ascending: false })
+    .limit(10)
+
+  if (records.error) return { data: null, error: records.error }
+  return {
+    data: (records.data || []).filter(attempt => attempt.id !== currentAttemptId),
+    error: null,
+  }
 }
 
 function getAttemptByReferenceKey(client, referenceKey) {

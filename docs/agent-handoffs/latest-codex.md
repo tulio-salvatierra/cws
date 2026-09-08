@@ -1,85 +1,32 @@
-Task ID: CWS-MARKETING-M2
+Task ID: CWS-MARKETING-M3
 Agent: Codex
-Objective: Deliver the smallest isolated, owner-confirmed path for one CWS LinkedIn post through bundle.social, without extending legacy Content Operations.
-
-Files inspected:
-- The frozen M1/M2 tickets, Task 001/M0 documentation, current admin auth and API patterns, legacy publish route, Vercel configuration, database conventions, and the existing CWS logo asset
-- Official bundle.social account, upload, post, reference-key, and status documentation
+Objective: Make the completed one-post Marketing V1 experiment durable across reloads without extending the frozen M2 scope.
 
 Files changed:
 - `api/marketing-linkedin.js`
 - `api/__tests__/marketing-linkedin.test.js`
 - `src/pages/admin/MarketingPage.jsx`
 - `src/pages/admin/__tests__/MarketingPage.test.jsx`
-- `src/App.jsx`
-- `src/components/admin/AdminLayout.jsx`
-- `src/components/admin/__tests__/AdminLayout.test.jsx`
-- `supabase/migrations/20260907163842_marketing_publish_attempts.sql`
-- `supabase/tests/marketing_publish_attempts_test.sql`
-- `vercel.json`
-- `docs/agent-handoffs/latest-codex.md`
 - `docs/project-log.md`
 - `docs/task-ledger.md`
+- `docs/agent-handoffs/latest-codex.md`
 
-Database and API changes:
-- Added the standalone `marketing_publish_attempts` migration. It stores the immutable owner/workspace/reference/caption/asset/destination identity plus upload ID, provider post ID, status, error, permalink, and provider response data. The table has no browser-role grants or RLS policies; only the server service role can use it.
-- Added authenticated `GET`/`POST /api/marketing-linkedin`. It requires a valid session and active workspace owner, performs the read-only bundle.social Company Page verification before every post attempt, uploads only `public/images/logo.png`, sends only the LinkedIn request shape, and polls provider status while the page is open.
-- The function includes the exact public logo file in its Vercel bundle. Provider credentials remain server-side environment variables and no `VITE_*` provider value was added.
+Implementation:
+- The authenticated owner `GET /api/marketing-linkedin` still reads the latest `marketing_publish_attempts` row from server-only persistence. A non-terminal latest attempt is reconciled with bundle.social on that GET; a terminal Posted or Error row is rendered directly from persistence.
+- The GET response now includes up to ten earlier attempts as `attempt_history`, excluding the current attempt. This is a read-only query; no migration, RLS change, or write path was added.
+- The page makes Preparing, Scheduled, Processing, Retrying, Posted, and Error distinct. A Posted result states that it is complete, exposes the persisted LinkedIn permalink, locks the caption, and leaves no active Confirm action.
+- Historical failed records remain visible with the retained provider error and an explicit audit-history label. The original upload-contract failure is never overwritten or retried by M3.
 
-Safety and duplicate protection:
-- Confirm creates one UUID-backed `reference_key`; the UI locks after an attempt is created.
-- The endpoint writes the durable intent before provider side effects and the database enforces a unique reference key.
-- A repeated request returns the existing attempt without uploading or creating another post. If create-post has an ambiguous timeout/failure, the endpoint looks up the same reference key and never replays create-post.
-- No real provider upload or social post was made by this task. The API uses the provider-required near-immediate scheduled timestamp internally, but exposes no scheduling control or scheduler.
-
-Tests and verification:
-- `npm run test:run` — 35 files and 127 tests passed. The provider tests mock every provider call and never contact bundle.social.
-- `npm run lint` — no errors; the pre-existing `src/Hooks/useDrafts.js` exhaustive-deps warning remains.
-- `npm run build` — import-casing validation and Vite production build passed. Existing lottie `eval` and large-chunk warnings remain.
+Verification:
+- `npm run test:run` — 35 files, 133 tests passed. Provider requests are mocked; tests create no real post.
+- `npm run lint` — no errors; the existing `src/Hooks/useDrafts.js` exhaustive-deps warning remains.
+- `npm run build` — import-casing validation and Vite production build passed. Existing Lottie `eval` and large-chunk warnings remain.
 - `git diff --check` — passed.
-- `npx supabase test db` could not run because local Postgres is not running. The migration has not been applied or checked against a managed database: the linked migration-list request repeatedly timed out, and the available Supabase project is inactive and was not proven to be the Production database.
 
-Live provider verification status:
-- The former `GET /api/v1/social-account?teamId=…` provider request returned `404 Cannot GET` at the correct `https://api.bundle.social` host. The current public OpenAPI exposes the supported, read-only `GET /api/v1/social-account/by-type?type=LINKEDIN&teamId=…` route instead.
-- Commit `2f86f98` replaces only that server-side lookup and its response shape. Vercel Production deployment `dpl_HBqkqFVBmHJSU6EXESbpuoHsHei5` is Ready. The new test asserts the complete provider URL and the server-side `x-api-key` header; it does not expose a real credential.
-- Screenshot evidence shows the intended LinkedIn connection is “Cicero Web Studio” with `cicero-web-studio`. Commit `ea5e9e1`, deployed as `dpl_8wDfWdX8p7aNLUiyFeRF6RF79mFW`, recognizes that identifier in a selected channel plus all documented top-level account/user identity fields.
-- Vercel's local Production environment pull supplied empty secret values to this execution environment. A direct read-only provider lookup therefore returned 401 and was not used to infer anything about Vercel runtime configuration. The temporary credentials file was deleted.
-- An authenticated owner re-ran Production `/admin/marketing` after the identity-field update. It still returned “Not ready: The bundle.social team does not have the selected Cicero Web Studio LinkedIn Company Page.” Confirm remained disabled; no upload or post was made.
-- Because the screenshot identifier matches every supported field, the Production API key/team configuration does not resolve to the dashboard team in the screenshot (or the key cannot access that team). The request remains strictly `type=LINKEDIN` and the fail-closed matcher does not expose a nonmatching account name to the browser.
+Safety boundary:
+- No bundle.social upload, create-post call, provider mutation, or real LinkedIn post occurred in M3.
+- No Instagram, Facebook, scheduling UI, webhook, notification, AI, asset-library, Campaign, Variant, Approval, Export, n8n, generic-event, CEO, or legacy Marketing change was added.
+- Authority remains PREPARE -> owner CONFIRM -> automatic result reconciliation.
 
-Latest Production safety finding:
-- A read-only bundle.social check located the correct CWS team and confirms the provider's active LinkedIn integration is a personal profile. The Cicero Web Studio Company Page is available as a channel but is not the active destination.
-- The previous verifier incorrectly accepted an expected Company Page found anywhere in `channels`. The current scoped change accepts only the provider's active top-level account identity, so the page will return 409 and keep Confirm disabled until the Company Page is explicitly selected in bundle.social.
-- The new mocked regression case mirrors that provider response. All 35 Vitest files (127 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, and the production build pass. No provider mutation, upload, or social post was made.
-
-Latest upload-contract finding:
-- Production now reports the CWS Company Page as the active destination. It also reports one retained terminal error, “bundle.social did not return an upload ID.” The handler can only have created that attempt through an authenticated POST from Confirm; the GET preflight and polling paths do not create attempts.
-- The official `POST /api/v1/upload/` response is an upload record with an `id`, not an `uploadId`. The owner-authorized attempt therefore uploaded media successfully but stopped before `POST /post`; no provider post ID or permalink exists.
-- The current scoped correction reads the upload record `id`, targets the documented trailing-slash upload route, and updates provider mocks accordingly. It passes all 35 Vitest files (127 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, and the production build. It does not retry, delete, or publish the retained failed attempt.
-
-Authorized retry implementation:
-- The failed `marketing_publish_attempts` row remains immutable audit history. No migration or update to that row is needed.
-- A fresh attempt is accepted only if the latest row is terminal `error` with no provider post ID and no permalink. The server rejects a fresh attempt after a nonterminal, posted, or provider-created row, while matching reference keys retain their existing per-attempt duplicate behavior.
-- `GET /api/marketing-linkedin` now returns the preserved failure separately from a new-attempt readiness flag. The Marketing page renders both states distinctly and generates a fresh UUID only when the owner clicks “Confirm new attempt.” There is no automatic retry or provider request during page load.
-- All 35 Vitest files (131 tests), lint (no errors; existing `useDrafts` warning), import-casing validation, production build, and diff validation pass. New tests prove the preserved row is unchanged, the new key is fresh, and provider-evidenced rows cannot be retried.
-
-Published result:
-- Tulio explicitly authorized the fresh owner-confirmed attempt. The prior failed row was not modified.
-- bundle.social reported the new attempt as Scheduled, then Processing, then Posted. The provider permalink is `https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832`.
-- The protected Marketing page now shows Posted and disables the caption and action button. No other platform or legacy publishing path was used.
-
-Known limitations:
-- M2 is intentionally limited to the one completed LinkedIn Company Page post.
-- The persisted attempt confirms the Production table supports this route's reads and writes, although its migration history was not independently listed.
-
-Recommended next step:
-- Keep M2 isolated. Any additional destination, scheduler, webhook, or content-workflow change requires a new scoped task.
-
-Permanent decisions added:
-- None. The isolated M2 implementation is ticket-scoped and has not been elevated to a permanent architecture decision.
-
-Reusable learnings added:
-- None.
-
-Git summary:
-- M1 and M2 remain isolated from Campaigns, Channels, Variants, Approvals, Exports, n8n, webhooks, generic events, and the legacy Marketing publishing route. No old Marketing code was deleted.
+Git follow-up:
+- Existing local documentation commits remain unpushed because GitHub HTTPS credentials were previously unavailable. Reattempt a normal scoped push after credentials are restored; documentation delivery must not gate this completed application behavior.

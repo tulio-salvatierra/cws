@@ -33,7 +33,7 @@ function makeResponse() {
   return response
 }
 
-function createDatabase({ currentAttempt = null, existingAttempt = null } = {}) {
+function createDatabase({ currentAttempt = null, existingAttempt = null, attemptHistory = [] } = {}) {
   const state = { inserts: [], updates: [] }
   const workspaceResult = { data: { workspace_id: 'workspace-1', role: 'owner' }, error: null }
 
@@ -45,7 +45,10 @@ function createDatabase({ currentAttempt = null, existingAttempt = null } = {}) 
         return chain
       }),
       order: vi.fn(() => chain),
-      limit: vi.fn(() => chain),
+      limit: vi.fn(value => {
+        chain.limitValue = value
+        return chain
+      }),
       insert: vi.fn(values => {
         state.inserts.push(values)
         chain.operation = 'insert'
@@ -86,6 +89,9 @@ function createDatabase({ currentAttempt = null, existingAttempt = null } = {}) 
         }
         return Promise.resolve({ data: null, error: null })
       }),
+      then: (resolve, reject) => Promise.resolve(
+        chain.limitValue === 10 ? { data: attemptHistory, error: null } : result,
+      ).then(resolve, reject),
     }
     return chain
   }
@@ -190,6 +196,44 @@ describe('marketing LinkedIn endpoint', () => {
     expect(response.body.can_start_new_attempt).toBe(true)
     expect(database.state.inserts).toEqual([])
     expect(database.state.updates).toEqual([])
+  })
+
+  it('returns a persisted posted result with the earlier failed attempt as history after reload', async () => {
+    const postedAttempt = {
+      id: 'posted-attempt-1',
+      reference_key: 'cws-marketing-linkedin:dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+      caption: 'A clear CWS message.',
+      asset_path: '/images/logo.png',
+      provider_status: 'posted',
+      provider_post_id: 'provider-post-1',
+      provider_permalink: 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832',
+      provider_error: null,
+      created_at: '2026-09-07T01:00:00.000Z',
+    }
+    const database = createDatabase({
+      currentAttempt: postedAttempt,
+      attemptHistory: [postedAttempt, failedBeforeProviderPost],
+    })
+    createClientMock.mockReturnValue(database.client)
+    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, connectedCompanyPage))
+
+    const response = makeResponse()
+    await handler(request(), response)
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body.attempt).toMatchObject({
+      id: postedAttempt.id,
+      provider_status: 'posted',
+      provider_permalink: postedAttempt.provider_permalink,
+    })
+    expect(response.body.attempt_history).toEqual([expect.objectContaining({
+      id: failedBeforeProviderPost.id,
+      provider_status: 'error',
+      provider_error: failedBeforeProviderPost.provider_error,
+    })])
+    expect(response.body.can_start_new_attempt).toBe(false)
+    expect(database.state.updates).toEqual([])
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
   })
 
   it('blocks publishing when the selected LinkedIn profile is personal even if the Company Page is available', async () => {
