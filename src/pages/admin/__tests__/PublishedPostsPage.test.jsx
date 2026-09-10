@@ -41,7 +41,7 @@ function publishedPostsQuery(posts, updateResult) {
 describe('PublishedPostsPage', () => {
   beforeEach(() => fromMock.mockReset())
 
-  it('shows newest publish records in the content publish-log tab', async () => {
+  it('shows newest publish records without a legacy queue entry point', async () => {
     const posts = [{
       id: 'post-1',
       platform: 'youtube',
@@ -59,7 +59,7 @@ describe('PublishedPostsPage', () => {
     render(<PublishedPostsPage />)
 
     expect(await screen.findByText('youtube')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Publish log' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.queryByRole('link', { name: 'Legacy queue' })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('href', 'https://youtube.example/post-1')
   })
 

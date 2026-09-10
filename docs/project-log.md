@@ -1814,3 +1814,167 @@ warning remains), import-casing validation, production build, and diff
 validation pass. The new API and UI regression tests prove reload rendering of
 the Posted result, permalink, preserved failed history, and absence of an
 available Confirm action.
+
+## 2026-09-08 — CWS-MARKETING-M5 final closeout
+
+Agent: Codex
+Status: M5 COMPLETE — WEEKLY MARKETING LOOP VERIFIED
+
+The Production two-slot Marketing loop is accepted as complete. Post A and
+Post B each retain one durable M5 parent attempt and independent LinkedIn,
+Facebook, and Instagram Posted results. The earlier M2 failed attempt, the
+M2/M3 LinkedIn result, and the M4 multi-destination result remain preserved.
+
+During the initial M5 verification, Post B was published without the intended
+owner authorization. Production evidence establishes two distinct authenticated
+`POST /api/marketing-linkedin` requests 14 seconds apart. The available
+request evidence cannot establish the actor or UI trigger, so the root cause is
+recorded as UNDETERMINED; no further attribution is inferred.
+
+The permanent correction is a server-signed, 10-minute owner-confirmation
+capability bound to the authenticated owner, exact weekly slot, and exact
+asset. Only the earliest eligible slot receives a capability; one slot cannot
+authorize another. The UI requires a native owner confirmation, while the
+server remains the enforcing boundary. Existing unique-slot/reference-key
+duplicate protections remain in force, and GET, reload, preparation, and
+reconciliation paths cannot create provider posts.
+
+Verification completed with 141 passing tests, lint with zero errors (the
+existing unrelated `useDrafts` warning remains), and a passing production
+build. The Production safety deployment is Ready. An authenticated reload
+produced only a GET request and no new attempt, upload, provider post, or
+other external action.
+
+M5 is frozen. No M5 modification, publication, or M6 work is authorized by
+this closeout.
+
+## 2026-09-09 — CWS-MARKETING-M6 missed-slot handling
+
+Agent: Codex
+Status: M6 IMPLEMENTED — MISSED SLOT HANDLING VERIFIED
+
+M6 adds a Chicago-calendar-derived `Missed — decision required` state without
+creating provider work. Immutable Marketing-owned `move` and `skip` decisions
+retain the original occurrence, asset, edited caption, owner, and timestamp.
+Moving carries that same post to the next empty scheduled slot; skipping
+resolves only that occurrence. Neither action advances evergreen rotation or
+contacts bundle.social. Publish now remains the existing server-signed,
+owner/slot/asset-bound M5 confirmation path.
+
+Production migration `20260909034637_marketing_missed_slot_resolutions` is
+applied with RLS enabled, no browser grants or policies, and `SELECT, INSERT`
+only for the server role. Production deployment `dpl_GysP1QhrTC9nySWQnGaxVSTLyZ1c`
+is Ready. The authenticated Marketing page reloaded with both existing weekly
+posts locked and all three destinations verified; database counts remained five
+attempts, nine destination results, and zero M6 decisions. No upload, provider
+post, or new publish attempt was created during M6 verification.
+
+All 155 tests passed. Lint has zero errors with the pre-existing unrelated
+`useDrafts` warning; import-casing validation and the production build passed.
+
+## 2026-09-09 — CWS-N8N-RETIREMENT-DECISION
+
+Agent: Codex
+Status: N8N RETIRED — RUNTIME DEPENDENCY NONE
+
+Owner architectural decision: n8n is completely retired from CWS OS. There is
+no runtime dependency and no future compatibility requirement. CWS must not
+restore, replace, or maintain n8n adapters, endpoints, webhooks, environment
+configuration, or dormant workflow paths. Historical assessment and audit
+material remain documentation only.
+
+Application-side containment remains preserved. External n8n retirement is an
+owner action still to complete: deactivate every CWS workflow, schedule,
+trigger, and public webhook; optionally export definitions first, then archive
+or delete the workflows/workspace as appropriate. This decision does not claim
+that external deactivation has already occurred.
+
+No database schema, RLS policy, table, row, Marketing V1 record, provider
+configuration, or external publishing state changed. M7B database retirement
+is not authorized by this decision.
+
+## 2026-09-09 — CWS-SALES-S0 Resend safety and migration reconciliation
+
+Agent: Codex
+Status: Safety foundation applied; no email sent during implementation or verification
+
+The two unauthenticated Resend-capable legacy handlers,
+`/api/lead-outreach` and `/api/client-portal-notify`, had no legitimate
+Production consumer. Their only remaining client-portal caller used explicitly
+synthetic fixture data, so the handlers, their browser callers, and their local
+development proxy routes were retired rather than preserved as an unsafe
+compatibility path. Client Portal sheet-sync behavior remains, but it cannot
+send email.
+
+The current Marketing-line checkout did not contain the proven Resend
+bounce/complaint hardening from commit `90f02ba`; that commit is not an
+ancestor of this checkout. Its relevant signed-webhook behavior was restored
+without a blind cherry-pick. Bounces and complaints now persist on the
+outreach-send record, suppress subscriber-backed sends, and prevent the
+authenticated Sales lead sender from re-sending to a lead with a known bounce
+or complaint.
+
+Sales email preparation is now owner-only. A server-signed, ten-minute
+confirmation is bound to the authenticated owner, exact lead, recipient,
+template/send type, and SHA-256 hash of the reviewed subject/body. The send
+handler creates its durable `queued` row before calling Resend and uses a
+workspace-scoped stable idempotency key, so duplicate requests cannot create a
+second provider email. It records provider success or failure back on that row;
+if the final persistence step fails, it fails closed and requires reconciliation
+before any retry.
+
+Production migration history remains the authority. The managed project has
+the older foundational migration sequence plus later Marketing/M6 changes that
+do not map one-for-one to this checkout's starter files; do not repair or replay
+them with a broad CLI push. The forward-only S0 migration is recorded remotely
+as `20260909063617_sales_send_safety` (the managed apply operation assigned the
+remote timestamp) and locally as
+`20260909063339_sales_send_safety.sql`. It adds only nullable send metadata and
+a partial unique idempotency index; historical outreach rows remain untouched.
+
+Production deployment `cws-abz0k3ctx-t00lio-s-team.vercel.app` is Ready. Safe
+GET checks returned `404` for both retired public paths, `405` for the send
+handler, and `200` for the protected Leads route shell. No request with a
+mutation method was made. Before and after counts remain 16 outreach records,
+zero S0-keyed records, five Marketing publish attempts, and nine Marketing
+destination results. The authenticated visual check could not run because the
+local Mac session was locked; this is not evidence of a route or provider
+failure.
+
+## 2026-09-09 — CWS-SALES-S1 daily command queue
+
+Agent: Codex
+Status: S1 IMPLEMENTED — SALES COMMAND QUEUE VERIFIED
+
+Sales now has an authenticated `/admin/sales` command surface that presents
+only deterministic work in this exact order: inbound lead, promised action
+due, warm response, follow-up due, then new prospect. Items within a category
+are ordered by their oldest actionable date. The narrow Sales summary exposes
+warm responses, promised actions due, follow-ups due, and the remaining
+Chicago-business-day initial-prospect target for future read-only CEO use; no
+CEO page, score, generic task, or event system was added.
+
+The forward-only production migration is recorded as
+`20260909184839_sales_command_queue` (local source:
+`20260909184041_sales_command_queue.sql`). It adds conservative nullable
+Sales fields to `leads` and one workspace-scoped `sales_promised_actions`
+table. Browser access is denied by explicit RLS policy and grants; the server
+accesses it only after authenticated workspace/owner checks. Existing leads
+remain unclassified, all 16 outreach records remain intact, and no data was
+backfilled or invented.
+
+The Day 0/4/10 sequence is derived only from successful initial and follow-up
+send history. Initial prospect sends alone count toward the daily target;
+follow-ups, inbound sends, failures, drafts, and calls do not. Email
+preparation routes back into S0's exact owner/lead/recipient/send-type/draft
+confirmation and durable idempotent send path. Sales GET, reload, Not now,
+promise tracking, and call logging cannot call Resend.
+
+Production deployment `dpl_AnPTWRDVHyC6Q9D3UkMkc6QAXefA` is Ready at
+`https://www.cicerowebstudio.xyz`. An authenticated read-only check showed the
+new Sales page, two intentionally unclassified historical leads, no currently
+due queue items, and `0 / 5` new outreach. Database counts after that check
+remain two leads, zero promised actions, 16 outreach records, five Marketing
+attempts, and nine Marketing destination results. No email, upload, social
+post, or publication attempt was created. All 141 tests, lint, import-casing
+validation, production build, and diff validation pass.

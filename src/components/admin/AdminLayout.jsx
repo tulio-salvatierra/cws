@@ -3,7 +3,6 @@ import { useAuth } from '../../Hooks/useAuth'
 
 const NAV = [
   { to: '/admin', label: '◈ Overview', end: true },
-  { to: '/admin/legacy-queue', label: '📋 Legacy queue' },
   { to: '/admin/marketing', label: 'Marketing V1' },
   { to: '/admin/workspace', label: '🧭 Workspace' },
   { to: '/admin/channels', label: 'Channels' },
@@ -14,11 +13,9 @@ const NAV = [
   { to: '/admin/agent-runs', label: 'Agent runs' },
   { to: '/admin/clients', label: 'Clients' },
   { to: '/admin/leads', label: 'Leads' },
+  { to: '/admin/sales', label: 'Sales' },
   { to: '/admin/mailing-list', label: 'Mailing List' },
-  { to: '/admin/calendar', label: '📅 Calendar' },
   { to: '/admin/keywords', label: '🔑 Keywords' },
-  { to: '/admin/analytics', label: '📊 Analytics' },
-  { to: '/admin/settings', label: '⚙️ Settings' },
 ]
 
 export default function AdminLayout({ children }) {

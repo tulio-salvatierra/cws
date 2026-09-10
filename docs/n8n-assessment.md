@@ -1,5 +1,11 @@
 # CWS-N8N-ASSESS-006 — Live n8n Assessment
 
+> **Historical evidence only — superseded by DEC-030 (2026-09-09).** n8n is
+> retired from CWS OS. It has no runtime dependency and no future compatibility
+> requirement. Do not use this assessment to revive, reconfigure, or reconnect
+> n8n. The owner must still deactivate all external CWS workflows, schedules,
+> triggers, and public webhooks; definitions may be exported for archival first.
+
 Date: 2026-08-09
 Agent: Codex
 Mode: Read-only assessment

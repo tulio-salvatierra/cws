@@ -273,3 +273,31 @@ more capability above a storage or integration boundary, exercise that boundary
 in the real environment, verify error handling and idempotency, clean up the
 synthetic evidence, and leave a short repeatable command for the first real
 operation.
+
+## Bind an external mutation to the exact confirmed resource
+
+Date: 2026-09-08
+
+Verified by: CWS-MARKETING-M5
+
+An authenticated browser request alone does not prove that the user intended a
+specific external side effect. For a sequence of independently publishable
+resources, require the server to verify a short-lived confirmation capability
+bound to the authenticated principal and exact resource identity. Issue it only
+for the next eligible resource, retain a durable uniqueness constraint, and
+keep GET, reload, preparation, and reconciliation paths mutation-free. This
+contains an accidental or repeated UI request to one resource rather than
+letting it authorize a neighboring resource.
+
+## Derive time-based state; persist only the owner decision
+
+Date: 2026-09-09
+
+Verified by: CWS-MARKETING-M6
+
+For a time-based operational state, calculate the state from a centralized,
+injectable business-calendar clock and durable outcome data rather than writing
+rows just because time passed. Persist only an explicit human decision that
+cannot be reconstructed safely, with its original resource, carried data, and
+timestamp. This keeps reloads mutation-free, makes date-edge tests
+deterministic, and prevents a passive status view from becoming an automation.
