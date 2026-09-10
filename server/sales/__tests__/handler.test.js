@@ -57,7 +57,7 @@ vi.mock('../prospect-brief.js', () => ({
   prospectBriefConfiguration: mocks.prospectBriefConfiguration,
 }))
 
-import handler, { reserveAuthorizedDiscoveryRun } from '../handler.js'
+import handler, { prospectBriefExecutionContext, reserveAuthorizedDiscoveryRun } from '../handler.js'
 
 function response() {
   const res = { status: vi.fn(() => res), json: vi.fn(() => res) }
@@ -135,6 +135,7 @@ describe('Sales command endpoint', () => {
       .mockReturnValueOnce(query({ data: [], error: null }))
       .mockReturnValueOnce(query({ data: [], error: null }))
       .mockReturnValueOnce(query({ data: [], error: null }))
+      .mockReturnValueOnce(query({ data: [], error: null }))
       .mockReturnValueOnce(query({ data: [], error: null })) }
     mocks.authenticateWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a' })
     const res = response()
@@ -143,8 +144,64 @@ describe('Sales command endpoint', () => {
 
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ ok: true, summary: expect.objectContaining({ newProspectContactsRemaining: expect.any(Number) }) }))
+    expect(res.json.mock.calls[0][0].items[0]).not.toHaveProperty('prospect_brief_context')
     expect(mocks.sendResendEmail).not.toHaveBeenCalled()
     expect(mocks.discoverGooglePlaces).not.toHaveBeenCalled()
+  })
+
+  it('attaches a completed workspace-scoped Prospect Brief only to its converted lead', async () => {
+    const converted = query({ data: [{ workspace_id: 'workspace-a', converted_lead_id: 'lead-a', prospect_brief_run_id: 'brief-a' }], error: null })
+    const briefs = query({ data: [{
+      id: 'brief-a', workspace_id: 'workspace-a', agent_key: 'sales-prospect-brief', command_level: 'propose', status: 'completed',
+      output: { brief: {
+        contact_recommendation: { value: 'CONTACT' },
+        sales_angle: { text: 'Customer-information cleanup + clearer service presentation' },
+        why_contact: { text: 'Published customer hours conflict in two inspected website sections.' },
+        outreach_hook: { text: 'I noticed the published hours appear differently in two places.' },
+      } },
+    }], error: null })
+    const client = { from: vi.fn()
+      .mockReturnValueOnce(query({ data: [queueLead], error: null }))
+      .mockReturnValueOnce(query({ data: [], error: null }))
+      .mockReturnValueOnce(query({ data: [], error: null }))
+      .mockReturnValueOnce(query({ data: [], error: null }))
+      .mockReturnValueOnce(query({ data: [], error: null }))
+      .mockReturnValueOnce(converted)
+      .mockReturnValueOnce(briefs) }
+    mocks.authenticateWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a' })
+    const res = response()
+
+    await handler({ method: 'GET' }, res)
+
+    const item = res.json.mock.calls[0][0].items.find((entry) => entry.lead.id === 'lead-a')
+    expect(item.prospect_brief_context).toEqual({
+      recommendation: 'CONTACT',
+      sales_angle: 'Customer-information cleanup + clearer service presentation',
+      why_contact: 'Published customer hours conflict in two inspected website sections.',
+      outreach_hook: 'I noticed the published hours appear differently in two places.',
+    })
+    expect(converted.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
+    expect(converted.in).toHaveBeenCalledWith('converted_lead_id', ['lead-a'])
+    expect(briefs.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
+    expect(briefs.eq).toHaveBeenCalledWith('agent_key', 'sales-prospect-brief')
+    expect(briefs.eq).toHaveBeenCalledWith('command_level', 'propose')
+    expect(mocks.sendResendEmail).not.toHaveBeenCalled()
+    expect(mocks.discoverGooglePlaces).not.toHaveBeenCalled()
+    expect(mocks.inspectOfficialWebsite).not.toHaveBeenCalled()
+    expect(mocks.generateProspectBrief).not.toHaveBeenCalled()
+  })
+
+  it('omits missing, malformed, failed, unrelated, or cross-workspace Prospect Brief context', async () => {
+    const completed = {
+      id: 'brief-a', workspace_id: 'workspace-a', agent_key: 'sales-prospect-brief', command_level: 'propose', status: 'completed',
+      output: { brief: { contact_recommendation: { value: 'CONTACT' }, sales_angle: { text: 'A specific angle' }, why_contact: { text: 'A specific reason' }, outreach_hook: { text: 'A specific opener' } } },
+    }
+    expect(prospectBriefExecutionContext(completed, 'workspace-a')).toEqual(expect.objectContaining({ recommendation: 'CONTACT' }))
+    expect(prospectBriefExecutionContext({ ...completed, workspace_id: 'workspace-b' }, 'workspace-a')).toBeNull()
+    expect(prospectBriefExecutionContext({ ...completed, status: 'failed' }, 'workspace-a')).toBeNull()
+    expect(prospectBriefExecutionContext({ ...completed, agent_key: 'other-agent' }, 'workspace-a')).toBeNull()
+    expect(prospectBriefExecutionContext({ ...completed, command_level: 'ask' }, 'workspace-a')).toBeNull()
+    expect(prospectBriefExecutionContext({ ...completed, output: { brief: { ...completed.output.brief, outreach_hook: null } } }, 'workspace-a')).toBeNull()
   })
 
   it('requires an owner before any internal Sales action and never reaches Resend', async () => {

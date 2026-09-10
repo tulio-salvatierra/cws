@@ -37,6 +37,37 @@ describe('SalesPage', () => {
     expect(globalThis.fetch.mock.calls.every(([, options = {}]) => !options.method || options.method === 'GET')).toBe(true)
   })
 
+  it('shows completed Prospect Brief context on a phone-only Call command without creating an action', async () => {
+    const phoneLead = { ...salesState.leads[0], id: 'lead-phone', name: 'Logan', company: 'Logan Auto Fix', email: null, phone: '+13125550123' }
+    globalThis.fetch = vi.fn().mockResolvedValue(response({
+      ...salesState,
+      leads: [phoneLead],
+      items: [{
+        id: 'new_prospect:lead-phone', category: 'new_prospect', priority: 5, actionableOn: '2026-09-09', reason: 'No successful initial outreach yet', recommendation: 'Call', sendType: null, lead: phoneLead,
+        prospect_brief_context: {
+          recommendation: 'CONTACT',
+          why_contact: 'Published customer hours conflict in two inspected website sections.',
+          sales_angle: 'Customer-information cleanup + clearer service presentation',
+          outreach_hook: 'I noticed the published hours appear differently in two places.',
+        },
+      }],
+    }))
+
+    render(<MemoryRouter><SalesPage /></MemoryRouter>)
+
+    expect(await screen.findByRole('heading', { name: 'Logan Auto Fix', level: 2 })).toBeInTheDocument()
+    expect(screen.getByText('Why contact')).toBeInTheDocument()
+    expect(screen.getByText('Conversation angle')).toBeInTheDocument()
+    expect(screen.getByText('Suggested opener')).toBeInTheDocument()
+    expect(screen.getByText('Customer-information cleanup + clearer service presentation')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Call' })).toHaveAttribute('href', 'tel:+13125550123')
+    expect(screen.getByRole('button', { name: 'Log call' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Edit lead' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Prepare email' })).not.toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+    expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
+  })
+
   it('keeps Not now local: it hides the item without a mutation and a fresh load restores it', async () => {
     const first = render(<MemoryRouter><SalesPage /></MemoryRouter>)
     await screen.findByRole('heading', { name: 'Ada Plumbing', level: 2 })

@@ -32,6 +32,7 @@ import {
 const CLASSIFICATIONS = new Set(['inbound', 'prospect'])
 const RESPONSE_STATES = new Set(['no_response', 'warm', 'neutral'])
 const LEAD_STATUSES = new Set(['new', 'contacted', 'responded', 'won', 'lost', 'unresponsive'])
+const PROSPECT_BRIEF_RECOMMENDATIONS = new Set(['CONTACT', 'SKIP', 'OWNER_JUDGMENT'])
 
 export default async function handler(req, res) {
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ ok: false, error: 'Method not allowed' })
@@ -54,20 +55,43 @@ async function loadQueue(req, res) {
   const failed = [leads, promisedActions, outreachSends, prospects, verificationRequired].find((result) => result.error)
   if (failed) return res.status(502).json({ ok: false, error: failed.error.message })
   const prospectRows = prospects.data || []
-  const briefRunIds = [...new Set(prospectRows.map((candidate) => candidate.prospect_brief_run_id).filter(Boolean))]
+  const loadedLeadIds = (leads.data || []).map((lead) => lead.id).filter(Boolean)
+  let convertedRows = []
+  if (loadedLeadIds.length) {
+    const convertedCandidates = await context.client.from('sales_discovery_candidates').select('workspace_id, converted_lead_id, prospect_brief_run_id')
+      .eq('workspace_id', context.workspaceId).eq('review_state', 'converted').in('converted_lead_id', loadedLeadIds)
+      .not('prospect_brief_run_id', 'is', null)
+    if (convertedCandidates.error) return res.status(502).json({ ok: false, error: convertedCandidates.error.message })
+    convertedRows = convertedCandidates.data || []
+  }
+  const briefRunIds = [...new Set([...prospectRows, ...convertedRows].map((candidate) => candidate.prospect_brief_run_id).filter(Boolean))]
   let prospectBriefs = new Map()
+  let prospectBriefRuns = new Map()
   if (briefRunIds.length) {
     const briefs = await context.client.from('agent_runs')
-      .select('id, status, output, error_message, created_at, started_at, finished_at')
+      .select('id, workspace_id, agent_key, command_level, status, output, error_message, created_at, started_at, finished_at')
       .eq('workspace_id', context.workspaceId)
       .eq('agent_key', PROSPECT_BRIEF_AGENT_KEY)
+      .eq('command_level', 'propose')
       .in('id', briefRunIds)
     if (briefs.error) return res.status(502).json({ ok: false, error: briefs.error.message })
+    prospectBriefRuns = new Map((briefs.data || []).map((run) => [run.id, run]))
     prospectBriefs = new Map((briefs.data || []).map((run) => [run.id, prospectBriefSummary(run)]))
   }
+  const executionContextByLead = new Map(convertedRows.map((candidate) => [
+    candidate.converted_lead_id,
+    candidate.workspace_id === context.workspaceId
+      ? prospectBriefExecutionContext(prospectBriefRuns.get(candidate.prospect_brief_run_id), context.workspaceId)
+      : null,
+  ]).filter(([, context]) => context))
+  const queue = buildSalesCommandQueue({ leads: leads.data, promisedActions: promisedActions.data, outreachSends: outreachSends.data })
   return res.status(200).json({
     ok: true,
-    ...buildSalesCommandQueue({ leads: leads.data, promisedActions: promisedActions.data, outreachSends: outreachSends.data }),
+    ...queue,
+    items: queue.items.map((item) => {
+      const prospectBriefContext = executionContextByLead.get(item.lead.id)
+      return prospectBriefContext ? { ...item, prospect_brief_context: prospectBriefContext } : item
+    }),
     leads: leads.data,
     prospects: prospectRows.map((candidate) => ({
       ...candidate,
@@ -80,6 +104,22 @@ async function loadQueue(req, res) {
     },
     prospectBrief: prospectBriefConfiguration(),
   })
+}
+
+export function prospectBriefExecutionContext(run, workspaceId) {
+  if (!run || run.workspace_id !== workspaceId || run.agent_key !== PROSPECT_BRIEF_AGENT_KEY || run.command_level !== 'propose' || run.status !== 'completed') return null
+  const brief = run.output?.brief
+  const recommendation = brief?.contact_recommendation?.value
+  const salesAngle = brief?.sales_angle?.text
+  const whyContact = brief?.why_contact?.text
+  const outreachHook = brief?.outreach_hook?.text
+  if (!PROSPECT_BRIEF_RECOMMENDATIONS.has(recommendation) || ![salesAngle, whyContact, outreachHook].every((value) => typeof value === 'string' && value.trim())) return null
+  return {
+    recommendation,
+    sales_angle: salesAngle.trim(),
+    why_contact: whyContact.trim(),
+    outreach_hook: outreachHook.trim(),
+  }
 }
 
 async function runOwnerAction(req, res) {
