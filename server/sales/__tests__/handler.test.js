@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   validateDiscoverySelectionCapability: vi.fn(),
   collectProspectBriefEvidence: vi.fn(),
   generateProspectBrief: vi.fn(),
+  prospectBriefFailureDetails: vi.fn(() => ({})),
   prospectBriefConfiguration: vi.fn(() => ({ configured: true })),
 }))
 
@@ -52,6 +53,7 @@ vi.mock('../prospect-brief.js', () => ({
   PROSPECT_BRIEF_AGENT_KEY: 'sales-prospect-brief',
   collectProspectBriefEvidence: mocks.collectProspectBriefEvidence,
   generateProspectBrief: mocks.generateProspectBrief,
+  prospectBriefFailureDetails: mocks.prospectBriefFailureDetails,
   prospectBriefConfiguration: mocks.prospectBriefConfiguration,
 }))
 
@@ -511,7 +513,42 @@ describe('Sales command endpoint', () => {
     expect(mocks.generateProspectBrief).not.toHaveBeenCalled()
   })
 
-  it('retains a failed brief without creating a lead or outreach', async () => {
+  it('lets one explicit owner retry replace only the failed brief pointer, then reconciles a duplicate retry', async () => {
+    const failedCandidate = { id: 'candidate-a', business_name: 'Northside Repair', website_url: 'https://northside.example/', observed_facts: [], opportunities: [], review_basis: 'owner_selected', review_state: 'ready', prospect_brief_run_id: 'brief-failed' }
+    const failedRun = { id: 'brief-failed', status: 'failed', input: { candidate_id: 'candidate-a' }, output: { failure: { failure_stage: 'evidence_reference_validation' } }, error_message: 'Why includes unsupported evidence.', created_at: '2026-09-10T20:00:00.000Z', started_at: '2026-09-10T20:00:01.000Z', finished_at: '2026-09-10T20:00:02.000Z' }
+    const retryRun = { id: 'brief-retry', status: 'queued', output: null, error_message: null, created_at: '2026-09-10T20:01:00.000Z', started_at: null, finished_at: null }
+    const activeCandidate = { ...failedCandidate, prospect_brief_run_id: 'brief-retry' }
+    const activeRun = { ...retryRun, status: 'running', input: { candidate_id: 'candidate-a', retry_of_run_id: 'brief-failed' } }
+    const queued = query({ data: retryRun, error: null })
+    const claimed = query({ data: { prospect_brief_run_id: 'brief-retry' }, error: null })
+    const client = { from: vi.fn()
+      .mockReturnValueOnce(query({ data: failedCandidate, error: null }))
+      .mockReturnValueOnce(query({ data: failedRun, error: null }))
+      .mockReturnValueOnce(queued)
+      .mockReturnValueOnce(claimed)
+      .mockReturnValueOnce(query({ data: null, error: null }))
+      .mockReturnValueOnce(query({ data: null, error: null }))
+      .mockReturnValueOnce(query({ data: activeCandidate, error: null }))
+      .mockReturnValueOnce(query({ data: activeRun, error: null })) }
+    mocks.authenticateOwner.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
+
+    const first = response()
+    await handler({ method: 'POST', body: { action: 'retry_prospect_brief', candidate_id: 'candidate-a', retry_of_run_id: 'brief-failed' } }, first)
+    expect(queued.insert).toHaveBeenCalledWith(expect.objectContaining({ input: expect.objectContaining({ candidate_id: 'candidate-a', retry_of_run_id: 'brief-failed' }) }))
+    expect(claimed.update).toHaveBeenCalledWith({ prospect_brief_run_id: 'brief-retry' })
+    expect(claimed.eq).toHaveBeenCalledWith('prospect_brief_run_id', 'brief-failed')
+    expect(mocks.collectProspectBriefEvidence).toHaveBeenCalledTimes(1)
+    expect(mocks.generateProspectBrief).toHaveBeenCalledTimes(1)
+
+    const replay = response()
+    await handler({ method: 'POST', body: { action: 'retry_prospect_brief', candidate_id: 'candidate-a', retry_of_run_id: 'brief-failed' } }, replay)
+    expect(replay.status).toHaveBeenCalledWith(200)
+    expect(queued.insert).toHaveBeenCalledTimes(1)
+    expect(mocks.collectProspectBriefEvidence).toHaveBeenCalledTimes(1)
+    expect(mocks.generateProspectBrief).toHaveBeenCalledTimes(1)
+  })
+
+  it('retains safe failed-brief diagnostics without creating a lead or outreach', async () => {
     const candidate = { id: 'candidate-a', business_name: 'Northside Repair', website_url: 'https://northside.example/', observed_facts: [], opportunities: [], review_basis: 'owner_selected', review_state: 'ready', prospect_brief_run_id: null }
     const queued = query({ data: { id: 'brief-a', status: 'queued', output: null, error_message: null }, error: null })
     const claimed = query({ data: { prospect_brief_run_id: 'brief-a' }, error: null })
@@ -524,6 +561,7 @@ describe('Sales command endpoint', () => {
       .mockReturnValueOnce(failed) }
     mocks.authenticateOwner.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
     mocks.generateProspectBrief.mockRejectedValueOnce(new Error('Why includes unsupported evidence.'))
+    mocks.prospectBriefFailureDetails.mockReturnValueOnce({ failureStage: 'evidence_reference_validation', model: 'gpt-5.6', providerRequestId: 'req-a' })
     const res = response()
 
     await handler({ method: 'POST', body: { action: 'prepare_prospect_brief', candidate_id: 'candidate-a' } }, res)
@@ -531,7 +569,7 @@ describe('Sales command endpoint', () => {
     expect(failed.update).toHaveBeenCalledWith(expect.objectContaining({
       status: 'failed',
       error_message: 'Why includes unsupported evidence.',
-      output: null,
+      output: expect.objectContaining({ failure: expect.objectContaining({ failure_stage: 'evidence_reference_validation', model: 'gpt-5.6', provider_request_id: 'req-a', evidence_item_count: 1 }) }),
     }))
     expect(mocks.sendResendEmail).not.toHaveBeenCalled()
   })

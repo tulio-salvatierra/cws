@@ -192,4 +192,26 @@ describe('SalesPage', () => {
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
   })
 
+  it('shows the sanitized failed-brief message and requires a separate explicit retry action', async () => {
+    const failedCandidate = {
+      id: 'candidate-a', business_name: 'Northside Repair', category: 'Auto repair', locality: 'Chicago, IL', website_url: 'https://northside.example', business_email: 'info@northside.example', business_phone: '+13125550123', observed_facts: ['Homepage reachable.'], opportunities: [], review_basis: 'owner_selected', possible_duplicate: false,
+      prospect_brief: {
+        run_id: 'brief-failed', status: 'failed', error_message: "Brief verification failed because the AI referenced website evidence that wasn't in the inspected evidence set. Nothing was sent or added to Sales.", output: null,
+      },
+    }
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response({ ...salesState, prospectDiscovery: { configured: true }, prospects: [failedCandidate] }))
+      .mockResolvedValueOnce(response({ ok: true, replayed: true }))
+      .mockResolvedValueOnce(response({ ...salesState, prospectDiscovery: { configured: true }, prospects: [failedCandidate] }))
+
+    render(<MemoryRouter><SalesPage /></MemoryRouter>)
+
+    expect(await screen.findByText(/Brief verification failed because the AI referenced website evidence/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Retry prospect brief' })).toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retry prospect brief' }))
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
+    expect(globalThis.fetch.mock.calls[1][1]).toMatchObject({ method: 'POST', body: JSON.stringify({ action: 'retry_prospect_brief', candidate_id: 'candidate-a', retry_of_run_id: 'brief-failed' }) })
+  })
 })

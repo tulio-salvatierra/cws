@@ -1,7 +1,7 @@
 /* global process */
 
 import { describe, expect, it, vi } from 'vitest'
-import { collectProspectBriefEvidence, generateProspectBrief, validateProspectBrief } from '../prospect-brief.js'
+import { collectProspectBriefEvidence, generateProspectBrief, prospectBriefFailureDetails, validateProspectBrief } from '../prospect-brief.js'
 
 const candidate = {
   id: 'candidate-a', business_name: 'Northside Repair', website_url: 'https://northside.example/',
@@ -54,6 +54,8 @@ describe('Sales Prospect Brief', () => {
       expect(request.text.format).toMatchObject({ type: 'json_schema', strict: true })
       expect(request.tools).toBeUndefined()
       expect(request.instructions).toMatch(/untrusted quoted data/i)
+      expect(request.instructions).toContain('ALLOWED_EVIDENCE_IDS: ["e1"]')
+      expect(request.instructions).toMatch(/use ONLY IDs from this list/i)
       expect(generated.brief).toEqual(validBrief)
     } finally {
       if (originalKey === undefined) delete process.env.OPENAI_API_KEY
@@ -64,6 +66,33 @@ describe('Sales Prospect Brief', () => {
   it('rejects unsupported substantive claims instead of fabricating a fallback brief', () => {
     expect(() => validateProspectBrief({ ...validBrief, why: { text: 'This business is losing revenue.', evidence_ids: ['unknown'] } }, ['e1'])).toThrow(/unsupported evidence/i)
     expect(() => validateProspectBrief({ ...validBrief, opportunities: [{ observation: 'Poor SEO', why_it_may_matter: 'Ranking is low', possible_cws_help: 'SEO', evidence_ids: [] }] }, ['e1'])).toThrow(/unsupported evidence/i)
+  })
+
+  it('retains an evidence-reference failure as a hard error with safe request metadata', async () => {
+    const originalKey = process.env.OPENAI_API_KEY
+    process.env.OPENAI_API_KEY = 'test-key'
+    const invalid = { ...validBrief, why: { text: 'A useful observation.', evidence_ids: ['invented'] } }
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: (name) => name === 'x-request-id' ? 'req_test' : null },
+      json: async () => ({ id: 'resp-a', model: 'gpt-5.6', output_text: JSON.stringify(invalid) }),
+    })
+
+    try {
+      let failure = null
+      try {
+        await generateProspectBrief({ candidate, evidencePacket: { canonical_url: candidate.website_url, items: [{ id: 'e1', text: 'Northside Repair' }] }, userId: 'owner-a', fetchImpl })
+      } catch (error) {
+        failure = error
+      }
+      expect(failure).toBeInstanceOf(Error)
+      expect(failure.message).toMatch(/unsupported evidence/i)
+      expect(prospectBriefFailureDetails(failure)).toMatchObject({ failureStage: 'evidence_reference_validation', model: 'gpt-5.6', providerRequestId: 'req_test' })
+    } finally {
+      if (originalKey === undefined) delete process.env.OPENAI_API_KEY
+      else process.env.OPENAI_API_KEY = originalKey
+    }
   })
 
   it('allows a zero-opportunity result as a valid completed proposal', () => {

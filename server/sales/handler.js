@@ -24,6 +24,7 @@ import {
 import {
   collectProspectBriefEvidence,
   generateProspectBrief,
+  prospectBriefFailureDetails,
   prospectBriefConfiguration,
   PROSPECT_BRIEF_AGENT_KEY,
 } from './prospect-brief.js'
@@ -96,6 +97,7 @@ async function runOwnerAction(req, res) {
   if (body.action === 'diagnose_google_places') return diagnoseGooglePlacesProvider(context, res)
   if (body.action === 'verify_discovery_candidate_contact_path') return verifyDiscoveryCandidateContactPath(context, body, res)
   if (body.action === 'prepare_prospect_brief') return prepareProspectBrief(context, body, res)
+  if (body.action === 'retry_prospect_brief') return retryProspectBrief(context, body, res)
   if (body.action === 'dismiss_discovery_candidate') return dismissDiscoveryCandidate(context, body, res)
   if (body.action === 'add_discovery_candidate_to_sales') return addDiscoveryCandidateToSales(context, body, res)
   return res.status(400).json({ ok: false, error: 'Unknown Sales action.' })
@@ -277,8 +279,37 @@ async function prepareProspectBrief(context, body, res) {
   return executeProspectBrief(context, candidate, res)
 }
 
-async function executeProspectBrief(context, candidate, res) {
-  const reserved = await reserveProspectBriefRun(context, candidate)
+async function retryProspectBrief(context, body, res) {
+  if (!body.candidate_id || !body.retry_of_run_id) return res.status(400).json({ ok: false, error: 'candidate_id and retry_of_run_id are required.' })
+  if (!prospectBriefConfiguration().configured) {
+    return res.status(503).json({ ok: false, error: 'Prospect Brief requires server-side OpenAI configuration.' })
+  }
+  const candidateResult = await context.client.from('sales_discovery_candidates')
+    .select('id, business_name, website_url, observed_facts, opportunities, evidence_urls, review_basis, review_state, prospect_brief_run_id')
+    .eq('id', body.candidate_id).eq('workspace_id', context.workspaceId).maybeSingle()
+  if (candidateResult.error) return res.status(502).json({ ok: false, error: candidateResult.error.message })
+  const candidate = candidateResult.data
+  if (!candidate || candidate.review_basis !== 'owner_selected' || candidate.review_state !== 'ready' || !candidate.website_url || !candidate.prospect_brief_run_id) {
+    return res.status(409).json({ ok: false, error: 'Only a failed owner-selected Prospect Brief can be retried.' })
+  }
+  const current = await loadProspectBriefRun(context, candidate.prospect_brief_run_id)
+  if (current.error) return res.status(current.status).json({ ok: false, error: current.error })
+  if (!current.run) return res.status(409).json({ ok: false, error: 'Only a failed owner-selected Prospect Brief can be retried.' })
+  if (candidate.prospect_brief_run_id !== body.retry_of_run_id) {
+    if (current.run.input?.retry_of_run_id === body.retry_of_run_id) {
+      return res.status(200).json({ ok: true, replayed: true, prospect_brief: prospectBriefSummary(current.run) })
+    }
+    return res.status(409).json({ ok: false, error: 'The failed Prospect Brief is no longer the current attempt.' })
+  }
+  if (current.run.status !== 'failed') {
+    return res.status(409).json({ ok: false, error: 'Only a failed owner-selected Prospect Brief can be retried.' })
+  }
+
+  return executeProspectBrief(context, candidate, res, { retryOfRunId: current.run.id })
+}
+
+async function executeProspectBrief(context, candidate, res, { retryOfRunId = null } = {}) {
+  const reserved = await reserveProspectBriefRun(context, candidate, { retryOfRunId })
   if (reserved.error) return res.status(reserved.status).json({ ok: false, error: reserved.error })
   if (reserved.replayed) return res.status(200).json({ ok: true, replayed: true, prospect_brief: prospectBriefSummary(reserved.run) })
 
@@ -303,19 +334,33 @@ async function executeProspectBrief(context, candidate, res) {
     }
     const completed = await context.client.from('agent_runs').update({ status: 'completed', output, error_message: null })
       .eq('id', reserved.run.id).eq('workspace_id', context.workspaceId)
-    if (completed.error) return failProspectBriefRun(context, reserved.run.id, res, 'Prospect Brief outcome could not be stored.', 502)
+    if (completed.error) return failProspectBriefRun(context, reserved.run.id, res, 'Prospect Brief outcome could not be stored.', 502, {
+      failureStage: 'persistence', model: generated.model, providerRequestId: generated.responseId,
+      evidenceItemCount: evidencePacket.items.length, retryOfRunId,
+    })
     return res.status(201).json({ ok: true, prospect_brief: { ...prospectBriefSummary({ ...reserved.run, status: 'completed', output }), output } })
   } catch (error) {
-    return failProspectBriefRun(context, reserved.run.id, res, safeProspectBriefError(error), 502)
+    const diagnostics = prospectBriefFailureDetails(error)
+    return failProspectBriefRun(context, reserved.run.id, res, safeProspectBriefError(error), 502, {
+      failureStage: diagnostics.failureStage || 'website_evidence_collection',
+      model: diagnostics.model || null,
+      providerRequestId: diagnostics.providerRequestId || null,
+      providerStatus: diagnostics.providerStatus || null,
+      evidenceItemCount: evidencePacket?.items?.length || 0,
+      retryOfRunId,
+    })
   }
 }
 
-async function reserveProspectBriefRun(context, candidate) {
-  if (candidate.prospect_brief_run_id) {
+async function reserveProspectBriefRun(context, candidate, { retryOfRunId = null } = {}) {
+  if (candidate.prospect_brief_run_id && !retryOfRunId) {
     const existing = await loadProspectBriefRun(context, candidate.prospect_brief_run_id)
     if (existing.error) return existing
     if (existing.run) return { run: existing.run, replayed: true }
     return { error: 'The existing Prospect Brief could not be reconciled.', status: 502 }
+  }
+  if (retryOfRunId && candidate.prospect_brief_run_id !== retryOfRunId) {
+    return { error: 'The failed Prospect Brief is no longer the current attempt.', status: 409 }
   }
   const queued = await context.client.from('agent_runs').insert({
     workspace_id: context.workspaceId,
@@ -326,6 +371,7 @@ async function reserveProspectBriefRun(context, candidate) {
       candidate_id: candidate.id,
       website_url: candidate.website_url,
       review_basis: candidate.review_basis,
+      ...(retryOfRunId ? { retry_of_run_id: retryOfRunId } : {}),
     },
     created_by: context.user.id,
   }).select('id, status, output, error_message, created_at, started_at, finished_at').single()
@@ -333,7 +379,7 @@ async function reserveProspectBriefRun(context, candidate) {
 
   let claim = context.client.from('sales_discovery_candidates').update({ prospect_brief_run_id: queued.data.id })
     .eq('id', candidate.id).eq('workspace_id', context.workspaceId)
-  claim = claim.is('prospect_brief_run_id', null)
+  claim = retryOfRunId ? claim.eq('prospect_brief_run_id', retryOfRunId) : claim.is('prospect_brief_run_id', null)
   const claimed = await claim
     .select('prospect_brief_run_id').maybeSingle()
   if (!claimed.error && claimed.data?.prospect_brief_run_id === queued.data.id) return { run: queued.data, replayed: false }
@@ -359,11 +405,22 @@ async function loadProspectBriefRun(context, runId) {
   return result.error ? { error: result.error.message, status: 502 } : { run: result.data || null }
 }
 
-async function failProspectBriefRun(context, runId, res, message, status) {
+async function failProspectBriefRun(context, runId, res, message, status, failure = null) {
   const sanitizedError = cleanText(message, 500)
   const failed = await context.client.from('agent_runs').update({
     status: 'failed',
-    output: null,
+    output: failure ? {
+      failure: {
+        failure_stage: failure.failureStage,
+        sanitized_error: sanitizedError,
+        model: failure.model || null,
+        provider_request_id: failure.providerRequestId || null,
+        provider_status: failure.providerStatus || null,
+        evidence_item_count: failure.evidenceItemCount || 0,
+        retry_of_run_id: failure.retryOfRunId || null,
+        failed_at: new Date().toISOString(),
+      },
+    } : null,
     error_message: sanitizedError,
   })
     .eq('id', runId).eq('workspace_id', context.workspaceId).eq('status', 'running')
@@ -372,15 +429,24 @@ async function failProspectBriefRun(context, runId, res, message, status) {
 }
 
 function prospectBriefSummary(run) {
+  const failure = run.output?.failure || null
   return {
     run_id: run.id,
     status: run.status,
     output: run.output || null,
-    error: run.error_message || null,
+    error: ownerFacingProspectBriefError(run.error_message, failure?.failure_stage),
+    failure_stage: failure?.failure_stage || null,
     created_at: run.created_at || null,
     started_at: run.started_at || null,
     finished_at: run.finished_at || null,
   }
+}
+
+function ownerFacingProspectBriefError(error, failureStage) {
+  if (failureStage === 'evidence_reference_validation' || error === 'Why includes unsupported evidence.') {
+    return "Brief verification failed because the AI referenced website evidence that wasn't in the inspected evidence set. Nothing was sent or added to Sales."
+  }
+  return error || null
 }
 
 function safeProspectBriefError(error) {
