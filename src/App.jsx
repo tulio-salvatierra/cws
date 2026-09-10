@@ -25,14 +25,11 @@ const ResetPasswordPage = lazy(() => import("./pages/admin/ResetPasswordPage"));
 const AdminPage = lazy(() => import("./pages/admin/AdminPage"));
 const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminGuard = lazy(() => import("./components/admin/AdminGuard"));
-const ContentQueue = lazy(() => import("./components/admin/ContentQueue"));
 const PublishedPostsPage = lazy(() => import("./pages/admin/PublishedPostsPage"));
 const KeywordsPage = lazy(() => import("./pages/admin/KeywordsPage"));
-const CalendarPage = lazy(() => import("./pages/admin/CalendarPage"));
-const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage"));
-const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
 const LeadsPage = lazy(() => import("./pages/admin/LeadsPage"));
+const SalesPage = lazy(() => import("./pages/admin/SalesPage"));
 const MailingListPage = lazy(() => import("./pages/admin/MailingListPage"));
 const WorkspacePage = lazy(() => import("./pages/admin/WorkspacePage"));
 const ChannelsPage = lazy(() => import("./pages/admin/ChannelsPage"));
@@ -157,15 +154,16 @@ function App() {
               }
             >
               <Route index element={<AdminOverview />} />
-              <Route path="legacy-queue" element={<ContentQueue />} />
+              <Route path="legacy-queue" element={<Navigate to="/admin/marketing" replace />} />
               <Route path="published" element={<PublishedPostsPage />} />
               <Route path="keywords" element={<KeywordsPage />} />
-              <Route path="calendar" element={<CalendarPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
+              <Route path="calendar" element={<Navigate to="/admin/marketing" replace />} />
+              <Route path="analytics" element={<Navigate to="/admin/marketing" replace />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="leads" element={<LeadsPage />} />
+              <Route path="sales" element={<SalesPage />} />
               <Route path="mailing-list" element={<MailingListPage />} />
-              <Route path="settings" element={<SettingsPage />} />
+              <Route path="settings" element={<Navigate to="/admin" replace />} />
               <Route path="workspace" element={<WorkspacePage />} />
               <Route path="channels" element={<ChannelsPage />} />
               <Route path="campaigns" element={<CampaignsPage />} />

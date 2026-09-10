@@ -7,7 +7,7 @@ import {
 import { CLIENT_PORTAL_GOOGLE_SHEET } from '../../lib/clientPortalGoogleSheet'
 import {
   sendClientPortalUpdate,
-  notifyClientWhenReportIsReady,
+  recordReportReady,
   sendProjectPhaseUpdate,
   sendProjectStatusUpdate,
 } from '../../lib/clientPortalAutomations'
@@ -93,7 +93,7 @@ export default function AdminClientDashboard() {
       : [{ label: 'Strategy report', url: value }]
 
     updateSelectedClient({ reportLinks: nextLinks })
-    void notifyClientWhenReportIsReady(selectedClient, value)
+    void recordReportReady(selectedClient, value)
   }
 
   async function syncSelectedClientToSheet() {

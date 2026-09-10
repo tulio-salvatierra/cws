@@ -1,7 +1,10 @@
 ## DEC-004 — Existing social publishing pipeline remains separate during MVP
 
 Date: 2026-07-21
-Status: Approved
+Status: Superseded by DEC-030
+
+Historical note: retained as a record of the initial migration posture. n8n is
+now retired and must not be treated as an operational legacy subsystem.
 
 ### Decision
 
@@ -47,7 +50,10 @@ Initial routes will follow the pattern:
 ## DEC-006 — Existing publishing integration is deferred
 
 Date: 2026-07-21
-Status: Approved
+Status: Superseded by DEC-030
+
+Historical note: the deferred integration was never a continuing compatibility
+commitment. n8n is now retired from CWS OS.
 
 ### Decision
 
@@ -220,7 +226,10 @@ of scope until that contract is wired and tested.
 ## DEC-026 — Revive n8n through an isolated authenticated dry-run bridge
 
 Date: 2026-08-13
-Status: Approved
+Status: Superseded by DEC-030
+
+Historical note: this dry-run revival proposal is retired. No CWS-to-n8n path
+may be restored or maintained for compatibility.
 
 ### Decision
 
@@ -290,3 +299,133 @@ Separately, Tulio clarified this is a solo-operator workspace — the operator d
 - [ ] product-definition.md patch (Core Structure, approval model, scope-list correction)
 - [ ] Shell-nav ticket (Channels menu, per-channel routing, stub states) — blocked on migration ticket and on Tulio confirming where Channels docks in the higher-level nav
 - [ ] Content Variant `type` field / short status ladder for text content — separate ticket, not blocking
+
+---
+
+## DEC-028 — Marketing publication confirmation is slot-bound
+
+Date: 2026-09-08
+Status: Approved
+
+### Decision
+
+For Marketing V1 weekly slots, a provider-mutating request requires a
+short-lived server-signed confirmation capability. It is bound to the active
+authenticated owner, one exact slot, and that slot's exact asset. The server
+issues a capability only for the earliest eligible slot and rejects a request
+for every other slot.
+
+The owner-facing confirmation remains explicit in the UI, but the server is
+the final boundary. Existing durable attempt uniqueness and reference-key
+reconciliation protections remain required. Read-only preparation, GET,
+reload, and reconciliation routes must never create an upload or provider post.
+
+### Reason
+
+M5 evidence showed two distinct authenticated provider-mutating requests 14
+seconds apart, and Post B published without the intended owner authorization.
+The available evidence cannot establish the actor or trigger. A general
+per-session authorization is not sufficient to prevent one slot from being
+used to authorize another.
+
+### Consequence
+
+Marketing V1 is frozen with per-slot server enforcement. A later Marketing
+scope must retain this boundary or replace it only through an explicitly
+approved, equivalently strong authorization design. This decision does not add
+a generic approval framework or authorize M6.
+
+---
+
+## DEC-029 — Marketing missed occurrences are calendar-derived and owner-resolved
+
+**Status:** approved
+**Date:** 2026-09-09
+**Scope:** Marketing M6 only.
+
+### Decision
+
+Weekly Marketing occurrence state is calculated from the existing Chicago
+business calendar, durable publication attempts, and any immutable M6 owner
+decision. A calendar day that has passed without a successful publication is
+`MISSED — OWNER DECISION REQUIRED`; reading or reloading this state never
+creates data or provider work.
+
+The only durable M6 record is an immutable Marketing-owned resolution for an
+explicit owner `move` or `skip`. It retains the source occurrence, asset,
+edited caption, actor, timestamp, and (for move) exact target slot. Move and
+Skip are internal-only: they never upload or contact bundle.social. Successful
+publication remains the sole event that advances evergreen rotation.
+
+`Publish now` is not a new authority path. It remains subject to DEC-028's
+short-lived, authenticated-owner, exact-slot, and exact-asset confirmation
+capability and the existing duplicate protections.
+
+### Consequence
+
+Marketing now exposes a narrow read-only missed-slot signal without adding CEO
+Today, notifications, scheduling, a workflow engine, approvals, or a generic
+event system. M6 begins with the current Marketing calendar to avoid
+retroactively reclassifying frozen M0–M5 records as missed occurrences.
+
+---
+
+## DEC-030 — n8n is retired from CWS OS
+
+Date: 2026-09-09
+Status: Approved
+
+### Decision
+
+**N8N — RETIRED**
+
+**Runtime dependency — NONE**
+
+**Future compatibility requirement — NONE**
+
+CWS OS will not retain, restore, replace, or maintain n8n adapters, webhooks,
+endpoints, environment variables, or workflow compatibility. bundle.social is
+the only intended Marketing publishing provider. Historical n8n assessments,
+workflow descriptions, and incident/audit records remain documentation only;
+they are not an operational runbook.
+
+### External retirement action
+
+The owner must deactivate every CWS n8n workflow, schedule, trigger, and public
+webhook in the n8n workspace. Workflow definitions may be exported first as a
+historical backup, then archived or deleted as appropriate. This action remains
+external to the repository and is not asserted complete by this decision.
+
+### Consequence
+
+Application-side n8n containment remains in effect. Future CWS work must not
+introduce dormant n8n paths or compatibility layers. This decision does not
+authorize M7B database retirement: historical legacy data and all Marketing V1
+M2–M6 records remain untouched until separately approved.
+
+---
+
+## DEC-031 — Sales command queue remains deterministic and owner-confirmed
+
+Date: 2026-09-09
+Status: Approved
+
+### Decision
+
+Sales S1 orders owner work deterministically: inbound lead, promised action
+due, warm response, follow-up due, then new prospect; within a category,
+oldest actionable work comes first. It measures five successful initial
+prospect emails per Chicago business day, without treating the target as a
+cap. Day 0, Day 4, Day 10, and dormant/revisit state are derived from durable
+successful outbound history rather than a scheduler or sequence table.
+
+The only new durable Sales-owned object is a workspace-scoped promised action
+with its lead, action, due date, completion timestamp, actor, and audit
+timestamp. Existing historical leads remain unclassified unless evidence
+supports a classification. A queue view, reload, Not now action, promise
+action, or call log must never send email.
+
+Every external Sales email remains subject to S0's separate owner-bound,
+exact-lead/recipient/send-type/template/draft confirmation, durable
+persist-before-provider record, and stable idempotency boundary. S1 does not
+create a generic CRM, task, approval, workflow, event, or CEO framework.

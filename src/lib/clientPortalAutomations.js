@@ -12,8 +12,6 @@ export async function runNewIntakeAutomation(intakePayload) {
   await Promise.all([
     createGoogleDriveFolder(clientRecord),
     addRowToGoogleSheet(clientRecord),
-    sendConfirmationEmail(clientRecord),
-    notifyAdminWhenClientSubmitsForm(clientRecord),
   ])
 
   return clientRecord
@@ -38,11 +36,6 @@ export async function addRowToGoogleSheet(clientRecord) {
   return safelyRunSheetSync(() => syncIntakeToGoogleSheet(clientRecord))
 }
 
-export async function sendConfirmationEmail(clientRecord) {
-  await postClientPortalNotification('confirmation', clientRecord)
-  return { clientId: clientRecord.id, sent: true }
-}
-
 export async function sendProjectStatusUpdate(clientRecord, nextStatus) {
   await sendClientPortalUpdate(clientRecord, { projectStatus: nextStatus })
   // Future: notify the client when the project phase or status changes.
@@ -59,16 +52,11 @@ export async function sendClientPortalUpdate(clientRecord, changes = {}) {
   return safelyRunSheetSync(() => syncClientUpdateToGoogleSheet(nextRecord, changes))
 }
 
-export async function notifyAdminWhenClientSubmitsForm(clientRecord) {
-  await postClientPortalNotification('admin-notify', clientRecord)
-  return { clientId: clientRecord.id, sent: true }
-}
-
-export async function notifyClientWhenReportIsReady(clientRecord, reportUrl) {
+export async function recordReportReady(clientRecord, reportUrl) {
   await sendClientPortalUpdate(clientRecord, {
     reportLinks: [{ label: 'Strategy report', url: reportUrl }],
   })
-  // Future: trigger when the final report link is added or marked ready.
+  // This legacy UI records only its optional Sheet update. It never sends email.
   return { clientId: clientRecord.id, reportUrl, sent: false }
 }
 
@@ -82,19 +70,4 @@ async function safelyRunSheetSync(runSync) {
       error: error instanceof Error ? error.message : 'Google Sheet sync failed',
     }
   }
-}
-
-async function postClientPortalNotification(type, clientRecord) {
-  const response = await fetch('/api/client-portal-notify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, clientRecord }),
-  })
-
-  if (!response.ok) {
-    const result = await response.json().catch(() => null)
-    throw new Error(result?.error || `Client portal notification failed with status ${response.status}`)
-  }
-
-  return response.json()
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import ContentAreaTabs from '../../components/admin/ContentAreaTabs'
 import { supabase } from '../../lib/supabase'
 
 const OUTCOMES = ['worked', 'flat', 'flopped']
@@ -94,8 +93,6 @@ export default function PublishedPostsPage() {
         <h1 className="mt-2 text-xl font-semibold text-white">Published posts</h1>
         <p className="mt-1 text-sm text-gray-400">A durable record of posts published by any source.</p>
       </div>
-
-      <ContentAreaTabs active="publish-log" />
 
       {state.loading && <p className="text-sm text-gray-500">Loading published posts…</p>}
       {state.error && <p role="alert" className="text-sm text-rose-300">{state.error}</p>}

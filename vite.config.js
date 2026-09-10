@@ -1,10 +1,7 @@
-/* global process */
-
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { SERVER_ENV_KEYS } from './env.keys.js'
 import validateProductionClientEnv from './scripts/validate-production-client-env.mjs'
 import {
   GoogleSheetsWebhookTimeoutError,
@@ -14,17 +11,6 @@ import {
 // In ESM, __dirname is not defined. Recreate it from import.meta.url
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-
-const LOCAL_SERVERLESS_HANDLERS = [
-  {
-    route: '/api/client-portal-notify',
-    handlerUrl: new URL('./api/client-portal-notify.js', import.meta.url).href,
-  },
-  {
-    route: '/api/lead-outreach',
-    handlerUrl: new URL('./api/lead-outreach.js', import.meta.url).href,
-  },
-]
 
 function clientPortalApiPlugin(env) {
   return {
@@ -70,10 +56,6 @@ function clientPortalApiPlugin(env) {
           })
         }
       })
-
-      LOCAL_SERVERLESS_HANDLERS.forEach(({ route, handlerUrl }) => {
-        mountServerlessHandler(server, route, handlerUrl, env)
-      })
     },
   }
 }
@@ -103,54 +85,6 @@ function sendJson(res, statusCode, payload) {
   res.end(JSON.stringify(payload))
 }
 
-function mountServerlessHandler(server, route, handlerUrl, env) {
-  server.middlewares.use(route, async (req, res) => {
-    try {
-      applyLocalServerEnv(env)
-      const body = await readJsonBody(req)
-      const { default: handler } = await import(`${handlerUrl}?t=${Date.now()}`)
-      let statusCode = 200
-      let responseSent = false
-
-      const apiRes = {
-        status(code) {
-          statusCode = code
-          return this
-        },
-        json(payload) {
-          if (!responseSent) {
-            responseSent = true
-            sendJson(res, statusCode, payload)
-          }
-          return this
-        },
-      }
-
-      await handler(
-        {
-          method: req.method,
-          headers: req.headers,
-          body,
-        },
-        apiRes,
-      )
-    } catch (error) {
-      sendJson(res, 500, {
-        ok: false,
-        error: error instanceof Error ? error.message : 'Local API route failed',
-      })
-    }
-  })
-}
-
-function applyLocalServerEnv(env) {
-  SERVER_ENV_KEYS.forEach((key) => {
-    if (env[key]) {
-      process.env[key] = env[key]
-    }
-  })
-}
-
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '')
@@ -168,14 +102,6 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5174,
       strictPort: true,
-      proxy: {
-        // Proxy n8n webhook calls in dev to avoid CORS (browser → n8n.cloud cross-origin)
-        '/webhook': {
-          target: 'https://ciceroweb.app.n8n.cloud',
-          changeOrigin: true,
-          secure: true,
-        },
-      },
     },
     preview: {
       port: 5174,
