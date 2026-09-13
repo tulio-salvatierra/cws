@@ -6,6 +6,7 @@ const secondaryNavigation = [
   ['Workspace', 'Campaigns, variants, knowledge, and agent history.', '/admin/workspace'],
   ['Marketing', 'Review weekly publishing and its durable history.', '/admin/marketing'],
   ['Sales', 'Work the full Sales command queue and prospects.', '/admin/sales'],
+  ['Accounting', 'Review expected, received, and outstanding money.', '/admin/accounting'],
   ['Clients', 'Open the separate client workspace.', '/admin/clients'],
 ]
 

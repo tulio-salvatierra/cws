@@ -46,6 +46,7 @@ const AgentRunsPage = lazy(() => import("./pages/admin/AgentRunsPage"));
 const MarketingPage = lazy(() => import("./pages/admin/MarketingPage"));
 const OperationsPage = lazy(() => import("./pages/admin/OperationsPage"));
 const OperationsProjectPage = lazy(() => import("./pages/admin/OperationsProjectPage"));
+const AccountingPage = lazy(() => import("./pages/admin/AccountingPage"));
 const NewGoalPage = lazy(() => import("./pages/admin/NewGoalPage"));
 const NewInitiativePage = lazy(() => import("./pages/admin/NewInitiativePage"));
 const NewProjectPage = lazy(() => import("./pages/admin/NewProjectPage"));
@@ -186,6 +187,7 @@ function App() {
               <Route path="marketing" element={<MarketingPage />} />
               <Route path="operations" element={<OperationsPage />} />
               <Route path="operations/:projectId" element={<OperationsProjectPage />} />
+              <Route path="accounting" element={<AccountingPage />} />
             </Route>
           </Routes>
         </Router>
