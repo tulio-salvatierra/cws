@@ -33,6 +33,23 @@ function fullyPostedAttempt(slotKey, id = slotKey) {
   }
 }
 
+function operationsProject(overrides = {}) {
+  return {
+    project_id: 'operations-a',
+    project_name: 'Northside Website',
+    status: 'setup',
+    delivery_state: 'waiting_on_cws',
+    blocker_count: 1,
+    oldest_blocker_since: '2026-09-01T15:00:00.000Z',
+    human_reason: 'Waiting on CWS: Brand assets.',
+    ...overrides,
+  }
+}
+
+function operationsActions(result) {
+  return result.all_actions.filter((item) => item.source_type === 'operations_delivery')
+}
+
 describe('CEO Today prioritizer', () => {
   it('reuses the existing Sales command queue meaning and order', () => {
     const result = buildCeoToday({
@@ -162,5 +179,121 @@ describe('CEO Today prioritizer', () => {
       human_action: 'Find the next customer',
       href: '/admin/sales',
     })])
+  })
+
+  it('creates a DELIVER action for CWS-blocked work using its durable Operations reason', () => {
+    const result = buildCeoToday({
+      now: new Date('2026-09-06T18:00:00.000Z'),
+      operationsProjects: [operationsProject()],
+    })
+
+    expect(operationsActions(result)).toEqual([expect.objectContaining({
+      department: 'OPERATIONS',
+      business_priority: 'DELIVER',
+      human_action: 'Open Northside Website',
+      why_now: 'Waiting on CWS: Brand assets.',
+      href: '/admin/operations/operations-a',
+      cta_label: 'Open project',
+    })])
+  })
+
+  it('creates a DELIVER action for work that is ready to continue', () => {
+    const result = buildCeoToday({
+      now: new Date('2026-09-06T18:00:00.000Z'),
+      operationsProjects: [operationsProject({ delivery_state: 'ready_to_work', blocker_count: 0, oldest_blocker_since: null, human_reason: 'No needed-now readiness blocker remains.' })],
+    })
+
+    expect(operationsActions(result)).toEqual([expect.objectContaining({
+      human_action: 'Open Northside Website',
+      why_now: 'All needed-now inputs are available; work can continue.',
+      cta_label: 'Open project',
+    })])
+  })
+
+  it('creates a DELIVER review only for a client wait with a real blocker', () => {
+    const withBlocker = buildCeoToday({
+      now: new Date('2026-09-06T18:00:00.000Z'),
+      operationsProjects: [operationsProject({ delivery_state: 'waiting_on_client', human_reason: 'Waiting on client: Project-specific requirements.' })],
+    })
+    const withoutBlocker = buildCeoToday({
+      now: new Date('2026-09-06T18:00:00.000Z'),
+      operationsProjects: [operationsProject({ delivery_state: 'waiting_on_client', blocker_count: 0, human_reason: 'Project is manually marked waiting on client.' })],
+    })
+
+    expect(operationsActions(withBlocker)).toEqual([expect.objectContaining({
+      human_action: 'Review Northside Website',
+      why_now: 'Waiting on client: Project-specific requirements.',
+      cta_label: 'Review project',
+    })])
+    expect(operationsActions(withoutBlocker)).toEqual([])
+  })
+
+  it('omits completed and paused Operations projects and deduplicates each project', () => {
+    const result = buildCeoToday({
+      now: new Date('2026-09-06T18:00:00.000Z'),
+      operationsProjects: [
+        operationsProject({ project_id: 'completed', status: 'completed' }),
+        operationsProject({ project_id: 'paused', status: 'paused' }),
+        operationsProject({ project_id: 'same-project' }),
+        operationsProject({ project_id: 'same-project', delivery_state: 'ready_to_work', blocker_count: 0, oldest_blocker_since: null }),
+      ],
+    })
+
+    expect(operationsActions(result)).toEqual([expect.objectContaining({ id: 'operations:same-project' })])
+  })
+
+  it('keeps non-urgent GET MONEY and Marketing work ahead of DELIVER work', () => {
+    const result = buildCeoToday({
+      now: friday,
+      leads: [lead({ company: 'Northside Repair' })],
+      marketingAttempts: [fullyPostedAttempt('2026-09-07:post-a')],
+      operationsProjects: [operationsProject()],
+    })
+
+    expect(result.actions.map((item) => item.department)).toEqual(['SALES', 'MARKETING', 'OPERATIONS'])
+  })
+
+  it('keeps urgent work ahead of DELIVER work', () => {
+    const result = buildCeoToday({
+      now: wednesday,
+      operationsProjects: [operationsProject()],
+    })
+
+    expect(result.actions[0]).toMatchObject({ priority_tier: 1, department: 'MARKETING' })
+    expect(operationsActions(result)[0]).toMatchObject({ priority_tier: 4 })
+  })
+
+  it('orders Operations work by state, then oldest blocker timestamp, then stable project id', () => {
+    const result = buildCeoToday({
+      now: new Date('2026-09-06T18:00:00.000Z'),
+      operationsProjects: [
+        operationsProject({ project_id: 'client', delivery_state: 'waiting_on_client', human_reason: 'Waiting on client: Copy.', oldest_blocker_since: '2026-09-01T15:00:00.000Z' }),
+        operationsProject({ project_id: 'ready', delivery_state: 'ready_to_work', blocker_count: 0, oldest_blocker_since: null, human_reason: 'No needed-now readiness blocker remains.' }),
+        operationsProject({ project_id: 'cws-late', oldest_blocker_since: '2026-09-03T15:00:00.000Z' }),
+        operationsProject({ project_id: 'cws-b', oldest_blocker_since: '2026-09-01T15:00:00.000Z' }),
+        operationsProject({ project_id: 'cws-a', oldest_blocker_since: '2026-09-01T15:00:00.000Z' }),
+      ],
+    })
+
+    expect(operationsActions(result).map((item) => item.id)).toEqual([
+      'operations:cws-a',
+      'operations:cws-b',
+      'operations:cws-late',
+      'operations:ready',
+      'operations:client',
+    ])
+  })
+
+  it('keeps the top-five cap deterministic while retaining lower-ranked Operations candidates for inspection', () => {
+    const leads = Array.from({ length: 5 }, (_, index) => lead({ id: `lead-${index}`, company: `Company ${index}` }))
+    const result = buildCeoToday({
+      now: new Date('2026-09-06T18:00:00.000Z'),
+      leads,
+      operationsProjects: [operationsProject()],
+    })
+
+    expect(result.actions).toHaveLength(CEO_ACTION_LIMIT)
+    expect(result.actions.every((item) => item.department === 'SALES')).toBe(true)
+    expect(operationsActions(result)).toHaveLength(1)
   })
 })

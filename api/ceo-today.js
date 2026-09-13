@@ -1,5 +1,6 @@
 import { authenticateWorkspace, missingOutreachEnv } from '../server/outreach/shared.js'
 import { buildCeoToday } from '../server/ceo/today.js'
+import { buildOperationsReadModel } from '../server/operations/readiness.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'Method not allowed.' })
@@ -16,14 +17,17 @@ export default async function handler(req, res) {
 }
 
 export async function loadCeoToday(context, now = new Date()) {
-  const [leads, promisedActions, outreachSends, attempts, resolutions] = await Promise.all([
+  const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients] = await Promise.all([
     context.client.from('leads').select('id, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('sales_promised_actions').select('id, lead_id, action_text, due_on, completed_at, created_at').eq('workspace_id', context.workspaceId).is('completed_at', null).order('due_on', { ascending: true }).order('created_at', { ascending: true }),
     context.client.from('outreach_sends').select('id, lead_id, send_type, status, sent_at, created_at').eq('workspace_id', context.workspaceId).not('lead_id', 'is', null).order('created_at', { ascending: true }),
     context.client.from('marketing_publish_attempts').select('id, marketing_slot_key, asset_id, asset_path, destination, provider_status, provider_error, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }).limit(50),
     context.client.from('marketing_slot_resolutions').select('occurrence_slot_key, origin_slot_key, target_slot_key, action, asset_id, asset_path, caption, created_at, decided_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }),
+    context.client.from('operations_projects').select('id, workspace_id, client_id, name, project_type, status, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+    context.client.from('project_requirements').select('id, workspace_id, project_id, requirement_key, label, category, status, timing, responsible_party, notes, requested_at, received_at, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+    context.client.from('clients').select('id, workspace_id, name, contact_email, contact_phone, status, created_at').eq('workspace_id', context.workspaceId).eq('status', 'active').order('name', { ascending: true }),
   ])
-  const failed = [leads, promisedActions, outreachSends, attempts, resolutions].find((result) => result.error)
+  const failed = [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients].find((result) => result.error)
   if (failed) return { data: null, error: 'CEO Today could not load the current workspace state.' }
 
   const attemptRows = attempts.data || []
@@ -44,6 +48,13 @@ export async function loadCeoToday(context, now = new Date()) {
     resultsByAttempt.set(result.attempt_id, values)
   }
 
+  const operations = buildOperationsReadModel({
+    workspaceId: context.workspaceId,
+    projects: operationsProjects.data || [],
+    requirements: operationsRequirements.data || [],
+    clients: operationsClients.data || [],
+  })
+
   return {
     data: buildCeoToday({
       leads: leads.data || [],
@@ -54,6 +65,7 @@ export async function loadCeoToday(context, now = new Date()) {
         destination_results: resultsByAttempt.get(attempt.id) || [],
       })),
       marketingResolutions: resolutions.data || [],
+      operationsProjects: operations.ceo_projection,
       now,
     }),
     error: null,

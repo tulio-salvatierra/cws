@@ -39,6 +39,23 @@ function activeLead() {
   }
 }
 
+function activeOperationsProject(overrides = {}) {
+  return {
+    id: 'project-a', workspace_id: 'workspace-a', client_id: 'client-a', name: 'Ecclection Website',
+    project_type: 'website_build', status: 'setup', created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z',
+    ...overrides,
+  }
+}
+
+function neededClientRequirement(overrides = {}) {
+  return {
+    id: 'requirement-a', workspace_id: 'workspace-a', project_id: 'project-a', requirement_key: 'project_specific_requirements',
+    label: 'Project-specific requirements', category: 'project_specific', status: 'needed', timing: 'needed_now', responsible_party: 'client',
+    notes: null, requested_at: '2026-09-01T15:00:00.000Z', received_at: null, created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z',
+    ...overrides,
+  }
+}
+
 describe('CEO Today endpoint', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -55,7 +72,7 @@ describe('CEO Today endpoint', () => {
     expect(res.json).toHaveBeenCalledWith({ ok: false, error: 'Authentication required.' })
   })
 
-  it('reads only workspace-scoped durable Sales and Marketing state without provider or reconciliation calls', async () => {
+  it('reads only workspace-scoped durable department state without provider or reconciliation calls', async () => {
     const queries = []
     const client = {
       from: vi.fn((table) => {
@@ -69,6 +86,12 @@ describe('CEO Today endpoint', () => {
               }]
             : table === 'marketing_publish_destination_results'
               ? ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'].map((platform) => ({ attempt_id: 'attempt-a', platform, provider_status: 'posted', provider_error: null }))
+              : table === 'operations_projects'
+                ? [activeOperationsProject(), { ...activeOperationsProject(), id: 'project-b', workspace_id: 'workspace-b' }]
+                : table === 'project_requirements'
+                  ? [neededClientRequirement(), { ...neededClientRequirement(), id: 'requirement-b', workspace_id: 'workspace-b', project_id: 'project-b' }]
+                  : table === 'clients'
+                    ? [{ id: 'client-a', workspace_id: 'workspace-a', name: 'Ecclection', contact_email: null, contact_phone: null, status: 'active', created_at: '2026-09-01T15:00:00.000Z' }, { id: 'client-b', workspace_id: 'workspace-b', name: 'Other', contact_email: null, contact_phone: null, status: 'active', created_at: '2026-09-01T15:00:00.000Z' }]
               : []
         const current = query({ data, error: null })
         queries.push({ table, current })
@@ -86,6 +109,7 @@ describe('CEO Today endpoint', () => {
     expect(res.json.mock.calls[0][0]).toMatchObject({ ok: true })
     expect(res.json.mock.calls[0][0].actions).toEqual(expect.arrayContaining([
       expect.objectContaining({ department: 'SALES', human_action: 'Call Ada Plumbing' }),
+      expect.objectContaining({ department: 'OPERATIONS', human_action: 'Review Ecclection Website', href: '/admin/operations/project-a' }),
     ]))
     expect(queries.map(({ table }) => table)).toEqual([
       'leads',
@@ -93,6 +117,9 @@ describe('CEO Today endpoint', () => {
       'outreach_sends',
       'marketing_publish_attempts',
       'marketing_slot_resolutions',
+      'operations_projects',
+      'project_requirements',
+      'clients',
       'marketing_publish_destination_results',
     ])
     for (const { table, current } of queries) {
@@ -100,6 +127,12 @@ describe('CEO Today endpoint', () => {
       expect(table).not.toContain('bundle')
     }
     expect(queries.find(({ table }) => table === 'marketing_publish_destination_results').current.in).toHaveBeenCalledWith('attempt_id', ['attempt-a'])
+    expect(queries.find(({ table }) => table === 'operations_projects').current.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
+    expect(queries.find(({ table }) => table === 'project_requirements').current.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
+    expect(queries.find(({ table }) => table === 'clients').current.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
+    expect(res.json.mock.calls[0][0].all_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'operations:project-a', source_type: 'operations_delivery' }),
+    ]))
     expect(fetchSpy).not.toHaveBeenCalled()
     vi.unstubAllGlobals()
   })

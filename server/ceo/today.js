@@ -7,6 +7,13 @@ const TIER = {
   urgent: 1,
   sales: 2,
   marketing: 3,
+  deliver: 4,
+}
+
+const OPERATIONS_STATE_ORDER = {
+  waiting_on_cws: 1,
+  ready_to_work: 2,
+  waiting_on_client: 3,
 }
 
 // CEO Today deliberately owns only this pure, read-side projection. The
@@ -17,6 +24,7 @@ export function buildCeoToday({
   outreachSends = [],
   marketingAttempts = [],
   marketingResolutions = [],
+  operationsProjects = [],
   now = new Date(),
 } = {}) {
   const today = chicagoDate(now)
@@ -30,11 +38,13 @@ export function buildCeoToday({
   const actions = [
     ...salesActions(salesQueue.items, today),
     ...marketingActions(marketingPlan, now),
+    ...operationsActions(operationsProjects),
   ].sort(compareActions)
 
   const visibleActions = actions.slice(0, CEO_ACTION_LIMIT)
   return {
     actions: visibleActions.length ? visibleActions : [fallbackAction()],
+    all_actions: actions,
     sales_summary: salesQueue.summary,
   }
 }
@@ -133,6 +143,52 @@ function hasMarketingDeliveryFailure(slot) {
   return (slot.destinationResults || []).some((result) => result.provider_status === 'error')
 }
 
+function operationsActions(projects) {
+  const byProjectId = new Map()
+
+  for (const project of projects || []) {
+    if (!project?.project_id || ['completed', 'paused'].includes(project.status)) continue
+    if (!OPERATIONS_STATE_ORDER[project.delivery_state]) continue
+    if (project.delivery_state === 'waiting_on_client' && Number(project.blocker_count) < 1) continue
+
+    const candidate = action({
+      id: `operations:${project.project_id}`,
+      department: 'OPERATIONS',
+      businessPriority: 'DELIVER',
+      humanAction: operationsHumanAction(project),
+      whyNow: operationsReason(project),
+      href: `/admin/operations/${project.project_id}`,
+      ctaLabel: project.delivery_state === 'waiting_on_client' ? 'Review project' : 'Open project',
+      tier: TIER.deliver,
+      actionableOn: '',
+      sourceTimestamp: project.oldest_blocker_since || '',
+      sourceType: 'operations_delivery',
+      operationsOrder: OPERATIONS_STATE_ORDER[project.delivery_state],
+    })
+
+    const current = byProjectId.get(project.project_id)
+    if (!current || compareOperationsActions(candidate, current) < 0) byProjectId.set(project.project_id, candidate)
+  }
+
+  return [...byProjectId.values()]
+}
+
+function operationsHumanAction(project) {
+  const projectName = project.project_name || 'Client project'
+  return project.delivery_state === 'waiting_on_client' ? `Review ${projectName}` : `Open ${projectName}`
+}
+
+function operationsReason(project) {
+  if (project.delivery_state === 'ready_to_work') return 'All needed-now inputs are available; work can continue.'
+  return project.human_reason || 'Operations readiness needs review.'
+}
+
+function compareOperationsActions(left, right) {
+  return left.operations_order - right.operations_order
+    || String(left.source_timestamp).localeCompare(String(right.source_timestamp))
+    || left.id.localeCompare(right.id)
+}
+
 function salesHumanAction(item) {
   const business = item.lead.company || item.lead.name || 'Sales lead'
   if (item.category === 'promised') {
@@ -155,6 +211,7 @@ function action({
   sourceTimestamp,
   sourceType,
   salesOrder = null,
+  operationsOrder = null,
 }) {
   return {
     id,
@@ -169,6 +226,7 @@ function action({
     source_timestamp: sourceTimestamp,
     source_type: sourceType,
     sales_order: salesOrder,
+    operations_order: operationsOrder,
   }
 }
 
@@ -195,6 +253,10 @@ function compareActions(left, right) {
   // actionable dates differ across categories.
   if (left.priority_tier === TIER.sales && left.sales_order !== null && right.sales_order !== null) {
     return left.sales_order - right.sales_order || left.id.localeCompare(right.id)
+  }
+
+  if (left.priority_tier === TIER.deliver && left.operations_order !== null && right.operations_order !== null) {
+    return compareOperationsActions(left, right)
   }
 
   return String(left.actionable_on).localeCompare(String(right.actionable_on))

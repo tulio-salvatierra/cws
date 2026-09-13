@@ -75,4 +75,29 @@ describe('AdminOverview CEO Today', () => {
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Call Chicago General Contractor', level: 2 })).toBeInTheDocument())
     expect(globalThis.fetch).toHaveBeenCalledTimes(2)
   })
+
+  it('renders an Operations DELIVER card without mutating its source state when set aside', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({
+      ok: true,
+      actions: [{
+        id: 'operations:project-a',
+        department: 'OPERATIONS',
+        business_priority: 'DELIVER',
+        human_action: 'Review Ecclection Website',
+        why_now: 'Waiting on client: Project-specific requirements.',
+        href: '/admin/operations/project-a',
+        cta_label: 'Review project',
+      }],
+    }))
+
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+
+    expect(await screen.findByRole('heading', { name: 'Review Ecclection Website', level: 2 })).toBeInTheDocument()
+    expect(screen.getByText('Waiting on client: Project-specific requirements.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Review project' })).toHaveAttribute('href', '/admin/operations/project-a')
+    fireEvent.click(screen.getByRole('button', { name: 'Not now' }))
+    expect(screen.queryByRole('heading', { name: 'Review Ecclection Website', level: 2 })).not.toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+    expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
+  })
 })
