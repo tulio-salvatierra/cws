@@ -1,6 +1,7 @@
 import { authenticateWorkspace, missingOutreachEnv } from '../server/outreach/shared.js'
 import { buildCeoToday } from '../server/ceo/today.js'
 import { buildOperationsReadModel } from '../server/operations/readiness.js'
+import { buildAccountingReadModel } from '../server/accounting/read-model.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'Method not allowed.' })
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
 }
 
 export async function loadCeoToday(context, now = new Date()) {
-  const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients] = await Promise.all([
+  const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue] = await Promise.all([
     context.client.from('leads').select('id, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('sales_promised_actions').select('id, lead_id, action_text, due_on, completed_at, created_at').eq('workspace_id', context.workspaceId).is('completed_at', null).order('due_on', { ascending: true }).order('created_at', { ascending: true }),
     context.client.from('outreach_sends').select('id, lead_id, send_type, status, sent_at, created_at').eq('workspace_id', context.workspaceId).not('lead_id', 'is', null).order('created_at', { ascending: true }),
@@ -26,8 +27,11 @@ export async function loadCeoToday(context, now = new Date()) {
     context.client.from('operations_projects').select('id, workspace_id, client_id, name, project_type, status, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('project_requirements').select('id, workspace_id, project_id, requirement_key, label, category, status, timing, responsible_party, notes, requested_at, received_at, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('clients').select('id, workspace_id, name, contact_email, contact_phone, status, created_at').eq('workspace_id', context.workspaceId).eq('status', 'active').order('name', { ascending: true }),
+    context.client.from('financial_obligations').select('id, workspace_id, client_id, operations_project_id, description, amount_cents, currency, obligation_type, due_date, status, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+    context.client.from('payment_receipts').select('id, workspace_id, financial_obligation_id, amount_cents, received_at, payment_method, reference_note, created_at').eq('workspace_id', context.workspaceId).order('received_at', { ascending: false }),
+    context.client.from('recurring_revenue').select('id, workspace_id, client_id, description, amount_cents, currency, cadence, status, provider, provider_reference, started_at, next_expected_at, ended_at, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
   ])
-  const failed = [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients].find((result) => result.error)
+  const failed = [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue].find((result) => result.error)
   if (failed) return { data: null, error: 'CEO Today could not load the current workspace state.' }
 
   const attemptRows = attempts.data || []
@@ -54,6 +58,15 @@ export async function loadCeoToday(context, now = new Date()) {
     requirements: operationsRequirements.data || [],
     clients: operationsClients.data || [],
   })
+  const accounting = buildAccountingReadModel({
+    workspaceId: context.workspaceId,
+    obligations: obligations.data || [],
+    receipts: receipts.data || [],
+    recurringRevenue: recurringRevenue.data || [],
+    clients: operationsClients.data || [],
+    operationsProjects: operationsProjects.data || [],
+    now,
+  })
 
   return {
     data: buildCeoToday({
@@ -66,6 +79,7 @@ export async function loadCeoToday(context, now = new Date()) {
       })),
       marketingResolutions: resolutions.data || [],
       operationsProjects: operations.ceo_projection,
+      accountingProjection: accounting.ceo_projection,
       now,
     }),
     error: null,

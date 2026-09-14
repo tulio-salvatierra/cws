@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildCeoToday, CEO_ACTION_LIMIT } from '../today.js'
+import { buildAccountingReadModel } from '../../accounting/read-model.js'
 
 const wednesday = new Date('2026-09-09T18:00:00.000Z')
 const friday = new Date('2026-09-11T18:00:00.000Z')
@@ -48,6 +49,26 @@ function operationsProject(overrides = {}) {
 
 function operationsActions(result) {
   return result.all_actions.filter((item) => item.source_type === 'operations_delivery')
+}
+
+function accountingProjection(overrides = {}) {
+  return {
+    id: 'financial_obligation:obligation-a',
+    financial_obligation_id: 'obligation-a',
+    client_name: 'Carolina Skin Centre',
+    project_name: null,
+    amount_outstanding_cents: 7000,
+    currency: 'USD',
+    due_date: '2026-09-10',
+    source_timestamp: '2026-09-01T15:00:00.000Z',
+    financial_state: 'payment_overdue',
+    human_reason: 'Carolina Skin Centre has an overdue payment for Monthly subscription due 2026-09-10.',
+    ...overrides,
+  }
+}
+
+function accountingActions(result) {
+  return result.all_actions.filter((item) => item.source_type === 'accounting_financial')
 }
 
 describe('CEO Today prioritizer', () => {
@@ -295,5 +316,95 @@ describe('CEO Today prioritizer', () => {
     expect(result.actions).toHaveLength(CEO_ACTION_LIMIT)
     expect(result.actions.every((item) => item.department === 'SALES')).toBe(true)
     expect(operationsActions(result)).toHaveLength(1)
+  })
+
+  it('translates an overdue Accounting projection into one urgent CONTROL MONEY card', () => {
+    const result = buildCeoToday({
+      now: friday,
+      accountingProjection: [accountingProjection()],
+    })
+
+    expect(accountingActions(result)).toEqual([expect.objectContaining({
+      id: 'accounting:financial_obligation:obligation-a',
+      department: 'ACCOUNTING',
+      business_priority: 'CONTROL MONEY',
+      human_action: 'Review overdue payment for Carolina Skin Centre',
+      why_now: '$70.00 is overdue since 2026-09-10.',
+      href: '/admin/accounting',
+      cta_label: 'Review Accounting',
+      priority_tier: 1,
+    })])
+  })
+
+  it('keeps normal CONTROL MONEY after GET MONEY and DELIVER work', () => {
+    const result = buildCeoToday({
+      now: friday,
+      leads: [lead({ company: 'Northside Repair' })],
+      operationsProjects: [operationsProject()],
+      accountingProjection: [accountingProjection({ financial_state: 'payment_due', due_date: '2026-09-11' })],
+    })
+
+    const salesIndex = result.all_actions.findIndex((item) => item.department === 'SALES')
+    const operationsIndex = result.all_actions.findIndex((item) => item.department === 'OPERATIONS')
+    const accountingIndex = result.all_actions.findIndex((item) => item.department === 'ACCOUNTING')
+    expect(salesIndex).toBeLessThan(accountingIndex)
+    expect(operationsIndex).toBeLessThan(accountingIndex)
+    expect(accountingActions(result)[0]).toMatchObject({ priority_tier: 5, human_action: 'Review Accounting for Carolina Skin Centre' })
+  })
+
+  it('orders Accounting projection rows overdue, due, then recurring attention with durable ties', () => {
+    const result = buildCeoToday({
+      now: friday,
+      accountingProjection: [
+        accountingProjection({ id: 'recurring_revenue:recurring-a', financial_state: 'recurring_attention', due_date: '2026-09-01', source_timestamp: '2026-09-01T00:00:00.000Z' }),
+        accountingProjection({ id: 'financial_obligation:due-equal-late', financial_state: 'payment_due', due_date: '2026-09-12', source_timestamp: '2026-09-04T00:00:00.000Z' }),
+        accountingProjection({ id: 'financial_obligation:due-equal-early', financial_state: 'payment_due', due_date: '2026-09-12', source_timestamp: '2026-09-03T00:00:00.000Z' }),
+        accountingProjection({ id: 'financial_obligation:due-earlier', financial_state: 'payment_due', due_date: '2026-09-11', source_timestamp: '2026-09-04T00:00:00.000Z' }),
+        accountingProjection({ id: 'financial_obligation:overdue', financial_state: 'payment_overdue', due_date: '2026-09-10' }),
+      ],
+    })
+
+    expect(accountingActions(result).map((item) => item.id)).toEqual([
+      'accounting:financial_obligation:overdue',
+      'accounting:financial_obligation:due-earlier',
+      'accounting:financial_obligation:due-equal-early',
+      'accounting:financial_obligation:due-equal-late',
+      'accounting:recurring_revenue:recurring-a',
+    ])
+  })
+
+  it('does not create CONTROL MONEY for healthy, settled, waived, or cancelled financial state', () => {
+    const workspaceId = 'workspace-a'
+    const accounting = buildAccountingReadModel({
+      workspaceId,
+      now: friday,
+      clients: [{ id: 'client-a', workspace_id: workspaceId, name: 'Carolina Skin Centre' }],
+      obligations: [
+        { id: 'settled', workspace_id: workspaceId, client_id: 'client-a', description: 'Settled', amount_cents: 7000, status: 'expected', due_date: '2026-09-11', created_at: '2026-09-01T00:00:00.000Z' },
+        { id: 'waived', workspace_id: workspaceId, client_id: 'client-a', description: 'Waived', amount_cents: 7000, status: 'waived', due_date: '2026-09-11', created_at: '2026-09-01T00:00:00.000Z' },
+        { id: 'cancelled', workspace_id: workspaceId, client_id: 'client-a', description: 'Cancelled', amount_cents: 7000, status: 'cancelled', due_date: '2026-09-11', created_at: '2026-09-01T00:00:00.000Z' },
+      ],
+      receipts: [{ id: 'receipt-a', workspace_id: workspaceId, financial_obligation_id: 'settled', amount_cents: 7000, received_at: '2026-09-10T00:00:00.000Z' }],
+      recurringRevenue: [{ id: 'healthy-recurring', workspace_id: workspaceId, client_id: 'client-a', description: 'Monthly subscription', amount_cents: 7000, cadence: 'monthly', status: 'active', provider: 'square', next_expected_at: '2026-10-04', created_at: '2026-03-13T00:00:00.000Z' }],
+    })
+
+    const result = buildCeoToday({ now: friday, accountingProjection: accounting.ceo_projection })
+    expect(accounting.ceo_projection).toEqual([])
+    expect(accountingActions(result)).toEqual([])
+  })
+
+  it('deduplicates repeated projection records and preserves the deterministic top-five cap', () => {
+    const result = buildCeoToday({
+      now: friday,
+      leads: Array.from({ length: 5 }, (_, index) => lead({ id: `lead-${index}`, company: `Company ${index}` })),
+      accountingProjection: [
+        accountingProjection({ financial_state: 'payment_due', due_date: '2026-09-11' }),
+        accountingProjection({ financial_state: 'payment_due', due_date: '2026-09-11' }),
+      ],
+    })
+
+    expect(accountingActions(result)).toHaveLength(1)
+    expect(result.actions).toHaveLength(CEO_ACTION_LIMIT)
+    expect(result.actions.some((item) => item.department === 'ACCOUNTING')).toBe(false)
   })
 })

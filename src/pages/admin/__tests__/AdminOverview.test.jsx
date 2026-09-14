@@ -100,4 +100,29 @@ describe('AdminOverview CEO Today', () => {
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
     expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
   })
+
+  it('renders a read-only CONTROL MONEY card and keeps Not now local', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({
+      ok: true,
+      actions: [{
+        id: 'accounting:financial_obligation:due-a',
+        department: 'ACCOUNTING',
+        business_priority: 'CONTROL MONEY',
+        human_action: 'Review Accounting for Carolina Skin Centre',
+        why_now: '$70.00 is due 2026-09-13.',
+        href: '/admin/accounting',
+        cta_label: 'Review Accounting',
+      }],
+    }))
+
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+
+    expect(await screen.findByRole('heading', { name: 'Review Accounting for Carolina Skin Centre', level: 2 })).toBeInTheDocument()
+    expect(screen.getByText('$70.00 is due 2026-09-13.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Review Accounting' })).toHaveAttribute('href', '/admin/accounting')
+    fireEvent.click(screen.getByRole('button', { name: 'Not now' }))
+    expect(screen.queryByRole('heading', { name: 'Review Accounting for Carolina Skin Centre', level: 2 })).not.toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+    expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
+  })
 })

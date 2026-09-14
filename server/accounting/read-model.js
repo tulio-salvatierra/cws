@@ -165,6 +165,7 @@ function financialProjection(row) {
     amount_outstanding_cents: row.outstanding_amount_cents,
     currency: row.currency,
     due_date: row.due_date,
+    source_timestamp: row.created_at,
     financial_state: row.financial_state,
     human_reason: overdue
       ? `${row.client?.name || 'Client'} has an overdue payment for ${row.description}${datePhrase}.`
@@ -182,6 +183,7 @@ function recurringProjection(row, today) {
     amount_outstanding_cents: row.amount_cents,
     currency: row.currency,
     due_date: row.next_expected_at,
+    source_timestamp: row.created_at,
     financial_state: 'recurring_attention',
     human_reason: overdue
       ? `Recurring revenue for ${row.client?.name || 'this client'} needs owner review; its expected date was ${row.next_expected_at}.`

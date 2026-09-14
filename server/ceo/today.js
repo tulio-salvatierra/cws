@@ -8,12 +8,19 @@ const TIER = {
   sales: 2,
   marketing: 3,
   deliver: 4,
+  controlMoney: 5,
 }
 
 const OPERATIONS_STATE_ORDER = {
   waiting_on_cws: 1,
   ready_to_work: 2,
   waiting_on_client: 3,
+}
+
+const ACCOUNTING_STATE_ORDER = {
+  payment_overdue: 1,
+  payment_due: 2,
+  recurring_attention: 3,
 }
 
 // CEO Today deliberately owns only this pure, read-side projection. The
@@ -25,6 +32,7 @@ export function buildCeoToday({
   marketingAttempts = [],
   marketingResolutions = [],
   operationsProjects = [],
+  accountingProjection = [],
   now = new Date(),
 } = {}) {
   const today = chicagoDate(now)
@@ -39,6 +47,7 @@ export function buildCeoToday({
     ...salesActions(salesQueue.items, today),
     ...marketingActions(marketingPlan, now),
     ...operationsActions(operationsProjects),
+    ...accountingActions(accountingProjection),
   ].sort(compareActions)
 
   const visibleActions = actions.slice(0, CEO_ACTION_LIMIT)
@@ -47,6 +56,58 @@ export function buildCeoToday({
     all_actions: actions,
     sales_summary: salesQueue.summary,
   }
+}
+
+function accountingActions(projection) {
+  const bySourceId = new Map()
+
+  for (const row of projection || []) {
+    const stateOrder = ACCOUNTING_STATE_ORDER[row?.financial_state]
+    if (!row?.id || !stateOrder) continue
+
+    const overdue = row.financial_state === 'payment_overdue'
+    const clientName = row.client_name || 'Client'
+    const candidate = action({
+      id: `accounting:${row.id}`,
+      department: 'ACCOUNTING',
+      businessPriority: 'CONTROL MONEY',
+      humanAction: overdue ? `Review overdue payment for ${clientName}` : `Review Accounting for ${clientName}`,
+      whyNow: accountingReason(row),
+      href: '/admin/accounting',
+      ctaLabel: 'Review Accounting',
+      tier: overdue ? TIER.urgent : TIER.controlMoney,
+      actionableOn: row.due_date || '',
+      sourceTimestamp: row.source_timestamp || '',
+      sourceType: 'accounting_financial',
+      accountingOrder: stateOrder,
+    })
+    const current = bySourceId.get(row.id)
+    if (!current || compareAccountingActions(candidate, current) < 0) bySourceId.set(row.id, candidate)
+  }
+
+  return [...bySourceId.values()]
+}
+
+function compareAccountingActions(left, right) {
+  return left.accounting_order - right.accounting_order
+    || String(left.actionable_on || '9999-12-31').localeCompare(String(right.actionable_on || '9999-12-31'))
+    || String(left.source_timestamp).localeCompare(String(right.source_timestamp))
+    || left.id.localeCompare(right.id)
+}
+
+function accountingReason(row) {
+  const amount = usdAmount(row.amount_outstanding_cents)
+  if (row.financial_state === 'payment_overdue') {
+    return row.due_date ? `${amount} is overdue since ${row.due_date}.` : `${amount} is overdue.`
+  }
+  if (row.financial_state === 'payment_due') {
+    return row.due_date ? `${amount} is due ${row.due_date}.` : `${amount} is due.`
+  }
+  return row.human_reason || 'Recurring revenue record requires review.'
+}
+
+function usdAmount(cents) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(cents || 0) / 100)
 }
 
 function salesActions(items, today) {
@@ -212,6 +273,7 @@ function action({
   sourceType,
   salesOrder = null,
   operationsOrder = null,
+  accountingOrder = null,
 }) {
   return {
     id,
@@ -227,6 +289,7 @@ function action({
     source_type: sourceType,
     sales_order: salesOrder,
     operations_order: operationsOrder,
+    accounting_order: accountingOrder,
   }
 }
 
@@ -257,6 +320,10 @@ function compareActions(left, right) {
 
   if (left.priority_tier === TIER.deliver && left.operations_order !== null && right.operations_order !== null) {
     return compareOperationsActions(left, right)
+  }
+
+  if (left.priority_tier === TIER.controlMoney && left.accounting_order !== null && right.accounting_order !== null) {
+    return compareAccountingActions(left, right)
   }
 
   return String(left.actionable_on).localeCompare(String(right.actionable_on))

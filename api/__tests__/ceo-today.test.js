@@ -88,8 +88,14 @@ describe('CEO Today endpoint', () => {
               ? ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'].map((platform) => ({ attempt_id: 'attempt-a', platform, provider_status: 'posted', provider_error: null }))
               : table === 'operations_projects'
                 ? [activeOperationsProject(), { ...activeOperationsProject(), id: 'project-b', workspace_id: 'workspace-b' }]
-                : table === 'project_requirements'
+          : table === 'project_requirements'
                   ? [neededClientRequirement(), { ...neededClientRequirement(), id: 'requirement-b', workspace_id: 'workspace-b', project_id: 'project-b' }]
+                  : table === 'financial_obligations'
+                    ? [{ id: 'obligation-a', workspace_id: 'workspace-a', client_id: 'client-a', operations_project_id: null, description: 'September website work', amount_cents: 75000, currency: 'USD', obligation_type: 'milestone', due_date: '2026-09-10', status: 'expected', created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z' }, { id: 'obligation-b', workspace_id: 'workspace-b', client_id: 'client-b', operations_project_id: null, description: 'Other workspace', amount_cents: 90000, currency: 'USD', obligation_type: 'milestone', due_date: '2026-09-10', status: 'expected', created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z' }]
+                    : table === 'payment_receipts'
+                      ? []
+                      : table === 'recurring_revenue'
+                        ? [{ id: 'recurring-a', workspace_id: 'workspace-a', client_id: 'client-a', description: 'Healthy care plan', amount_cents: 7000, currency: 'USD', cadence: 'monthly', status: 'active', provider: 'square', provider_reference: null, started_at: '2026-03-13', next_expected_at: '2026-10-04', ended_at: null, created_at: '2026-03-13T15:00:00.000Z', updated_at: '2026-03-13T15:00:00.000Z' }]
                   : table === 'clients'
                     ? [{ id: 'client-a', workspace_id: 'workspace-a', name: 'Ecclection', contact_email: null, contact_phone: null, status: 'active', created_at: '2026-09-01T15:00:00.000Z' }, { id: 'client-b', workspace_id: 'workspace-b', name: 'Other', contact_email: null, contact_phone: null, status: 'active', created_at: '2026-09-01T15:00:00.000Z' }]
               : []
@@ -120,6 +126,9 @@ describe('CEO Today endpoint', () => {
       'operations_projects',
       'project_requirements',
       'clients',
+      'financial_obligations',
+      'payment_receipts',
+      'recurring_revenue',
       'marketing_publish_destination_results',
     ])
     for (const { table, current } of queries) {
@@ -132,6 +141,7 @@ describe('CEO Today endpoint', () => {
     expect(queries.find(({ table }) => table === 'clients').current.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
     expect(res.json.mock.calls[0][0].all_actions).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: 'operations:project-a', source_type: 'operations_delivery' }),
+      expect.objectContaining({ id: 'accounting:financial_obligation:obligation-a', department: 'ACCOUNTING', business_priority: 'CONTROL MONEY', href: '/admin/accounting' }),
     ]))
     expect(fetchSpy).not.toHaveBeenCalled()
     vi.unstubAllGlobals()
