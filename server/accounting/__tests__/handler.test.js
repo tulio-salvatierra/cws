@@ -111,4 +111,25 @@ describe('Accounting endpoint', () => {
     expect(insert.insert).toHaveBeenCalledWith(expect.objectContaining({ cadence: 'monthly', status: 'active', amount_cents: 7000, provider: 'square' }))
     expect(res.status).toHaveBeenCalledWith(201)
   })
+
+  it('allows only an owner to correct recurring details within the current workspace', async () => {
+    const update = query({ data: { id: 'recurring-a', started_at: '2026-03-13' }, error: null })
+    const client = { from: vi.fn(() => update) }
+    mocks.authenticateAccountingOwner.mockResolvedValue({ ...context, client })
+    const res = response(); await handler({ method: 'POST', body: {
+      action: 'update_recurring_revenue', recurring_revenue_id: 'recurring-a', description: 'Monthly subscription', amount_cents: 7000, provider: 'square', provider_reference: '', started_at: '2026-03-13', next_expected_at: '2026-10-04',
+    } }, res)
+    expect(update.update).toHaveBeenCalledWith(expect.objectContaining({ description: 'Monthly subscription', amount_cents: 7000, provider: 'square', started_at: '2026-03-13', next_expected_at: '2026-10-04' }))
+    expect(update.eq).toHaveBeenCalledWith('id', 'recurring-a')
+    expect(update.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
+    expect(res.status).toHaveBeenCalledWith(200)
+  })
+
+  it('rejects invalid recurring corrections before an update', async () => {
+    mocks.authenticateAccountingOwner.mockResolvedValue(context)
+    const res = response(); await handler({ method: 'POST', body: {
+      action: 'update_recurring_revenue', recurring_revenue_id: 'recurring-a', description: 'Monthly subscription', amount_cents: 0, provider: 'square', started_at: '2026-03-13',
+    } }, res)
+    expect(res.status).toHaveBeenCalledWith(400)
+  })
 })

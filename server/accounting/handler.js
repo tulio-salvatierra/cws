@@ -69,6 +69,7 @@ async function runOwnerAction(req, res) {
   if (body.action === 'record_payment_receipt') return recordPaymentReceipt(context, body, res)
   if (body.action === 'resolve_financial_obligation') return resolveFinancialObligation(context, body, res)
   if (body.action === 'create_recurring_revenue') return createRecurringRevenue(context, body, res)
+  if (body.action === 'update_recurring_revenue') return updateRecurringRevenue(context, body, res)
   if (body.action === 'set_recurring_revenue_status') return setRecurringRevenueStatus(context, body, res)
   return res.status(400).json({ ok: false, error: 'Unknown Accounting action.' })
 }
@@ -202,6 +203,34 @@ async function setRecurringRevenueStatus(context, body, res) {
     .eq('id', recurringId).eq('workspace_id', context.workspaceId)
     .select('id, status, ended_at, updated_at').maybeSingle()
   if (result.error) return res.status(502).json({ ok: false, error: 'Recurring revenue could not be updated.' })
+  if (!result.data) return res.status(404).json({ ok: false, error: 'Recurring revenue not found.' })
+  return res.status(200).json({ ok: true, recurring_revenue: result.data })
+}
+
+async function updateRecurringRevenue(context, body, res) {
+  const recurringId = cleanText(body.recurring_revenue_id, 50)
+  const values = {
+    description: cleanText(body.description, 500),
+    amountCents: cents(body.amount_cents),
+    provider: cleanText(body.provider, 50),
+    providerReference: cleanText(body.provider_reference, 500) || null,
+    startedAt: dateOnly(body.started_at, { required: true }),
+    nextExpectedAt: dateOnly(body.next_expected_at),
+  }
+  if (!validUuid(recurringId) || !values.description || !values.amountCents || !RECURRING_PROVIDERS.includes(values.provider) || !values.startedAt || (body.next_expected_at && !values.nextExpectedAt)) {
+    return res.status(400).json({ ok: false, error: 'Recurring revenue details are invalid.' })
+  }
+
+  const result = await context.client.from('recurring_revenue').update({
+    description: values.description,
+    amount_cents: values.amountCents,
+    provider: values.provider,
+    provider_reference: values.providerReference,
+    started_at: values.startedAt,
+    next_expected_at: values.nextExpectedAt,
+  }).eq('id', recurringId).eq('workspace_id', context.workspaceId)
+    .select('id, workspace_id, client_id, description, amount_cents, currency, cadence, status, provider, provider_reference, started_at, next_expected_at, ended_at, created_at, updated_at').maybeSingle()
+  if (result.error) return res.status(502).json({ ok: false, error: 'Recurring revenue details could not be updated.' })
   if (!result.data) return res.status(404).json({ ok: false, error: 'Recurring revenue not found.' })
   return res.status(200).json({ ok: true, recurring_revenue: result.data })
 }

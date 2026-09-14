@@ -46,6 +46,19 @@ describe('AccountingPage', () => {
     expect(globalThis.fetch.mock.calls[1][1]).toMatchObject({ method: 'POST', body: expect.stringContaining('"amount_cents":75000') })
   })
 
+  it('requires an explicit owner action to correct recurring revenue details', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValueOnce(response(state)).mockResolvedValueOnce(response({ ok: true, recurring_revenue: { id: 'recurring-a' } })).mockResolvedValueOnce(response(state))
+    render(<AccountingPage />)
+    await screen.findByRole('heading', { name: 'Accounting' })
+    fireEvent.click(screen.getByRole('button', { name: 'Edit details' }))
+    expect(screen.getByRole('heading', { name: 'Edit recurring revenue' })).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('Start date'), { target: { value: '2026-03-13' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save recurring revenue' }))
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
+    expect(globalThis.fetch.mock.calls[1][1]).toMatchObject({ method: 'POST', body: expect.stringContaining('"action":"update_recurring_revenue"') })
+    expect(globalThis.fetch.mock.calls[1][1].body).toContain('"started_at":"2026-03-13"')
+  })
+
   it('parses money into integer cents without floating point input', () => {
     expect(dollarsToCents('70')).toBe(7000)
     expect(dollarsToCents('70.01')).toBe(7001)

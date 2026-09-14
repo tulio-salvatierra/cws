@@ -34,6 +34,7 @@ export default function AccountingPage() {
   const [showObligation, setShowObligation] = useState(false)
   const [showReceipt, setShowReceipt] = useState(false)
   const [showRecurring, setShowRecurring] = useState(false)
+  const [editingRecurring, setEditingRecurring] = useState(null)
 
   const load = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -102,6 +103,7 @@ export default function AccountingPage() {
     {showObligation && <ObligationForm clients={clients} projects={clientProjects} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setShowObligation(false) }} />}
     {showReceipt && <ReceiptForm obligations={accounting?.outstanding_obligations || []} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setShowReceipt(false) }} />}
     {showRecurring && <RecurringForm clients={clients} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setShowRecurring(false) }} />}
+    {editingRecurring && <RecurringEditForm key={editingRecurring.id} item={editingRecurring} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setEditingRecurring(null) }} />}
 
     <section className="mt-10"><SectionTitle title="Outstanding money" description="Expected payments not yet fully covered by recorded receipts." />
       <div className="mt-4 space-y-3">{accounting?.outstanding_obligations?.length
@@ -117,7 +119,7 @@ export default function AccountingPage() {
 
     <section className="mt-10"><SectionTitle title="Recurring revenue" description="Expected recurring revenue only; Square or another provider remains responsible for charging customers." />
       <div className="mt-4 space-y-3">{accounting?.recurring_revenue?.length
-        ? accounting.recurring_revenue.map((item) => <RecurringRow key={item.id} item={item} busy={busy} onAction={ownerAction} />)
+        ? accounting.recurring_revenue.map((item) => <RecurringRow key={item.id} item={item} busy={busy} onAction={ownerAction} onEdit={() => setEditingRecurring(item)} />)
         : <Empty message="No recurring revenue recorded yet." />}</div>
     </section>
   </div></main>
@@ -169,15 +171,37 @@ function RecurringForm({ clients, busy, onSubmit }) {
   </form></FormPanel>
 }
 
+function RecurringEditForm({ item, busy, onSubmit }) {
+  const [values, setValues] = useState({
+    description: item.description || '',
+    amount: String(Number(item.amount_cents || 0) / 100),
+    provider: item.provider || 'manual',
+    provider_reference: item.provider_reference || '',
+    started_at: item.started_at || '',
+    next_expected_at: item.next_expected_at || '',
+  })
+  return <FormPanel title="Edit recurring revenue"><form className="mt-4 grid gap-3 md:grid-cols-2" onSubmit={(event) => {
+    event.preventDefault(); const amount_cents = dollarsToCents(values.amount); if (!amount_cents) return; void onSubmit({ action: 'update_recurring_revenue', recurring_revenue_id: item.id, ...values, amount_cents })
+  }}>
+    <Input required label="Description" value={values.description} onChange={(description) => setValues({ ...values, description })} />
+    <Input required label="Monthly amount (USD)" value={values.amount} onChange={(amount) => setValues({ ...values, amount })} inputMode="decimal" />
+    <Select label="Provider" value={values.provider} options={RECURRING_PROVIDERS} onChange={(provider) => setValues({ ...values, provider })} />
+    <Input required label="Start date" type="date" value={values.started_at} onChange={(started_at) => setValues({ ...values, started_at })} />
+    <Input label="Next expected date (optional)" type="date" value={values.next_expected_at} onChange={(next_expected_at) => setValues({ ...values, next_expected_at })} />
+    <Input label="Provider reference (optional)" value={values.provider_reference} onChange={(provider_reference) => setValues({ ...values, provider_reference })} />
+    <button disabled={busy} className="rounded-xl bg-orange-300 px-4 py-3 font-semibold text-slate-950 disabled:opacity-50">Save recurring revenue</button>
+  </form></FormPanel>
+}
+
 function ObligationRow({ item, busy, onAction }) {
   return <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><div className="flex flex-wrap justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-200">{label(item.financial_state)}</p><h3 className="mt-1 text-lg font-semibold">{item.client?.name || 'Client unavailable'}</h3><p className="mt-1 text-sm text-slate-300">{item.description}{item.project?.name ? ` · ${item.project.name}` : ''}</p>{item.due_date && <p className="mt-2 text-sm text-slate-400">Due {item.due_date}</p>}</div><div className="text-right"><p className="text-xl font-semibold">{money(item.outstanding_amount_cents)}</p><p className="mt-1 text-sm text-slate-400">of {money(item.amount_cents)} outstanding</p></div></div>
     <div className="mt-4 flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={() => onAction({ action: 'resolve_financial_obligation', financial_obligation_id: item.id, status: 'waived' })} className="rounded-full border border-white/20 px-3 py-2 text-sm disabled:opacity-50">Waive</button><button type="button" disabled={busy} onClick={() => onAction({ action: 'resolve_financial_obligation', financial_obligation_id: item.id, status: 'cancelled' })} className="rounded-full border border-white/20 px-3 py-2 text-sm disabled:opacity-50">Cancel</button></div>
   </article>
 }
 
-function RecurringRow({ item, busy, onAction }) {
+function RecurringRow({ item, busy, onAction, onEdit }) {
   return <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><div className="flex flex-wrap justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-200">{label(item.status)} · {label(item.provider)}</p><h3 className="mt-1 text-lg font-semibold">{item.client?.name || 'Client unavailable'}</h3><p className="mt-1 text-sm text-slate-300">{item.description}</p>{item.next_expected_at && <p className="mt-2 text-sm text-slate-400">Next expected {item.next_expected_at}</p>}</div><p className="text-xl font-semibold">{money(item.amount_cents)}<span className="text-sm font-normal text-slate-400"> / month</span></p></div>
-    {item.status === 'active' && <div className="mt-4 flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={() => onAction({ action: 'set_recurring_revenue_status', recurring_revenue_id: item.id, status: 'paused' })} className="rounded-full border border-white/20 px-3 py-2 text-sm disabled:opacity-50">Pause</button><button type="button" disabled={busy} onClick={() => onAction({ action: 'set_recurring_revenue_status', recurring_revenue_id: item.id, status: 'ended', ended_at: today() })} className="rounded-full border border-white/20 px-3 py-2 text-sm disabled:opacity-50">End</button></div>}
+    <div className="mt-4 flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={onEdit} className="rounded-full border border-white/20 px-3 py-2 text-sm disabled:opacity-50">Edit details</button>{item.status === 'active' && <><button type="button" disabled={busy} onClick={() => onAction({ action: 'set_recurring_revenue_status', recurring_revenue_id: item.id, status: 'paused' })} className="rounded-full border border-white/20 px-3 py-2 text-sm disabled:opacity-50">Pause</button><button type="button" disabled={busy} onClick={() => onAction({ action: 'set_recurring_revenue_status', recurring_revenue_id: item.id, status: 'ended', ended_at: today() })} className="rounded-full border border-white/20 px-3 py-2 text-sm disabled:opacity-50">End</button></>}</div>
   </article>
 }
 
