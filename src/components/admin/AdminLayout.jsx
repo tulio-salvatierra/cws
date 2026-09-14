@@ -6,6 +6,7 @@ const NAV = [
   { to: '/admin/marketing', label: 'Marketing V1' },
   { to: '/admin/operations', label: 'Operations' },
   { to: '/admin/accounting', label: 'Accounting' },
+  { to: '/admin/compliance', label: 'Compliance' },
   { to: '/admin/workspace', label: '🧭 Workspace' },
   { to: '/admin/channels', label: 'Channels' },
   { to: '/admin/campaigns', label: 'Campaigns' },
