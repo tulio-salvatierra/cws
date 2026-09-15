@@ -161,7 +161,7 @@ describe('M5 Marketing endpoint', () => {
   it('creates only Post A from one confirmed Post A request and locks a duplicate request', async () => {
     const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts(); readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
     globalThis.fetch
-      .mockResolvedValueOnce(providerResponse(200, { id: 'upload-1' }))
+      .mockResolvedValueOnce(providerResponse(200, { uploadId: 'upload-1' }))
       .mockResolvedValueOnce(providerResponse(200, { id: 'bundle-post-1', status: 'PROCESSING', externalData: {} }))
     const response = makeResponse(); await handler(request({ method: 'POST', body: { caption: 'M5 caption.', slot_key: m5SlotKey, asset_id: 'website-launch', reference_key: m5Reference, owner_confirmation_token: ownerConfirmation() } }), response)
     expect(response.statusCode).toBe(202)
