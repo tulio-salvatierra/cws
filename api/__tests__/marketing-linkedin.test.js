@@ -158,6 +158,24 @@ describe('M5 Marketing endpoint', () => {
     expect(response.statusCode).toBe(409); expect(database.state.attemptInserts).toEqual([]); expect(readFile).not.toHaveBeenCalled()
   })
 
+  it('rejects a confirmation for the withdrawn portrait asset before any upload or provider post', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    const response = makeResponse(); await handler(request({ method: 'POST', body: {
+      caption: 'Photography caption.',
+      slot_key: m5SlotKey,
+      asset_id: 'business-photography-350',
+      reference_key: m5Reference,
+      owner_confirmation_token: ownerConfirmation(m5SlotKey, 'business-photography-350'),
+    } }), response)
+    expect(response.statusCode).toBe(409)
+    expect(response.body.error).toMatch(/not ready with the selected evergreen asset/i)
+    expect(database.state.attemptInserts).toEqual([])
+    expect(database.state.destinationInserts).toEqual([])
+    expect(readFile).not.toHaveBeenCalled()
+    expect(globalThis.fetch.mock.calls.filter(([url, options]) => url.endsWith('/upload/') && options?.method === 'POST')).toHaveLength(0)
+    expect(globalThis.fetch.mock.calls.filter(([url, options]) => url.endsWith('/post') && options?.method === 'POST')).toHaveLength(0)
+  })
+
   it('creates only Post A from one confirmed Post A request and locks a duplicate request', async () => {
     const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts(); readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
     globalThis.fetch

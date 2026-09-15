@@ -38,7 +38,11 @@ export const EVERGREEN_ASSETS = [
     label: 'Business Photography',
     price: '$350',
     defaultCaption: 'Professional photos make your website, Google Business Profile, and social media feel like your business. On-location Business Photography is $350. Contact Cicero Web Studio to book a session.',
-    enabled: true,
+    // This source is 720 × 1280 (0.5625). The fixed three-destination
+    // publisher includes Instagram, which requires at least 0.8. Keep the
+    // asset in the catalog for durable history, but do not offer it for a
+    // future owner confirmation until it has a verified replacement.
+    enabled: false,
     rotationOrder: 3,
     fallback: false,
   },

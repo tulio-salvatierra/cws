@@ -43,6 +43,19 @@ describe('M5 weekly Marketing slots', () => {
     ])
   })
 
+  it('withholds the portrait photography asset from the fixed Instagram-inclusive rotation', () => {
+    const photography = EVERGREEN_ASSETS.find(asset => asset.id === 'business-photography-350')
+    expect(photography).toMatchObject({
+      assetPath: '/images/business-photography-350.jpeg',
+      enabled: false,
+      fallback: false,
+    })
+    expect(chooseNextAsset(EVERGREEN_ASSETS, [
+      successfulAttempt('website-launch', '2026-09-01T12:00:00.000Z'),
+      successfulAttempt('bilingual-website', '2026-09-02T12:00:00.000Z'),
+    ])?.id).not.toBe('business-photography-350')
+  })
+
   it('creates exactly Tuesday and Friday slots for the current Chicago week', () => {
     const slots = buildWeeklySlotPlan({ now: new Date('2026-09-09T17:00:00.000Z'), assets, attempts: [] })
     expect(marketingWeekStart(new Date('2026-09-09T17:00:00.000Z'))).toBe('2026-09-07')
