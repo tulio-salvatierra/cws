@@ -125,4 +125,29 @@ describe('AdminOverview CEO Today', () => {
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
     expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
   })
+
+  it('renders a read-only PROTECT verification card and keeps Not now local', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({
+      ok: true,
+      actions: [{
+        id: 'compliance:requirement-a',
+        department: 'COMPLIANCE',
+        business_priority: 'PROTECT',
+        human_action: 'Verify Illinois annual report',
+        why_now: 'Verify whether Illinois annual report applies. Authority to review: Illinois Secretary of State.',
+        href: '/admin/compliance',
+        cta_label: 'Review Compliance',
+      }],
+    }))
+
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+
+    expect(await screen.findByRole('heading', { name: 'Verify Illinois annual report', level: 2 })).toBeInTheDocument()
+    expect(screen.getByText(/Verify whether Illinois annual report applies/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Review Compliance' })).toHaveAttribute('href', '/admin/compliance')
+    fireEvent.click(screen.getByRole('button', { name: 'Not now' }))
+    expect(screen.queryByRole('heading', { name: 'Verify Illinois annual report', level: 2 })).not.toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+    expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
+  })
 })

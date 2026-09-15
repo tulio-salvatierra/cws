@@ -94,8 +94,15 @@ describe('CEO Today endpoint', () => {
                     ? [{ id: 'obligation-a', workspace_id: 'workspace-a', client_id: 'client-a', operations_project_id: null, description: 'September website work', amount_cents: 75000, currency: 'USD', obligation_type: 'milestone', due_date: '2026-09-10', status: 'expected', created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z' }, { id: 'obligation-b', workspace_id: 'workspace-b', client_id: 'client-b', operations_project_id: null, description: 'Other workspace', amount_cents: 90000, currency: 'USD', obligation_type: 'milestone', due_date: '2026-09-10', status: 'expected', created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z' }]
                     : table === 'payment_receipts'
                       ? []
-                      : table === 'recurring_revenue'
+                  : table === 'recurring_revenue'
                         ? [{ id: 'recurring-a', workspace_id: 'workspace-a', client_id: 'client-a', description: 'Healthy care plan', amount_cents: 7000, currency: 'USD', cadence: 'monthly', status: 'active', provider: 'square', provider_reference: null, started_at: '2026-03-13', next_expected_at: '2026-10-04', ended_at: null, created_at: '2026-03-13T15:00:00.000Z', updated_at: '2026-03-13T15:00:00.000Z' }]
+                        : table === 'compliance_requirements'
+                          ? [
+                              { id: 'compliance-a', workspace_id: 'workspace-a', title: 'Illinois annual report', category: 'filing', authority_name: 'Illinois Secretary of State', source_url: 'https://www.ilsos.gov/', jurisdiction: 'Illinois', description: 'Annual filing.', applicability_status: 'needs_verification', verified_by_owner_at: null, verified_by_owner_id: null, verified_source_at: null, recurrence_type: 'annual', recurrence_interval: null, last_completed_at: null, next_due_date: null, status: 'active', notes: null, created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z' },
+                              { id: 'compliance-b', workspace_id: 'workspace-b', title: 'Other workspace requirement', category: 'filing', authority_name: 'Other', source_url: null, jurisdiction: null, description: 'Other.', applicability_status: 'needs_verification', verified_by_owner_at: null, verified_by_owner_id: null, verified_source_at: null, recurrence_type: 'annual', recurrence_interval: null, last_completed_at: null, next_due_date: null, status: 'active', notes: null, created_at: '2026-09-01T15:00:00.000Z', updated_at: '2026-09-01T15:00:00.000Z' },
+                            ]
+                          : table === 'compliance_completions'
+                            ? []
                   : table === 'clients'
                     ? [{ id: 'client-a', workspace_id: 'workspace-a', name: 'Ecclection', contact_email: null, contact_phone: null, status: 'active', created_at: '2026-09-01T15:00:00.000Z' }, { id: 'client-b', workspace_id: 'workspace-b', name: 'Other', contact_email: null, contact_phone: null, status: 'active', created_at: '2026-09-01T15:00:00.000Z' }]
               : []
@@ -129,6 +136,8 @@ describe('CEO Today endpoint', () => {
       'financial_obligations',
       'payment_receipts',
       'recurring_revenue',
+      'compliance_requirements',
+      'compliance_completions',
       'marketing_publish_destination_results',
     ])
     for (const { table, current } of queries) {
@@ -142,6 +151,7 @@ describe('CEO Today endpoint', () => {
     expect(res.json.mock.calls[0][0].all_actions).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: 'operations:project-a', source_type: 'operations_delivery' }),
       expect.objectContaining({ id: 'accounting:financial_obligation:obligation-a', department: 'ACCOUNTING', business_priority: 'CONTROL MONEY', href: '/admin/accounting' }),
+      expect.objectContaining({ id: 'compliance:compliance-a', department: 'COMPLIANCE', business_priority: 'PROTECT', href: '/admin/compliance' }),
     ]))
     expect(fetchSpy).not.toHaveBeenCalled()
     vi.unstubAllGlobals()

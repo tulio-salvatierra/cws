@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { buildCeoToday, CEO_ACTION_LIMIT } from '../today.js'
 import { buildAccountingReadModel } from '../../accounting/read-model.js'
+import { buildComplianceReadModel } from '../../compliance/read-model.js'
 
 const wednesday = new Date('2026-09-09T18:00:00.000Z')
 const friday = new Date('2026-09-11T18:00:00.000Z')
@@ -69,6 +70,23 @@ function accountingProjection(overrides = {}) {
 
 function accountingActions(result) {
   return result.all_actions.filter((item) => item.source_type === 'accounting_financial')
+}
+
+function complianceProjection(overrides = {}) {
+  return {
+    requirement_id: 'compliance-a',
+    title: 'Illinois annual report',
+    compliance_state: 'compliance_overdue',
+    next_due_date: '2026-09-10',
+    authority_name: 'Illinois Secretary of State',
+    human_reason: 'Owner-verified requirement was due 2026-09-10.',
+    source_timestamp: '2026-09-01T15:00:00.000Z',
+    ...overrides,
+  }
+}
+
+function complianceActions(result) {
+  return result.all_actions.filter((item) => item.source_type === 'compliance_requirement')
 }
 
 describe('CEO Today prioritizer', () => {
@@ -406,5 +424,123 @@ describe('CEO Today prioritizer', () => {
     expect(accountingActions(result)).toHaveLength(1)
     expect(result.actions).toHaveLength(CEO_ACTION_LIMIT)
     expect(result.actions.some((item) => item.department === 'ACCOUNTING')).toBe(false)
+  })
+
+  it('translates each actionable Compliance projection condition once without duplicating C1 deadline logic', () => {
+    const result = buildCeoToday({
+      now: friday,
+      complianceProjection: [
+        complianceProjection({ requirement_id: 'overdue', compliance_state: 'compliance_overdue', next_due_date: '2026-09-10' }),
+        complianceProjection({ requirement_id: 'due', compliance_state: 'compliance_due', next_due_date: '2026-09-11', human_reason: 'Owner-verified requirement is due today (2026-09-11).' }),
+        complianceProjection({ requirement_id: 'approaching', compliance_state: 'compliance_approaching', next_due_date: '2026-09-20', human_reason: 'Owner-verified requirement is due 2026-09-20.' }),
+        complianceProjection({ requirement_id: 'unverified', compliance_state: 'compliance_needs_verification', next_due_date: null, human_reason: 'Verify whether Illinois annual report applies. Authority to review: Illinois Secretary of State.' }),
+      ],
+    })
+
+    expect(complianceActions(result)).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'compliance:overdue', department: 'COMPLIANCE', business_priority: 'PROTECT',
+        human_action: 'Review Compliance: Illinois annual report', href: '/admin/compliance', cta_label: 'Review Compliance', priority_tier: 1,
+      }),
+      expect.objectContaining({ id: 'compliance:due', priority_tier: 6 }),
+      expect.objectContaining({ id: 'compliance:approaching', priority_tier: 6 }),
+      expect.objectContaining({ id: 'compliance:unverified', human_action: 'Verify Illinois annual report', priority_tier: 6 }),
+    ]))
+  })
+
+  it('keeps Compliance verification wording explicitly uncertain', () => {
+    const result = buildCeoToday({
+      now: friday,
+      complianceProjection: [complianceProjection({
+        compliance_state: 'compliance_needs_verification',
+        next_due_date: null,
+        human_reason: 'Verify whether Illinois annual report applies. Authority to review: Illinois Secretary of State.',
+      })],
+    })
+    const [candidate] = complianceActions(result)
+
+    expect(candidate).toMatchObject({ human_action: 'Verify Illinois annual report' })
+    expect(candidate.why_now).toMatch(/^Verify whether /)
+    expect(`${candidate.human_action} ${candidate.why_now}`).not.toMatch(/\b(file|must)\b/i)
+  })
+
+  it('omits verified OK and owner-reviewed not-applicable Compliance records', () => {
+    const workspaceId = 'workspace-a'
+    const verified = {
+      workspace_id: workspaceId,
+      applicability_status: 'applies',
+      verified_by_owner_at: '2026-09-01T10:00:00.000Z',
+      verified_by_owner_id: 'owner-a',
+      status: 'active',
+      created_at: '2026-09-01T10:00:00.000Z',
+      recurrence_type: 'none',
+      title: 'Illinois annual report',
+      authority_name: 'Illinois Secretary of State',
+    }
+    const compliance = buildComplianceReadModel({
+      workspaceId,
+      now: friday,
+      requirements: [
+        { ...verified, id: 'ok', next_due_date: null },
+        { ...verified, id: 'not-applicable', applicability_status: 'not_applicable', next_due_date: '2026-09-01' },
+      ],
+    })
+    const result = buildCeoToday({ now: friday, complianceProjection: compliance.ceo_projection })
+
+    expect(compliance.ceo_projection).toEqual([])
+    expect(complianceActions(result)).toEqual([])
+  })
+
+  it('keeps normal PROTECT after GET MONEY, DELIVER, and CONTROL MONEY work', () => {
+    const result = buildCeoToday({
+      now: friday,
+      leads: [lead({ company: 'Northside Repair' })],
+      operationsProjects: [operationsProject()],
+      accountingProjection: [accountingProjection({ financial_state: 'payment_due', due_date: '2026-09-11' })],
+      complianceProjection: [complianceProjection({ compliance_state: 'compliance_due', next_due_date: '2026-09-11' })],
+    })
+    const salesIndex = result.all_actions.findIndex((item) => item.department === 'SALES')
+    const operationsIndex = result.all_actions.findIndex((item) => item.department === 'OPERATIONS')
+    const accountingIndex = result.all_actions.findIndex((item) => item.department === 'ACCOUNTING')
+    const complianceIndex = result.all_actions.findIndex((item) => item.department === 'COMPLIANCE')
+
+    expect(salesIndex).toBeLessThan(complianceIndex)
+    expect(operationsIndex).toBeLessThan(complianceIndex)
+    expect(accountingIndex).toBeLessThan(complianceIndex)
+  })
+
+  it('orders normal Compliance work due, approaching, then verification with durable ties and retains it below the visible cap', () => {
+    const result = buildCeoToday({
+      now: friday,
+      leads: Array.from({ length: 5 }, (_, index) => lead({ id: `lead-${index}`, company: `Company ${index}` })),
+      complianceProjection: [
+        complianceProjection({ requirement_id: 'verify', compliance_state: 'compliance_needs_verification', next_due_date: null, source_timestamp: '2026-09-01T00:00:00.000Z' }),
+        complianceProjection({ requirement_id: 'approaching-late', compliance_state: 'compliance_approaching', next_due_date: '2026-09-20', source_timestamp: '2026-09-04T00:00:00.000Z' }),
+        complianceProjection({ requirement_id: 'approaching-early', compliance_state: 'compliance_approaching', next_due_date: '2026-09-20', source_timestamp: '2026-09-03T00:00:00.000Z' }),
+        complianceProjection({ requirement_id: 'due', compliance_state: 'compliance_due', next_due_date: '2026-09-11' }),
+      ],
+    })
+
+    expect(complianceActions(result).map((item) => item.id)).toEqual([
+      'compliance:due',
+      'compliance:approaching-early',
+      'compliance:approaching-late',
+      'compliance:verify',
+    ])
+    expect(result.actions).toHaveLength(CEO_ACTION_LIMIT)
+    expect(result.actions.some((item) => item.department === 'COMPLIANCE')).toBe(false)
+  })
+
+  it('deduplicates malformed repeated Compliance projections by requirement and fails closed for unknown states', () => {
+    const result = buildCeoToday({
+      now: friday,
+      complianceProjection: [
+        complianceProjection({ requirement_id: 'same', compliance_state: 'compliance_approaching', next_due_date: '2026-09-20' }),
+        complianceProjection({ requirement_id: 'same', compliance_state: 'compliance_due', next_due_date: '2026-09-11' }),
+        complianceProjection({ requirement_id: 'unknown', compliance_state: 'compliance_ok' }),
+      ],
+    })
+
+    expect(complianceActions(result)).toEqual([expect.objectContaining({ id: 'compliance:same', priority_tier: 6 })])
   })
 })

@@ -9,6 +9,7 @@ const TIER = {
   marketing: 3,
   deliver: 4,
   controlMoney: 5,
+  protect: 6,
 }
 
 const OPERATIONS_STATE_ORDER = {
@@ -23,6 +24,12 @@ const ACCOUNTING_STATE_ORDER = {
   recurring_attention: 3,
 }
 
+const COMPLIANCE_STATE_ORDER = {
+  compliance_due: 1,
+  compliance_approaching: 2,
+  compliance_needs_verification: 3,
+}
+
 // CEO Today deliberately owns only this pure, read-side projection. The
 // underlying Sales and Marketing records remain the systems of record.
 export function buildCeoToday({
@@ -33,6 +40,7 @@ export function buildCeoToday({
   marketingResolutions = [],
   operationsProjects = [],
   accountingProjection = [],
+  complianceProjection = [],
   now = new Date(),
 } = {}) {
   const today = chicagoDate(now)
@@ -48,6 +56,7 @@ export function buildCeoToday({
     ...marketingActions(marketingPlan, now),
     ...operationsActions(operationsProjects),
     ...accountingActions(accountingProjection),
+    ...complianceActions(complianceProjection),
   ].sort(compareActions)
 
   const visibleActions = actions.slice(0, CEO_ACTION_LIMIT)
@@ -56,6 +65,52 @@ export function buildCeoToday({
     all_actions: actions,
     sales_summary: salesQueue.summary,
   }
+}
+
+function complianceActions(projection) {
+  const byRequirementId = new Map()
+
+  for (const row of projection || []) {
+    if (!row?.requirement_id || !row?.title) continue
+    const overdue = row.compliance_state === 'compliance_overdue'
+    const complianceOrder = COMPLIANCE_STATE_ORDER[row.compliance_state]
+    if (!overdue && !complianceOrder) continue
+
+    const verifying = row.compliance_state === 'compliance_needs_verification'
+    const candidate = action({
+      id: `compliance:${row.requirement_id}`,
+      department: 'COMPLIANCE',
+      businessPriority: 'PROTECT',
+      humanAction: verifying ? `Verify ${row.title}` : `Review Compliance: ${row.title}`,
+      whyNow: complianceReason(row),
+      href: '/admin/compliance',
+      ctaLabel: 'Review Compliance',
+      tier: overdue ? TIER.urgent : TIER.protect,
+      actionableOn: row.next_due_date || '',
+      sourceTimestamp: row.source_timestamp || '',
+      sourceType: 'compliance_requirement',
+      complianceOrder: overdue ? 0 : complianceOrder,
+    })
+
+    const current = byRequirementId.get(row.requirement_id)
+    if (!current || compareComplianceActions(candidate, current) < 0) byRequirementId.set(row.requirement_id, candidate)
+  }
+
+  return [...byRequirementId.values()]
+}
+
+function complianceReason(row) {
+  if (row.compliance_state === 'compliance_needs_verification') {
+    return row.human_reason || `Confirm whether ${row.title} applies to CWS.`
+  }
+  return row.human_reason || 'Compliance status requires owner review.'
+}
+
+function compareComplianceActions(left, right) {
+  return left.compliance_order - right.compliance_order
+    || String(left.actionable_on || '9999-12-31').localeCompare(String(right.actionable_on || '9999-12-31'))
+    || String(left.source_timestamp).localeCompare(String(right.source_timestamp))
+    || left.id.localeCompare(right.id)
 }
 
 function accountingActions(projection) {
@@ -274,6 +329,7 @@ function action({
   salesOrder = null,
   operationsOrder = null,
   accountingOrder = null,
+  complianceOrder = null,
 }) {
   return {
     id,
@@ -290,6 +346,7 @@ function action({
     sales_order: salesOrder,
     operations_order: operationsOrder,
     accounting_order: accountingOrder,
+    compliance_order: complianceOrder,
   }
 }
 
@@ -324,6 +381,10 @@ function compareActions(left, right) {
 
   if (left.priority_tier === TIER.controlMoney && left.accounting_order !== null && right.accounting_order !== null) {
     return compareAccountingActions(left, right)
+  }
+
+  if (left.priority_tier === TIER.protect && left.compliance_order !== null && right.compliance_order !== null) {
+    return compareComplianceActions(left, right)
   }
 
   return String(left.actionable_on).localeCompare(String(right.actionable_on))
