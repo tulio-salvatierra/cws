@@ -158,3 +158,38 @@ describe('MarketingPage M6 missed slots', () => {
     expect(window.confirm).toHaveBeenCalledWith('Do you want to move this post to the next scheduled slot? This will not publish anything.')
   })
 })
+
+describe('MarketingPage failed-slot recovery', () => {
+  beforeEach(() => {
+    useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true))
+  })
+
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('closes an all-error slot without sending a caption, reference key, or publish request', async () => {
+    const failedAttempt = { id: 'm5-attempt', provider_status: 'error' }
+    const failedResults = [
+      { id: 'li', platform: 'LINKEDIN', provider_status: 'error', provider_error: 'Image ratio is unsupported.' },
+      { id: 'fb', platform: 'FACEBOOK', provider_status: 'error', provider_error: 'Image ratio is unsupported.' },
+      { id: 'ig', platform: 'INSTAGRAM', provider_status: 'error', provider_error: 'Image ratio is unsupported.' },
+    ]
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(statusBody({ slots: [slot('post-a', 'failed', failedAttempt, failedResults), slot('post-b')] })))
+      .mockResolvedValueOnce(response({ ok: true, decision: 'close_failed' }))
+      .mockResolvedValueOnce(response(statusBody({ slots: [slot('post-a', 'resolved', failedAttempt, failedResults), slot('post-b')] })))
+
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Close failed slot' })).toBeEnabled())
+    expect(screen.getByText('Failed — close required')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Close failed slot' }))
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
+
+    const [, options] = globalThis.fetch.mock.calls[1]
+    expect(JSON.parse(options.body)).toEqual({
+      action: 'close_failed', slot_key: '2026-09-07:post-a', asset_id: 'website-launch', owner_confirmation_token: 'post-a-confirmation-token',
+    })
+    expect(window.confirm).toHaveBeenCalledWith('Close this failed slot? The failed attempt will remain in history. Nothing will be retried or published.')
+    expect(screen.queryByRole('button', { name: 'Close failed slot' })).not.toBeInTheDocument()
+  })
+})

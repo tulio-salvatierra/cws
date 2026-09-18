@@ -7,6 +7,7 @@ const SLOT_DETAILS = {
   upcoming: { label: 'Upcoming', detail: 'Waiting for an eligible evergreen asset.' },
   ready: { label: 'Ready', detail: 'Ready for the owner to review and confirm.' },
   missed: { label: 'Missed — decision required', detail: 'The scheduled day passed without a successful publication. Choose what happens next.' },
+  failed: { label: 'Failed — close required', detail: 'No destination was published. Close this failed occurrence to unlock the next slot without retrying it.' },
   resolved: { label: 'Decision recorded', detail: 'This occurrence has an owner decision and remains in Marketing history.' },
   processing: { label: 'In delivery', detail: 'bundle.social is reconciling this confirmed post.' },
   posted: { label: 'Posted', detail: 'All three destinations are posted.' },
@@ -120,8 +121,31 @@ export default function MarketingPage() {
     }
   }
 
+  async function closeFailedSlot(slot) {
+    if (!session?.access_token || resolvingSlotKey || !canCloseFailedSlot(state, slot)) return
+    if (!window.confirm('Close this failed slot? The failed attempt will remain in history. Nothing will be retried or published.')) return
+    setResolvingSlotKey(slot.slot_key)
+    setState(current => ({ ...current, error: '' }))
+
+    try {
+      const response = await requestMarketing('/api/marketing-linkedin', session.access_token, {
+        action: 'close_failed',
+        slot_key: slot.slot_key,
+        asset_id: slot.asset.id,
+        owner_confirmation_token: slot.owner_confirmation_token,
+      })
+      const body = await readJson(response)
+      if (!response.ok) throw new Error(body.error || 'The failed slot could not be closed.')
+      await refreshStatus()
+    } catch (error) {
+      setState(current => ({ ...current, error: error.message || 'The failed slot could not be closed.' }))
+    } finally {
+      setResolvingSlotKey('')
+    }
+  }
+
   const allVerified = state.destinations.length === 3 && state.destinations.every(destination => destination.verification_state === 'verified')
-  const nextSlot = state.slots.find(slot => ['missed', 'ready', 'processing'].includes(slot.state)) || state.slots.at(-1)
+  const nextSlot = state.slots.find(slot => ['missed', 'failed', 'ready', 'processing'].includes(slot.state)) || state.slots.at(-1)
 
   return (
     <div className="min-h-full bg-gray-950 px-6 py-8 text-white md:px-10 md:py-10">
@@ -148,10 +172,12 @@ export default function MarketingPage() {
             onCaptionChange={value => setCaptions(current => ({ ...current, [slot.slot_key]: value }))}
             onConfirm={() => confirm(slot)}
             onResolve={action => resolveMissedSlot(slot, action)}
+            onCloseFailed={() => closeFailedSlot(slot)}
             confirming={confirmingSlotKey === slot.slot_key}
             resolving={resolvingSlotKey === slot.slot_key}
             canConfirm={canConfirmSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '')}
             canResolve={canResolveMissedSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '')}
+            canCloseFailed={canCloseFailedSlot(state, slot)}
           />)}
         </main>
 
@@ -180,12 +206,12 @@ export default function MarketingPage() {
   )
 }
 
-function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, onResolve, confirming, resolving, canConfirm, canResolve }) {
+function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed }) {
   const detail = SLOT_DETAILS[slot.state] || SLOT_DETAILS.processing
   const locked = Boolean(slot.attempt) || confirming || resolving || slot.state === 'resolved'
   const fallback = slot.asset?.fallback === true
   return <section aria-labelledby={`${slot.key}-heading`} className="rounded-2xl border border-gray-800 bg-gray-900/70 p-5 shadow-2xl shadow-black/20 sm:p-6">
-    <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">{slot.label}</p><h2 id={`${slot.key}-heading`} className="mt-2 text-xl font-semibold text-white">{slot.weekday}</h2><p className="mt-1 text-sm text-gray-400">{slot.state === 'missed' ? `Original scheduled day: ${formatSlotDate(slot.slot_date)}` : formatSlotDate(slot.slot_date)}</p></div><span className={`rounded-full border px-3 py-1 text-xs font-semibold ${slot.state === 'posted' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200' : slot.state === 'ready' ? 'border-indigo-400/30 bg-indigo-400/10 text-indigo-100' : slot.state === 'missed' ? 'border-amber-400/30 bg-amber-400/10 text-amber-100' : 'border-gray-700 bg-gray-800 text-gray-300'}`}>{detail.label}</span></div>
+    <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">{slot.label}</p><h2 id={`${slot.key}-heading`} className="mt-2 text-xl font-semibold text-white">{slot.weekday}</h2><p className="mt-1 text-sm text-gray-400">{slot.state === 'missed' ? `Original scheduled day: ${formatSlotDate(slot.slot_date)}` : formatSlotDate(slot.slot_date)}</p></div><span className={`rounded-full border px-3 py-1 text-xs font-semibold ${slot.state === 'posted' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200' : slot.state === 'ready' ? 'border-indigo-400/30 bg-indigo-400/10 text-indigo-100' : slot.state === 'missed' ? 'border-amber-400/30 bg-amber-400/10 text-amber-100' : slot.state === 'failed' ? 'border-rose-400/30 bg-rose-400/10 text-rose-200' : 'border-gray-700 bg-gray-800 text-gray-300'}`}>{detail.label}</span></div>
     {slot.asset ? <>
       <div className="mt-5 overflow-hidden rounded-xl border border-gray-700 bg-gray-100"><img src={slot.asset.asset_path} alt={slot.asset.label} className="block max-h-[34rem] w-full object-contain" /></div>
       <div className="mt-4 flex items-center gap-2"><h3 className="font-medium text-white">{slot.asset.label}</h3>{slot.asset.price && <span className="text-sm text-gray-400">{slot.asset.price}</span>}{fallback && <span className="rounded bg-amber-400/10 px-2 py-0.5 text-xs text-amber-100">Fallback asset</span>}</div>
@@ -200,8 +226,8 @@ function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, o
       <button type="button" disabled={!canConfirm || confirming || resolving} onClick={onConfirm} className="rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-45">{confirming ? 'Starting post…' : 'Publish now'}</button>
       <button type="button" disabled={!canResolve || confirming || resolving} onClick={() => onResolve('move')} className="rounded-xl border border-indigo-400/50 px-4 py-3 text-sm font-semibold text-indigo-100 transition hover:bg-indigo-400/10 disabled:cursor-not-allowed disabled:opacity-45">{resolving ? 'Saving…' : 'Move to next slot'}</button>
       <button type="button" disabled={!canResolve || confirming || resolving} onClick={() => onResolve('skip')} className="rounded-xl border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-45">Skip</button>
-    </div> : <button type="button" disabled={!canConfirm || confirming} onClick={onConfirm} className="mt-6 w-full rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-45">{confirming ? 'Starting post…' : slot.attempt ? 'Slot locked' : slot.state === 'resolved' ? 'Decision recorded' : slot.asset && !slot.owner_confirmation_token ? 'Awaiting prior slot' : slot.asset ? `Confirm ${slot.label}` : 'Assets required'}</button>}
-    <p className="mt-2 text-center text-xs text-gray-500">{slot.attempt ? 'This slot is locked to its durable Marketing attempt. Posted destinations are never republished.' : slot.state === 'missed' ? 'Publish now still requires the exact owner confirmation. Move and Skip are internal decisions only.' : slot.asset && !slot.owner_confirmation_token ? 'This slot needs its own owner confirmation after the prior slot is complete.' : slot.asset ? 'Confirm is the single human authorization for LinkedIn, Facebook, and Instagram.' : detail.detail}</p>
+    </div> : slot.state === 'failed' ? <button type="button" disabled={!canCloseFailed || resolving} onClick={onCloseFailed} className="mt-6 w-full rounded-xl border border-rose-400/50 px-4 py-3 text-sm font-semibold text-rose-100 transition hover:bg-rose-400/10 disabled:cursor-not-allowed disabled:opacity-45">{resolving ? 'Closing…' : 'Close failed slot'}</button> : <button type="button" disabled={!canConfirm || confirming} onClick={onConfirm} className="mt-6 w-full rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-45">{confirming ? 'Starting post…' : slot.state === 'resolved' ? 'Decision recorded' : slot.attempt ? 'Slot locked' : slot.asset && !slot.owner_confirmation_token ? 'Awaiting prior slot' : slot.asset ? `Confirm ${slot.label}` : 'Assets required'}</button>}
+    <p className="mt-2 text-center text-xs text-gray-500">{slot.state === 'failed' ? 'No destination was published. Closing preserves this failed attempt, does not retry it, and unlocks the next slot.' : slot.state === 'resolved' ? detail.detail : slot.attempt ? 'This slot is locked to its durable Marketing attempt. Posted destinations are never republished.' : slot.state === 'missed' ? 'Publish now still requires the exact owner confirmation. Move and Skip are internal decisions only.' : slot.asset && !slot.owner_confirmation_token ? 'This slot needs its own owner confirmation after the prior slot is complete.' : slot.asset ? 'Confirm is the single human authorization for LinkedIn, Facebook, and Instagram.' : detail.detail}</p>
   </section>
 }
 
@@ -227,6 +253,7 @@ function AttemptHistory({ attempt }) {
 
 function canConfirmSlot(state, slot, caption) { return Boolean(state.storageReady && ['ready', 'missed'].includes(slot.state) && slot.asset && slot.owner_confirmation_token && !slot.attempt && state.destinations.length === 3 && state.destinations.every(destination => destination.verification_state === 'verified') && caption.trim() && caption.trim().length <= 3000) }
 function canResolveMissedSlot(state, slot, caption) { return Boolean(state.storageReady && slot.state === 'missed' && slot.asset && slot.owner_confirmation_token && !slot.attempt && caption.trim() && caption.trim().length <= 3000) }
+function canCloseFailedSlot(state, slot) { return Boolean(state.storageReady && slot.state === 'failed' && slot.asset && slot.owner_confirmation_token && slot.attempt?.provider_status === 'error') }
 function formatSlotDate(date) { return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`)) }
 function platformName(platform) { return platform === 'LINKEDIN' ? 'LinkedIn' : platform === 'FACEBOOK' ? 'Facebook' : 'Instagram' }
 function requestMarketing(path, accessToken, body) { return fetch(path, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${accessToken}`, ...(body ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }) }

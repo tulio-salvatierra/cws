@@ -352,3 +352,67 @@ describe('M6 missed-slot safety boundary', () => {
     expect(readFile).not.toHaveBeenCalled()
   })
 })
+
+describe('failed Marketing slot recovery', () => {
+  beforeEach(() => {
+    vi.useFakeTimers(); vi.setSystemTime(new Date('2026-09-09T17:00:00.000Z'))
+    process.env.GENERATION_SUPABASE_URL = 'https://project.supabase.co'
+    process.env.GENERATION_SUPABASE_SERVICE_ROLE_KEY = 'service-role-key'
+    process.env.BUNDLE_SOCIAL_API_KEY = 'bundle-key'
+    process.env.BUNDLE_SOCIAL_TEAM_ID = 'team-1'
+    createClientMock.mockReset(); readFile.mockReset(); globalThis.fetch = vi.fn()
+  })
+
+  afterEach(() => vi.useRealTimers())
+
+  it('marks only an all-error, zero-publication slot as failed and issues its close capability', async () => {
+    const failed = m5Attempt('error')
+    const database = createDatabase({ attempts: [failed, legacyM4Attempt], resultRows: { 'm4-posted': m4Results(), 'm5-attempt': m5Results('error') } })
+    createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+
+    const response = makeResponse(); await handler(request(), response)
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body.slots.find(slot => slot.slot_key === m5SlotKey)).toMatchObject({ state: 'failed', owner_confirmation_token: expect.any(String) })
+    expect(database.state.attemptInserts).toEqual([])
+    expect(database.state.resolutionInserts).toEqual([])
+    expect(readFile).not.toHaveBeenCalled()
+  })
+
+  it('closes an all-error slot as an internal skip without any provider, upload, or retry request', async () => {
+    const failed = m5Attempt('error')
+    const database = createDatabase({ attempts: [failed, legacyM4Attempt], resultRows: { 'm4-posted': m4Results(), 'm5-attempt': m5Results('error') } })
+    createClientMock.mockReturnValue(database.client)
+
+    const response = makeResponse(); await handler(request({ method: 'POST', body: {
+      action: 'close_failed', slot_key: m5SlotKey, asset_id: 'website-launch', owner_confirmation_token: ownerConfirmation(),
+    } }), response)
+
+    expect(response.statusCode).toBe(200)
+    expect(response.body).toMatchObject({ decision: 'close_failed', occurrence_slot_key: m5SlotKey })
+    expect(database.state.resolutionInserts).toEqual([expect.objectContaining({ action: 'skip', target_slot_key: null, asset_id: 'website-launch', caption: 'M5 caption.' })])
+    expect(database.state.attempts).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'm5-attempt', provider_status: 'error' })]))
+    expect(database.state.attemptInserts).toEqual([])
+    expect(database.state.destinationInserts).toEqual([])
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    expect(readFile).not.toHaveBeenCalled()
+  })
+
+  it('rejects close for any partial publication and makes no provider or database mutation', async () => {
+    const failed = m5Attempt('error')
+    const results = m5Results('error')
+    results[0] = { ...results[0], provider_status: 'posted', provider_permalink: 'https://linkedin.test/post' }
+    const database = createDatabase({ attempts: [failed, legacyM4Attempt], resultRows: { 'm4-posted': m4Results(), 'm5-attempt': results } })
+    createClientMock.mockReturnValue(database.client)
+
+    const response = makeResponse(); await handler(request({ method: 'POST', body: {
+      action: 'close_failed', slot_key: m5SlotKey, asset_id: 'website-launch', owner_confirmation_token: ownerConfirmation(),
+    } }), response)
+
+    expect(response.statusCode).toBe(409)
+    expect(database.state.resolutionInserts).toEqual([])
+    expect(database.state.attemptInserts).toEqual([])
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    expect(readFile).not.toHaveBeenCalled()
+  })
+})

@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { Buffer } from 'node:buffer'
 import { createClient } from '@supabase/supabase-js'
-import { buildMarketingOccurrencePlan, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
+import { buildMarketingOccurrencePlan, isFailedWithoutPublication, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
 
 export const MARKETING_ENDPOINT_TIMEOUT_MS = 10_000
 export const MARKETING_POLL_INTERVAL_MS = 30_000
@@ -35,7 +35,11 @@ export default async function handler(req, res) {
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
   const body = req.method === 'POST' ? parseRequestBody(req.body) : null
-  if (isSlotResolutionRequest(body)) return resolveMissedSlot(res, client, context, body)
+  if (isSlotResolutionRequest(body)) {
+    return body.action === 'close_failed'
+      ? closeFailedSlot(res, client, context, body)
+      : resolveMissedSlot(res, client, context, body)
+  }
 
   if (getMissingProviderEnv().length) return res.status(503).json({ ok: false, error: 'Marketing publishing is not configured.' })
   const destinations = await verifyDestinations()
@@ -223,6 +227,59 @@ async function resolveMissedSlot(res, client, context, body) {
   })
 }
 
+// Closing an all-error attempt is an owner-only internal Marketing decision.
+// It preserves the immutable failed attempt and writes a normal skip
+// resolution before any provider configuration or bundle.social code runs.
+async function closeFailedSlot(res, client, context, body) {
+  const validationError = validateCloseFailedRequest(body)
+  if (validationError) return res.status(400).json({ ok: false, error: validationError })
+
+  const loaded = await loadMarketingAttempts(client, context.workspaceId)
+  if (loaded.error) return databaseFailure(res, loaded.error)
+  const resolutions = await loadSlotResolutions(client, context.workspaceId)
+  if (resolutions.error) return databaseFailure(res, resolutions.error)
+
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data })
+  const slot = plan.slots.find(candidate => candidate.slotKey === body.slot_key)
+  const closeableSlot = nextClosableFailedSlot(plan.slots)
+  if (!slot || !closeableSlot || closeableSlot.slotKey !== slot.slotKey || !slot.asset || !isFailedWithoutPublication(slot.attempt)) {
+    return res.status(409).json({ ok: false, error: 'Only the oldest failed Marketing slot with no published destination can be closed.' })
+  }
+  if (slot.asset.id !== body.asset_id) {
+    return res.status(409).json({ ok: false, error: 'This close decision is bound to a different Marketing asset.' })
+  }
+  if (!isValidOwnerConfirmationToken(body.owner_confirmation_token, context, slot)) {
+    return res.status(403).json({ ok: false, error: 'This owner confirmation is expired, invalid, or bound to a different Marketing slot.' })
+  }
+
+  const inserted = await client
+    .from('marketing_slot_resolutions')
+    .insert({
+      workspace_id: context.workspaceId,
+      occurrence_slot_key: slot.slotKey,
+      origin_slot_key: slot.originalSlotKey || slot.slotKey,
+      action: 'skip',
+      target_slot_key: null,
+      asset_id: slot.asset.id,
+      asset_path: slot.asset.assetPath,
+      caption: slot.caption,
+      created_by: context.userId,
+    })
+    .select('*')
+    .single()
+
+  if (inserted.error?.code === '23505') {
+    return res.status(409).json({ ok: false, error: 'This failed Marketing slot already has an owner close decision.' })
+  }
+  if (inserted.error) return databaseFailure(res, inserted.error)
+
+  return res.status(200).json({
+    ok: true,
+    decision: 'close_failed',
+    occurrence_slot_key: slot.slotKey,
+  })
+}
+
 async function respondWithExistingAttempt(res, client, attempt) {
   if (!isSlotAttempt(attempt)) {
     return res.status(409).json({ ok: false, error: 'That reference belongs to a historical Marketing attempt.' })
@@ -285,11 +342,12 @@ function marketingStatusResponse(destinations, storage, attempts, resolutions, c
   const history = attempts.filter(attempt => !activeSlotKeys.has(attempt.marketing_slot_key))
   const hasUnfinishedAttempt = slots.some(slot => slot.attempt && slot.destinationResults.some(result => !TERMINAL_STATUS.has(result.provider_status)))
   const authorizableSlot = storage.ready ? nextAuthorizableSlot(slots) : null
+  const closeableFailedSlot = storage.ready ? nextClosableFailedSlot(slots) : null
 
   return {
     ok: true,
     destinations: serializeDestinations(destinations),
-    slots: slots.map(slot => serializeSlot(slot, slot === authorizableSlot ? createOwnerConfirmationToken(context, slot) : null)),
+    slots: slots.map(slot => serializeSlot(slot, slot === authorizableSlot || slot === closeableFailedSlot ? createOwnerConfirmationToken(context, slot) : null)),
     attempt_history: history.map(serializeAttempt),
     storage_ready: storage.ready,
     storage_error: storage.error,
@@ -712,7 +770,7 @@ function validatePublishRequest(body) {
 }
 
 function isSlotResolutionRequest(body) {
-  return body?.action === 'move' || body?.action === 'skip'
+  return body?.action === 'move' || body?.action === 'skip' || body?.action === 'close_failed'
 }
 
 function validateSlotResolutionRequest(body) {
@@ -725,6 +783,14 @@ function validateSlotResolutionRequest(body) {
   return ''
 }
 
+function validateCloseFailedRequest(body) {
+  if (body.action !== 'close_failed') return 'A valid failed-slot close decision is required.'
+  if (!SLOT_KEY_PATTERN.test(body.slot_key || '')) return 'A valid weekly Marketing slot is required.'
+  if (typeof body.asset_id !== 'string' || !body.asset_id.trim()) return 'A valid evergreen asset is required.'
+  if (typeof body.owner_confirmation_token !== 'string' || body.owner_confirmation_token.length > 1024) return 'A valid owner confirmation is required.'
+  return ''
+}
+
 function nextAuthorizableSlot(slots) {
   for (const slot of slots) {
     if (slot.state === 'resolved') continue
@@ -733,6 +799,16 @@ function nextAuthorizableSlot(slots) {
       return null
     }
     if (slot.state === 'missed' || slot.state === 'ready') return slot.asset ? slot : null
+  }
+  return null
+}
+
+function nextClosableFailedSlot(slots) {
+  for (const slot of slots) {
+    if (slot.state === 'resolved' || slot.state === 'posted') continue
+    if (slot.state === 'missed') return null
+    if (slot.state === 'failed') return slot
+    if (slot.attempt || slot.state === 'ready') return null
   }
   return null
 }
