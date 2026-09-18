@@ -54,6 +54,9 @@ describe('AdminOverview CEO Today', () => {
     expect(screen.getByText('New prospect with no successful initial outreach.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Go to Sales' })).toHaveAttribute('href', '/admin/sales')
     expect(screen.getByRole('link', { name: 'Go to Marketing' })).toHaveAttribute('href', '/admin/marketing')
+    expect(screen.getByRole('heading', { name: 'Departments', level: 2 })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Operations Review active client work/ })).toHaveAttribute('href', '/admin/operations')
+    expect(screen.queryByRole('link', { name: 'Workspace' })).not.toBeInTheDocument()
     expect(globalThis.fetch).toHaveBeenCalledWith('/api/ceo-today', {
       headers: { Authorization: 'Bearer access-token' },
     })

@@ -17,7 +17,6 @@ import BlogPost from "./components/BlogPost";
 import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
 import Gallery from "./components/Gallery";
-import LegacyWorkspaceRedirect from "./components/admin/LegacyWorkspaceRedirect";
 import { getLandingPageData } from "./data/landingPagesData";
 
 const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
@@ -25,34 +24,14 @@ const ResetPasswordPage = lazy(() => import("./pages/admin/ResetPasswordPage"));
 const AdminPage = lazy(() => import("./pages/admin/AdminPage"));
 const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminGuard = lazy(() => import("./components/admin/AdminGuard"));
-const PublishedPostsPage = lazy(() => import("./pages/admin/PublishedPostsPage"));
-const KeywordsPage = lazy(() => import("./pages/admin/KeywordsPage"));
 const ClientsPage = lazy(() => import("./pages/admin/ClientsPage"));
 const LeadsPage = lazy(() => import("./pages/admin/LeadsPage"));
 const SalesPage = lazy(() => import("./pages/admin/SalesPage"));
-const MailingListPage = lazy(() => import("./pages/admin/MailingListPage"));
-const WorkspacePage = lazy(() => import("./pages/admin/WorkspacePage"));
-const ChannelsPage = lazy(() => import("./pages/admin/ChannelsPage"));
-const CampaignDetailPage = lazy(() => import("./pages/admin/CampaignDetailPage"));
-const CampaignsPage = lazy(() => import("./pages/admin/CampaignsPage"));
-const NewCampaignPage = lazy(() => import("./pages/admin/NewCampaignPage"));
-const NewVariantPage = lazy(() => import("./pages/admin/NewVariantPage"));
-const TasksPage = lazy(() => import("./pages/admin/TasksPage"));
-const PlanningPage = lazy(() => import("./pages/admin/PlanningPage"));
-const KnowledgePage = lazy(() => import("./pages/admin/KnowledgePage"));
-const NewDecisionPage = lazy(() => import("./pages/admin/NewDecisionPage"));
-const NewLearningPage = lazy(() => import("./pages/admin/NewLearningPage"));
-const AgentRunsPage = lazy(() => import("./pages/admin/AgentRunsPage"));
 const MarketingPage = lazy(() => import("./pages/admin/MarketingPage"));
 const OperationsPage = lazy(() => import("./pages/admin/OperationsPage"));
 const OperationsProjectPage = lazy(() => import("./pages/admin/OperationsProjectPage"));
 const AccountingPage = lazy(() => import("./pages/admin/AccountingPage"));
 const CompliancePage = lazy(() => import("./pages/admin/CompliancePage"));
-const NewGoalPage = lazy(() => import("./pages/admin/NewGoalPage"));
-const NewInitiativePage = lazy(() => import("./pages/admin/NewInitiativePage"));
-const NewProjectPage = lazy(() => import("./pages/admin/NewProjectPage"));
-const ProjectDetailPage = lazy(() => import("./pages/admin/ProjectDetailPage"));
-const VariantDetailPage = lazy(() => import("./pages/admin/VariantDetailPage"));
 
 // Wrapper component for dynamic landing pages
 function LandingPageWrapper() {
@@ -132,21 +111,8 @@ function App() {
               </Suspense>
             } />
             <Route path="/admin/reset-password" element={<Suspense fallback={null}><ResetPasswordPage /></Suspense>} />
-            {/* Legacy workspace URLs remain valid while the operating system lives under /admin. */}
-            <Route path="/workspace" element={<Navigate to="/admin/workspace" replace />} />
-            <Route path="/workspace/campaigns" element={<Navigate to="/admin/campaigns" replace />} />
-            <Route path="/workspace/campaigns/new" element={<Navigate to="/admin/campaigns/new" replace />} />
-            <Route path="/workspace/campaigns/:campaignId/variants/new" element={<LegacyWorkspaceRedirect to="/admin/campaigns/:campaignId/variants/new" />} />
-            <Route path="/workspace/campaigns/:campaignId" element={<LegacyWorkspaceRedirect to="/admin/campaigns/:campaignId" />} />
-            <Route path="/workspace/variants/:variantId" element={<LegacyWorkspaceRedirect to="/admin/variants/:variantId" />} />
-            <Route path="/workspace/tasks" element={<Navigate to="/admin/tasks" replace />} />
-            <Route path="/workspace/planning/new-goal" element={<Navigate to="/admin/planning/new-goal" replace />} />
-            <Route path="/workspace/planning/new-initiative" element={<Navigate to="/admin/planning/new-initiative" replace />} />
-            <Route path="/workspace/planning/new-project" element={<Navigate to="/admin/planning/new-project" replace />} />
-            <Route path="/workspace/planning" element={<Navigate to="/admin/planning" replace />} />
-            <Route path="/workspace/projects/:projectId" element={<LegacyWorkspaceRedirect to="/admin/projects/:projectId" />} />
-            <Route path="/workspace/knowledge" element={<Navigate to="/admin/knowledge" replace />} />
-            <Route path="/workspace/agent-runs" element={<Navigate to="/admin/agent-runs" replace />} />
+            {/* Retired generic workspace screens stay harmless for saved links. */}
+            <Route path="/workspace/*" element={<Navigate to="/admin" replace />} />
             <Route
               path="/admin"
               element={
@@ -159,32 +125,24 @@ function App() {
             >
               <Route index element={<AdminOverview />} />
               <Route path="legacy-queue" element={<Navigate to="/admin/marketing" replace />} />
-              <Route path="published" element={<PublishedPostsPage />} />
-              <Route path="keywords" element={<KeywordsPage />} />
+              <Route path="published" element={<Navigate to="/admin/marketing" replace />} />
+              <Route path="keywords" element={<Navigate to="/admin" replace />} />
               <Route path="calendar" element={<Navigate to="/admin/marketing" replace />} />
               <Route path="analytics" element={<Navigate to="/admin/marketing" replace />} />
               <Route path="clients" element={<ClientsPage />} />
               <Route path="leads" element={<LeadsPage />} />
               <Route path="sales" element={<SalesPage />} />
-              <Route path="mailing-list" element={<MailingListPage />} />
+              <Route path="mailing-list" element={<Navigate to="/admin" replace />} />
               <Route path="settings" element={<Navigate to="/admin" replace />} />
-              <Route path="workspace" element={<WorkspacePage />} />
-              <Route path="channels" element={<ChannelsPage />} />
-              <Route path="campaigns" element={<CampaignsPage />} />
-              <Route path="campaigns/new" element={<NewCampaignPage />} />
-              <Route path="campaigns/:campaignId" element={<CampaignDetailPage />} />
-              <Route path="campaigns/:campaignId/variants/new" element={<NewVariantPage />} />
-              <Route path="variants/:variantId" element={<VariantDetailPage />} />
-              <Route path="tasks" element={<TasksPage />} />
-              <Route path="planning" element={<PlanningPage />} />
-              <Route path="planning/new-goal" element={<NewGoalPage />} />
-              <Route path="planning/new-initiative" element={<NewInitiativePage />} />
-              <Route path="planning/new-project" element={<NewProjectPage />} />
-              <Route path="projects/:projectId" element={<ProjectDetailPage />} />
-              <Route path="knowledge" element={<KnowledgePage />} />
-              <Route path="knowledge/new-decision" element={<NewDecisionPage />} />
-              <Route path="knowledge/new-learning" element={<NewLearningPage />} />
-              <Route path="agent-runs" element={<AgentRunsPage />} />
+              <Route path="workspace/*" element={<Navigate to="/admin" replace />} />
+              <Route path="channels/*" element={<Navigate to="/admin" replace />} />
+              <Route path="campaigns/*" element={<Navigate to="/admin" replace />} />
+              <Route path="variants/*" element={<Navigate to="/admin" replace />} />
+              <Route path="tasks/*" element={<Navigate to="/admin" replace />} />
+              <Route path="planning/*" element={<Navigate to="/admin" replace />} />
+              <Route path="projects/*" element={<Navigate to="/admin" replace />} />
+              <Route path="knowledge/*" element={<Navigate to="/admin" replace />} />
+              <Route path="agent-runs/*" element={<Navigate to="/admin" replace />} />
               <Route path="marketing" element={<MarketingPage />} />
               <Route path="operations" element={<OperationsPage />} />
               <Route path="operations/:projectId" element={<OperationsProjectPage />} />

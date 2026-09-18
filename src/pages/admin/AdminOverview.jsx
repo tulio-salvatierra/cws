@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
-const secondaryNavigation = [
-  ['Workspace', 'Campaigns, variants, knowledge, and agent history.', '/admin/workspace'],
-  ['Marketing', 'Review weekly publishing and its durable history.', '/admin/marketing'],
+const departmentNavigation = [
   ['Sales', 'Work the full Sales command queue and prospects.', '/admin/sales'],
+  ['Marketing', 'Review weekly publishing and its durable history.', '/admin/marketing'],
+  ['Operations', 'Review active client work, readiness, and delivery blockers.', '/admin/operations'],
   ['Accounting', 'Review expected, received, and outstanding money.', '/admin/accounting'],
   ['Compliance', 'Review owner-verified business obligations and deadlines.', '/admin/compliance'],
-  ['Clients', 'Open the separate client workspace.', '/admin/clients'],
 ]
 
 async function loadCeoToday() {
@@ -61,10 +60,10 @@ export default function AdminOverview() {
         {!actions.length && <p className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5 text-sm text-gray-400">No further action is shown in this view. Reload to recalculate from current department state.</p>}
       </section>}
 
-      <section className="mt-10 border-t border-gray-800 pt-8" aria-labelledby="other-workspaces-heading">
-        <h2 id="other-workspaces-heading" className="text-lg font-semibold text-white">Other workspaces</h2>
+      <section className="mt-10 border-t border-gray-800 pt-8" aria-labelledby="departments-heading">
+        <h2 id="departments-heading" className="text-lg font-semibold text-white">Departments</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {secondaryNavigation.map(([title, description, href]) => <Link key={href} to={href} className="rounded-xl border border-gray-800 bg-gray-900/60 p-4 transition hover:border-indigo-500">
+          {departmentNavigation.map(([title, description, href]) => <Link key={href} to={href} className="rounded-xl border border-gray-800 bg-gray-900/60 p-4 transition hover:border-indigo-500">
             <h3 className="font-semibold text-white">{title}</h3>
             <p className="mt-1 text-sm leading-6 text-gray-400">{description}</p>
           </Link>)}

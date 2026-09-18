@@ -9,17 +9,22 @@ vi.mock('../../../Hooks/useAuth', () => ({
 import AdminLayout from '../AdminLayout'
 
 describe('AdminLayout navigation', () => {
-  it('exposes the consolidated channels route alongside the admin workspace routes', () => {
+  it('shows only the core OS departments and keeps legacy screens out of the navigation', () => {
     render(
-      <MemoryRouter initialEntries={['/admin/channels']}>
+      <MemoryRouter initialEntries={['/admin']}>
         <AdminLayout><div>content</div></AdminLayout>
       </MemoryRouter>
     )
 
-    expect(screen.getByRole('link', { name: 'Channels' })).toHaveAttribute('href', '/admin/channels')
-    expect(screen.getByRole('link', { name: 'Marketing V1' })).toHaveAttribute('href', '/admin/marketing')
+    expect(screen.getByRole('link', { name: 'Sales' })).toHaveAttribute('href', '/admin/sales')
+    expect(screen.getByRole('link', { name: 'Marketing' })).toHaveAttribute('href', '/admin/marketing')
+    expect(screen.getByRole('link', { name: 'Operations' })).toHaveAttribute('href', '/admin/operations')
+    expect(screen.getByRole('link', { name: 'Accounting' })).toHaveAttribute('href', '/admin/accounting')
     expect(screen.getByRole('link', { name: 'Compliance' })).toHaveAttribute('href', '/admin/compliance')
-    expect(screen.getByRole('link', { name: /Workspace/ })).toHaveAttribute('href', '/admin/workspace')
+    expect(screen.queryByRole('link', { name: 'Workspace' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Channels' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Planning' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Agent runs' })).not.toBeInTheDocument()
     expect(screen.getByText('content')).toBeInTheDocument()
   })
 })
