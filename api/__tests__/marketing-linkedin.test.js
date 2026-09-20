@@ -37,8 +37,8 @@ function m5Attempt(status = 'processing') { return { id: 'm5-attempt', reference
 function m5Results(status = 'processing') { return ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'].map((platform, index) => ({ id: `m5-result-${index}`, attempt_id: 'm5-attempt', platform, provider_status: status, provider_error: null, provider_permalink: null })) }
 function m6Resolution(action = 'move') { return { occurrence_slot_key: m5SlotKey, origin_slot_key: m5SlotKey, action, target_slot_key: action === 'move' ? m5PostBSlotKey : null, asset_id: 'website-launch', asset_path: '/images/en-launch.png', caption: 'Edited M6 caption.', decided_at: '2026-09-09T12:00:00.000Z', created_at: '2026-09-09T12:00:00.000Z' } }
 
-function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], resultRows = { 'm4-posted': m4Results() }, resolutions = [] } = {}) {
-  const state = { attempts: attempts.map(attempt => ({ ...attempt })), resultRows: Object.fromEntries(Object.entries(resultRows).map(([id, rows]) => [id, rows.map(row => ({ ...row }))])), resolutions: resolutions.map(resolution => ({ ...resolution })), attemptInserts: [], destinationInserts: [], resolutionInserts: [], attemptUpdates: [], destinationUpdates: [] }
+function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], resultRows = { 'm4-posted': m4Results() }, resolutions = [], offers = [], media = [], captions = [] } = {}) {
+  const state = { attempts: attempts.map(attempt => ({ ...attempt })), resultRows: Object.fromEntries(Object.entries(resultRows).map(([id, rows]) => [id, rows.map(row => ({ ...row }))])), resolutions: resolutions.map(resolution => ({ ...resolution })), offers: offers.map(offer => ({ ...offer })), media: media.map(record => ({ ...record })), captions: captions.map(record => ({ ...record })), attemptInserts: [], destinationInserts: [], resolutionInserts: [], attemptUpdates: [], destinationUpdates: [], catalogInserts: [] }
   const workspace = { data: { workspace_id: 'workspace-1', role: 'owner' }, error: null }
   const latestAttempt = () => state.attempts[0] || null
 
@@ -56,6 +56,7 @@ function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], res
         if (table === 'workspace_members') return Promise.resolve(workspace)
         if (table === 'marketing_publish_attempts' && chain.filters.reference_key) return Promise.resolve({ data: state.attempts.find(attempt => attempt.reference_key === chain.filters.reference_key) || null, error: null })
         if (table === 'marketing_publish_attempts' && chain.filters.marketing_slot_key) return Promise.resolve({ data: state.attempts.find(attempt => attempt.marketing_slot_key === chain.filters.marketing_slot_key) || null, error: null })
+        if (table === 'offers' && chain.filters.id) return Promise.resolve({ data: state.offers.find(offer => offer.id === chain.filters.id) || null, error: null })
         return Promise.resolve({ data: latestAttempt(), error: null })
       }),
       single: vi.fn(() => {
@@ -84,12 +85,21 @@ function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], res
           state.resolutions.push(data); state.resolutionInserts.push(data)
           return Promise.resolve({ data, error: null })
         }
+        if (['offers', 'offer_media', 'offer_captions'].includes(table) && chain.operation === 'insert') {
+          const data = { id: `catalog-${state.catalogInserts.length + 1}`, ...chain.values, created_at: '2026-09-08T12:00:00.000Z' }
+          const collection = table === 'offers' ? state.offers : table === 'offer_media' ? state.media : state.captions
+          collection.push(data); state.catalogInserts.push({ table, data })
+          return Promise.resolve({ data, error: null })
+        }
         return Promise.resolve({ data: null, error: null })
       }),
       then: (resolve, reject) => {
         let response = { data: null, error: null }
         if (table === 'marketing_publish_attempts') response = { data: state.attempts, error: null }
         if (table === 'marketing_slot_resolutions') response = { data: state.resolutions, error: null }
+        if (table === 'offers') response = { data: state.offers, error: null }
+        if (table === 'offer_media') response = { data: state.media, error: null }
+        if (table === 'offer_captions') response = { data: state.captions, error: null }
         if (table === 'marketing_publish_destination_results' && chain.operation === 'insert') {
           const rows = chain.values.map((value, index) => ({ id: `m5-result-${index}`, ...value, provider_error: null, provider_permalink: null, created_at: '2026-09-08T12:00:00.000Z' }))
           state.resultRows[rows[0].attempt_id] = rows; state.destinationInserts.push(...rows); response = { data: rows, error: null }
@@ -119,6 +129,55 @@ describe('M5 Marketing endpoint', () => {
   it('requires authentication before provider discovery', async () => {
     const response = makeResponse(); await handler(request({ token: '' }), response)
     expect(response.statusCode).toBe(401); expect(globalThis.fetch).not.toHaveBeenCalled()
+  })
+
+  it('lets only the owner save an offer as reference data without provider discovery or publication', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client)
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: {
+      action: 'save_marketing_offer',
+      offer: {
+        name: 'Website Refresh',
+        description: 'A focused refresh for an existing business website.',
+        price_mode: 'by_scope',
+        price_cents: null,
+        price_display_override: null,
+        default_project_type: 'website',
+        status: 'draft',
+      },
+    } }), response)
+
+    expect(response.statusCode).toBe(200)
+    expect(database.state.catalogInserts).toHaveLength(1)
+    expect(database.state.catalogInserts[0].data).toMatchObject({
+      workspace_id: 'workspace-1', created_by: 'owner-1', name: 'Website Refresh', status: 'draft',
+    })
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    expect(readFile).not.toHaveBeenCalled()
+  })
+
+  it('fails closed when an active catalog image lacks three-channel confirmation', async () => {
+    const offerId = '11111111-1111-4111-8111-111111111111'
+    const database = createDatabase({ offers: [{ id: offerId, workspace_id: 'workspace-1' }] }); createClientMock.mockReturnValue(database.client)
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: {
+      action: 'save_marketing_offer_media',
+      media: {
+        offer_id: offerId,
+        storage_path: '/images/en-launch.png',
+        linkedin_compatible: true,
+        facebook_compatible: true,
+        instagram_compatible: false,
+        status: 'active',
+      },
+    } }), response)
+
+    expect(response.statusCode).toBe(400)
+    expect(response.body.error).toMatch(/LinkedIn, Facebook, and Instagram/)
+    expect(database.state.catalogInserts).toEqual([])
+    expect(database.state.attemptInserts).toEqual([])
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    expect(readFile).not.toHaveBeenCalled()
   })
 
   it('prepares status without creating attempts and issues a token only for Post A', async () => {

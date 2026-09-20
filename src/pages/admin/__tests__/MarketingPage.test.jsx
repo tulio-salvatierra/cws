@@ -104,6 +104,28 @@ describe('MarketingPage M5', () => {
     expect(window.confirm).not.toHaveBeenCalled()
   })
 
+  it('saves a draft offer as catalog reference data without confirming a post', async () => {
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(statusBody({ offer_catalog: [] })))
+      .mockResolvedValueOnce(response({ ok: true, offer_catalog: [{
+        id: 'offer-a', name: 'Website Refresh', description: 'A focused refresh for an existing website.', price_mode: 'by_scope', price_cents: null, price_display: 'Price by scope', price_display_override: null, default_project_type: 'website', status: 'draft', media: [], captions: [],
+      }] }))
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save offer' })).toBeEnabled())
+    fireEvent.change(screen.getByLabelText('Offer name'), { target: { value: 'Website Refresh' } })
+    fireEvent.change(screen.getByLabelText('Offer description'), { target: { value: 'A focused refresh for an existing website.' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save offer' }))
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(2))
+
+    const [, options] = globalThis.fetch.mock.calls[1]
+    expect(JSON.parse(options.body)).toMatchObject({
+      action: 'save_marketing_offer',
+      offer: { name: 'Website Refresh', status: 'draft', price_mode: 'by_scope', price_cents: null },
+    })
+    expect(JSON.parse(options.body).owner_confirmation_token).toBeUndefined()
+    expect(screen.getByRole('heading', { name: 'Website Refresh' })).toBeInTheDocument()
+  })
+
   it('fails closed for an unverified destination while retaining M2/M3/M4 history', async () => {
     globalThis.fetch.mockResolvedValueOnce(response(statusBody({
       destinations: [verifiedDestinations[0], { ...verifiedDestinations[1], verification_state: 'not_verified', channel_name: 'Other Business', error: 'The active provider account is not the intended CWS destination.' }, verifiedDestinations[2]],

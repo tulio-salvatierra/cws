@@ -148,6 +148,23 @@ describe('CEO Today prioritizer', () => {
     })
   })
 
+  it('keeps a closed all-error Marketing occurrence in history without CEO work', () => {
+    const failed = {
+      ...fullyPostedAttempt('2026-09-07:post-a', 'failed-a'),
+      provider_status: 'error',
+      destination_results: [{ platform: 'LINKEDIN', provider_status: 'error' }],
+    }
+    const result = buildCeoToday({
+      now: wednesday,
+      marketingAttempts: [failed],
+      marketingResolutions: [{ occurrence_slot_key: '2026-09-07:post-a', action: 'skip', target_slot_key: null }],
+    })
+
+    expect(result.all_actions).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ source_type: 'marketing_delivery_failure' }),
+    ]))
+  })
+
   it('keeps current-day ready Marketing review after GET MONEY Sales actions', () => {
     const result = buildCeoToday({
       now: friday,

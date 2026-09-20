@@ -28,10 +28,11 @@ const VERIFICATION_DETAILS = {
 }
 
 export default function MarketingPage() {
-  const [state, setState] = useState({ loading: true, destinations: [], slots: [], attemptHistory: [], storageReady: false, storageError: '', pollAfterMs: null, error: '' })
+  const [state, setState] = useState({ loading: true, destinations: [], slots: [], attemptHistory: [], offerCatalog: [], storageReady: false, storageError: '', pollAfterMs: null, error: '' })
   const [captions, setCaptions] = useState({})
   const [confirmingSlotKey, setConfirmingSlotKey] = useState('')
   const [resolvingSlotKey, setResolvingSlotKey] = useState('')
+  const [catalogSaving, setCatalogSaving] = useState(false)
   const referenceKeysRef = useRef({})
   const { session } = useAuth()
 
@@ -47,6 +48,7 @@ export default function MarketingPage() {
         destinations: body.destinations || [],
         slots,
         attemptHistory: body.attempt_history || [],
+        offerCatalog: body.offer_catalog || [],
         storageReady: body.storage_ready === true,
         storageError: body.storage_error || '',
         pollAfterMs: body.poll_after_ms || null,
@@ -144,6 +146,27 @@ export default function MarketingPage() {
     }
   }
 
+  async function saveCatalog(action, detail) {
+    if (!session?.access_token || catalogSaving) return false
+    setCatalogSaving(true)
+    setState(current => ({ ...current, error: '' }))
+    try {
+      const response = await requestMarketing('/api/marketing-linkedin', session.access_token, { action, ...detail })
+      const body = await readJson(response)
+      if (!response.ok) throw new Error(body.error || 'The offer catalog could not be saved.')
+      // Catalog writes are intentionally provider-free. The save response
+      // includes the refreshed catalog so this interaction does not turn into
+      // a bundle.social status check.
+      setState(current => ({ ...current, offerCatalog: body.offer_catalog || current.offerCatalog }))
+      return true
+    } catch (error) {
+      setState(current => ({ ...current, error: error.message || 'The offer catalog could not be saved.' }))
+      return false
+    } finally {
+      setCatalogSaving(false)
+    }
+  }
+
   const allVerified = state.destinations.length === 3 && state.destinations.every(destination => destination.verification_state === 'verified')
   const nextSlot = state.slots.find(slot => ['missed', 'failed', 'ready', 'processing'].includes(slot.state)) || state.slots.at(-1)
 
@@ -201,10 +224,69 @@ export default function MarketingPage() {
             <div className="border-t border-gray-200 px-4 py-3 text-xs font-medium text-gray-500">Like · Comment · Repost · Send</div>
           </article> : <p className="mt-5 text-sm text-amber-200">Add a verified CWS evergreen offer graphic to prepare a post.</p>}
         </section>
+
+        <OfferCatalog offers={state.offerCatalog} saving={catalogSaving} onSave={saveCatalog} />
       </div>
     </div>
   )
 }
+
+function OfferCatalog({ offers, saving, onSave }) {
+  const [offer, setOffer] = useState(blankOffer())
+  const [media, setMedia] = useState(blankMedia())
+  const [caption, setCaption] = useState(blankCaption())
+  const activeReady = offers.filter(item => item.status === 'active' && item.media.some(isCompatibleActiveMedia) && item.captions.some(item => item.status === 'active' && item.locale === 'en')).length
+
+  async function saveOffer(event) {
+    event.preventDefault()
+    const saved = await onSave('save_marketing_offer', { offer: { ...offer, price_cents: dollarsToCents(offer.price) } })
+    if (saved) setOffer(blankOffer())
+  }
+
+  async function saveMedia(event) {
+    event.preventDefault()
+    const saved = await onSave('save_marketing_offer_media', { media })
+    if (saved) setMedia(blankMedia())
+  }
+
+  async function saveCaption(event) {
+    event.preventDefault()
+    const saved = await onSave('save_marketing_offer_caption', { caption })
+    if (saved) setCaption(blankCaption())
+  }
+
+  return <section aria-labelledby="offer-catalog-heading" className="mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 sm:p-6">
+    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Offer catalog</p>
+    <h2 id="offer-catalog-heading" className="mt-2 text-xl font-semibold text-white">Approved services and Marketing variations</h2>
+    <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Offers stay as reference data. An active offer enters rotation only when it has an active English caption and an image you have explicitly confirmed works for LinkedIn, Facebook, and Instagram.</p>
+    <p className="mt-3 text-sm text-amber-100">{activeReady ? `${activeReady} offer${activeReady === 1 ? '' : 's'} can currently enter rotation.` : 'No catalog offer is active and three-channel ready yet; the current approved rotation remains in use.'}</p>
+
+    <div className="mt-5 grid gap-3">{offers.map(item => <article key={item.id} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-semibold text-white">{item.name}</h3><p className="mt-1 text-sm text-gray-400">{item.description || 'No description yet.'}</p></div><span className="rounded-full border border-gray-700 px-2.5 py-1 text-xs font-semibold text-gray-300">{item.status}</span></div><p className="mt-3 text-sm text-indigo-100">{item.price_display || 'Pricing still needs wording.'}{item.default_project_type ? ` · Default project type: ${item.default_project_type}` : ''}</p><p className="mt-3 text-xs text-gray-500">{item.media.length} image variation{item.media.length === 1 ? '' : 's'} · {item.captions.length} caption variation{item.captions.length === 1 ? '' : 's'}</p><button type="button" onClick={() => setOffer({ id: item.id, name: item.name, description: item.description || '', price_mode: item.price_mode, price: centsToDollars(item.price_cents), price_display_override: item.price_display_override || '', default_project_type: item.default_project_type || '', status: item.status })} className="mt-3 rounded-full border border-white/20 px-3 py-2 text-sm font-semibold text-white">Edit offer</button></article>)}</div>
+
+    <div className="mt-6 grid gap-5 xl:grid-cols-3">
+      <form onSubmit={saveOffer} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">{offer.id ? 'Edit offer' : 'Add offer'}</h3><label className="mt-3 block text-xs text-gray-400">Name<input aria-label="Offer name" required value={offer.name} onChange={event => setOffer(current => ({ ...current, name: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Description<textarea aria-label="Offer description" value={offer.description} onChange={event => setOffer(current => ({ ...current, description: event.target.value }))} rows={4} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Price mode<select aria-label="Offer price mode" value={offer.price_mode} onChange={event => setOffer(current => ({ ...current, price_mode: event.target.value, price: event.target.value === 'by_scope' ? '' : current.price }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="fixed">Fixed price</option><option value="from">From price</option><option value="by_scope">Price by scope</option></select></label>{offer.price_mode !== 'by_scope' && <label className="mt-3 block text-xs text-gray-400">Price in USD<input aria-label="Offer price" required inputMode="decimal" value={offer.price} onChange={event => setOffer(current => ({ ...current, price: event.target.value }))} placeholder="550" className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label>}<label className="mt-3 block text-xs text-gray-400">Approved price wording (optional)<input aria-label="Offer price wording" value={offer.price_display_override} onChange={event => setOffer(current => ({ ...current, price_display_override: event.target.value }))} placeholder="Starting at $550" className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Default project type (optional)<input aria-label="Offer default project type" value={offer.default_project_type} onChange={event => setOffer(current => ({ ...current, default_project_type: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer status" value={offer.status} onChange={event => setOffer(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><div className="mt-4 flex gap-2"><button type="submit" disabled={saving} className="rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save offer'}</button>{offer.id && <button type="button" disabled={saving} onClick={() => setOffer(blankOffer())} className="rounded-full border border-white/20 px-3 py-2 text-sm font-semibold text-white">Cancel</button>}</div></form>
+
+      <form onSubmit={saveMedia} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add image variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">The image must already exist in this deployed build under <code>/images/</code>. Compatibility is your explicit one-time confirmation; no image is uploaded here.</p><CatalogOfferSelect ariaLabel="Media offer" offers={offers} value={media.offer_id} onChange={value => setMedia(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Image path<input aria-label="Offer image path" required value={media.storage_path} onChange={event => setMedia(current => ({ ...current, storage_path: event.target.value }))} placeholder="/images/my-offer.png" className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><CompatibilityChecks media={media} onChange={setMedia} /><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer image status" value={media.status} onChange={event => setMedia(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save image variation'}</button></form>
+
+      <form onSubmit={saveCaption} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add caption variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">Only active English captions may enter the current three-channel rotation. Saving this text never creates a post.</p><CatalogOfferSelect ariaLabel="Caption offer" offers={offers} value={caption.offer_id} onChange={value => setCaption(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Locale<select aria-label="Caption locale" value={caption.locale} onChange={event => setCaption(current => ({ ...current, locale: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="en">English</option><option value="es">Spanish</option></select></label><label className="mt-3 block text-xs text-gray-400">Caption<textarea aria-label="Offer caption body" required value={caption.body} onChange={event => setCaption(current => ({ ...current, body: event.target.value }))} rows={5} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer caption status" value={caption.status} onChange={event => setCaption(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save caption variation'}</button></form>
+    </div>
+  </section>
+}
+
+function CatalogOfferSelect({ ariaLabel, offers, value, onChange }) {
+  return <label className="mt-3 block text-xs text-gray-400">Offer<select aria-label={ariaLabel} required value={value} onChange={event => onChange(event.target.value)} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="" disabled>Choose an offer</option>{offers.filter(item => item.status !== 'retired').map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+}
+
+function CompatibilityChecks({ media, onChange }) {
+  return <fieldset className="mt-3"><legend className="text-xs text-gray-400">I confirmed this image is compatible with:</legend><div className="mt-2 grid gap-2 text-sm text-gray-200">{[['linkedin_compatible', 'LinkedIn'], ['facebook_compatible', 'Facebook'], ['instagram_compatible', 'Instagram']].map(([key, label]) => <label key={key} className="flex items-center gap-2"><input type="checkbox" checked={media[key]} onChange={event => onChange(current => ({ ...current, [key]: event.target.checked }))} />{label}</label>)}</div></fieldset>
+}
+
+function blankOffer() { return { id: '', name: '', description: '', price_mode: 'by_scope', price: '', price_display_override: '', default_project_type: '', status: 'draft' } }
+function blankMedia() { return { offer_id: '', storage_path: '', linkedin_compatible: false, facebook_compatible: false, instagram_compatible: false, status: 'draft' } }
+function blankCaption() { return { offer_id: '', locale: 'en', body: '', status: 'draft' } }
+function isCompatibleActiveMedia(media) { return media.status === 'active' && media.linkedin_compatible && media.facebook_compatible && media.instagram_compatible }
+function dollarsToCents(value) { const match = String(value || '').trim().match(/^(\d+)(?:\.(\d{1,2}))?$/); return match ? Number(match[1]) * 100 + Number((match[2] || '').padEnd(2, '0')) : null }
+function centsToDollars(value) { return Number.isInteger(value) ? String(value / 100) : '' }
 
 function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed }) {
   const detail = SLOT_DETAILS[slot.state] || SLOT_DETAILS.processing

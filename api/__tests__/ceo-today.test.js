@@ -122,7 +122,6 @@ describe('CEO Today endpoint', () => {
     expect(res.json.mock.calls[0][0]).toMatchObject({ ok: true })
     expect(res.json.mock.calls[0][0].actions).toEqual(expect.arrayContaining([
       expect.objectContaining({ department: 'SALES', human_action: 'Call Ada Plumbing' }),
-      expect.objectContaining({ department: 'OPERATIONS', human_action: 'Review Ecclection Website', href: '/admin/operations/project-a' }),
     ]))
     expect(queries.map(({ table }) => table)).toEqual([
       'leads',

@@ -5,7 +5,8 @@ import { join } from 'node:path'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { Buffer } from 'node:buffer'
 import { createClient } from '@supabase/supabase-js'
-import { buildMarketingOccurrencePlan, isFailedWithoutPublication, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
+import { buildMarketingOccurrencePlan, EVERGREEN_ASSETS, isFailedWithoutPublication, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
+import { buildOfferCatalog } from '../server/marketing/offer-catalog.js'
 
 export const MARKETING_ENDPOINT_TIMEOUT_MS = 10_000
 export const MARKETING_POLL_INTERVAL_MS = 30_000
@@ -35,6 +36,7 @@ export default async function handler(req, res) {
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
   const body = req.method === 'POST' ? parseRequestBody(req.body) : null
+  if (isOfferCatalogRequest(body)) return updateOfferCatalog(res, client, context, body)
   if (isSlotResolutionRequest(body)) {
     return body.action === 'close_failed'
       ? closeFailedSlot(res, client, context, body)
@@ -55,10 +57,13 @@ async function getMarketingStatus(res, client, context, destinations) {
   const resolutions = await loadSlotResolutions(client, context.workspaceId)
   if (resolutions.error) return databaseFailure(res, resolutions.error)
 
+  const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
+  if (catalog.error) return databaseFailure(res, catalog.error)
+
   const reconciled = await reconcileUnfinishedSlotAttempts(client, loaded.data)
   if (reconciled.error) return databaseFailure(res, reconciled.error)
 
-  return res.status(200).json(marketingStatusResponse(destinations, storage, reconciled.data, resolutions.data, context))
+  return res.status(200).json(marketingStatusResponse(destinations, storage, reconciled.data, resolutions.data, context, catalog.data))
 }
 
 async function createMarketingPost(res, client, context, destinations, body) {
@@ -85,7 +90,9 @@ async function createMarketingPost(res, client, context, destinations, body) {
   if (loaded.error) return databaseFailure(res, loaded.error)
   const resolutions = await loadSlotResolutions(client, context.workspaceId)
   if (resolutions.error) return databaseFailure(res, resolutions.error)
-  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data })
+  const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
+  if (catalog.error) return databaseFailure(res, catalog.error)
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data, assets: marketingAssets(catalog.data, loaded.data) })
   const slots = plan.slots
   const slot = slots.find(candidate => candidate.slotKey === body.slot_key)
   if (!slot || !slot.asset || slot.asset.id !== body.asset_id) {
@@ -115,6 +122,9 @@ async function createMarketingPost(res, client, context, destinations, body) {
       caption: body.caption.trim(),
       asset_id: slot.asset.id,
       asset_path: slot.asset.assetPath,
+      offer_id: slot.asset.offerId || null,
+      offer_media_id: slot.asset.offerMediaId || null,
+      offer_caption_id: slot.asset.offerCaptionId || null,
       destination: M4_DESTINATION,
       marketing_slot_key: slot.slotKey,
       provider_status: 'preparing',
@@ -165,6 +175,112 @@ async function createMarketingPost(res, client, context, destinations, body) {
     if (failedAttempt.error || failedResults.error) return databaseFailure(res, failedAttempt.error || failedResults.error)
     return providerFailure(res, error, serializeAttempt(failedAttempt.data), destinations, failedResults.data)
   }
+}
+
+// Catalog changes are owner-only, server-side reference-data writes. They run
+// before destination verification and never upload, schedule, or publish.
+async function updateOfferCatalog(res, client, context, body) {
+  const action = body.action
+  if (action === 'save_marketing_offer') {
+    const normalized = normalizeOffer(body.offer)
+    if (normalized.error) return res.status(400).json({ ok: false, error: normalized.error })
+    const saved = await saveCatalogRow(client, 'offers', context, body.offer?.id, normalized.data)
+    return catalogWriteResponse(res, client, context, saved)
+  }
+
+  if (action === 'save_marketing_offer_media') {
+    const normalized = normalizeOfferMedia(body.media)
+    if (normalized.error) return res.status(400).json({ ok: false, error: normalized.error })
+    if (!await localMarketingImageExists(normalized.data.storage_path)) {
+      return res.status(400).json({ ok: false, error: 'That image is not available in this deployed Marketing build.' })
+    }
+    const parent = await catalogOffer(client, context.workspaceId, normalized.data.offer_id)
+    if (parent.error) return databaseFailure(res, parent.error)
+    if (!parent.data) return res.status(404).json({ ok: false, error: 'Offer not found.' })
+    const saved = await saveCatalogRow(client, 'offer_media', context, body.media?.id, normalized.data)
+    return catalogWriteResponse(res, client, context, saved)
+  }
+
+  const normalized = normalizeOfferCaption(body.caption)
+  if (normalized.error) return res.status(400).json({ ok: false, error: normalized.error })
+  const parent = await catalogOffer(client, context.workspaceId, normalized.data.offer_id)
+  if (parent.error) return databaseFailure(res, parent.error)
+  if (!parent.data) return res.status(404).json({ ok: false, error: 'Offer not found.' })
+  const saved = await saveCatalogRow(client, 'offer_captions', context, body.caption?.id, normalized.data)
+  return catalogWriteResponse(res, client, context, saved)
+}
+
+async function catalogOffer(client, workspaceId, offerId) {
+  return client.from('offers').select('id').eq('id', offerId).eq('workspace_id', workspaceId).maybeSingle()
+}
+
+async function saveCatalogRow(client, table, context, id, data) {
+  if (id) {
+    if (!isUuid(id)) return { data: null, error: { code: 'invalid_id', message: 'Invalid catalog record.' } }
+    const updated = await client.from(table).update(data).eq('id', id).eq('workspace_id', context.workspaceId).select('*').maybeSingle()
+    if (!updated.error && !updated.data) return { data: null, error: { code: 'not_found', message: 'Catalog record not found.' } }
+    return updated
+  }
+  return client.from(table).insert({ ...data, workspace_id: context.workspaceId, created_by: context.userId }).select('*').single()
+}
+
+async function catalogWriteResponse(res, client, context, result) {
+  if (result.error?.code === 'not_found') return res.status(404).json({ ok: false, error: result.error.message })
+  if (result.error?.code === 'invalid_id') return res.status(400).json({ ok: false, error: result.error.message })
+  if (result.error) return databaseFailure(res, result.error)
+  const catalog = await loadOfferCatalog(client, context.workspaceId, [])
+  if (catalog.error) return databaseFailure(res, catalog.error)
+  return res.status(200).json({ ok: true, catalog_record: result.data, offer_catalog: catalog.data.offers })
+}
+
+function normalizeOffer(value) {
+  if (!isPlainObject(value)) return { error: 'Offer details are required.' }
+  const name = optionalText(value.name)
+  const description = optionalText(value.description)
+  const priceMode = value.price_mode
+  const status = value.status
+  const override = optionalText(value.price_display_override) || null
+  const projectType = optionalText(value.default_project_type) || null
+  if (!name || name.length > 160) return { error: 'Offer name is required and must be 160 characters or fewer.' }
+  if (description.length > 3000) return { error: 'Offer description must be 3,000 characters or fewer.' }
+  if (!['fixed', 'from', 'by_scope'].includes(priceMode)) return { error: 'Choose fixed, from, or by-scope pricing.' }
+  if (!['draft', 'active', 'retired'].includes(status)) return { error: 'Choose a valid offer status.' }
+  if (status === 'active' && description.length < 10) return { error: 'An active offer needs a clear description.' }
+  if (override?.length > 160) return { error: 'Price wording must be 160 characters or fewer.' }
+  if (projectType?.length > 80) return { error: 'Default project type must be 80 characters or fewer.' }
+
+  const priceCents = value.price_cents === null || value.price_cents === undefined || value.price_cents === '' ? null : Number(value.price_cents)
+  if (priceMode === 'by_scope' && priceCents !== null) return { error: 'By-scope pricing cannot include a fixed amount.' }
+  if (priceMode !== 'by_scope' && (!Number.isInteger(priceCents) || priceCents <= 0)) return { error: 'Fixed and from pricing require a positive whole-cent amount.' }
+  return { data: { name, description, price_mode: priceMode, price_cents: priceCents, price_display_override: override, default_project_type: projectType, status } }
+}
+
+function normalizeOfferMedia(value) {
+  if (!isPlainObject(value)) return { error: 'Media details are required.' }
+  if (!isUuid(value.offer_id)) return { error: 'Choose the offer this image belongs to.' }
+  const storagePath = optionalText(value.storage_path)
+  const status = value.status
+  if (!isLocalMarketingImagePath(storagePath)) return { error: 'Use a verified image path under /images/.' }
+  if (!['draft', 'active', 'retired'].includes(status)) return { error: 'Choose a valid image status.' }
+  const compatible = {
+    linkedin_compatible: value.linkedin_compatible === true,
+    facebook_compatible: value.facebook_compatible === true,
+    instagram_compatible: value.instagram_compatible === true,
+  }
+  if (status === 'active' && !Object.values(compatible).every(Boolean)) {
+    return { error: 'An active Marketing image must be explicitly confirmed for LinkedIn, Facebook, and Instagram.' }
+  }
+  return { data: { offer_id: value.offer_id, storage_path: storagePath, ...compatible, status } }
+}
+
+function normalizeOfferCaption(value) {
+  if (!isPlainObject(value)) return { error: 'Caption details are required.' }
+  if (!isUuid(value.offer_id)) return { error: 'Choose the offer this caption belongs to.' }
+  const body = optionalText(value.body)
+  if (!body || body.length > 3000) return { error: 'Caption text is required and must be 3,000 characters or fewer.' }
+  if (!['en', 'es'].includes(value.locale)) return { error: 'Choose English or Spanish.' }
+  if (!['draft', 'active', 'retired'].includes(value.status)) return { error: 'Choose a valid caption status.' }
+  return { data: { offer_id: value.offer_id, body, locale: value.locale, status: value.status } }
 }
 
 // Move and Skip are internal Marketing decisions. They deliberately run before
@@ -335,8 +451,35 @@ async function reconcileUnfinishedSlotAttempts(client, attempts) {
   return failed ? { data: null, error: failed.error } : { data: reconciled, error: null }
 }
 
-function marketingStatusResponse(destinations, storage, attempts, resolutions, context) {
-  const plan = buildMarketingOccurrencePlan({ attempts, resolutions })
+async function loadOfferCatalog(client, workspaceId, attempts) {
+  const [offers, media, captions] = await Promise.all([
+    client.from('offers').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(100),
+    client.from('offer_media').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(300),
+    client.from('offer_captions').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(300),
+  ])
+  const failure = [offers, media, captions].find(result => result.error)
+  if (failure) return { data: null, error: failure.error }
+  return {
+    data: buildOfferCatalog({
+      offers: offers.data || [],
+      media: media.data || [],
+      captions: captions.data || [],
+      attempts: attempts || [],
+    }),
+    error: null,
+  }
+}
+
+function marketingAssets(catalog, attempts) {
+  if (!catalog?.activeOfferCount) return EVERGREEN_ASSETS
+  const historicLegacyAssets = EVERGREEN_ASSETS
+    .filter(asset => (attempts || []).some(attempt => attempt.asset_id === asset.id || attempt.asset_path === asset.assetPath))
+    .map(asset => ({ ...asset, enabled: false }))
+  return [...catalog.assets, ...historicLegacyAssets]
+}
+
+function marketingStatusResponse(destinations, storage, attempts, resolutions, context, catalog) {
+  const plan = buildMarketingOccurrencePlan({ attempts, resolutions, assets: marketingAssets(catalog, attempts) })
   const slots = plan.slots
   const activeSlotKeys = new Set(slots.map(slot => slot.slotKey))
   const history = attempts.filter(attempt => !activeSlotKeys.has(attempt.marketing_slot_key))
@@ -353,6 +496,7 @@ function marketingStatusResponse(destinations, storage, attempts, resolutions, c
     storage_error: storage.error,
     missed_slot_signal: plan.missedSlotSignal,
     missed_slot_decisions: resolutions.map(serializeSlotResolution),
+    offer_catalog: catalog.offers,
     poll_after_ms: hasUnfinishedAttempt ? MARKETING_POLL_INTERVAL_MS : null,
   }
 }
@@ -773,6 +917,10 @@ function isSlotResolutionRequest(body) {
   return body?.action === 'move' || body?.action === 'skip' || body?.action === 'close_failed'
 }
 
+function isOfferCatalogRequest(body) {
+  return ['save_marketing_offer', 'save_marketing_offer_media', 'save_marketing_offer_caption'].includes(body?.action)
+}
+
 function validateSlotResolutionRequest(body) {
   if (!['move', 'skip'].includes(body.action)) return 'A valid missed-slot decision is required.'
   if (!SLOT_KEY_PATTERN.test(body.slot_key || '')) return 'A valid weekly Marketing slot is required.'
@@ -789,6 +937,23 @@ function validateCloseFailedRequest(body) {
   if (typeof body.asset_id !== 'string' || !body.asset_id.trim()) return 'A valid evergreen asset is required.'
   if (typeof body.owner_confirmation_token !== 'string' || body.owner_confirmation_token.length > 1024) return 'A valid owner confirmation is required.'
   return ''
+}
+
+function isUuid(value) {
+  return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+function isLocalMarketingImagePath(value) {
+  return /^\/images\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:png|jpe?g|webp)$/i.test(value)
+}
+
+async function localMarketingImageExists(storagePath) {
+  try {
+    await readFile(join(process.cwd(), 'public', storagePath))
+    return true
+  } catch {
+    return false
+  }
 }
 
 function nextAuthorizableSlot(slots) {

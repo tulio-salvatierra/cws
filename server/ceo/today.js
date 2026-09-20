@@ -254,6 +254,10 @@ function marketingActions(plan, now) {
 }
 
 function hasMarketingDeliveryFailure(slot) {
+  // A closed failed occurrence stays in Marketing's audit history, but the
+  // owner has already made its durable internal decision. CEO must not keep
+  // presenting that same failure as unresolved work.
+  if (slot?.state === 'resolved' || slot?.resolution) return false
   if (!slot?.attempt) return false
   if (slot.attempt.provider_status === 'error') return true
   return (slot.destinationResults || []).some((result) => result.provider_status === 'error')

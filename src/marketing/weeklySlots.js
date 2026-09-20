@@ -220,6 +220,7 @@ export function marketingWeekStart(now = new Date()) {
 }
 
 function lastSuccessfulPublication(asset, attempts) {
+  if (asset?.lastPublishedAt) return asset.lastPublishedAt
   const matches = attempts
     .filter(attempt => isFullyPosted(attempt))
     .filter(attempt => attempt.asset_id === asset.id || (!attempt.asset_id && attempt.asset_path === asset.assetPath))
