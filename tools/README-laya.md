@@ -54,7 +54,7 @@ In the untracked `.env` used by `npm run dev`, add the same values:
 
 ```text
 LAYA_SERVICE_URL=http://127.0.0.1:8765/assess
-LAYA_SERVICE_TOKEN=17499954
+LAYA_SERVICE_TOKEN=choose-a-long-random-local-secret
 
 ```
 

@@ -7,6 +7,7 @@ import {
   GoogleSheetsWebhookTimeoutError,
   postGoogleSheetsWebhook,
 } from './server/google-sheets-webhook.js'
+import generateDraftHandler from './api/generate-draft.js'
 
 // In ESM, __dirname is not defined. Recreate it from import.meta.url
 const __filename = fileURLToPath(import.meta.url)
@@ -16,6 +17,15 @@ function clientPortalApiPlugin(env) {
   return {
     name: 'client-portal-local-api',
     configureServer(server) {
+      server.middlewares.use('/api/generate-draft', async (req, res) => {
+        const body = await readJsonBody(req).catch(() => null)
+        if (body === null) {
+          sendJson(res, 400, { ok: false, error: 'Request body must be valid JSON.' })
+          return
+        }
+        await generateDraftHandler({ method: req.method, headers: req.headers, body }, createVercelResponse(res))
+      })
+
       server.middlewares.use('/api/client-portal-intake', async (req, res) => {
         if (req.method !== 'POST') {
           sendJson(res, 405, { ok: false, error: 'Method not allowed' })
@@ -58,6 +68,20 @@ function clientPortalApiPlugin(env) {
       })
     },
   }
+}
+
+function createVercelResponse(res) {
+  const response = {
+    status(statusCode) {
+      res.statusCode = statusCode
+      return response
+    },
+    json(payload) {
+      sendJson(res, res.statusCode || 200, payload)
+      return response
+    },
+  }
+  return response
 }
 
 function readJsonBody(req) {

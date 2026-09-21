@@ -48,7 +48,7 @@ export default function AgentRunsPage() {
           topic,
         }),
       })
-      const result = await response.json()
+      const result = await response.json().catch(() => ({}))
       if (!response.ok) throw new Error(result.error || 'Draft generation failed.')
       setGenerated(result.output)
       await load()
