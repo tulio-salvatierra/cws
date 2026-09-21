@@ -1,0 +1,63 @@
+- generic [ref=e15]:
+  - complementary [ref=e16]:
+    - generic [ref=e17]: Cicero Admin
+    - navigation [ref=e18]:
+      - link "◈ CEO Today" [ref=e19] [cursor=pointer]:
+        - /url: /admin
+      - link "Marketing V1" [ref=e20] [cursor=pointer]:
+        - /url: /admin/marketing
+      - link "Operations" [active] [ref=e21] [cursor=pointer]:
+        - /url: /admin/operations
+      - link "🧭 Workspace" [ref=e22] [cursor=pointer]:
+        - /url: /admin/workspace
+      - link "Channels" [ref=e23] [cursor=pointer]:
+        - /url: /admin/channels
+      - link "Campaigns" [ref=e24] [cursor=pointer]:
+        - /url: /admin/campaigns
+      - link "Tasks" [ref=e25] [cursor=pointer]:
+        - /url: /admin/tasks
+      - link "Planning" [ref=e26] [cursor=pointer]:
+        - /url: /admin/planning
+      - link "Knowledge" [ref=e27] [cursor=pointer]:
+        - /url: /admin/knowledge
+      - link "Agent runs" [ref=e28] [cursor=pointer]:
+        - /url: /admin/agent-runs
+      - link "Clients" [ref=e29] [cursor=pointer]:
+        - /url: /admin/clients
+      - link "Leads" [ref=e30] [cursor=pointer]:
+        - /url: /admin/leads
+      - link "Sales" [ref=e31] [cursor=pointer]:
+        - /url: /admin/sales
+      - link "Mailing List" [ref=e32] [cursor=pointer]:
+        - /url: /admin/mailing-list
+      - link "🔑 Keywords" [ref=e33] [cursor=pointer]:
+        - /url: /admin/keywords
+    - button "Sign out" [ref=e34] [cursor=pointer]
+  - main [ref=e35]:
+    - main [ref=e72]:
+      - generic [ref=e73]:
+        - paragraph [ref=e74]: Operations V1
+        - heading "Client readiness" [level=1] [ref=e75]
+        - paragraph [ref=e76]: Track the information needed to deliver client work. This is a fixed readiness checklist, not a task manager.
+        - generic [ref=e77]:
+          - heading "Start a client project" [level=2] [ref=e78]
+          - paragraph [ref=e79]: Creates or reuses the client and seeds the fixed Operations checklist. Nothing is sent externally.
+          - generic [ref=e80]:
+            - textbox "Client or business name" [ref=e81]
+            - textbox "Project name" [ref=e82]
+            - textbox "Client email (optional)" [ref=e83]
+            - textbox "Client phone (optional)" [ref=e84]
+            - combobox [ref=e85]:
+              - option "Website build" [selected]
+              - option "Website refresh"
+              - option "Photography / video"
+              - option "Marketing support"
+              - option "Other"
+            - button "Create Operations project" [ref=e86] [cursor=pointer]
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - heading "Active projects" [level=2] [ref=e90]
+              - paragraph [ref=e91]: Derived from durable Operations readiness state.
+            - paragraph [ref=e92]: 0 projects
+          - paragraph [ref=e94]: No Operations projects yet.

@@ -167,6 +167,7 @@ describe('non-publishing draft generation API', () => {
         draft_text: 'Clear websites help customers act.',
         brief_id: 'brief-1',
         brief_version: 1,
+        laya: expect.objectContaining({ status: 'not_configured', mode: 'shadow-only' }),
       }),
     }))
     const openAiRequest = JSON.parse(fetch.mock.calls[0][1].body)

@@ -1,0 +1,43 @@
+- generic [ref=f3e2]:
+  - generic:
+    - generic:
+      - complementary:
+        - generic: Cicero Admin
+        - navigation:
+          - link "◈ CEO Today":
+            - /url: /admin
+          - link "Marketing V1":
+            - /url: /admin/marketing
+          - link "Operations":
+            - /url: /admin/operations
+          - link "🧭 Workspace":
+            - /url: /admin/workspace
+          - link "Channels":
+            - /url: /admin/channels
+          - link "Campaigns":
+            - /url: /admin/campaigns
+          - link "Tasks":
+            - /url: /admin/tasks
+          - link "Planning":
+            - /url: /admin/planning
+          - link "Knowledge":
+            - /url: /admin/knowledge
+          - link "Agent runs":
+            - /url: /admin/agent-runs
+          - link "Clients":
+            - /url: /admin/clients
+          - link "Leads":
+            - /url: /admin/leads
+          - link "Sales":
+            - /url: /admin/sales
+          - link "Mailing List":
+            - /url: /admin/mailing-list
+          - link "🔑 Keywords":
+            - /url: /admin/keywords
+        - button "Sign out"
+      - main:
+        - main: Loading Operations project…
+  - generic "Loading site":
+    - generic [ref=f3e4]:
+      - img "Cicero Web Studio" [ref=f3e5]
+      - paragraph [ref=f3e6]: 21%

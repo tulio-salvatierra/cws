@@ -46,3 +46,7 @@ agents.local/
 .tmp/
 skills-lock.json
 .vercel
+
+# Local Laya evaluation environment and downloaded model cache
+.venv-laya/
+.laya-cache/

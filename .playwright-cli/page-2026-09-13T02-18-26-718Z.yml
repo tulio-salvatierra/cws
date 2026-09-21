@@ -1,0 +1,13 @@
+- generic [ref=e2]:
+  - generic:
+    - generic:
+      - generic:
+        - heading "Cicero Admin" [level=1]
+        - textbox "Email"
+        - textbox "Password"
+        - button "Sign in"
+        - button "Forgot password?"
+  - generic "Loading site":
+    - generic [ref=e4]:
+      - img "Cicero Web Studio" [ref=e5]
+      - paragraph [ref=e6]: 15%

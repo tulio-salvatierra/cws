@@ -1,0 +1,375 @@
+- generic [ref=f8e4]:
+  - complementary [ref=f8e5]:
+    - generic [ref=f8e6]: Cicero Admin
+    - navigation [ref=f8e7]:
+      - link "◈ CEO Today" [ref=f8e8] [cursor=pointer]:
+        - /url: /admin
+      - link "Marketing V1" [ref=f8e9] [cursor=pointer]:
+        - /url: /admin/marketing
+      - link "Operations" [ref=f8e10] [cursor=pointer]:
+        - /url: /admin/operations
+      - link "🧭 Workspace" [ref=f8e11] [cursor=pointer]:
+        - /url: /admin/workspace
+      - link "Channels" [ref=f8e12] [cursor=pointer]:
+        - /url: /admin/channels
+      - link "Campaigns" [ref=f8e13] [cursor=pointer]:
+        - /url: /admin/campaigns
+      - link "Tasks" [ref=f8e14] [cursor=pointer]:
+        - /url: /admin/tasks
+      - link "Planning" [ref=f8e15] [cursor=pointer]:
+        - /url: /admin/planning
+      - link "Knowledge" [ref=f8e16] [cursor=pointer]:
+        - /url: /admin/knowledge
+      - link "Agent runs" [ref=f8e17] [cursor=pointer]:
+        - /url: /admin/agent-runs
+      - link "Clients" [ref=f8e18] [cursor=pointer]:
+        - /url: /admin/clients
+      - link "Leads" [ref=f8e19] [cursor=pointer]:
+        - /url: /admin/leads
+      - link "Sales" [ref=f8e20] [cursor=pointer]:
+        - /url: /admin/sales
+      - link "Mailing List" [ref=f8e21] [cursor=pointer]:
+        - /url: /admin/mailing-list
+      - link "🔑 Keywords" [ref=f8e22] [cursor=pointer]:
+        - /url: /admin/keywords
+    - button "Sign out" [ref=f8e23] [cursor=pointer]
+  - main [ref=f8e24]:
+    - main [ref=f8e69]:
+      - generic [ref=f8e70]:
+        - link "← Operations" [ref=f8e71] [cursor=pointer]:
+          - /url: /admin/operations
+        - generic [ref=f8e72]:
+          - generic [ref=f8e73]:
+            - paragraph [ref=f8e74]: Ecclection
+            - heading "Ecclection Website" [level=1] [ref=f8e75]
+            - paragraph [ref=f8e76]: Website build
+          - generic [ref=f8e77]:
+            - paragraph [ref=f8e78]: Readiness
+            - paragraph [ref=f8e79]: 33%
+            - paragraph [ref=f8e80]: 1/3 received
+        - generic [ref=f8e82]:
+          - generic [ref=f8e83]:
+            - heading "Delivery state" [level=2] [ref=f8e84]
+            - paragraph [ref=f8e85]: "Waiting On Client · Waiting on client: Project-specific requirements."
+          - generic [ref=f8e86]:
+            - combobox "Project status" [ref=f8e87]:
+              - option "Setup"
+              - option "In progress"
+              - option "Waiting on client"
+              - option "Waiting on CWS" [selected]
+              - option "Completed"
+              - option "Paused"
+            - button "Save status" [disabled] [ref=f8e88]
+        - generic [ref=f8e89]:
+          - heading "Readiness checklist" [level=2] [ref=f8e90]
+          - paragraph [ref=f8e91]: Mark the fixed intake requirements that matter for this project. CWS/client ownership is used only to derive the waiting state.
+          - generic [ref=f8e92]:
+            - article [ref=f8e93]:
+              - generic [ref=f8e94]:
+                - generic [ref=f8e95]:
+                  - paragraph [ref=f8e96]: Booking Ecommerce Integrations
+                  - heading "Booking, ecommerce, and integrations" [level=3] [ref=f8e97]
+                - paragraph [ref=f8e98]: Not Applicable
+              - generic [ref=f8e99]:
+                - generic [ref=f8e100]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e101]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e102]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e103]:
+                    - option "Needed now" [selected]
+                    - option "Needed later"
+                    - option "Opportunity"
+                - generic [ref=f8e104]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e105]:
+                    - option "Client"
+                    - option "CWS" [selected]
+              - textbox "Booking, ecommerce, and integrations notes" [ref=f8e106]:
+                - /placeholder: Short readiness note (optional)
+                - text: Current scope is informational/community website, not an e-commerce build.
+              - button "Save requirement" [disabled] [ref=f8e107]
+            - article [ref=f8e108]:
+              - generic [ref=f8e109]:
+                - generic [ref=f8e110]:
+                  - paragraph [ref=f8e111]: Brand
+                  - heading "Brand assets" [level=3] [ref=f8e112]
+                - paragraph [ref=f8e113]: Not Applicable
+              - generic [ref=f8e114]:
+                - generic [ref=f8e115]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e116]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e117]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e118]:
+                    - option "Needed now"
+                    - option "Needed later"
+                    - option "Opportunity" [selected]
+                - generic [ref=f8e119]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e120]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Brand assets notes" [ref=f8e121]:
+                - /placeholder: Short readiness note (optional)
+                - text: Not applicable
+              - button "Save requirement" [disabled] [ref=f8e122]
+            - article [ref=f8e123]:
+              - generic [ref=f8e124]:
+                - generic [ref=f8e125]:
+                  - paragraph [ref=f8e126]: Business Basics
+                  - heading "Business basics" [level=3] [ref=f8e127]
+                - paragraph [ref=f8e128]: Not Applicable
+              - generic [ref=f8e129]:
+                - generic [ref=f8e130]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e131]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e132]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e133]:
+                    - option "Needed now" [selected]
+                    - option "Needed later"
+                    - option "Opportunity"
+                - generic [ref=f8e134]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e135]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Business basics notes" [ref=f8e136]:
+                - /placeholder: Short readiness note (optional)
+                - text: Existing client/project identity is known.
+              - button "Save requirement" [disabled] [ref=f8e137]
+            - article [ref=f8e138]:
+              - generic [ref=f8e139]:
+                - generic [ref=f8e140]:
+                  - paragraph [ref=f8e141]: Business Copy
+                  - heading "Business copy" [level=3] [ref=f8e142]
+                - paragraph [ref=f8e143]: Needed
+              - generic [ref=f8e144]:
+                - generic [ref=f8e145]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e146]:
+                    - option "Needed" [selected]
+                    - option "Received"
+                    - option "Not applicable"
+                - generic [ref=f8e147]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e148]:
+                    - option "Needed now"
+                    - option "Needed later" [selected]
+                    - option "Opportunity"
+                - generic [ref=f8e149]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e150]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Business copy notes" [ref=f8e151]:
+                - /placeholder: Short readiness note (optional)
+                - text: "Main known blocker: copy/content workbook remains incomplete and prior copy revisions were unresolved."
+              - button "Save requirement" [disabled] [ref=f8e152]
+            - article [ref=f8e153]:
+              - generic [ref=f8e154]:
+                - generic [ref=f8e155]:
+                  - paragraph [ref=f8e156]: Google Business Profile
+                  - heading "Google Business Profile" [level=3] [ref=f8e157]
+                - paragraph [ref=f8e158]: Not Applicable
+              - generic [ref=f8e159]:
+                - generic [ref=f8e160]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e161]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e162]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e163]:
+                    - option "Needed now"
+                    - option "Needed later"
+                    - option "Opportunity" [selected]
+                - generic [ref=f8e164]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e165]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Google Business Profile notes" [ref=f8e166]:
+                - /placeholder: Short readiness note (optional)
+                - text: Not applicable
+              - button "Save requirement" [disabled] [ref=f8e167]
+            - article [ref=f8e168]:
+              - generic [ref=f8e169]:
+                - generic [ref=f8e170]:
+                  - paragraph [ref=f8e171]: Legal Policies
+                  - heading "Legal and policies" [level=3] [ref=f8e172]
+                - paragraph [ref=f8e173]: Not Applicable
+              - generic [ref=f8e174]:
+                - generic [ref=f8e175]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e176]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e177]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e178]:
+                    - option "Needed now"
+                    - option "Needed later" [selected]
+                    - option "Opportunity"
+                - generic [ref=f8e179]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e180]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Legal and policies notes" [ref=f8e181]:
+                - /placeholder: Short readiness note (optional)
+                - text: not applicable
+              - button "Save requirement" [disabled] [ref=f8e182]
+            - article [ref=f8e183]:
+              - generic [ref=f8e184]:
+                - generic [ref=f8e185]:
+                  - paragraph [ref=f8e186]: Photos Video
+                  - heading "Photos and video" [level=3] [ref=f8e187]
+                - paragraph [ref=f8e188]: Not Applicable
+              - generic [ref=f8e189]:
+                - generic [ref=f8e190]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e191]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e192]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e193]:
+                    - option "Needed now"
+                    - option "Needed later" [selected]
+                    - option "Opportunity"
+                - generic [ref=f8e194]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e195]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Photos and video notes" [ref=f8e196]:
+                - /placeholder: Short readiness note (optional)
+                - text: Not applicable
+              - button "Save requirement" [disabled] [ref=f8e197]
+            - article [ref=f8e198]:
+              - generic [ref=f8e199]:
+                - generic [ref=f8e200]:
+                  - paragraph [ref=f8e201]: Project Specific
+                  - heading "Project-specific requirements" [level=3] [ref=f8e202]
+                - paragraph [ref=f8e203]: Needed
+              - generic [ref=f8e204]:
+                - generic [ref=f8e205]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e206]:
+                    - option "Needed" [selected]
+                    - option "Received"
+                    - option "Not applicable"
+                - generic [ref=f8e207]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e208]:
+                    - option "Needed now" [selected]
+                    - option "Needed later"
+                    - option "Opportunity"
+                - generic [ref=f8e209]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e210]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Project-specific requirements notes" [ref=f8e211]:
+                - /placeholder: Short readiness note (optional)
+                - text: Complete/finalize outstanding content workbook and approve final page copy.
+              - button "Save requirement" [disabled] [ref=f8e212]
+            - article [ref=f8e213]:
+              - generic [ref=f8e214]:
+                - generic [ref=f8e215]:
+                  - paragraph [ref=f8e216]: Services Offers
+                  - heading "Services and offers" [level=3] [ref=f8e217]
+                - paragraph [ref=f8e218]: Not Applicable
+              - generic [ref=f8e219]:
+                - generic [ref=f8e220]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e221]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e222]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e223]:
+                    - option "Needed now" [selected]
+                    - option "Needed later"
+                    - option "Opportunity"
+                - generic [ref=f8e224]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e225]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Services and offers notes" [ref=f8e226]:
+                - /placeholder: Short readiness note (optional)
+                - text: No current opportunities
+              - button "Save requirement" [disabled] [ref=f8e227]
+            - article [ref=f8e228]:
+              - generic [ref=f8e229]:
+                - generic [ref=f8e230]:
+                  - paragraph [ref=f8e231]: Social Contact Links
+                  - heading "Social and contact links" [level=3] [ref=f8e232]
+                - paragraph [ref=f8e233]: Not Applicable
+              - generic [ref=f8e234]:
+                - generic [ref=f8e235]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e236]:
+                    - option "Needed"
+                    - option "Received"
+                    - option "Not applicable" [selected]
+                - generic [ref=f8e237]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e238]:
+                    - option "Needed now" [selected]
+                    - option "Needed later"
+                    - option "Opportunity"
+                - generic [ref=f8e239]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e240]:
+                    - option "Client" [selected]
+                    - option "CWS"
+              - textbox "Social and contact links notes" [ref=f8e241]:
+                - /placeholder: Short readiness note (optional)
+                - text: Not needed
+              - button "Save requirement" [disabled] [ref=f8e242]
+            - article [ref=f8e243]:
+              - generic [ref=f8e244]:
+                - generic [ref=f8e245]:
+                  - paragraph [ref=f8e246]: Website Domain
+                  - heading "Website, domain, and access" [level=3] [ref=f8e247]
+                  - paragraph [ref=f8e248]: Received Sep 12, 2026
+                - paragraph [ref=f8e249]: Received
+              - generic [ref=f8e250]:
+                - generic [ref=f8e251]:
+                  - text: Status
+                  - combobox "Status" [ref=f8e252]:
+                    - option "Needed"
+                    - option "Received" [selected]
+                    - option "Not applicable"
+                - generic [ref=f8e253]:
+                  - text: Timing
+                  - combobox "Timing" [ref=f8e254]:
+                    - option "Needed now" [selected]
+                    - option "Needed later"
+                    - option "Opportunity"
+                - generic [ref=f8e255]:
+                  - text: Waiting on
+                  - combobox "Waiting on" [ref=f8e256]:
+                    - option "Client"
+                    - option "CWS" [selected]
+              - textbox "Website, domain, and access notes" [ref=f8e257]:
+                - /placeholder: Short readiness note (optional)
+                - text: Existing custom Next.js/Vercel project already exists.
+              - button "Save requirement" [disabled] [ref=f8e258]

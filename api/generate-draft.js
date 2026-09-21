@@ -2,6 +2,7 @@
 
 import { createHash } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
+import { assessDraftSafely } from '../server/laya/assess.js'
 
 const DEFAULT_CHANNEL_SLUG = 'cicero-web-studio'
 const DEFAULT_LANGUAGE = 'en'
@@ -139,6 +140,11 @@ export default async function handler(req, res) {
       brief: brief.data,
       topic,
     })
+    const laya = await assessDraftSafely({
+      topic,
+      draft: generated.text,
+      brief: runInput.brief_snapshot,
+    })
     const output = {
       draft_text: generated.text,
       model: generated.model,
@@ -149,6 +155,7 @@ export default async function handler(req, res) {
       brief_id: brief.data.id,
       brief_version: brief.data.version,
       generated_at: new Date().toISOString(),
+      laya,
     }
     const reviewed = await updateRun(client, queued.data.id, {
       status: 'needs_review',
