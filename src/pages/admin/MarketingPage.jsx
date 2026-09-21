@@ -33,7 +33,10 @@ export default function MarketingPage() {
   const [confirmingSlotKey, setConfirmingSlotKey] = useState('')
   const [resolvingSlotKey, setResolvingSlotKey] = useState('')
   const [catalogSaving, setCatalogSaving] = useState(false)
+  const [creative, setCreative] = useState({ loading: true, ideaRuns: [], assets: [], error: '' })
+  const [creativeBusy, setCreativeBusy] = useState('')
   const referenceKeysRef = useRef({})
+  const creativeReferenceKeysRef = useRef({})
   const { session } = useAuth()
 
   const refreshStatus = useCallback(async () => {
@@ -61,6 +64,29 @@ export default function MarketingPage() {
   }, [session?.access_token])
 
   useEffect(() => { refreshStatus() }, [refreshStatus])
+
+  const refreshCreative = useCallback(async () => {
+    if (!session?.access_token) return
+    try {
+      const response = await requestMarketing('/api/marketing-creative', session.access_token)
+      const body = await readJson(response)
+      if (!response.ok) throw new Error(body.error || 'Marketing creative could not be loaded.')
+      setCreative({ loading: false, ideaRuns: body.idea_runs || [], assets: body.creative_assets || [], error: '' })
+    } catch (error) {
+      setCreative(current => ({ ...current, loading: false, error: error.message || 'Marketing creative could not be loaded.' }))
+    }
+  }, [session?.access_token])
+
+  useEffect(() => {
+    // The creative read is only useful when there is an offer the owner can
+    // actually select. Keeping the empty catalog provider-free also makes the
+    // initial Marketing surface quieter.
+    if (!state.offerCatalog.length) {
+      setCreative(current => current.loading ? { ...current, loading: false } : current)
+      return
+    }
+    refreshCreative()
+  }, [refreshCreative, state.offerCatalog.length])
 
   useEffect(() => {
     if (!state.pollAfterMs) return undefined
@@ -167,6 +193,52 @@ export default function MarketingPage() {
     }
   }
 
+  async function runCreative(action, key, detail) {
+    if (!session?.access_token || creativeBusy) return
+    setCreativeBusy(key)
+    setCreative(current => ({ ...current, error: '' }))
+    try {
+      const response = await requestMarketing('/api/marketing-creative', session.access_token, { action, ...detail })
+      const body = await readJson(response)
+      if (!response.ok) throw new Error(body.error || 'Marketing creative could not be prepared.')
+      await Promise.all([refreshCreative(), refreshStatus()])
+    } catch (error) {
+      setCreative(current => ({ ...current, error: error.message || 'Marketing creative could not be prepared.' }))
+    } finally {
+      setCreativeBusy('')
+    }
+  }
+
+  function generateIdeas(offerId) {
+    const key = `ideas:${offerId}`
+    creativeReferenceKeysRef.current[key] ||= crypto.randomUUID()
+    return runCreative('generate_story_ideas', key, { offer_id: offerId, request_key: creativeReferenceKeysRef.current[key] })
+  }
+
+  function generateVisual(ideaRunId, ideaId) {
+    const key = `visual:${ideaRunId}:${ideaId}`
+    creativeReferenceKeysRef.current[key] ||= crypto.randomUUID()
+    return runCreative('generate_visual_draft', key, { idea_run_id: ideaRunId, idea_id: ideaId, request_key: creativeReferenceKeysRef.current[key] })
+  }
+
+  function approveVisual(asset, caption) {
+    return runCreative('approve_visual_draft', `approve:${asset.id}`, {
+      creative_asset_id: asset.id,
+      caption,
+      linkedin_compatible: true,
+      facebook_compatible: true,
+      instagram_compatible: true,
+    })
+  }
+
+  function retryVisual(asset) {
+    return runCreative('generate_visual_draft', `visual:${asset.idea_run_id}:${asset.idea_id}`, {
+      idea_run_id: asset.idea_run_id,
+      idea_id: asset.idea_id,
+      request_key: crypto.randomUUID(),
+    })
+  }
+
   const allVerified = state.destinations.length === 3 && state.destinations.every(destination => destination.verification_state === 'verified')
   const nextSlot = state.slots.find(slot => ['missed', 'failed', 'ready', 'processing'].includes(slot.state)) || state.slots.at(-1)
 
@@ -204,14 +276,20 @@ export default function MarketingPage() {
           />)}
         </main>
 
+        <CreativeStudio
+          offers={state.offerCatalog}
+          creative={creative}
+          busy={creativeBusy}
+          onGenerateIdeas={generateIdeas}
+          onGenerateVisual={generateVisual}
+          onRetryVisual={retryVisual}
+          onApproveVisual={approveVisual}
+        />
+
         {state.storageError && <p className="mt-6 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-sm text-amber-100">{state.storageError}</p>}
         {state.error && <p role="alert" className="mt-6 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-sm text-rose-200">{state.error}</p>}
 
-        {state.attemptHistory.length > 0 && <section aria-labelledby="marketing-history-heading" className="mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 text-sm sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">History</p>
-          <h2 id="marketing-history-heading" className="mt-2 text-xl font-semibold text-white">Previous attempts</h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">{state.attemptHistory.map(attempt => <AttemptHistory key={attempt.id || attempt.reference_key} attempt={attempt} />)}</div>
-        </section>}
+        {state.attemptHistory.length > 0 && <details className="mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 text-sm sm:p-6"><summary className="cursor-pointer font-semibold text-white">Previous attempts</summary><div className="mt-4 grid gap-3 md:grid-cols-3">{state.attemptHistory.map(attempt => <AttemptHistory key={attempt.id || attempt.reference_key} attempt={attempt} />)}</div></details>}
 
         <section aria-labelledby="marketing-preview-heading" className="mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Live preview</p>
@@ -220,18 +298,59 @@ export default function MarketingPage() {
           {nextSlot?.asset ? <article className="mt-5 max-w-md overflow-hidden rounded-xl border border-gray-700 bg-white text-gray-900 shadow-xl shadow-black/20">
             <div className="flex items-center gap-3 px-4 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0a66c2] text-sm font-bold text-white">CW</div><div><p className="text-sm font-semibold">Cicero Web Studio</p><p className="text-xs text-gray-500">Social · Preview</p></div></div>
             <p data-testid="marketing-preview-caption" className="whitespace-pre-wrap px-4 pb-4 text-sm leading-6">{captions[nextSlot.slot_key] ?? nextSlot.caption ?? 'Your caption will appear here.'}</p>
-            <div className="bg-gray-100"><img src={nextSlot.asset.asset_path} alt={`${nextSlot.asset.label} post preview`} className="block max-h-[34rem] w-full object-contain" /></div>
+            <div className="bg-gray-100"><img src={nextSlot.asset.asset_url || nextSlot.asset.asset_path} alt={`${nextSlot.asset.label} post preview`} className="block max-h-[34rem] w-full object-contain" /></div>
             <div className="border-t border-gray-200 px-4 py-3 text-xs font-medium text-gray-500">Like · Comment · Repost · Send</div>
           </article> : <p className="mt-5 text-sm text-amber-200">Add a verified CWS evergreen offer graphic to prepare a post.</p>}
         </section>
 
-        <OfferCatalog offers={state.offerCatalog} saving={catalogSaving} onSave={saveCatalog} />
+        <details className="mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 sm:p-6">
+          <summary className="cursor-pointer text-sm font-semibold text-gray-100">Evergreen offer library</summary>
+          <p className="mt-2 text-sm leading-6 text-gray-400">Manage approved offers, images, and captions used by the owner-confirmed publishing flow.</p>
+          <OfferCatalog offers={state.offerCatalog} saving={catalogSaving} onSave={saveCatalog} embedded />
+        </details>
       </div>
     </div>
   )
 }
 
-function OfferCatalog({ offers, saving, onSave }) {
+function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVisual, onRetryVisual, onApproveVisual }) {
+  const [assetCaptions, setAssetCaptions] = useState({})
+  const usableOffers = offers.filter(offer => offer.status !== 'retired')
+
+  return <section aria-labelledby="creative-studio-heading" className="mt-8 rounded-2xl border border-indigo-400/20 bg-indigo-400/5 p-5 sm:p-6">
+    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Creative studio</p>
+    <h2 id="creative-studio-heading" className="mt-2 text-xl font-semibold text-white">Turn an offer into a reviewable post asset</h2>
+    <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Generate ideas first. Create a visual only for an idea you choose. Nothing here schedules or publishes a post.</p>
+    {creative.error && <p role="alert" className="mt-4 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-sm text-rose-200">{creative.error}</p>}
+
+    <div className="mt-5 flex flex-wrap gap-3">
+      {usableOffers.map(offer => <button key={offer.id} type="button" disabled={Boolean(busy)} onClick={() => onGenerateIdeas(offer.id)} className="rounded-full border border-indigo-300/50 px-4 py-2 text-sm font-semibold text-indigo-100 transition hover:bg-indigo-400/10 disabled:opacity-45">{busy === `ideas:${offer.id}` ? 'Generating ideas…' : `Generate ideas for ${offer.name}`}</button>)}
+      {!usableOffers.length && <p className="text-sm text-amber-100">Add an offer before generating ideas.</p>}
+    </div>
+
+    {creative.loading ? <p className="mt-5 text-sm text-gray-400">Loading creative drafts…</p> : <div className="mt-6 space-y-5">
+      {creative.ideaRuns.map(run => <article key={run.id} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="font-semibold text-white">Idea set</p><p className="mt-1 text-xs text-gray-500">{run.status === 'needs_review' ? 'Ready for owner review' : run.status}</p></div></div>
+        {run.error_message && <p className="mt-3 text-sm text-rose-200">{run.error_message}</p>}
+        {run.output?.ideas && <div className="mt-4 grid gap-3 lg:grid-cols-2">{run.output.ideas.map(idea => {
+          const asset = creative.assets.find(item => item.idea_run_id === run.id && item.idea_id === idea.id)
+          const key = `visual:${run.id}:${idea.id}`
+          return <section key={idea.id} className="rounded-lg border border-gray-800 bg-gray-900/60 p-4"><p className="font-medium text-white">{idea.title}</p><p className="mt-2 text-sm text-gray-300">{idea.hook}</p><p className="mt-3 text-xs leading-5 text-gray-500">Suggested caption: {idea.caption}</p>{!asset && <button type="button" disabled={Boolean(busy)} onClick={() => onGenerateVisual(run.id, idea.id)} className="mt-4 rounded-full border border-indigo-300/50 px-3 py-2 text-sm font-semibold text-indigo-100 disabled:opacity-45">{busy === key ? 'Creating visual…' : 'Create visual draft'}</button>}{asset && <VisualDraft asset={asset} idea={idea} caption={assetCaptions[asset.id] ?? idea.caption} busy={busy === `approve:${asset.id}`} retrying={busy === key} onCaptionChange={value => setAssetCaptions(current => ({ ...current, [asset.id]: value }))} onRetry={() => onRetryVisual(asset)} onApprove={() => onApproveVisual(asset, assetCaptions[asset.id] ?? idea.caption)} />}</section>
+        })}</div>}
+      </article>)}
+      {!creative.ideaRuns.length && <p className="rounded-xl border border-dashed border-gray-700 p-4 text-sm text-gray-400">No creative ideas yet. Choose an offer to begin.</p>}
+    </div>}
+  </section>
+}
+
+function VisualDraft({ asset, idea, caption, busy, retrying, onCaptionChange, onRetry, onApprove }) {
+  if (asset.status === 'generating' || asset.status === 'approving') return <p className="mt-4 text-sm text-indigo-100">{asset.status === 'generating' ? 'Creating the visual draft…' : 'Adding this asset to the evergreen library…'}</p>
+  if (asset.status === 'failed') return <div className="mt-4"><p className="text-sm text-rose-200">{asset.failure_message || 'The visual draft was not created.'}</p><button type="button" disabled={busy || retrying} onClick={onRetry} className="mt-3 rounded-full border border-rose-300/50 px-3 py-2 text-sm font-semibold text-rose-100 disabled:opacity-45">{retrying ? 'Retrying visual…' : 'Retry visual draft'}</button></div>
+  if (asset.status === 'approved') return <p className="mt-4 text-sm text-emerald-200">Added to the evergreen library. It remains separate from publishing.</p>
+  return <div className="mt-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Visual draft</p>{asset.preview_url ? <img src={asset.preview_url} alt={`Draft visual for ${idea.title}`} className="mt-3 max-h-[28rem] w-full rounded-lg border border-gray-700 bg-white object-contain" /> : <p className="mt-3 text-sm text-amber-100">The draft is ready, but its private preview could not be loaded.</p>}<label className="mt-4 block text-xs text-gray-400">Caption to add with this image<textarea aria-label={`Caption for ${idea.title}`} value={caption} onChange={event => onCaptionChange(event.target.value)} rows={4} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm leading-6 text-white" /></label><p className="mt-2 text-xs text-gray-500">Approving confirms this 4:5 image for LinkedIn, Facebook, and Instagram. You can still decide later whether to publish.</p><button type="button" disabled={busy || !caption.trim()} onClick={onApprove} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-45">{busy ? 'Adding…' : 'Approve for evergreen library'}</button></div>
+}
+
+function OfferCatalog({ offers, saving, onSave, embedded = false }) {
   const [offer, setOffer] = useState(blankOffer())
   const [media, setMedia] = useState(blankMedia())
   const [caption, setCaption] = useState(blankCaption())
@@ -255,7 +374,7 @@ function OfferCatalog({ offers, saving, onSave }) {
     if (saved) setCaption(blankCaption())
   }
 
-  return <section aria-labelledby="offer-catalog-heading" className="mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 sm:p-6">
+  return <section aria-labelledby="offer-catalog-heading" className={embedded ? 'mt-5' : 'mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 sm:p-6'}>
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Offer catalog</p>
     <h2 id="offer-catalog-heading" className="mt-2 text-xl font-semibold text-white">Approved services and Marketing variations</h2>
     <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Offers stay as reference data. An active offer enters rotation only when it has an active English caption and an image you have explicitly confirmed works for LinkedIn, Facebook, and Instagram.</p>
@@ -295,7 +414,7 @@ function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, o
   return <section aria-labelledby={`${slot.key}-heading`} className="rounded-2xl border border-gray-800 bg-gray-900/70 p-5 shadow-2xl shadow-black/20 sm:p-6">
     <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">{slot.label}</p><h2 id={`${slot.key}-heading`} className="mt-2 text-xl font-semibold text-white">{slot.weekday}</h2><p className="mt-1 text-sm text-gray-400">{slot.state === 'missed' ? `Original scheduled day: ${formatSlotDate(slot.slot_date)}` : formatSlotDate(slot.slot_date)}</p></div><span className={`rounded-full border px-3 py-1 text-xs font-semibold ${slot.state === 'posted' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200' : slot.state === 'ready' ? 'border-indigo-400/30 bg-indigo-400/10 text-indigo-100' : slot.state === 'missed' ? 'border-amber-400/30 bg-amber-400/10 text-amber-100' : slot.state === 'failed' ? 'border-rose-400/30 bg-rose-400/10 text-rose-200' : 'border-gray-700 bg-gray-800 text-gray-300'}`}>{detail.label}</span></div>
     {slot.asset ? <>
-      <div className="mt-5 overflow-hidden rounded-xl border border-gray-700 bg-gray-100"><img src={slot.asset.asset_path} alt={slot.asset.label} className="block max-h-[34rem] w-full object-contain" /></div>
+      <div className="mt-5 overflow-hidden rounded-xl border border-gray-700 bg-gray-100"><img src={slot.asset.asset_url || slot.asset.asset_path} alt={slot.asset.label} className="block max-h-[34rem] w-full object-contain" /></div>
       <div className="mt-4 flex items-center gap-2"><h3 className="font-medium text-white">{slot.asset.label}</h3>{slot.asset.price && <span className="text-sm text-gray-400">{slot.asset.price}</span>}{fallback && <span className="rounded bg-amber-400/10 px-2 py-0.5 text-xs text-amber-100">Fallback asset</span>}</div>
       {fallback && <p className="mt-2 text-xs leading-5 text-gray-500">No priced CWS offer creative is currently available in the repository. Add one to replace this fallback in rotation.</p>}
       <label htmlFor={`${slot.key}-caption`} className="mt-5 block text-sm font-medium text-gray-200">Caption</label>

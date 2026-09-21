@@ -148,7 +148,7 @@ async function createMarketingPost(res, client, context, destinations, body) {
   }
 
   try {
-    const upload = await uploadAsset(slot.asset)
+    const upload = await uploadAsset(client, slot.asset)
     const createdPost = await createProviderPost(body.caption.trim(), body.reference_key, upload.id)
     const persisted = await persistProviderPost(client, attempt, prepared.data, createdPost, upload.id)
     if (persisted.error) return databaseFailure(res, persisted.error)
@@ -459,10 +459,15 @@ async function loadOfferCatalog(client, workspaceId, attempts) {
   ])
   const failure = [offers, media, captions].find(result => result.error)
   if (failure) return { data: null, error: failure.error }
+  const signedMedia = await Promise.all((media.data || []).map(async medium => {
+    if (medium.media_source !== 'generated') return medium
+    const signed = await client.storage.from(medium.storage_bucket).createSignedUrl(medium.storage_object_path, 60 * 60)
+    return { ...medium, preview_url: signed.error ? null : signed.data?.signedUrl || null }
+  }))
   return {
     data: buildOfferCatalog({
       offers: offers.data || [],
-      media: media.data || [],
+      media: signedMedia,
       captions: captions.data || [],
       attempts: attempts || [],
     }),
@@ -663,10 +668,12 @@ function providerPlatformError(post, platform) {
   return null
 }
 
-async function uploadAsset(asset) {
-  const image = await readFile(join(process.cwd(), 'public', asset.assetPath))
+async function uploadAsset(client, asset) {
+  const image = asset.assetSource === 'generated'
+    ? await readGeneratedAsset(client, asset)
+    : await readFile(join(process.cwd(), 'public', asset.assetPath))
   const form = new FormData()
-  form.set('file', new Blob([image], { type: mimeTypeForAsset(asset.assetPath) }), asset.assetPath.split('/').at(-1))
+  form.set('file', new Blob([image], { type: mimeTypeForAsset(asset.assetPath) }), assetFilename(asset))
   form.set('teamId', process.env.BUNDLE_SOCIAL_TEAM_ID)
   const body = await providerRequest('/upload/', { method: 'POST', body: form })
   const id = typeof body?.uploadId === 'string'
@@ -676,6 +683,19 @@ async function uploadAsset(asset) {
       : ''
   if (!id) throw new ProviderError(502, 'bundle.social did not return an upload ID.')
   return { id }
+}
+
+async function readGeneratedAsset(client, asset) {
+  if (asset.assetBucket !== 'marketing-creative' || !/^generated\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.png$/i.test(asset.assetObjectPath || '')) {
+    throw new ProviderError(400, 'Generated Marketing asset storage reference is invalid.')
+  }
+  const downloaded = await client.storage.from(asset.assetBucket).download(asset.assetObjectPath)
+  if (downloaded.error || !downloaded.data) throw new ProviderError(502, 'Generated Marketing asset could not be loaded for publishing.')
+  return Buffer.from(await downloaded.data.arrayBuffer())
+}
+
+function assetFilename(asset) {
+  return asset.assetSource === 'generated' ? `${asset.offerId || 'marketing'}-creative.png` : asset.assetPath.split('/').at(-1)
 }
 
 async function createProviderPost(caption, referenceKey, uploadId) {
@@ -801,6 +821,7 @@ function serializeSlot(slot, ownerConfirmationToken = null) {
     asset: slot.asset ? {
       id: slot.asset.id,
       asset_path: slot.asset.assetPath,
+      asset_url: slot.asset.assetUrl || slot.asset.assetPath,
       label: slot.asset.label,
       price: slot.asset.price,
       default_caption: slot.asset.defaultCaption,

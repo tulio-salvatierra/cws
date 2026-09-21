@@ -47,6 +47,26 @@ function statusBody(overrides = {}) {
   }
 }
 
+function creativeBody(overrides = {}) {
+  return { idea_runs: [], creative_assets: [], ...overrides }
+}
+
+function catalogOffer() {
+  return {
+    id: '11111111-1111-4111-8111-111111111111',
+    name: 'Website Refresh',
+    description: 'A focused refresh for an existing business website.',
+    price_mode: 'by_scope',
+    price_cents: null,
+    price_display: 'Price by scope',
+    price_display_override: null,
+    default_project_type: 'website',
+    status: 'active',
+    media: [],
+    captions: [],
+  }
+}
+
 describe('MarketingPage M5', () => {
   beforeEach(() => {
     useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
@@ -110,12 +130,13 @@ describe('MarketingPage M5', () => {
       .mockResolvedValueOnce(response({ ok: true, offer_catalog: [{
         id: 'offer-a', name: 'Website Refresh', description: 'A focused refresh for an existing website.', price_mode: 'by_scope', price_cents: null, price_display: 'Price by scope', price_display_override: null, default_project_type: 'website', status: 'draft', media: [], captions: [],
       }] }))
+      .mockResolvedValueOnce(response(creativeBody()))
     render(<MarketingPage />)
     await waitFor(() => expect(screen.getByRole('button', { name: 'Save offer' })).toBeEnabled())
     fireEvent.change(screen.getByLabelText('Offer name'), { target: { value: 'Website Refresh' } })
     fireEvent.change(screen.getByLabelText('Offer description'), { target: { value: 'A focused refresh for an existing website.' } })
     fireEvent.click(screen.getByRole('button', { name: 'Save offer' }))
-    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
 
     const [, options] = globalThis.fetch.mock.calls[1]
     expect(JSON.parse(options.body)).toMatchObject({
@@ -136,6 +157,48 @@ describe('MarketingPage M5', () => {
     expect(screen.getAllByText('The active provider account is not the intended CWS destination.')).toHaveLength(2)
     expect(screen.getByRole('link', { name: 'Open LinkedIn post →' })).toHaveAttribute('href', 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832')
     expect(screen.getByText('bundle.social did not return an upload ID.')).toBeInTheDocument()
+  })
+})
+
+describe('MarketingPage Creative Studio', () => {
+  beforeEach(() => {
+    useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true))
+  })
+
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('creates ideas only through an explicit owner action and never confirms a post', async () => {
+    const offer = catalogOffer()
+    const run = {
+      id: '22222222-2222-4222-8222-222222222222',
+      offer_id: offer.id,
+      status: 'needs_review',
+      output: { ideas: [
+        { id: 'idea-1', title: 'Clarify the next step', hook: 'A clearer route from interest to action.', caption: 'A concise review caption.', visual_prompt: 'A calm work space.', cta: 'Ask about a focused refresh.' },
+        { id: 'idea-2', title: 'Show the work', hook: 'Make the service easier to understand.', caption: 'A second review caption.', visual_prompt: 'A bright workspace.', cta: 'Explore the service.' },
+        { id: 'idea-3', title: 'Keep it current', hook: 'Small updates can keep information clear.', caption: 'A third review caption.', visual_prompt: 'A simple storefront detail.', cta: 'Start a conversation.' },
+      ] },
+    }
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(statusBody({ offer_catalog: [offer] })))
+      .mockResolvedValueOnce(response(creativeBody()))
+      .mockResolvedValueOnce(response({ ok: true, run }))
+      .mockResolvedValueOnce(response(creativeBody({ idea_runs: [run] })))
+      .mockResolvedValueOnce(response(statusBody({ offer_catalog: [offer] })))
+
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Generate ideas for Website Refresh' })).toBeEnabled())
+    fireEvent.click(screen.getByRole('button', { name: 'Generate ideas for Website Refresh' }))
+
+    await waitFor(() => expect(screen.getByText('Clarify the next step')).toBeInTheDocument())
+    const [, options] = globalThis.fetch.mock.calls[2]
+    expect(globalThis.fetch.mock.calls[2][0]).toBe('/api/marketing-creative')
+    expect(JSON.parse(options.body)).toMatchObject({ action: 'generate_story_ideas', offer_id: offer.id })
+    expect(JSON.parse(options.body).request_key).toMatch(/^[0-9a-f-]{36}$/i)
+    expect(globalThis.fetch.mock.calls.every(([url]) => url === '/api/marketing-linkedin' || url === '/api/marketing-creative')).toBe(true)
+    expect(globalThis.fetch.mock.calls.some(([, request]) => request?.body?.includes('owner_confirmation_token'))).toBe(false)
+    expect(window.confirm).not.toHaveBeenCalled()
   })
 })
 

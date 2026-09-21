@@ -81,6 +81,10 @@ function serializeMedium(medium) {
     id: medium.id,
     offer_id: medium.offer_id,
     storage_path: medium.storage_path,
+    media_source: medium.media_source || 'local',
+    storage_bucket: medium.storage_bucket || null,
+    storage_object_path: medium.storage_object_path || null,
+    preview_url: medium.preview_url || null,
     linkedin_compatible: medium.linkedin_compatible === true,
     facebook_compatible: medium.facebook_compatible === true,
     instagram_compatible: medium.instagram_compatible === true,
@@ -99,12 +103,17 @@ function serializeCaption(caption) {
 }
 
 function toAsset({ offer, media, caption, attempts, enabled }) {
+  const generated = media.media_source === 'generated'
   return {
     id: `catalog:${offer.id}:${media.id}:${caption.id}`,
     offerId: offer.id,
     offerMediaId: media.id,
     offerCaptionId: caption.id,
-    assetPath: media.storage_path,
+    assetPath: generated ? `storage://${media.storage_bucket}/${media.storage_object_path}` : media.storage_path,
+    assetUrl: media.preview_url || media.storage_path,
+    assetSource: generated ? 'generated' : 'local',
+    assetBucket: generated ? media.storage_bucket : null,
+    assetObjectPath: generated ? media.storage_object_path : null,
     label: offer.name,
     price: offerPriceDisplay(offer),
     defaultCaption: caption.body,
