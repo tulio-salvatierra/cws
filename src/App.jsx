@@ -142,7 +142,7 @@ function App() {
               <Route path="planning/*" element={<Navigate to="/admin" replace />} />
               <Route path="projects/*" element={<Navigate to="/admin" replace />} />
               <Route path="knowledge/*" element={<Navigate to="/admin" replace />} />
-              <Route path="agent-runs/*" element={<Navigate to="/admin" replace />} />
+            <Route path="agent-runs/*" element={<Navigate to="/admin/marketing#laya-assessments" replace />} />
               <Route path="marketing" element={<MarketingPage />} />
               <Route path="operations" element={<OperationsPage />} />
               <Route path="operations/:projectId" element={<OperationsProjectPage />} />

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   authenticateWorkspace: vi.fn(),
@@ -59,8 +59,11 @@ function neededClientRequirement(overrides = {}) {
 describe('CEO Today endpoint', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-09-11T15:00:00Z'))
     mocks.missingOutreachEnv.mockReturnValue([])
   })
+  afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals() })
 
   it('requires authenticated workspace access before reading any department state', async () => {
     mocks.authenticateWorkspace.mockResolvedValue({ error: 'Authentication required.', status: 401 })
@@ -138,6 +141,7 @@ describe('CEO Today endpoint', () => {
       'compliance_requirements',
       'compliance_completions',
       'marketing_publish_destination_results',
+      'agent_runs',
     ])
     for (const { table, current } of queries) {
       if (table !== 'marketing_publish_destination_results') expect(current.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')

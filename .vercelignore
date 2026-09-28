@@ -1,0 +1,13 @@
+.git
+.env*
+node_modules
+dist
+.agents
+.codex
+.claude
+.tmp
+**/__tests__/**
+**/*.test.js
+**/*.test.jsx
+docs
+supabase

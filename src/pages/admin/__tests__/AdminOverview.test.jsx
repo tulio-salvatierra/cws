@@ -46,6 +46,23 @@ describe('AdminOverview CEO Today', () => {
 
   afterEach(() => vi.unstubAllGlobals())
 
+  it('shows pending assessments separately without adding authority or changing priorities', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...ceoToday, laya_reviews: { available: true, pending: [{ id: 'review-1', title: 'Five ChatGPT tips', available: false }] } }))
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+    const link = await screen.findByRole('link', { name: /Review: Five ChatGPT tips/ })
+    expect(link).toHaveAttribute('href', '/admin/marketing#laya-run-review-1')
+    expect(screen.getByRole('heading', { name: 'Call Chicago General Contractor' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /publish|approve/i })).not.toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps department actions visible when the assessment history fails', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...ceoToday, laya_reviews: { available: false, pending: [] } }))
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+    await screen.findByText(/Assessment history is unavailable/)
+    expect(screen.getByRole('heading', { name: 'Call Chicago General Contractor' })).toBeInTheDocument()
+  })
+
   it('renders concise routed department actions from the authenticated CEO read', async () => {
     render(<MemoryRouter><AdminOverview /></MemoryRouter>)
 

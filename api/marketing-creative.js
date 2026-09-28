@@ -3,6 +3,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { Buffer } from 'node:buffer'
 import { createClient } from '@supabase/supabase-js'
+import { handleMarketingAssessment } from '../server/laya/marketing.js'
 import {
   ASSET_AGENT_KEY,
   buildImageInstructions,
@@ -32,9 +33,11 @@ export default async function handler(req, res) {
   const context = await getOwnerContext(client, token)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
+  if (req.method === 'GET' && new URL(req.url || '/', 'http://localhost').searchParams.get('feature') === 'laya') return handleMarketingAssessment(req, res, client, context)
   if (req.method === 'GET') return getCreativeStatus(res, client, context)
 
   const body = parseRequestBody(req.body)
+  if (['assess_marketing_asset', 'review_laya_assessment'].includes(body.action)) return handleMarketingAssessment(req, res, client, context, body)
   if (body.action === 'generate_story_ideas') return generateStoryIdeas(res, client, context, body)
   if (body.action === 'generate_visual_draft') return generateVisualDraft(res, client, context, body)
   if (body.action === 'approve_visual_draft') return approveVisualDraft(res, client, context, body)

@@ -67,6 +67,14 @@ describe('Marketing creative server boundary', () => {
     expect(globalThis.fetch).not.toHaveBeenCalled()
   })
 
+  it.each(['assess_marketing_asset', 'review_laya_assessment'])('requires owner authority for %s', async action => {
+    createClientMock.mockReturnValue(ownerClient('member'))
+    const result = response()
+    await handler({ method: 'POST', headers: { authorization: 'Bearer access-token' }, body: { action } }, result)
+    expect(result.statusCode).toBe(403)
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+  })
+
   it('fails closed when owner-triggered generation lacks server-side OpenAI configuration', async () => {
     delete process.env.OPENAI_API_KEY
     createClientMock.mockReturnValue(ownerClient())

@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { useAuthMock } = vi.hoisted(() => ({ useAuthMock: vi.fn() }))
 vi.mock('../../../Hooks/useAuth', () => ({ useAuth: useAuthMock }))
+// Keep publisher regression tests independent from the separately tested assessment panel.
+vi.mock('../../../components/admin/LayaAssessmentPanel', () => ({ default: () => null }))
 
 import MarketingPage from '../MarketingPage'
 

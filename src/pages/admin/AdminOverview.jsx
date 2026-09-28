@@ -60,6 +60,15 @@ export default function AdminOverview() {
         {!actions.length && <p className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5 text-sm text-gray-400">No further action is shown in this view. Reload to recalculate from current department state.</p>}
       </section>}
 
+      <section className="mt-7 rounded-2xl border border-indigo-400/30 bg-gray-900/60 p-5" aria-label="Marketing content reviews">
+        <h2 className="text-lg font-semibold text-white">Marketing · Content reviews</h2>
+        {ceo?.laya_reviews?.available === false && <p className="mt-2 text-sm text-amber-200">Assessment history is unavailable. Your other priorities are unaffected.</p>}
+        {!!ceo?.laya_reviews?.pending?.length && <p className="mt-2 text-sm text-gray-300">{ceo.laya_reviews.pending.length} awaiting your review among the latest 100 assessments.</p>}
+        {(ceo?.laya_reviews?.pending || []).slice(0, 3).map(run => <Link key={run.id} to={`/admin/marketing#laya-run-${run.id}`} className="mt-3 block text-sm text-indigo-300">Review: {run.title}{!run.available ? ' — automated check unavailable' : ''}</Link>)}
+        <Link to="/admin/marketing#laya-assessments" className="mt-4 inline-block text-sm font-semibold text-indigo-300">Evaluate content in Marketing →</Link>
+        <p className="mt-2 text-xs text-gray-500">Human review only. Laya does not approve or publish content.</p>
+      </section>
+
       <section className="mt-10 border-t border-gray-800 pt-8" aria-labelledby="departments-heading">
         <h2 id="departments-heading" className="text-lg font-semibold text-white">Departments</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">

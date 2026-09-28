@@ -1,5 +1,6 @@
 import { authenticateWorkspace, missingOutreachEnv } from '../server/outreach/shared.js'
 import { buildCeoToday } from '../server/ceo/today.js'
+import { loadReviewSummary } from '../server/laya/marketing.js'
 import { buildOperationsReadModel } from '../server/operations/readiness.js'
 import { buildAccountingReadModel } from '../server/accounting/read-model.js'
 import { buildComplianceReadModel } from '../server/compliance/read-model.js'
@@ -18,7 +19,8 @@ export default async function handler(req, res) {
 
   const loaded = await loadCeoToday(context)
   if (loaded.error) return res.status(502).json({ ok: false, error: loaded.error })
-  return res.status(200).json({ ok: true, ...loaded.data })
+  const layaReviews = await loadReviewSummary(context.client, context.workspaceId)
+  return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews })
 }
 
 export async function loadCeoToday(context, now = new Date()) {

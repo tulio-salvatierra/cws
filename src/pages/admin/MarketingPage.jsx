@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../Hooks/useAuth'
+import LayaAssessmentPanel from '../../components/admin/LayaAssessmentPanel'
 
 const POLL_INTERVAL_MS = 30_000
 const TERMINAL_STATUSES = new Set(['posted', 'error'])
@@ -35,6 +36,7 @@ export default function MarketingPage() {
   const [catalogSaving, setCatalogSaving] = useState(false)
   const [creative, setCreative] = useState({ loading: true, ideaRuns: [], assets: [], error: '' })
   const [creativeBusy, setCreativeBusy] = useState('')
+  const [assessmentSelection, setAssessmentSelection] = useState(null)
   const referenceKeysRef = useRef({})
   const creativeReferenceKeysRef = useRef({})
   const { session } = useAuth()
@@ -265,6 +267,7 @@ export default function MarketingPage() {
             destinations={state.destinations}
             caption={captions[slot.slot_key] ?? slot.caption ?? ''}
             onCaptionChange={value => setCaptions(current => ({ ...current, [slot.slot_key]: value }))}
+            onEvaluate={() => setAssessmentSelection({ topic: `${slot.asset?.label || slot.label} · LinkedIn, Facebook, Instagram`, draft: captions[slot.slot_key] ?? slot.caption ?? '' })}
             onConfirm={() => confirm(slot)}
             onResolve={action => resolveMissedSlot(slot, action)}
             onCloseFailed={() => closeFailedSlot(slot)}
@@ -276,6 +279,8 @@ export default function MarketingPage() {
           />)}
         </main>
 
+        <LayaAssessmentPanel token={session?.access_token} selection={assessmentSelection} />
+
         <CreativeStudio
           offers={state.offerCatalog}
           creative={creative}
@@ -284,6 +289,7 @@ export default function MarketingPage() {
           onGenerateVisual={generateVisual}
           onRetryVisual={retryVisual}
           onApproveVisual={approveVisual}
+          onEvaluate={setAssessmentSelection}
         />
 
         {state.storageError && <p className="mt-6 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-sm text-amber-100">{state.storageError}</p>}
@@ -313,7 +319,7 @@ export default function MarketingPage() {
   )
 }
 
-function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVisual, onRetryVisual, onApproveVisual }) {
+function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVisual, onRetryVisual, onApproveVisual, onEvaluate }) {
   const [assetCaptions, setAssetCaptions] = useState({})
   const usableOffers = offers.filter(offer => offer.status !== 'retired')
 
@@ -335,7 +341,12 @@ function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVis
         {run.output?.ideas && <div className="mt-4 grid gap-3 lg:grid-cols-2">{run.output.ideas.map(idea => {
           const asset = creative.assets.find(item => item.idea_run_id === run.id && item.idea_id === idea.id)
           const key = `visual:${run.id}:${idea.id}`
-          return <section key={idea.id} className="rounded-lg border border-gray-800 bg-gray-900/60 p-4"><p className="font-medium text-white">{idea.title}</p><p className="mt-2 text-sm text-gray-300">{idea.hook}</p><p className="mt-3 text-xs leading-5 text-gray-500">Suggested caption: {idea.caption}</p>{!asset && <button type="button" disabled={Boolean(busy)} onClick={() => onGenerateVisual(run.id, idea.id)} className="mt-4 rounded-full border border-indigo-300/50 px-3 py-2 text-sm font-semibold text-indigo-100 disabled:opacity-45">{busy === key ? 'Creating visual…' : 'Create visual draft'}</button>}{asset && <VisualDraft asset={asset} idea={idea} caption={assetCaptions[asset.id] ?? idea.caption} busy={busy === `approve:${asset.id}`} retrying={busy === key} onCaptionChange={value => setAssetCaptions(current => ({ ...current, [asset.id]: value }))} onRetry={() => onRetryVisual(asset)} onApprove={() => onApproveVisual(asset, assetCaptions[asset.id] ?? idea.caption)} />}</section>
+          return <section key={idea.id} className="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
+            <p className="font-medium text-white">{idea.title}</p><p className="mt-2 text-sm text-gray-300">{idea.hook}</p><p className="mt-3 text-xs leading-5 text-gray-500">Suggested caption: {idea.caption}</p>
+            <button type="button" onClick={() => onEvaluate({ topic: `${idea.title} · LinkedIn, Facebook, Instagram`, draft: asset ? assetCaptions[asset.id] ?? idea.caption : idea.caption })} className="mt-3 block text-sm text-indigo-300">Check this text with Laya</button>
+            {!asset && <button type="button" disabled={Boolean(busy)} onClick={() => onGenerateVisual(run.id, idea.id)} className="mt-4 rounded-full border border-indigo-300/50 px-3 py-2 text-sm font-semibold text-indigo-100 disabled:opacity-45">{busy === key ? 'Creating visual…' : 'Create visual draft'}</button>}
+            {asset && <VisualDraft asset={asset} idea={idea} caption={assetCaptions[asset.id] ?? idea.caption} busy={busy === `approve:${asset.id}`} retrying={busy === key} onCaptionChange={value => setAssetCaptions(current => ({ ...current, [asset.id]: value }))} onRetry={() => onRetryVisual(asset)} onApprove={() => onApproveVisual(asset, assetCaptions[asset.id] ?? idea.caption)} />}
+          </section>
         })}</div>}
       </article>)}
       {!creative.ideaRuns.length && <p className="rounded-xl border border-dashed border-gray-700 p-4 text-sm text-gray-400">No creative ideas yet. Choose an offer to begin.</p>}
@@ -407,7 +418,7 @@ function isCompatibleActiveMedia(media) { return media.status === 'active' && me
 function dollarsToCents(value) { const match = String(value || '').trim().match(/^(\d+)(?:\.(\d{1,2}))?$/); return match ? Number(match[1]) * 100 + Number((match[2] || '').padEnd(2, '0')) : null }
 function centsToDollars(value) { return Number.isInteger(value) ? String(value / 100) : '' }
 
-function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed }) {
+function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed, onEvaluate }) {
   const detail = SLOT_DETAILS[slot.state] || SLOT_DETAILS.processing
   const locked = Boolean(slot.attempt) || confirming || resolving || slot.state === 'resolved'
   const fallback = slot.asset?.fallback === true
@@ -420,6 +431,7 @@ function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, o
       <label htmlFor={`${slot.key}-caption`} className="mt-5 block text-sm font-medium text-gray-200">Caption</label>
       <textarea id={`${slot.key}-caption`} aria-label={`${slot.label} caption`} value={caption} onChange={event => onCaptionChange(event.target.value)} rows={4} disabled={locked} className="mt-2 w-full resize-y rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm leading-6 text-white outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 disabled:cursor-not-allowed disabled:opacity-60" />
       <p className="mt-2 text-right text-xs text-gray-500">{caption.length} characters</p>
+      <button type="button" onClick={onEvaluate} disabled={!caption.trim()} className="mt-3 text-sm text-indigo-300 disabled:opacity-50">Check this caption with Laya</button>
     </> : <div className="mt-5 rounded-xl border border-dashed border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">No eligible evergreen asset is available for this slot yet.</div>}
     <section aria-label={`${slot.label} destinations`} className="mt-5 rounded-xl border border-gray-800 bg-gray-950/60 p-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Destinations</p><div className="mt-3 space-y-2">{destinations.map(destination => <DestinationVerification key={destination.platform} destination={destination} />)}</div></section>
     {slot.attempt && <DestinationOutcomes results={slot.destination_results} />}
