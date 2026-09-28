@@ -24,7 +24,7 @@ export default function LayaAssessmentPanel({ token, selection }) {
   const refresh = useCallback(async () => {
     const next = await request()
     setData(next)
-    setBriefId(current => next.briefs.some(brief => brief.id === current) ? current : next.briefs[0]?.id || '')
+    setBriefId(current => next.briefs.some(brief => brief.id === current) ? current : '')
   }, [request])
   useEffect(() => {
     if (!token) return
@@ -32,7 +32,7 @@ export default function LayaAssessmentPanel({ token, selection }) {
     request().then(next => {
       if (!active) return
       setData(next)
-      setBriefId(next.briefs[0]?.id || '')
+      setBriefId('')
       setError('')
     }).catch(err => { if (active) setError(err.message) }).finally(() => { if (active) setLoading(false) })
     return () => { active = false }
@@ -75,7 +75,7 @@ export default function LayaAssessmentPanel({ token, selection }) {
     <form onSubmit={assess} className="mt-5 space-y-4">
       <label className="block text-sm">Business context
         <select className={field} value={briefId} onChange={event => setBriefId(event.target.value)} disabled={busy || !data.briefs.length} required>
-          {!data.briefs.length && <option value="">No active brief</option>}
+          <option value="">{data.briefs.length ? 'Choose the business and language' : 'No active brief'}</option>
           {data.briefs.map(brief => <option key={brief.id} value={brief.id}>{brief.channels?.name || 'Channel'} · {brief.language} · Brief v{brief.version}</option>)}
         </select>
       </label>
