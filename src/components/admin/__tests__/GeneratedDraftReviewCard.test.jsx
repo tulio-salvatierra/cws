@@ -72,4 +72,24 @@ describe('GeneratedDraftReviewCard', () => {
     }))
     expect(onReviewed).toHaveBeenCalledWith(expect.objectContaining({ content_variant_id: 'variant-1' }))
   })
+
+  it('runs Laya against an existing draft without submitting a review decision', async () => {
+    const user = userEvent.setup()
+    const onReviewed = vi.fn()
+    mockGetSession.mockResolvedValue({ data: { session: { access_token: 'access-token' } } })
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ ok: true, laya: { available: false, status: 'not_configured' } }),
+    }))
+    render(<MemoryRouter><GeneratedDraftReviewCard run={run} campaigns={campaigns} onReviewed={onReviewed} /></MemoryRouter>)
+
+    await user.click(screen.getByRole('button', { name: 'Run Laya assessment' }))
+
+    expect(fetch).toHaveBeenCalledWith('/api/laya-assess', expect.objectContaining({
+      method: 'POST',
+      headers: expect.objectContaining({ Authorization: 'Bearer access-token' }),
+    }))
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ run_id: run.id })
+    expect(onReviewed).toHaveBeenCalledWith({ ok: true, laya: { available: false, status: 'not_configured' } })
+  })
 })

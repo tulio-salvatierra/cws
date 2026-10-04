@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -8,6 +9,8 @@ import {
   postGoogleSheetsWebhook,
 } from './server/google-sheets-webhook.js'
 import generateDraftHandler from './api/generate-draft.js'
+import layaAssessHandler from './api/laya-assess.js'
+import { SERVER_ENV_KEYS } from './env.keys.js'
 
 // In ESM, __dirname is not defined. Recreate it from import.meta.url
 const __filename = fileURLToPath(import.meta.url)
@@ -24,6 +27,15 @@ function clientPortalApiPlugin(env) {
           return
         }
         await generateDraftHandler({ method: req.method, headers: req.headers, body }, createVercelResponse(res))
+      })
+
+      server.middlewares.use('/api/laya-assess', async (req, res) => {
+        const body = await readJsonBody(req).catch(() => null)
+        if (body === null) {
+          sendJson(res, 400, { ok: false, error: 'Request body must be valid JSON.' })
+          return
+        }
+        await layaAssessHandler({ method: req.method, headers: req.headers, body }, createVercelResponse(res))
       })
 
       server.middlewares.use('/api/client-portal-intake', async (req, res) => {
@@ -112,6 +124,7 @@ function sendJson(res, statusCode, payload) {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '')
+  if (mode === 'development') exposeLocalServerEnv(env)
   const productionEnvPlugin = validateProductionClientEnv(mode, env)
 
   return {
@@ -141,3 +154,9 @@ export default defineConfig(({ mode }) => {
     },
   }
 })
+
+function exposeLocalServerEnv(env) {
+  for (const key of SERVER_ENV_KEYS) {
+    if (process.env[key] === undefined && env[key] !== undefined) process.env[key] = env[key]
+  }
+}

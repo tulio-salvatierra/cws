@@ -1,7 +1,7 @@
 /* global process */
 
 const POLICY_VERSION = 'cws-laya-shadow-v1'
-const TIMEOUT_MS = 6_000
+const TIMEOUT_MS = 45_000
 
 export async function assessDraftSafely({ topic, draft, brief }) {
   const url = process.env.LAYA_SERVICE_URL?.trim()

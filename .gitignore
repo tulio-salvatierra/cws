@@ -50,3 +50,4 @@ skills-lock.json
 # Local Laya evaluation environment and downloaded model cache
 .venv-laya/
 .laya-cache/
+.env*.local

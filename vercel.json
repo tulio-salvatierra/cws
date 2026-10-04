@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
+    "api/laya-assess.js": {
+      "maxDuration": 60
+    },
     "api/client-portal-intake.js": {
       "maxDuration": 60
     },
