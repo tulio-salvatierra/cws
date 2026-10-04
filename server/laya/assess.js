@@ -1,52 +1,23 @@
 /* global process */
-
-const POLICY_VERSION = 'cws-laya-shadow-v1'
-const TIMEOUT_MS = 45_000
-
 export async function assessDraftSafely({ topic, draft, brief }) {
   const url = process.env.LAYA_SERVICE_URL?.trim()
   const token = process.env.LAYA_SERVICE_TOKEN?.trim()
-
-  if (!url || !token) {
-    return {
-      available: false,
-      mode: 'shadow-only',
-      policy_version: POLICY_VERSION,
-      status: 'not_configured',
-    }
-  }
-
+  if (!url || !token) return { available: false, status: 'not_configured', mode: 'shadow-only' }
   try {
     const response = await fetch(url, {
-      method: 'POST',
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        policy_version: POLICY_VERSION,
-        state: { topic, draft, channel_brief: brief },
-      }),
+      method: 'POST', signal: AbortSignal.timeout(50_000),
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ policy_version: 'cws-laya-shadow-v1', state: { topic, draft, channel_brief: brief } }),
     })
-    const payload = await response.json().catch(() => ({}))
-    if (!response.ok) throw new Error(payload.error || `Laya service returned ${response.status}.`)
-    if (payload?.mode !== 'shadow-only' || payload?.policy_version !== POLICY_VERSION || !payload?.result?.answers) {
-      throw new Error('Laya service returned an invalid assessment.')
-    }
-    return { available: true, ...payload }
-  } catch (error) {
-    return {
-      available: false,
-      mode: 'shadow-only',
-      policy_version: POLICY_VERSION,
-      status: 'unavailable',
-      error: safeErrorMessage(error),
-    }
+    const payload = await response.json()
+    const answers = payload?.result?.answers
+    const probability = value => Number.isFinite(value) && value >= 0 && value <= 1
+    if (!response.ok || payload?.mode !== 'shadow-only' || payload?.policy_version !== 'cws-laya-shadow-v1'
+      || !probability(answers?.forbidden_claim?.noul) || !probability(answers?.review_priority?.confidence)
+      || !['allow', 'review', 'block'].includes(answers?.review_priority?.choice)
+      || !Number.isFinite(answers?.brief_fit?.score) || answers.brief_fit.score < 0 || answers.brief_fit.score > 3) throw new Error('Invalid assessment')
+    return { ...payload, available: true }
+  } catch {
+    return { available: false, status: 'unavailable', mode: 'shadow-only' }
   }
-}
-
-function safeErrorMessage(error) {
-  const message = error instanceof Error ? error.message : ''
-  return message && message.length <= 200 ? message : 'Laya assessment unavailable.'
 }

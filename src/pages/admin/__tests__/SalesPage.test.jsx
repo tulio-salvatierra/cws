@@ -37,6 +37,37 @@ describe('SalesPage', () => {
     expect(globalThis.fetch.mock.calls.every(([, options = {}]) => !options.method || options.method === 'GET')).toBe(true)
   })
 
+  it('shows completed Prospect Brief context on a phone-only Call command without creating an action', async () => {
+    const phoneLead = { ...salesState.leads[0], id: 'lead-phone', name: 'Logan', company: 'Logan Auto Fix', email: null, phone: '+13125550123' }
+    globalThis.fetch = vi.fn().mockResolvedValue(response({
+      ...salesState,
+      leads: [phoneLead],
+      items: [{
+        id: 'new_prospect:lead-phone', category: 'new_prospect', priority: 5, actionableOn: '2026-09-09', reason: 'No successful initial outreach yet', recommendation: 'Call', sendType: null, lead: phoneLead,
+        prospect_brief_context: {
+          recommendation: 'CONTACT',
+          why_contact: 'Published customer hours conflict in two inspected website sections.',
+          sales_angle: 'Customer-information cleanup + clearer service presentation',
+          outreach_hook: 'I noticed the published hours appear differently in two places.',
+        },
+      }],
+    }))
+
+    render(<MemoryRouter><SalesPage /></MemoryRouter>)
+
+    expect(await screen.findByRole('heading', { name: 'Logan Auto Fix', level: 2 })).toBeInTheDocument()
+    expect(screen.getByText('Why contact')).toBeInTheDocument()
+    expect(screen.getByText('Conversation angle')).toBeInTheDocument()
+    expect(screen.getByText('Suggested opener')).toBeInTheDocument()
+    expect(screen.getByText('Customer-information cleanup + clearer service presentation')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Call' })).toHaveAttribute('href', 'tel:+13125550123')
+    expect(screen.getByRole('button', { name: 'Log call' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Edit lead' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Prepare email' })).not.toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+    expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
+  })
+
   it('keeps Not now local: it hides the item without a mutation and a fresh load restores it', async () => {
     const first = render(<MemoryRouter><SalesPage /></MemoryRouter>)
     await screen.findByRole('heading', { name: 'Ada Plumbing', level: 2 })
@@ -213,5 +244,36 @@ describe('SalesPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Retry prospect brief' }))
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
     expect(globalThis.fetch.mock.calls[1][1]).toMatchObject({ method: 'POST', body: JSON.stringify({ action: 'retry_prospect_brief', candidate_id: 'candidate-a', retry_of_run_id: 'brief-failed' }) })
+  })
+
+  it('puts a completed brief’s owner-facing contact decision before its detailed evidence without changing the Add to Sales boundary', async () => {
+    const completedCandidate = {
+      id: 'candidate-contact', business_name: 'Northside Repair', category: 'Auto repair', locality: 'Chicago, IL', website_url: 'https://northside.example', business_email: 'info@northside.example', business_phone: '+13125550123', observed_facts: ['Homepage reachable.'], opportunities: [], review_basis: 'owner_selected', possible_duplicate: false,
+      prospect_brief: {
+        run_id: 'brief-contact', status: 'completed', error_message: null,
+        output: { brief: {
+          business: { text: 'Northside Repair describes auto repair services.' },
+          customer: { text: 'Not clearly identified from inspected evidence.' },
+          whats_working: [{ text: 'The site publishes a clear service heading.' }],
+          opportunities: [{ observation: 'Published customer hours conflict in two inspected website sections.', why_it_may_matter: 'Customers may see different closing times when planning a visit.', possible_cws_help: 'CWS could help clean up customer-facing information and clarify core services.' }],
+          contact_recommendation: { value: 'CONTACT' },
+          sales_angle: { text: 'Customer-information cleanup + clearer service presentation' },
+          why_contact: { text: 'The conflicting published hours create one specific, practical reason for a concise website cleanup conversation.' },
+          outreach_hook: { text: 'I noticed the published closing time appears differently in two places. Your contact path is already easy to find, so there may be a few useful updates worth discussing.' },
+        } },
+      },
+    }
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...salesState, prospectDiscovery: { configured: true }, prospects: [completedCandidate] }))
+
+    render(<MemoryRouter><SalesPage /></MemoryRouter>)
+
+    expect(await screen.findByText('Contact recommendation')).toBeInTheDocument()
+    expect(screen.getByText('CONTACT')).toBeInTheDocument()
+    expect(screen.getByText('Best conversation angle')).toBeInTheDocument()
+    expect(screen.getByText('Customer-information cleanup + clearer service presentation')).toBeInTheDocument()
+    expect(screen.getByText('Why it’s worth contacting')).toBeInTheDocument()
+    expect(screen.getByText('Suggested opener')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add to Sales' })).toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
   })
 })

@@ -38,7 +38,11 @@ export const EVERGREEN_ASSETS = [
     label: 'Business Photography',
     price: '$350',
     defaultCaption: 'Professional photos make your website, Google Business Profile, and social media feel like your business. On-location Business Photography is $350. Contact Cicero Web Studio to book a session.',
-    enabled: true,
+    // This source is 720 × 1280 (0.5625). The fixed three-destination
+    // publisher includes Instagram, which requires at least 0.8. Keep the
+    // asset in the catalog for durable history, but do not offer it for a
+    // future owner confirmation until it has a verified replacement.
+    enabled: false,
     rotationOrder: 3,
     fallback: false,
   },
@@ -72,10 +76,13 @@ export function buildMarketingOccurrencePlan({
   const missedSlots = allSlots
     .filter(slot => slot.state === 'missed')
     .sort(compareSlots)
+  const failedSlots = allSlots
+    .filter(slot => slot.state === 'failed')
+    .sort(compareSlots)
   const currentWeekSlots = allSlots
     .filter(slot => slot.weekStart === currentWeekStart)
     .sort(compareSlots)
-  const visibleSlots = [...missedSlots]
+  const visibleSlots = [...missedSlots, ...failedSlots]
   for (const slot of currentWeekSlots) {
     if (!visibleSlots.some(candidate => candidate.slotKey === slot.slotKey)) visibleSlots.push(slot)
   }
@@ -134,10 +141,10 @@ function buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, incl
         : chooseNextUnplannedAsset(assets, attempts, plannedAssetIds)
     if (asset) plannedAssetIds.add(asset.id)
     const fullyPosted = attempt && isFullyPosted(attempt)
-    const state = attempt
-      ? (fullyPosted ? 'posted' : 'processing')
-      : resolution
-        ? 'resolved'
+    const state = resolution
+      ? 'resolved'
+      : attempt
+        ? (fullyPosted ? 'posted' : isFailedWithoutPublication(attempt) ? 'failed' : 'processing')
         : includeMissed && isMissedMarketingSlot(slotDate, now)
           ? 'missed'
           : asset ? 'ready' : 'upcoming'
@@ -190,6 +197,20 @@ export function isFullyPosted(attempt) {
     && results.every(result => REQUIRED_DESTINATIONS.has(result.platform) && result.provider_status === 'posted')
 }
 
+// A failure can be closed only when every required destination has a terminal
+// error and none records publication evidence. This intentionally fails closed
+// for partial or ambiguous provider outcomes so a posted destination is never
+// treated as safely skipped.
+export function isFailedWithoutPublication(attempt) {
+  if (attempt?.destination !== 'multi:cicero-web-studio' || attempt?.provider_status !== 'error') return false
+  const results = attempt.destination_results || []
+  return results.length === REQUIRED_DESTINATIONS.size
+    && results.every(result => REQUIRED_DESTINATIONS.has(result.platform)
+      && result.provider_status === 'error'
+      && !result.provider_post_id
+      && !result.provider_permalink)
+}
+
 export function marketingWeekStart(now = new Date()) {
   const { year, month, day } = chicagoDateParts(now)
   const date = new Date(Date.UTC(year, month - 1, day))
@@ -199,6 +220,7 @@ export function marketingWeekStart(now = new Date()) {
 }
 
 function lastSuccessfulPublication(asset, attempts) {
+  if (asset?.lastPublishedAt) return asset.lastPublishedAt
   const matches = attempts
     .filter(attempt => isFullyPosted(attempt))
     .filter(attempt => attempt.asset_id === asset.id || (!attempt.asset_id && attempt.asset_path === asset.assetPath))

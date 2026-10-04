@@ -2,20 +2,12 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../Hooks/useAuth'
 
 const NAV = [
-  { to: '/admin', label: '◈ Overview', end: true },
-  { to: '/admin/marketing', label: 'Marketing V1' },
-  { to: '/admin/workspace', label: '🧭 Workspace' },
-  { to: '/admin/channels', label: 'Channels' },
-  { to: '/admin/campaigns', label: 'Campaigns' },
-  { to: '/admin/tasks', label: 'Tasks' },
-  { to: '/admin/planning', label: 'Planning' },
-  { to: '/admin/knowledge', label: 'Knowledge' },
-  { to: '/admin/agent-runs', label: 'Agent runs' },
-  { to: '/admin/clients', label: 'Clients' },
-  { to: '/admin/leads', label: 'Leads' },
+  { to: '/admin', label: '◈ CEO Today', end: true },
   { to: '/admin/sales', label: 'Sales' },
-  { to: '/admin/mailing-list', label: 'Mailing List' },
-  { to: '/admin/keywords', label: '🔑 Keywords' },
+  { to: '/admin/marketing', label: 'Marketing' },
+  { to: '/admin/operations', label: 'Operations' },
+  { to: '/admin/accounting', label: 'Accounting' },
+  { to: '/admin/compliance', label: 'Compliance' },
 ]
 
 export default function AdminLayout({ children }) {
@@ -26,7 +18,7 @@ export default function AdminLayout({ children }) {
       {/* Sidebar */}
       <aside className="w-full md:w-52 flex-shrink-0 border-b border-gray-800 md:border-b-0 md:border-r flex flex-col py-4 md:py-6 px-3">
         <div className="text-indigo-400 font-bold text-sm px-3 mb-3 md:mb-6 tracking-wide uppercase">
-          Cicero Admin
+          CWS OS
         </div>
         <nav className="flex flex-row md:flex-col gap-1 flex-1 overflow-x-auto">
           {NAV.map(({ to, label, end }) => (

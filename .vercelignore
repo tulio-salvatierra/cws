@@ -1,9 +1,13 @@
-# Local-only Laya runtime and model artifacts. Production calls the configured
-# private Laya service; it must never receive this local checkpoint cache.
-.venv-laya/
-.laya-cache/
-.tmp/
-tools/__pycache__/
-
-# Local browser automation artifacts.
-.playwright-cli/
+.git
+.env*
+node_modules
+dist
+.agents
+.codex
+.claude
+.tmp
+**/__tests__/**
+**/*.test.js
+**/*.test.jsx
+docs
+supabase

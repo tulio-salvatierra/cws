@@ -4,6 +4,9 @@
     "api/laya-assess.js": {
       "maxDuration": 60
     },
+    "api/marketing-creative.js": {
+      "maxDuration": 60
+    },
     "api/client-portal-intake.js": {
       "maxDuration": 60
     },

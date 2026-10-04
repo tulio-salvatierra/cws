@@ -5,7 +5,8 @@ import { join } from 'node:path'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { Buffer } from 'node:buffer'
 import { createClient } from '@supabase/supabase-js'
-import { buildMarketingOccurrencePlan, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
+import { buildMarketingOccurrencePlan, EVERGREEN_ASSETS, isFailedWithoutPublication, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
+import { buildOfferCatalog } from '../server/marketing/offer-catalog.js'
 
 export const MARKETING_ENDPOINT_TIMEOUT_MS = 10_000
 export const MARKETING_POLL_INTERVAL_MS = 30_000
@@ -35,7 +36,12 @@ export default async function handler(req, res) {
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
   const body = req.method === 'POST' ? parseRequestBody(req.body) : null
-  if (isSlotResolutionRequest(body)) return resolveMissedSlot(res, client, context, body)
+  if (isOfferCatalogRequest(body)) return updateOfferCatalog(res, client, context, body)
+  if (isSlotResolutionRequest(body)) {
+    return body.action === 'close_failed'
+      ? closeFailedSlot(res, client, context, body)
+      : resolveMissedSlot(res, client, context, body)
+  }
 
   if (getMissingProviderEnv().length) return res.status(503).json({ ok: false, error: 'Marketing publishing is not configured.' })
   const destinations = await verifyDestinations()
@@ -51,10 +57,13 @@ async function getMarketingStatus(res, client, context, destinations) {
   const resolutions = await loadSlotResolutions(client, context.workspaceId)
   if (resolutions.error) return databaseFailure(res, resolutions.error)
 
+  const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
+  if (catalog.error) return databaseFailure(res, catalog.error)
+
   const reconciled = await reconcileUnfinishedSlotAttempts(client, loaded.data)
   if (reconciled.error) return databaseFailure(res, reconciled.error)
 
-  return res.status(200).json(marketingStatusResponse(destinations, storage, reconciled.data, resolutions.data, context))
+  return res.status(200).json(marketingStatusResponse(destinations, storage, reconciled.data, resolutions.data, context, catalog.data))
 }
 
 async function createMarketingPost(res, client, context, destinations, body) {
@@ -81,7 +90,9 @@ async function createMarketingPost(res, client, context, destinations, body) {
   if (loaded.error) return databaseFailure(res, loaded.error)
   const resolutions = await loadSlotResolutions(client, context.workspaceId)
   if (resolutions.error) return databaseFailure(res, resolutions.error)
-  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data })
+  const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
+  if (catalog.error) return databaseFailure(res, catalog.error)
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data, assets: marketingAssets(catalog.data, loaded.data) })
   const slots = plan.slots
   const slot = slots.find(candidate => candidate.slotKey === body.slot_key)
   if (!slot || !slot.asset || slot.asset.id !== body.asset_id) {
@@ -111,6 +122,9 @@ async function createMarketingPost(res, client, context, destinations, body) {
       caption: body.caption.trim(),
       asset_id: slot.asset.id,
       asset_path: slot.asset.assetPath,
+      offer_id: slot.asset.offerId || null,
+      offer_media_id: slot.asset.offerMediaId || null,
+      offer_caption_id: slot.asset.offerCaptionId || null,
       destination: M4_DESTINATION,
       marketing_slot_key: slot.slotKey,
       provider_status: 'preparing',
@@ -134,7 +148,7 @@ async function createMarketingPost(res, client, context, destinations, body) {
   }
 
   try {
-    const upload = await uploadAsset(slot.asset)
+    const upload = await uploadAsset(client, slot.asset)
     const createdPost = await createProviderPost(body.caption.trim(), body.reference_key, upload.id)
     const persisted = await persistProviderPost(client, attempt, prepared.data, createdPost, upload.id)
     if (persisted.error) return databaseFailure(res, persisted.error)
@@ -161,6 +175,112 @@ async function createMarketingPost(res, client, context, destinations, body) {
     if (failedAttempt.error || failedResults.error) return databaseFailure(res, failedAttempt.error || failedResults.error)
     return providerFailure(res, error, serializeAttempt(failedAttempt.data), destinations, failedResults.data)
   }
+}
+
+// Catalog changes are owner-only, server-side reference-data writes. They run
+// before destination verification and never upload, schedule, or publish.
+async function updateOfferCatalog(res, client, context, body) {
+  const action = body.action
+  if (action === 'save_marketing_offer') {
+    const normalized = normalizeOffer(body.offer)
+    if (normalized.error) return res.status(400).json({ ok: false, error: normalized.error })
+    const saved = await saveCatalogRow(client, 'offers', context, body.offer?.id, normalized.data)
+    return catalogWriteResponse(res, client, context, saved)
+  }
+
+  if (action === 'save_marketing_offer_media') {
+    const normalized = normalizeOfferMedia(body.media)
+    if (normalized.error) return res.status(400).json({ ok: false, error: normalized.error })
+    if (!await localMarketingImageExists(normalized.data.storage_path)) {
+      return res.status(400).json({ ok: false, error: 'That image is not available in this deployed Marketing build.' })
+    }
+    const parent = await catalogOffer(client, context.workspaceId, normalized.data.offer_id)
+    if (parent.error) return databaseFailure(res, parent.error)
+    if (!parent.data) return res.status(404).json({ ok: false, error: 'Offer not found.' })
+    const saved = await saveCatalogRow(client, 'offer_media', context, body.media?.id, normalized.data)
+    return catalogWriteResponse(res, client, context, saved)
+  }
+
+  const normalized = normalizeOfferCaption(body.caption)
+  if (normalized.error) return res.status(400).json({ ok: false, error: normalized.error })
+  const parent = await catalogOffer(client, context.workspaceId, normalized.data.offer_id)
+  if (parent.error) return databaseFailure(res, parent.error)
+  if (!parent.data) return res.status(404).json({ ok: false, error: 'Offer not found.' })
+  const saved = await saveCatalogRow(client, 'offer_captions', context, body.caption?.id, normalized.data)
+  return catalogWriteResponse(res, client, context, saved)
+}
+
+async function catalogOffer(client, workspaceId, offerId) {
+  return client.from('offers').select('id').eq('id', offerId).eq('workspace_id', workspaceId).maybeSingle()
+}
+
+async function saveCatalogRow(client, table, context, id, data) {
+  if (id) {
+    if (!isUuid(id)) return { data: null, error: { code: 'invalid_id', message: 'Invalid catalog record.' } }
+    const updated = await client.from(table).update(data).eq('id', id).eq('workspace_id', context.workspaceId).select('*').maybeSingle()
+    if (!updated.error && !updated.data) return { data: null, error: { code: 'not_found', message: 'Catalog record not found.' } }
+    return updated
+  }
+  return client.from(table).insert({ ...data, workspace_id: context.workspaceId, created_by: context.userId }).select('*').single()
+}
+
+async function catalogWriteResponse(res, client, context, result) {
+  if (result.error?.code === 'not_found') return res.status(404).json({ ok: false, error: result.error.message })
+  if (result.error?.code === 'invalid_id') return res.status(400).json({ ok: false, error: result.error.message })
+  if (result.error) return databaseFailure(res, result.error)
+  const catalog = await loadOfferCatalog(client, context.workspaceId, [])
+  if (catalog.error) return databaseFailure(res, catalog.error)
+  return res.status(200).json({ ok: true, catalog_record: result.data, offer_catalog: catalog.data.offers })
+}
+
+function normalizeOffer(value) {
+  if (!isPlainObject(value)) return { error: 'Offer details are required.' }
+  const name = optionalText(value.name)
+  const description = optionalText(value.description)
+  const priceMode = value.price_mode
+  const status = value.status
+  const override = optionalText(value.price_display_override) || null
+  const projectType = optionalText(value.default_project_type) || null
+  if (!name || name.length > 160) return { error: 'Offer name is required and must be 160 characters or fewer.' }
+  if (description.length > 3000) return { error: 'Offer description must be 3,000 characters or fewer.' }
+  if (!['fixed', 'from', 'by_scope'].includes(priceMode)) return { error: 'Choose fixed, from, or by-scope pricing.' }
+  if (!['draft', 'active', 'retired'].includes(status)) return { error: 'Choose a valid offer status.' }
+  if (status === 'active' && description.length < 10) return { error: 'An active offer needs a clear description.' }
+  if (override?.length > 160) return { error: 'Price wording must be 160 characters or fewer.' }
+  if (projectType?.length > 80) return { error: 'Default project type must be 80 characters or fewer.' }
+
+  const priceCents = value.price_cents === null || value.price_cents === undefined || value.price_cents === '' ? null : Number(value.price_cents)
+  if (priceMode === 'by_scope' && priceCents !== null) return { error: 'By-scope pricing cannot include a fixed amount.' }
+  if (priceMode !== 'by_scope' && (!Number.isInteger(priceCents) || priceCents <= 0)) return { error: 'Fixed and from pricing require a positive whole-cent amount.' }
+  return { data: { name, description, price_mode: priceMode, price_cents: priceCents, price_display_override: override, default_project_type: projectType, status } }
+}
+
+function normalizeOfferMedia(value) {
+  if (!isPlainObject(value)) return { error: 'Media details are required.' }
+  if (!isUuid(value.offer_id)) return { error: 'Choose the offer this image belongs to.' }
+  const storagePath = optionalText(value.storage_path)
+  const status = value.status
+  if (!isLocalMarketingImagePath(storagePath)) return { error: 'Use a verified image path under /images/.' }
+  if (!['draft', 'active', 'retired'].includes(status)) return { error: 'Choose a valid image status.' }
+  const compatible = {
+    linkedin_compatible: value.linkedin_compatible === true,
+    facebook_compatible: value.facebook_compatible === true,
+    instagram_compatible: value.instagram_compatible === true,
+  }
+  if (status === 'active' && !Object.values(compatible).every(Boolean)) {
+    return { error: 'An active Marketing image must be explicitly confirmed for LinkedIn, Facebook, and Instagram.' }
+  }
+  return { data: { offer_id: value.offer_id, storage_path: storagePath, ...compatible, status } }
+}
+
+function normalizeOfferCaption(value) {
+  if (!isPlainObject(value)) return { error: 'Caption details are required.' }
+  if (!isUuid(value.offer_id)) return { error: 'Choose the offer this caption belongs to.' }
+  const body = optionalText(value.body)
+  if (!body || body.length > 3000) return { error: 'Caption text is required and must be 3,000 characters or fewer.' }
+  if (!['en', 'es'].includes(value.locale)) return { error: 'Choose English or Spanish.' }
+  if (!['draft', 'active', 'retired'].includes(value.status)) return { error: 'Choose a valid caption status.' }
+  return { data: { offer_id: value.offer_id, body, locale: value.locale, status: value.status } }
 }
 
 // Move and Skip are internal Marketing decisions. They deliberately run before
@@ -223,6 +343,59 @@ async function resolveMissedSlot(res, client, context, body) {
   })
 }
 
+// Closing an all-error attempt is an owner-only internal Marketing decision.
+// It preserves the immutable failed attempt and writes a normal skip
+// resolution before any provider configuration or bundle.social code runs.
+async function closeFailedSlot(res, client, context, body) {
+  const validationError = validateCloseFailedRequest(body)
+  if (validationError) return res.status(400).json({ ok: false, error: validationError })
+
+  const loaded = await loadMarketingAttempts(client, context.workspaceId)
+  if (loaded.error) return databaseFailure(res, loaded.error)
+  const resolutions = await loadSlotResolutions(client, context.workspaceId)
+  if (resolutions.error) return databaseFailure(res, resolutions.error)
+
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data })
+  const slot = plan.slots.find(candidate => candidate.slotKey === body.slot_key)
+  const closeableSlot = nextClosableFailedSlot(plan.slots)
+  if (!slot || !closeableSlot || closeableSlot.slotKey !== slot.slotKey || !slot.asset || !isFailedWithoutPublication(slot.attempt)) {
+    return res.status(409).json({ ok: false, error: 'Only the oldest failed Marketing slot with no published destination can be closed.' })
+  }
+  if (slot.asset.id !== body.asset_id) {
+    return res.status(409).json({ ok: false, error: 'This close decision is bound to a different Marketing asset.' })
+  }
+  if (!isValidOwnerConfirmationToken(body.owner_confirmation_token, context, slot)) {
+    return res.status(403).json({ ok: false, error: 'This owner confirmation is expired, invalid, or bound to a different Marketing slot.' })
+  }
+
+  const inserted = await client
+    .from('marketing_slot_resolutions')
+    .insert({
+      workspace_id: context.workspaceId,
+      occurrence_slot_key: slot.slotKey,
+      origin_slot_key: slot.originalSlotKey || slot.slotKey,
+      action: 'skip',
+      target_slot_key: null,
+      asset_id: slot.asset.id,
+      asset_path: slot.asset.assetPath,
+      caption: slot.caption,
+      created_by: context.userId,
+    })
+    .select('*')
+    .single()
+
+  if (inserted.error?.code === '23505') {
+    return res.status(409).json({ ok: false, error: 'This failed Marketing slot already has an owner close decision.' })
+  }
+  if (inserted.error) return databaseFailure(res, inserted.error)
+
+  return res.status(200).json({
+    ok: true,
+    decision: 'close_failed',
+    occurrence_slot_key: slot.slotKey,
+  })
+}
+
 async function respondWithExistingAttempt(res, client, attempt) {
   if (!isSlotAttempt(attempt)) {
     return res.status(409).json({ ok: false, error: 'That reference belongs to a historical Marketing attempt.' })
@@ -278,23 +451,57 @@ async function reconcileUnfinishedSlotAttempts(client, attempts) {
   return failed ? { data: null, error: failed.error } : { data: reconciled, error: null }
 }
 
-function marketingStatusResponse(destinations, storage, attempts, resolutions, context) {
-  const plan = buildMarketingOccurrencePlan({ attempts, resolutions })
+async function loadOfferCatalog(client, workspaceId, attempts) {
+  const [offers, media, captions] = await Promise.all([
+    client.from('offers').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(100),
+    client.from('offer_media').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(300),
+    client.from('offer_captions').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(300),
+  ])
+  const failure = [offers, media, captions].find(result => result.error)
+  if (failure) return { data: null, error: failure.error }
+  const signedMedia = await Promise.all((media.data || []).map(async medium => {
+    if (medium.media_source !== 'generated') return medium
+    const signed = await client.storage.from(medium.storage_bucket).createSignedUrl(medium.storage_object_path, 60 * 60)
+    return { ...medium, preview_url: signed.error ? null : signed.data?.signedUrl || null }
+  }))
+  return {
+    data: buildOfferCatalog({
+      offers: offers.data || [],
+      media: signedMedia,
+      captions: captions.data || [],
+      attempts: attempts || [],
+    }),
+    error: null,
+  }
+}
+
+function marketingAssets(catalog, attempts) {
+  if (!catalog?.activeOfferCount) return EVERGREEN_ASSETS
+  const historicLegacyAssets = EVERGREEN_ASSETS
+    .filter(asset => (attempts || []).some(attempt => attempt.asset_id === asset.id || attempt.asset_path === asset.assetPath))
+    .map(asset => ({ ...asset, enabled: false }))
+  return [...catalog.assets, ...historicLegacyAssets]
+}
+
+function marketingStatusResponse(destinations, storage, attempts, resolutions, context, catalog) {
+  const plan = buildMarketingOccurrencePlan({ attempts, resolutions, assets: marketingAssets(catalog, attempts) })
   const slots = plan.slots
   const activeSlotKeys = new Set(slots.map(slot => slot.slotKey))
   const history = attempts.filter(attempt => !activeSlotKeys.has(attempt.marketing_slot_key))
   const hasUnfinishedAttempt = slots.some(slot => slot.attempt && slot.destinationResults.some(result => !TERMINAL_STATUS.has(result.provider_status)))
   const authorizableSlot = storage.ready ? nextAuthorizableSlot(slots) : null
+  const closeableFailedSlot = storage.ready ? nextClosableFailedSlot(slots) : null
 
   return {
     ok: true,
     destinations: serializeDestinations(destinations),
-    slots: slots.map(slot => serializeSlot(slot, slot === authorizableSlot ? createOwnerConfirmationToken(context, slot) : null)),
+    slots: slots.map(slot => serializeSlot(slot, slot === authorizableSlot || slot === closeableFailedSlot ? createOwnerConfirmationToken(context, slot) : null)),
     attempt_history: history.map(serializeAttempt),
     storage_ready: storage.ready,
     storage_error: storage.error,
     missed_slot_signal: plan.missedSlotSignal,
     missed_slot_decisions: resolutions.map(serializeSlotResolution),
+    offer_catalog: catalog.offers,
     poll_after_ms: hasUnfinishedAttempt ? MARKETING_POLL_INTERVAL_MS : null,
   }
 }
@@ -461,15 +668,34 @@ function providerPlatformError(post, platform) {
   return null
 }
 
-async function uploadAsset(asset) {
-  const image = await readFile(join(process.cwd(), 'public', asset.assetPath))
+async function uploadAsset(client, asset) {
+  const image = asset.assetSource === 'generated'
+    ? await readGeneratedAsset(client, asset)
+    : await readFile(join(process.cwd(), 'public', asset.assetPath))
   const form = new FormData()
-  form.set('file', new Blob([image], { type: mimeTypeForAsset(asset.assetPath) }), asset.assetPath.split('/').at(-1))
+  form.set('file', new Blob([image], { type: mimeTypeForAsset(asset.assetPath) }), assetFilename(asset))
   form.set('teamId', process.env.BUNDLE_SOCIAL_TEAM_ID)
   const body = await providerRequest('/upload/', { method: 'POST', body: form })
-  const id = typeof body?.id === 'string' ? body.id : ''
+  const id = typeof body?.uploadId === 'string'
+    ? body.uploadId
+    : typeof body?.id === 'string'
+      ? body.id
+      : ''
   if (!id) throw new ProviderError(502, 'bundle.social did not return an upload ID.')
   return { id }
+}
+
+async function readGeneratedAsset(client, asset) {
+  if (asset.assetBucket !== 'marketing-creative' || !/^generated\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.png$/i.test(asset.assetObjectPath || '')) {
+    throw new ProviderError(400, 'Generated Marketing asset storage reference is invalid.')
+  }
+  const downloaded = await client.storage.from(asset.assetBucket).download(asset.assetObjectPath)
+  if (downloaded.error || !downloaded.data) throw new ProviderError(502, 'Generated Marketing asset could not be loaded for publishing.')
+  return Buffer.from(await downloaded.data.arrayBuffer())
+}
+
+function assetFilename(asset) {
+  return asset.assetSource === 'generated' ? `${asset.offerId || 'marketing'}-creative.png` : asset.assetPath.split('/').at(-1)
 }
 
 async function createProviderPost(caption, referenceKey, uploadId) {
@@ -595,6 +821,7 @@ function serializeSlot(slot, ownerConfirmationToken = null) {
     asset: slot.asset ? {
       id: slot.asset.id,
       asset_path: slot.asset.assetPath,
+      asset_url: slot.asset.assetUrl || slot.asset.assetPath,
       label: slot.asset.label,
       price: slot.asset.price,
       default_caption: slot.asset.defaultCaption,
@@ -708,7 +935,11 @@ function validatePublishRequest(body) {
 }
 
 function isSlotResolutionRequest(body) {
-  return body?.action === 'move' || body?.action === 'skip'
+  return body?.action === 'move' || body?.action === 'skip' || body?.action === 'close_failed'
+}
+
+function isOfferCatalogRequest(body) {
+  return ['save_marketing_offer', 'save_marketing_offer_media', 'save_marketing_offer_caption'].includes(body?.action)
 }
 
 function validateSlotResolutionRequest(body) {
@@ -721,6 +952,31 @@ function validateSlotResolutionRequest(body) {
   return ''
 }
 
+function validateCloseFailedRequest(body) {
+  if (body.action !== 'close_failed') return 'A valid failed-slot close decision is required.'
+  if (!SLOT_KEY_PATTERN.test(body.slot_key || '')) return 'A valid weekly Marketing slot is required.'
+  if (typeof body.asset_id !== 'string' || !body.asset_id.trim()) return 'A valid evergreen asset is required.'
+  if (typeof body.owner_confirmation_token !== 'string' || body.owner_confirmation_token.length > 1024) return 'A valid owner confirmation is required.'
+  return ''
+}
+
+function isUuid(value) {
+  return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+function isLocalMarketingImagePath(value) {
+  return /^\/images\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:png|jpe?g|webp)$/i.test(value)
+}
+
+async function localMarketingImageExists(storagePath) {
+  try {
+    await readFile(join(process.cwd(), 'public', storagePath))
+    return true
+  } catch {
+    return false
+  }
+}
+
 function nextAuthorizableSlot(slots) {
   for (const slot of slots) {
     if (slot.state === 'resolved') continue
@@ -729,6 +985,16 @@ function nextAuthorizableSlot(slots) {
       return null
     }
     if (slot.state === 'missed' || slot.state === 'ready') return slot.asset ? slot : null
+  }
+  return null
+}
+
+function nextClosableFailedSlot(slots) {
+  for (const slot of slots) {
+    if (slot.state === 'resolved' || slot.state === 'posted') continue
+    if (slot.state === 'missed') return null
+    if (slot.state === 'failed') return slot
+    if (slot.attempt || slot.state === 'ready') return null
   }
   return null
 }

@@ -23,7 +23,8 @@ export class ProspectBriefFailure extends Error {
   }
 }
 
-const BEST_CWS_ANGLES = new Set([
+const CONTACT_RECOMMENDATIONS = new Set(['CONTACT', 'SKIP', 'OWNER_JUDGMENT'])
+const GENERIC_SALES_ANGLES = new Set([
   'Website structure and usability',
   'Service presentation',
   'Contact and conversion path',
@@ -104,6 +105,8 @@ export async function generateProspectBrief({ candidate, evidencePacket, userId,
           `ALLOWED_EVIDENCE_IDS: ${JSON.stringify(allowedEvidenceIds)}. Use ONLY IDs from this list. Never invent an evidence ID.`,
           'Every substantive claim must cite one or more supplied evidence IDs. If evidence does not support a claim, omit the claim. "No strong CWS opportunity identified" and "Owner judgment needed" are valid outcomes.',
           'Use only the supplied official-site evidence. Do not infer SEO, rankings, revenue, competitors, demographics, traffic, conversion losses, or business performance.',
+          'Decide contact_recommendation honestly: CONTACT only for at least one specific, useful, evidence-backed CWS conversation; SKIP when the site appears sufficiently strong and no compelling conversation is supported; OWNER_JUDGMENT when the evidence is valid but its Sales value needs the owner’s judgment. Never force CONTACT.',
+          'For CONTACT, sales_angle must be a concise owner-facing conversation angle, not a generic category label. why_contact should prioritize the strongest one or two supported reasons. Make outreach_hook a natural two-to-four-sentence conversation opener: lead with one specific observation, acknowledge what works when useful, avoid insulting the site or pitching a rebuild, and never claim lost customers or revenue. For SKIP, return null for sales_angle and outreach_hook.',
           'This is preparation only. Do not recommend contacting the business automatically and do not claim an offer is approved.',
         ].join(' '),
         input: JSON.stringify({
@@ -160,10 +163,20 @@ export function validateProspectBrief(brief, allowedEvidenceIds) {
     if (!item || typeof item !== 'object' || typeof item.observation !== 'string' || typeof item.why_it_may_matter !== 'string' || typeof item.possible_cws_help !== 'string') throw new Error('An opportunity is incomplete.')
     cited({ text: item.observation, evidence_ids: item.evidence_ids }, 'Opportunity')
   })
-  if (!brief.best_cws_angle || !BEST_CWS_ANGLES.has(brief.best_cws_angle.value)) throw new Error('Best CWS angle is invalid.')
-  cited({ text: brief.best_cws_angle.value, evidence_ids: brief.best_cws_angle.evidence_ids }, 'Best CWS angle')
-  cited(brief.why, 'Why')
+  if (!brief.contact_recommendation || !CONTACT_RECOMMENDATIONS.has(brief.contact_recommendation.value)) throw new Error('Contact recommendation is invalid.')
+  cited({ text: brief.contact_recommendation.value, evidence_ids: brief.contact_recommendation.evidence_ids }, 'Contact recommendation')
+  if (brief.sales_angle !== null) {
+    cited(brief.sales_angle, 'Sales angle')
+    if (GENERIC_SALES_ANGLES.has(brief.sales_angle.text.trim())) throw new Error('Sales angle must describe a specific owner-facing conversation.')
+  }
+  cited(brief.why_contact, 'Why contact')
   if (brief.outreach_hook !== null) cited(brief.outreach_hook, 'Outreach hook')
+  if (brief.contact_recommendation.value === 'CONTACT' && (!brief.opportunities.length || brief.sales_angle === null)) {
+    throw new Error('Contact requires a supported opportunity and a specific Sales angle.')
+  }
+  if (brief.contact_recommendation.value === 'SKIP' && (brief.opportunities.length || brief.sales_angle !== null || brief.outreach_hook !== null)) {
+    throw new Error('Skip must not manufacture an opportunity, Sales angle, or outreach hook.')
+  }
   if (UNSUPPORTED_CLAIM_PATTERN.test(JSON.stringify(brief))) throw new Error('Prospect brief includes an unsupported business claim.')
   return brief
 }
@@ -176,7 +189,7 @@ function prospectBriefSchema() {
   }
   return {
     type: 'object', additionalProperties: false,
-    required: ['business', 'customer', 'whats_working', 'opportunities', 'best_cws_angle', 'why', 'outreach_hook'],
+    required: ['business', 'customer', 'whats_working', 'opportunities', 'contact_recommendation', 'sales_angle', 'why_contact', 'outreach_hook'],
     properties: {
       business: citedText,
       customer: citedText,
@@ -194,11 +207,12 @@ function prospectBriefSchema() {
           },
         },
       },
-      best_cws_angle: {
+      contact_recommendation: {
         type: 'object', additionalProperties: false, required: ['value', 'evidence_ids'],
-        properties: { value: { type: 'string', enum: [...BEST_CWS_ANGLES] }, evidence_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string', minLength: 1, maxLength: 120 } } },
+        properties: { value: { type: 'string', enum: [...CONTACT_RECOMMENDATIONS] }, evidence_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string', minLength: 1, maxLength: 120 } } },
       },
-      why: citedText,
+      sales_angle: { anyOf: [citedText, { type: 'null' }] },
+      why_contact: citedText,
       outreach_hook: { anyOf: [citedText, { type: 'null' }] },
     },
   }

@@ -43,6 +43,19 @@ describe('M5 weekly Marketing slots', () => {
     ])
   })
 
+  it('withholds the portrait photography asset from the fixed Instagram-inclusive rotation', () => {
+    const photography = EVERGREEN_ASSETS.find(asset => asset.id === 'business-photography-350')
+    expect(photography).toMatchObject({
+      assetPath: '/images/business-photography-350.jpeg',
+      enabled: false,
+      fallback: false,
+    })
+    expect(chooseNextAsset(EVERGREEN_ASSETS, [
+      successfulAttempt('website-launch', '2026-09-01T12:00:00.000Z'),
+      successfulAttempt('bilingual-website', '2026-09-02T12:00:00.000Z'),
+    ])?.id).not.toBe('business-photography-350')
+  })
+
   it('creates exactly Tuesday and Friday slots for the current Chicago week', () => {
     const slots = buildWeeklySlotPlan({ now: new Date('2026-09-09T17:00:00.000Z'), assets, attempts: [] })
     expect(marketingWeekStart(new Date('2026-09-09T17:00:00.000Z'))).toBe('2026-09-07')
@@ -87,6 +100,34 @@ describe('M5 weekly Marketing slots', () => {
     expect(postA.attempt.id).toBe(attempt.id)
     expect(postB.state).toBe('ready')
     expect(postB.asset.id).toBe('bilingual-website')
+  })
+
+  it('marks an all-error, zero-publication attempt as failed and preserves it after the owner closes the occurrence', () => {
+    const failed = {
+      ...failedAttempt('website-launch'),
+      marketing_slot_key: '2026-09-07:post-a',
+      caption: 'Failed caption.',
+    }
+    const closed = resolution({ action: 'skip' })
+    const beforeClose = buildMarketingOccurrencePlan({ now: new Date('2026-09-09T17:00:00.000Z'), assets, attempts: [failed] })
+    const afterClose = buildMarketingOccurrencePlan({ now: new Date('2026-09-09T17:00:00.000Z'), assets, attempts: [failed], resolutions: [closed] })
+
+    expect(beforeClose.slots.find(slot => slot.slotKey === '2026-09-07:post-a')).toMatchObject({ state: 'failed', attempt: { id: failed.id } })
+    expect(afterClose.slots.find(slot => slot.slotKey === '2026-09-07:post-a')).toMatchObject({ state: 'resolved', attempt: { id: failed.id }, resolution: { action: 'skip' } })
+  })
+
+  it('does not treat a partial published attempt as a safely closable failure', () => {
+    const partial = {
+      ...failedAttempt('website-launch'),
+      marketing_slot_key: '2026-09-07:post-a',
+      destination_results: [
+        { platform: 'LINKEDIN', provider_status: 'posted', provider_permalink: 'https://linkedin.test/post' },
+        { platform: 'FACEBOOK', provider_status: 'error' },
+        { platform: 'INSTAGRAM', provider_status: 'error' },
+      ],
+    }
+    const [postA] = buildWeeklySlotPlan({ now: new Date('2026-09-09T17:00:00.000Z'), assets, attempts: [partial] })
+    expect(postA.state).toBe('processing')
   })
 })
 

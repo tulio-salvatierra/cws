@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { useAuthMock } = vi.hoisted(() => ({ useAuthMock: vi.fn() }))
 vi.mock('../../../Hooks/useAuth', () => ({ useAuth: useAuthMock }))
+// Keep publisher regression tests independent from the separately tested assessment panel.
+vi.mock('../../../components/admin/LayaAssessmentPanel', () => ({ default: () => null }))
 
 import MarketingPage from '../MarketingPage'
 
@@ -44,6 +46,26 @@ function statusBody(overrides = {}) {
     storage_ready: true,
     poll_after_ms: null,
     ...overrides,
+  }
+}
+
+function creativeBody(overrides = {}) {
+  return { idea_runs: [], creative_assets: [], ...overrides }
+}
+
+function catalogOffer() {
+  return {
+    id: '11111111-1111-4111-8111-111111111111',
+    name: 'Website Refresh',
+    description: 'A focused refresh for an existing business website.',
+    price_mode: 'by_scope',
+    price_cents: null,
+    price_display: 'Price by scope',
+    price_display_override: null,
+    default_project_type: 'website',
+    status: 'active',
+    media: [],
+    captions: [],
   }
 }
 
@@ -104,6 +126,29 @@ describe('MarketingPage M5', () => {
     expect(window.confirm).not.toHaveBeenCalled()
   })
 
+  it('saves a draft offer as catalog reference data without confirming a post', async () => {
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(statusBody({ offer_catalog: [] })))
+      .mockResolvedValueOnce(response({ ok: true, offer_catalog: [{
+        id: 'offer-a', name: 'Website Refresh', description: 'A focused refresh for an existing website.', price_mode: 'by_scope', price_cents: null, price_display: 'Price by scope', price_display_override: null, default_project_type: 'website', status: 'draft', media: [], captions: [],
+      }] }))
+      .mockResolvedValueOnce(response(creativeBody()))
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save offer' })).toBeEnabled())
+    fireEvent.change(screen.getByLabelText('Offer name'), { target: { value: 'Website Refresh' } })
+    fireEvent.change(screen.getByLabelText('Offer description'), { target: { value: 'A focused refresh for an existing website.' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save offer' }))
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
+
+    const [, options] = globalThis.fetch.mock.calls[1]
+    expect(JSON.parse(options.body)).toMatchObject({
+      action: 'save_marketing_offer',
+      offer: { name: 'Website Refresh', status: 'draft', price_mode: 'by_scope', price_cents: null },
+    })
+    expect(JSON.parse(options.body).owner_confirmation_token).toBeUndefined()
+    expect(screen.getByRole('heading', { name: 'Website Refresh' })).toBeInTheDocument()
+  })
+
   it('fails closed for an unverified destination while retaining M2/M3/M4 history', async () => {
     globalThis.fetch.mockResolvedValueOnce(response(statusBody({
       destinations: [verifiedDestinations[0], { ...verifiedDestinations[1], verification_state: 'not_verified', channel_name: 'Other Business', error: 'The active provider account is not the intended CWS destination.' }, verifiedDestinations[2]],
@@ -114,6 +159,48 @@ describe('MarketingPage M5', () => {
     expect(screen.getAllByText('The active provider account is not the intended CWS destination.')).toHaveLength(2)
     expect(screen.getByRole('link', { name: 'Open LinkedIn post →' })).toHaveAttribute('href', 'https://www.linkedin.com/feed/update/urn:li:share:7502889252628856832')
     expect(screen.getByText('bundle.social did not return an upload ID.')).toBeInTheDocument()
+  })
+})
+
+describe('MarketingPage Creative Studio', () => {
+  beforeEach(() => {
+    useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true))
+  })
+
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('creates ideas only through an explicit owner action and never confirms a post', async () => {
+    const offer = catalogOffer()
+    const run = {
+      id: '22222222-2222-4222-8222-222222222222',
+      offer_id: offer.id,
+      status: 'needs_review',
+      output: { ideas: [
+        { id: 'idea-1', title: 'Clarify the next step', hook: 'A clearer route from interest to action.', caption: 'A concise review caption.', visual_prompt: 'A calm work space.', cta: 'Ask about a focused refresh.' },
+        { id: 'idea-2', title: 'Show the work', hook: 'Make the service easier to understand.', caption: 'A second review caption.', visual_prompt: 'A bright workspace.', cta: 'Explore the service.' },
+        { id: 'idea-3', title: 'Keep it current', hook: 'Small updates can keep information clear.', caption: 'A third review caption.', visual_prompt: 'A simple storefront detail.', cta: 'Start a conversation.' },
+      ] },
+    }
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(statusBody({ offer_catalog: [offer] })))
+      .mockResolvedValueOnce(response(creativeBody()))
+      .mockResolvedValueOnce(response({ ok: true, run }))
+      .mockResolvedValueOnce(response(creativeBody({ idea_runs: [run] })))
+      .mockResolvedValueOnce(response(statusBody({ offer_catalog: [offer] })))
+
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Generate ideas for Website Refresh' })).toBeEnabled())
+    fireEvent.click(screen.getByRole('button', { name: 'Generate ideas for Website Refresh' }))
+
+    await waitFor(() => expect(screen.getByText('Clarify the next step')).toBeInTheDocument())
+    const [, options] = globalThis.fetch.mock.calls[2]
+    expect(globalThis.fetch.mock.calls[2][0]).toBe('/api/marketing-creative')
+    expect(JSON.parse(options.body)).toMatchObject({ action: 'generate_story_ideas', offer_id: offer.id })
+    expect(JSON.parse(options.body).request_key).toMatch(/^[0-9a-f-]{36}$/i)
+    expect(globalThis.fetch.mock.calls.every(([url]) => url === '/api/marketing-linkedin' || url === '/api/marketing-creative')).toBe(true)
+    expect(globalThis.fetch.mock.calls.some(([, request]) => request?.body?.includes('owner_confirmation_token'))).toBe(false)
+    expect(window.confirm).not.toHaveBeenCalled()
   })
 })
 
@@ -156,5 +243,40 @@ describe('MarketingPage M6 missed slots', () => {
     }))
     expect(JSON.parse(options.body).reference_key).toBeUndefined()
     expect(window.confirm).toHaveBeenCalledWith('Do you want to move this post to the next scheduled slot? This will not publish anything.')
+  })
+})
+
+describe('MarketingPage failed-slot recovery', () => {
+  beforeEach(() => {
+    useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true))
+  })
+
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('closes an all-error slot without sending a caption, reference key, or publish request', async () => {
+    const failedAttempt = { id: 'm5-attempt', provider_status: 'error' }
+    const failedResults = [
+      { id: 'li', platform: 'LINKEDIN', provider_status: 'error', provider_error: 'Image ratio is unsupported.' },
+      { id: 'fb', platform: 'FACEBOOK', provider_status: 'error', provider_error: 'Image ratio is unsupported.' },
+      { id: 'ig', platform: 'INSTAGRAM', provider_status: 'error', provider_error: 'Image ratio is unsupported.' },
+    ]
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(statusBody({ slots: [slot('post-a', 'failed', failedAttempt, failedResults), slot('post-b')] })))
+      .mockResolvedValueOnce(response({ ok: true, decision: 'close_failed' }))
+      .mockResolvedValueOnce(response(statusBody({ slots: [slot('post-a', 'resolved', failedAttempt, failedResults), slot('post-b')] })))
+
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Close failed slot' })).toBeEnabled())
+    expect(screen.getByText('Failed — close required')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Close failed slot' }))
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
+
+    const [, options] = globalThis.fetch.mock.calls[1]
+    expect(JSON.parse(options.body)).toEqual({
+      action: 'close_failed', slot_key: '2026-09-07:post-a', asset_id: 'website-launch', owner_confirmation_token: 'post-a-confirmation-token',
+    })
+    expect(window.confirm).toHaveBeenCalledWith('Close this failed slot? The failed attempt will remain in history. Nothing will be retried or published.')
+    expect(screen.queryByRole('button', { name: 'Close failed slot' })).not.toBeInTheDocument()
   })
 })
