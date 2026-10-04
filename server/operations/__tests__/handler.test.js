@@ -51,7 +51,9 @@ describe('Operations endpoint', () => {
     const projects = query({ data: [project, { ...project, id: '33333333-3333-4333-8333-333333333333', workspace_id: 'workspace-b' }], error: null })
     const requirements = query({ data: [requirement, { ...requirement, id: '44444444-4444-4444-8444-444444444444', workspace_id: 'workspace-b' }], error: null })
     const clients = query({ data: [{ id: 'client-a', workspace_id: 'workspace-a', name: 'Northside', contact_email: null, contact_phone: null }, { id: 'client-b', workspace_id: 'workspace-b', name: 'Other', contact_email: null, contact_phone: null }], error: null })
-    const client = { from: vi.fn().mockReturnValueOnce(projects).mockReturnValueOnce(requirements).mockReturnValueOnce(clients) }
+    const financialSummaries = query({ data: [{ operations_project_id: project.id, workspace_id: 'workspace-a', contracted_cents: 95000, received_cents: 0, outstanding_cents: 95000, direct_cost_cents: 0, margin_cents: 95000, cash_margin_cents: 0, actual_hours: null, effective_hourly_rate_cents: null, undecided_cost_count: 0 }], error: null })
+    const costs = query({ data: [], error: null })
+    const client = { from: vi.fn().mockReturnValueOnce(projects).mockReturnValueOnce(requirements).mockReturnValueOnce(clients).mockReturnValueOnce(financialSummaries).mockReturnValueOnce(costs) }
     mocks.authenticateOperationsWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a' })
     const res = response()
 
@@ -64,6 +66,18 @@ describe('Operations endpoint', () => {
     const payload = res.json.mock.calls[0][0]
     expect(payload.operations.projects).toHaveLength(1)
     expect(payload.operations.projects[0].requirements).toHaveLength(1)
+    expect(payload.operations.financial_summaries).toHaveLength(1)
+  })
+
+  it('creates a billed project cost and reimbursement in one transactional RPC', async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: { id: '55555555-5555-4555-8555-555555555555' }, error: null })
+    mocks.authenticateOperationsOwner.mockResolvedValue({ client: { rpc }, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
+    const res = response()
+
+    await handler({ method: 'POST', body: { action: 'create_project_cost', project_id: project.id, description: 'Domain purchase', amount_cents: 1500, incurred_on: '2026-10-04', recovery: 'billed', reimbursement_amount_cents: 1500 } }, res)
+
+    expect(rpc).toHaveBeenCalledWith('create_project_cost_with_reimbursement', expect.objectContaining({ p_workspace_id: 'workspace-a', p_operations_project_id: project.id, p_recovery: 'billed', p_reimbursement_amount_cents: 1500, p_created_by: 'owner-a' }))
+    expect(res.status).toHaveBeenCalledWith(201)
   })
 
   it('requires the workspace owner before an Operations mutation', async () => {

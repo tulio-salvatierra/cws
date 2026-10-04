@@ -1,4 +1,4 @@
-export const OBLIGATION_TYPES = ['deposit', 'milestone', 'final_payment', 'recurring', 'other']
+export const OBLIGATION_TYPES = ['service', 'add_on', 'reimbursement', 'deposit', 'milestone', 'final_payment', 'recurring', 'other']
 export const OBLIGATION_STATUSES = ['expected', 'waived', 'cancelled']
 export const PAYMENT_METHODS = ['zelle', 'square', 'check', 'cash', 'bank_transfer', 'other']
 export const RECURRING_PROVIDERS = ['square', 'manual', 'other']

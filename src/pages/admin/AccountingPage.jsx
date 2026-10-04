@@ -3,6 +3,9 @@ import { supabase } from '../../lib/supabase'
 import { dollarsToCents } from '../../lib/money'
 
 const OBLIGATION_TYPES = [
+  ['service', 'Service'],
+  ['add_on', 'Add-on'],
+  ['reimbursement', 'Reimbursement'],
   ['deposit', 'Deposit'],
   ['milestone', 'Milestone'],
   ['final_payment', 'Final payment'],

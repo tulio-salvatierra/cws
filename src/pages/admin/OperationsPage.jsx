@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { dollarsToCents } from '../../lib/money'
 
 const PROJECT_TYPES = [
   ['website_build', 'Website build'],
@@ -83,7 +84,7 @@ export default function OperationsPage({ projectId = null }) {
 
   const project = useMemo(() => projectId ? operations?.projects?.[0] || null : null, [operations, projectId])
 
-  if (projectId) return <ProjectDetail project={project} loading={!operations} error={error} busy={busy} onAction={ownerAction} />
+  if (projectId) return <ProjectDetail project={project} financialSummary={operations?.financial_summaries?.find((item) => item.operations_project_id === projectId) || null} costs={(operations?.project_costs || []).filter((item) => item.operations_project_id === projectId)} loading={!operations} error={error} busy={busy} onAction={ownerAction} />
 
   return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-6xl">
     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-orange-200">Operations V1</p>
@@ -116,16 +117,37 @@ function ProjectCard({ project }) {
   </article>
 }
 
-function ProjectDetail({ project, loading, error, busy, onAction }) {
+function ProjectDetail({ project, financialSummary, costs, loading, error, busy, onAction }) {
   if (loading) return <main className="min-h-screen bg-slate-950 p-8 text-white">Loading Operations project…</main>
   if (!project) return <main className="min-h-screen bg-slate-950 p-8 text-white"><Link to="/admin/operations" className="text-orange-200">← Operations</Link><p role="alert" className="mt-8 text-rose-200">{error || 'Operations project not found.'}</p></main>
   return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-6xl"><Link to="/admin/operations" className="text-sm font-semibold text-orange-200">← Operations</Link>
     {error && <p role="alert" className="mt-5 rounded-xl border border-rose-300/30 bg-rose-300/10 p-4 text-rose-100">{error}</p>}
     <div className="mt-8 flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-200">{project.client?.name || 'Client unavailable'}</p><h1 className="mt-3 text-4xl font-semibold">{project.name}</h1><p className="mt-2 text-slate-400">{projectTypeLabel(project.project_type)}</p></div><Readiness readiness={project.readiness} /></div>
     <section className="mt-8 rounded-3xl border border-white/10 bg-white/[0.04] p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-semibold">Delivery state</h2><p className="mt-1 text-sm text-slate-300">{stateLabel(project.delivery_state)} · {project.human_reason}</p></div><ProjectStatus project={project} busy={busy} onAction={onAction} /></div></section>
+    <ProjectMoney project={project} summary={financialSummary} costs={costs} busy={busy} onAction={onAction} />
     <section className="mt-8"><h2 className="text-2xl font-semibold">Readiness checklist</h2><p className="mt-1 text-sm text-slate-400">Mark the fixed intake requirements that matter for this project. CWS/client ownership is used only to derive the waiting state.</p><div className="mt-5 space-y-4">{project.requirements.map((requirement) => <RequirementRow key={requirement.id} requirement={requirement} busy={busy} onAction={onAction} />)}</div></section>
   </div></main>
 }
+
+function ProjectMoney({ project, summary, costs, busy, onAction }) {
+  const [hours, setHours] = useState(summary?.actual_hours ?? project.actual_hours ?? '')
+  const [showCost, setShowCost] = useState(false)
+  useEffect(() => setHours(summary?.actual_hours ?? project.actual_hours ?? ''), [summary?.actual_hours, project.actual_hours])
+  const values = summary || { contracted_cents: 0, received_cents: 0, outstanding_cents: 0, direct_cost_cents: 0, margin_cents: 0, cash_margin_cents: 0, effective_hourly_rate_cents: null, undecided_cost_count: 0 }
+  return <section className="mt-8 rounded-3xl border border-emerald-300/20 bg-emerald-300/[0.05] p-5"><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200">Project financials</p><h2 className="mt-2 text-2xl font-semibold">Money</h2><p className="mt-1 text-sm text-slate-300">Contracted work, cash received, direct costs, and owner-entered hours. This does not invoice or charge a client.</p></div>{values.undecided_cost_count > 0 && <p className="rounded-full border border-amber-300/40 px-3 py-1 text-sm text-amber-100">{values.undecided_cost_count} undecided cost{values.undecided_cost_count === 1 ? '' : 's'}</p>}</div>
+    <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><MoneyStat label="Contracted" value={money(values.contracted_cents)} /><MoneyStat label="Received" value={money(values.received_cents)} /><MoneyStat label="Outstanding" value={money(values.outstanding_cents)} /><MoneyStat label="Direct costs" value={money(values.direct_cost_cents)} /><MoneyStat label="Margin" value={money(values.margin_cents)} /><MoneyStat label="Cash margin" value={money(values.cash_margin_cents)} /><MoneyStat label="Effective hourly rate" value={values.effective_hourly_rate_cents == null ? 'Add hours' : money(values.effective_hourly_rate_cents)} /></div>
+    <div className="mt-5 flex flex-wrap items-end gap-3"><label className="text-sm text-slate-200">Actual hours<input aria-label="Actual hours" value={hours} inputMode="decimal" onChange={(event) => setHours(event.target.value)} className="mt-1 block rounded-xl bg-slate-900 p-3 text-white" placeholder="e.g. 20" /></label><button type="button" disabled={busy} onClick={() => onAction({ action: 'update_project_financial_hours', project_id: project.id, actual_hours: hours })} className="rounded-xl border border-emerald-300/40 px-4 py-3 text-sm font-semibold text-emerald-100 disabled:opacity-50">Save hours</button><button type="button" onClick={() => setShowCost((open) => !open)} className="rounded-xl bg-emerald-300 px-4 py-3 text-sm font-semibold text-slate-950">Add cost</button></div>
+    {showCost && <CostForm projectId={project.id} busy={busy} onSubmit={async (body) => { if (await onAction(body)) setShowCost(false) }} />}
+    {costs.length > 0 && <div className="mt-5 space-y-2">{costs.map((cost) => <div key={cost.id} className="flex flex-wrap justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/30 p-3 text-sm"><span>{cost.description} · {stateLabel(cost.recovery)} · {cost.incurred_on}</span><span className="font-semibold">{money(cost.amount_cents)}</span></div>)}</div>}
+  </section>
+}
+
+function CostForm({ projectId, busy, onSubmit }) {
+  const [values, setValues] = useState({ description: '', amount: '', incurred_on: new Date().toISOString().slice(0, 10), recovery: 'undecided', reimbursement_amount: '' })
+  return <form className="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-slate-950/30 p-4 md:grid-cols-2" onSubmit={(event) => { event.preventDefault(); const amount_cents = dollarsToCents(values.amount); const reimbursement_amount_cents = values.recovery === 'billed' ? dollarsToCents(values.reimbursement_amount || values.amount) : null; if (amount_cents && (values.recovery !== 'billed' || reimbursement_amount_cents)) void onSubmit({ action: 'create_project_cost', project_id: projectId, ...values, amount_cents, reimbursement_amount_cents }) }}><input required value={values.description} onChange={(event) => setValues({ ...values, description: event.target.value })} placeholder="Domain purchase" className="rounded-xl bg-slate-900 p-3" /><input required value={values.amount} inputMode="decimal" onChange={(event) => setValues({ ...values, amount: event.target.value })} placeholder="Cost (USD)" className="rounded-xl bg-slate-900 p-3" /><input required type="date" value={values.incurred_on} onChange={(event) => setValues({ ...values, incurred_on: event.target.value })} className="rounded-xl bg-slate-900 p-3" /><select value={values.recovery} onChange={(event) => setValues({ ...values, recovery: event.target.value })} className="rounded-xl bg-slate-900 p-3"><option value="undecided">Recovery undecided</option><option value="billed">Bill client</option><option value="absorbed">Absorb as studio cost</option></select>{values.recovery === 'billed' && <input required value={values.reimbursement_amount || values.amount} inputMode="decimal" onChange={(event) => setValues({ ...values, reimbursement_amount: event.target.value })} placeholder="Amount billed (USD)" className="rounded-xl bg-slate-900 p-3" />}<button disabled={busy} className="rounded-xl bg-emerald-300 px-4 py-3 font-semibold text-slate-950 disabled:opacity-50">Save cost{values.recovery === 'billed' ? ' and reimbursement' : ''}</button></form>
+}
+
+function MoneyStat({ label, value }) { return <div className="rounded-xl border border-white/10 bg-slate-950/30 p-3"><p className="text-xs text-slate-400">{label}</p><p className="mt-1 text-lg font-semibold">{value}</p></div> }
 
 function ProjectStatus({ project, busy, onAction }) {
   const [status, setStatus] = useState(project.status)
@@ -151,3 +173,4 @@ function projectTypeLabel(value) { return PROJECT_TYPES.find(([type]) => type ==
 function stateLabel(value) { return String(value || '').replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()) }
 function categoryLabel(value) { return stateLabel(value) }
 function formatDate(value) { return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value)) }
+function money(cents) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(cents || 0) / 100) }

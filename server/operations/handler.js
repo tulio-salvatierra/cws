@@ -31,11 +31,11 @@ async function loadOperations(req, res) {
 
   const projectsQuery = context.client
     .from('operations_projects')
-    .select('id, workspace_id, client_id, name, project_type, status, created_at, updated_at')
+    .select('id, workspace_id, client_id, name, project_type, status, actual_hours, created_at, updated_at')
     .eq('workspace_id', context.workspaceId)
     .order('created_at', { ascending: true })
   if (projectId) projectsQuery.eq('id', projectId)
-  const [projects, requirements, clients] = await Promise.all([
+  const [projects, requirements, clients, financialSummaries, projectCosts] = await Promise.all([
     projectsQuery,
     context.client.from('project_requirements')
       .select('id, workspace_id, project_id, requirement_key, label, category, status, timing, responsible_party, notes, requested_at, received_at, created_at, updated_at')
@@ -46,18 +46,29 @@ async function loadOperations(req, res) {
       .eq('workspace_id', context.workspaceId)
       .eq('status', 'active')
       .order('name', { ascending: true }),
+    context.client.from('project_financial_summary')
+      .select('operations_project_id, workspace_id, contracted_cents, received_cents, outstanding_cents, direct_cost_cents, margin_cents, cash_margin_cents, actual_hours, effective_hourly_rate_cents, undecided_cost_count')
+      .eq('workspace_id', context.workspaceId),
+    context.client.from('project_costs')
+      .select('id, workspace_id, operations_project_id, description, amount_cents, currency, incurred_on, recovery, reimbursed_by_obligation_id, created_at')
+      .eq('workspace_id', context.workspaceId)
+      .order('incurred_on', { ascending: false }),
   ])
-  const failed = [projects, requirements, clients].find((result) => result.error)
+  const failed = [projects, requirements, clients, financialSummaries, projectCosts].find((result) => result.error)
   if (failed) return res.status(502).json({ ok: false, error: failed.error.message })
 
   return res.status(200).json({
     ok: true,
-    operations: buildOperationsReadModel({
+    operations: {
+      ...buildOperationsReadModel({
       workspaceId: context.workspaceId,
       projects: projects.data || [],
       requirements: requirements.data || [],
       clients: clients.data || [],
-    }),
+      }),
+      financial_summaries: financialSummaries.data || [],
+      project_costs: projectCosts.data || [],
+    },
   })
 }
 
@@ -67,8 +78,49 @@ async function runOwnerAction(req, res) {
   const body = parseBody(req.body)
   if (body.action === 'create_operations_project') return createOperationsProject(context, body, res)
   if (body.action === 'update_operations_project') return updateOperationsProject(context, body, res)
+  if (body.action === 'update_project_financial_hours') return updateProjectFinancialHours(context, body, res)
+  if (body.action === 'create_project_cost') return createProjectCost(context, body, res)
   if (body.action === 'update_project_requirement') return updateProjectRequirement(context, body, res)
   return res.status(400).json({ ok: false, error: 'Unknown Operations action.' })
+}
+
+async function updateProjectFinancialHours(context, body, res) {
+  const projectId = cleanText(body.project_id, 50)
+  const actualHours = body.actual_hours === '' || body.actual_hours === null ? null : Number(body.actual_hours)
+  if (!UUID.test(projectId) || (actualHours !== null && (!Number.isFinite(actualHours) || actualHours < 0 || actualHours > 9999.9))) {
+    return res.status(400).json({ ok: false, error: 'A project and non-negative actual hours are required.' })
+  }
+  const result = await context.client.from('operations_projects')
+    .update({ actual_hours: actualHours })
+    .eq('id', projectId).eq('workspace_id', context.workspaceId)
+    .select('id, actual_hours, updated_at').maybeSingle()
+  if (result.error) return res.status(502).json({ ok: false, error: 'Actual hours could not be saved.' })
+  if (!result.data) return res.status(404).json({ ok: false, error: 'Operations project not found.' })
+  return res.status(200).json({ ok: true, project: result.data })
+}
+
+async function createProjectCost(context, body, res) {
+  const projectId = cleanText(body.project_id, 50)
+  const description = cleanText(body.description, 500)
+  const amountCents = moneyCents(body.amount_cents)
+  const incurredOn = dateOnly(body.incurred_on)
+  const recovery = cleanText(body.recovery, 50)
+  const reimbursementAmountCents = recovery === 'billed' ? moneyCents(body.reimbursement_amount_cents) : null
+  if (!UUID.test(projectId) || !description || !amountCents || !incurredOn || !['undecided', 'billed', 'absorbed'].includes(recovery) || (recovery === 'billed' && !reimbursementAmountCents)) {
+    return res.status(400).json({ ok: false, error: 'Project, description, amount, incurred date, and recovery are required.' })
+  }
+  const result = await context.client.rpc('create_project_cost_with_reimbursement', {
+    p_workspace_id: context.workspaceId,
+    p_operations_project_id: projectId,
+    p_description: description,
+    p_amount_cents: amountCents,
+    p_incurred_on: incurredOn,
+    p_recovery: recovery,
+    p_reimbursement_amount_cents: reimbursementAmountCents,
+    p_created_by: context.user.id,
+  })
+  if (result.error || !result.data) return res.status(502).json({ ok: false, error: result.error?.message || 'Project cost could not be saved.' })
+  return res.status(201).json({ ok: true, project_cost: result.data })
 }
 
 async function createOperationsProject(context, body, res) {
@@ -142,4 +194,13 @@ function queryProjectId(req) {
   const value = req.query?.project_id
   if (value === undefined || value === null || value === '') return null
   return UUID.test(String(value)) ? String(value) : false
+}
+
+function moneyCents(value) {
+  const cents = Number(value)
+  return Number.isSafeInteger(cents) && cents > 0 && cents <= 1000000000 ? cents : null
+}
+
+function dateOnly(value) {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null
 }
