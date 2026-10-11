@@ -18,7 +18,7 @@ import handler from '../handler.js'
 
 function response() { const res = { status: vi.fn(() => res), json: vi.fn(() => res) }; return res }
 function query(result) {
-  const chain = { select: vi.fn(() => chain), eq: vi.fn(() => chain), order: vi.fn(() => chain), insert: vi.fn(() => chain), update: vi.fn(() => chain), maybeSingle: vi.fn(() => Promise.resolve(result)) }
+  const chain = { range: vi.fn(() => chain), select: vi.fn(() => chain), eq: vi.fn(() => chain), order: vi.fn(() => chain), insert: vi.fn(() => chain), update: vi.fn(() => chain), maybeSingle: vi.fn(() => Promise.resolve(result)) }
   chain.then = (resolve, reject) => Promise.resolve(result).then(resolve, reject)
   return chain
 }

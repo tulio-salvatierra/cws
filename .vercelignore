@@ -11,3 +11,9 @@ dist
 **/*.test.jsx
 docs
 supabase
+
+artifacts
+.venv-laya
+.laya-cache
+.playwright-cli
+.DS_Store

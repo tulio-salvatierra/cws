@@ -1,3 +1,4 @@
+import { EXPENSE_ACTIONS, expenseAction } from './expenses.js'
 import {
   OBLIGATION_TYPES,
   PAYMENT_METHODS,
@@ -28,7 +29,7 @@ async function loadAccounting(req, res) {
   const context = await authenticateWorkspace(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
-  const [obligations, receipts, recurringRevenue, clients, projects] = await Promise.all([
+  const [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses] = await Promise.all([
     context.client.from('financial_obligations')
       .select('id, workspace_id, client_id, operations_project_id, description, amount_cents, currency, obligation_type, due_date, status, created_at, updated_at')
       .eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
@@ -42,8 +43,10 @@ async function loadAccounting(req, res) {
       .select('id, workspace_id, name, status').eq('workspace_id', context.workspaceId).eq('status', 'active').order('name', { ascending: true }),
     context.client.from('operations_projects')
       .select('id, workspace_id, client_id, name, status').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+    loadExpenseRows(context, 'expense_subscriptions'),
+    loadExpenseRows(context, 'business_expenses'),
   ])
-  const failed = [obligations, receipts, recurringRevenue, clients, projects].find((result) => result.error)
+  const failed = [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses].find((result) => result.error)
   if (failed) return res.status(502).json({ ok: false, error: failed.error.message })
 
   return res.status(200).json({
@@ -56,6 +59,8 @@ async function loadAccounting(req, res) {
       clients: clients.data || [],
       operationsProjects: projects.data || [],
     }),
+    expense_subscriptions: subscriptions.data || [],
+    business_expenses: expenses.data || [],
     clients: clients.data || [],
     operations_projects: projects.data || [],
   })
@@ -65,6 +70,7 @@ async function runOwnerAction(req, res) {
   const context = await authenticateAccountingOwner(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
   const body = parseBody(req.body)
+  if (EXPENSE_ACTIONS.includes(body.action)) return expenseAction(context, body, res)
   if (body.action === 'create_financial_obligation') return createFinancialObligation(context, body, res)
   if (body.action === 'record_payment_receipt') return recordPaymentReceipt(context, body, res)
   if (body.action === 'resolve_financial_obligation') return resolveFinancialObligation(context, body, res)
@@ -246,4 +252,14 @@ async function validateClientAndProject(context, clientId, projectId) {
   if (project.error) return { error: 'The Operations project could not be verified.', status: 502 }
   if (!project.data || project.data.client_id !== clientId) return { error: 'The Operations project must belong to the selected client.', status: 400 }
   return { data: { client: client.data, project: project.data } }
+}
+
+async function loadExpenseRows(context, table) {
+  const data = []
+  for (let offset = 0; ; offset += 500) {
+    const result = await context.client.from(table).select('*').eq('workspace_id', context.workspaceId).order('id', { ascending: true }).range(offset, offset + 499)
+    if (result.error) return result
+    data.push(...(result.data || []))
+    if ((result.data || []).length < 500) return { data, error: null }
+  }
 }

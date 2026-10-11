@@ -1,3 +1,4 @@
+import BusinessExpenses from './BusinessExpenses'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { dollarsToCents } from '../../lib/money'
@@ -30,6 +31,8 @@ const today = () => new Date().toISOString().slice(0, 10)
 
 export default function AccountingPage() {
   const [accounting, setAccounting] = useState(null)
+  const [expenses, setExpenses] = useState([])
+  const [subscriptions, setSubscriptions] = useState([])
   const [clients, setClients] = useState([])
   const [projects, setProjects] = useState([])
   const [error, setError] = useState('')
@@ -52,6 +55,8 @@ export default function AccountingPage() {
       return
     }
     setAccounting(payload.accounting)
+    setExpenses(payload.business_expenses || [])
+    setSubscriptions(payload.expense_subscriptions || [])
     setClients(payload.clients || [])
     setProjects(payload.operations_projects || [])
     setError('')
@@ -96,6 +101,8 @@ export default function AccountingPage() {
       <Summary label="Overdue" cents={accounting?.summary?.overdue_amount_cents} tone="rose" />
       <Summary label="MRR" cents={accounting?.summary?.monthly_recurring_revenue_cents} />
     </section>
+
+    <BusinessExpenses subscriptions={subscriptions} expenses={expenses} projects={projects} busy={busy} onAction={ownerAction} />
 
     <section className="mt-8 flex flex-wrap gap-3" aria-label="Accounting actions">
       <button type="button" onClick={() => setShowObligation((open) => !open)} className="rounded-xl bg-orange-300 px-4 py-3 font-semibold text-slate-950">Add expected payment</button>
