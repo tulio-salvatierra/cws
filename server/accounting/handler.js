@@ -1,3 +1,5 @@
+import { AGREEMENT_ACTIONS, agreementAction } from './agreements.js'
+import { agreementSummary } from '../../src/lib/clientAgreements.js'
 import { EXPENSE_ACTIONS, expenseAction } from './expenses.js'
 import {
   OBLIGATION_TYPES,
@@ -29,10 +31,8 @@ async function loadAccounting(req, res) {
   const context = await authenticateWorkspace(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
-  const [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers] = await Promise.all([
-    context.client.from('financial_obligations')
-      .select('id, workspace_id, client_id, operations_project_id, description, amount_cents, currency, obligation_type, due_date, status, created_at, updated_at')
-      .eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+  const [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers, agreements, installments] = await Promise.all([
+    loadExpenseRows(context, 'financial_obligations'),
     loadExpenseRows(context, 'payment_receipts'),
     context.client.from('recurring_revenue')
       .select('id, workspace_id, client_id, description, amount_cents, currency, cadence, status, provider, provider_reference, started_at, next_expected_at, ended_at, created_at, updated_at')
@@ -45,20 +45,26 @@ async function loadAccounting(req, res) {
     loadExpenseRows(context, 'business_expenses'),
     loadExpenseRows(context, 'project_costs'),
     loadExpenseRows(context, 'offers'),
+    loadExpenseRows(context, 'client_service_agreements'),
+    loadExpenseRows(context, 'agreement_installments'),
   ])
-  const failed = [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers].find((result) => result.error)
+  const failed = [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers, agreements, installments].find((result) => result.error)
   if (failed) return res.status(502).json({ ok: false, error: failed.error.message })
 
-  return res.status(200).json({
-    ok: true,
-    accounting: buildAccountingReadModel({
+  const accounting = buildAccountingReadModel({
       workspaceId: context.workspaceId,
       obligations: obligations.data || [],
       receipts: receipts.data || [],
       recurringRevenue: recurringRevenue.data || [],
       clients: clients.data || [],
       operationsProjects: projects.data || [],
-    }),
+    })
+  accounting.summary.monthly_recurring_revenue_cents += (agreements.data || []).reduce((sum, a) => sum + agreementSummary(a).activeMonthly, 0)
+  return res.status(200).json({
+    ok: true, accounting,
+    client_agreements: agreements.data || [],
+    agreement_installments: installments.data || [],
+    financial_obligations: obligations.data || [],
     payment_receipts: receipts.data || [],
     project_costs: projectCosts.data || [],
     offers: offers.data || [],
@@ -73,6 +79,7 @@ async function runOwnerAction(req, res) {
   const context = await authenticateAccountingOwner(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
   const body = parseBody(req.body)
+  if (AGREEMENT_ACTIONS.includes(body.action)) return agreementAction(context, body, res)
   if (EXPENSE_ACTIONS.includes(body.action)) return expenseAction(context, body, res)
   if (body.action === 'create_financial_obligation') return createFinancialObligation(context, body, res)
   if (body.action === 'record_customer_payment') return recordCustomerPayment(context, body, res)

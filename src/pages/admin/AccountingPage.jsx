@@ -1,3 +1,4 @@
+import ClientAgreements from './ClientAgreements'
 import Profitability from './Profitability'
 import { businessToday } from '../../lib/businessExpenses'
 import BusinessExpenses from './BusinessExpenses'
@@ -33,6 +34,9 @@ const today = () => new Date().toISOString().slice(0, 10)
 
 export default function AccountingPage() {
   const [month, setMonth] = useState(() => businessToday().slice(0, 7))
+  const [agreements, setAgreements] = useState([])
+  const [installments, setInstallments] = useState([])
+  const [obligations, setObligations] = useState([])
   const [receipts, setReceipts] = useState([])
   const [projectCosts, setProjectCosts] = useState([])
   const [offers, setOffers] = useState([])
@@ -61,6 +65,9 @@ export default function AccountingPage() {
       return
     }
     setAccounting(payload.accounting)
+    setAgreements(payload.client_agreements || [])
+    setInstallments(payload.agreement_installments || [])
+    setObligations(payload.financial_obligations || [])
     setReceipts(payload.payment_receipts || [])
     setProjectCosts(payload.project_costs || [])
     setOffers(payload.offers || [])
@@ -112,6 +119,8 @@ export default function AccountingPage() {
     </section>
 
     <Profitability receipts={receipts} expenses={expenses} projectCosts={projectCosts} subscriptions={subscriptions} month={month} onMonthChange={setMonth} loaded={Boolean(accounting)} busy={busy} onAction={ownerAction} />
+
+    <ClientAgreements agreements={agreements} installments={installments} obligations={obligations} receipts={receipts} clients={clients} offers={offers} busy={busy} onAction={ownerAction} initialClientId={new URLSearchParams(window.location.search).get('client') || ''} />
 
     <BusinessExpenses selectedMonth={month} onMonthChange={setMonth} subscriptions={subscriptions} expenses={expenses} projects={projects} busy={busy} onAction={ownerAction} />
 
