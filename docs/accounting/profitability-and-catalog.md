@@ -1,5 +1,7 @@
 # Monthly profitability and draft services
 
+Production deployment: `dpl_Gw8tcWuMVhvVnRLqNHmcHhWuHjEG` (READY), October 11, 2026. Live: https://www.cicerowebstudio.xyz/admin/accounting
+
 Accounting now shows a shared selected month for profitability and business expenses.
 
 Cash profit/loss = all receipts received in the selected Chicago calendar month, less confirmed business expenses paid that month, less confirmed standalone project costs paid that month. Future receipts/payments are excluded. Linked business expense/project cost records count once. Existing project costs have no assumed payment date; owners can confirm one in Accounting.
