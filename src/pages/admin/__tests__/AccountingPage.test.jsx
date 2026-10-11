@@ -59,6 +59,35 @@ describe('AccountingPage', () => {
     expect(globalThis.fetch.mock.calls[1][1].body).toContain('"started_at":"2026-03-13"')
   })
 
+  it('records a new payment for a customer without an expected payment', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...state, clients: [{ id: 'upholstery', name: 'Upholstery of Chicago' }] }))
+    render(<AccountingPage />)
+    await screen.findByRole('heading', { name: 'Accounting' })
+    fireEvent.click(screen.getByRole('button', { name: 'Record payment received' }))
+    fireEvent.change(screen.getByLabelText('Customer'), { target: { value: 'upholstery' } })
+    fireEvent.change(screen.getByLabelText('Payment covers'), { target: { value: 'new' } })
+    fireEvent.change(screen.getByLabelText('Payment description'), { target: { value: 'Setup payment' } })
+    fireEvent.change(screen.getByLabelText('Amount received (USD)'), { target: { value: '300' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Record receipt' }))
+    await waitFor(() => expect(globalThis.fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(true))
+    const body = JSON.parse(globalThis.fetch.mock.calls.find(([, options]) => options?.method === 'POST')[1].body)
+    expect(body).toMatchObject({ action: 'record_customer_payment', client_id: 'upholstery', amount_cents: 30000, description: 'Setup payment' })
+    expect(body.receipt_id).toMatch(/^[a-f0-9-]{36}$/)
+  })
+
+  it('filters expected payments and clears the selection when the customer changes', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...state, clients: [...state.clients, { id: 'other', name: 'Other client' }], accounting: { ...state.accounting, outstanding_obligations: [{ ...state.accounting.outstanding_obligations[0], client_id: 'client-a' }] } }))
+    render(<AccountingPage />)
+    await screen.findByRole('heading', { name: 'Accounting' })
+    fireEvent.click(screen.getByRole('button', { name: 'Record payment received' }))
+    fireEvent.change(screen.getByLabelText('Customer'), { target: { value: 'client-a' } })
+    fireEvent.change(screen.getByLabelText('Payment covers'), { target: { value: 'obligation-a' } })
+    fireEvent.change(screen.getByLabelText('Customer'), { target: { value: 'other' } })
+    expect(screen.getByLabelText('Payment covers')).toHaveValue('')
+    expect(screen.queryByRole('option', { name: /Final website payment/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Record receipt' })).toBeDisabled()
+  })
+
   it('parses money into integer cents without floating point input', () => {
     expect(dollarsToCents('70')).toBe(7000)
     expect(dollarsToCents('70.01')).toBe(7001)

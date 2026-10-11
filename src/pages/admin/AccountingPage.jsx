@@ -111,7 +111,7 @@ export default function AccountingPage() {
     </section>
 
     {showObligation && <ObligationForm clients={clients} projects={clientProjects} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setShowObligation(false) }} />}
-    {showReceipt && <ReceiptForm obligations={accounting?.outstanding_obligations || []} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setShowReceipt(false) }} />}
+    {showReceipt && <ReceiptForm clients={clients} projects={projects} obligations={accounting?.outstanding_obligations || []} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setShowReceipt(false) }} />}
     {showRecurring && <RecurringForm clients={clients} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setShowRecurring(false) }} />}
     {editingRecurring && <RecurringEditForm key={editingRecurring.id} item={editingRecurring} busy={busy} onSubmit={async (body) => { if (await ownerAction(body)) setEditingRecurring(null) }} />}
 
@@ -151,17 +151,33 @@ function ObligationForm({ clients, projects, busy, onSubmit }) {
   </form></FormPanel>
 }
 
-function ReceiptForm({ obligations, busy, onSubmit }) {
-  const [values, setValues] = useState({ financial_obligation_id: obligations[0]?.id || '', amount: '', received_at: today(), payment_method: 'zelle', reference_note: '' })
+function ReceiptForm({ clients, projects, obligations, busy, onSubmit }) {
+  const [receiptId] = useState(() => crypto.randomUUID())
+  const [values, setValues] = useState({ client_id: '', financial_obligation_id: '', operations_project_id: '', description: '', amount: '', received_at: today(), payment_method: 'zelle', reference_note: '' })
+  const [error, setError] = useState('')
+  const available = obligations.filter((item) => item.client_id === values.client_id)
+  const newPayment = values.financial_obligation_id === 'new'
   return <FormPanel title="Record payment received"><form className="mt-4 grid gap-3 md:grid-cols-2" onSubmit={(event) => {
-    event.preventDefault(); const amount_cents = dollarsToCents(values.amount); if (!amount_cents) return; void onSubmit({ action: 'record_payment_receipt', ...values, amount_cents })
+    event.preventDefault()
+    const amount_cents = dollarsToCents(values.amount)
+    if (!amount_cents) { setError('Enter a positive amount with at most two decimal places.'); return }
+    setError('')
+    void onSubmit({ ...values, receipt_id: receiptId, action: newPayment ? 'record_customer_payment' : 'record_payment_receipt', amount_cents })
   }}>
-    <Select required label="Expected payment" value={values.financial_obligation_id} options={[['', 'Select an expected payment'], ...obligations.map((item) => [item.id, `${item.client?.name || 'Client'} — ${item.description} (${money(item.outstanding_amount_cents)} outstanding)`])]} onChange={(financial_obligation_id) => setValues({ ...values, financial_obligation_id })} />
+    {error && <p role="alert" className="text-rose-200 md:col-span-2">{error}</p>}
+    <Select required label="Customer" value={values.client_id} options={[["", "Select a customer"], ...clients.map((client) => [client.id, client.name])]} onChange={(client_id) => setValues({ ...values, client_id, financial_obligation_id: '', operations_project_id: '', description: '', amount: '' })} />
+    <Select required label="Payment covers" value={values.financial_obligation_id} options={[["", "Choose what this payment covers"], ...available.map((item) => [item.id, `${item.description} (${money(item.outstanding_amount_cents)} outstanding)`]), ...(values.client_id ? [['new', 'New payment — no existing expected payment']] : [])]} onChange={(financial_obligation_id) => setValues({ ...values, financial_obligation_id })} />
+    {newPayment && <>
+      <Input required label="Payment description" value={values.description} onChange={(description) => setValues({ ...values, description })} placeholder="Website setup payment" />
+      <Select label="Project (optional)" value={values.operations_project_id} options={[["", "No project"], ...projects.filter((project) => project.client_id === values.client_id).map((project) => [project.id, project.name])]} onChange={(operations_project_id) => setValues({ ...values, operations_project_id })} />
+      <p className="text-sm text-slate-400 md:col-span-2">Creates a matching paid item for this amount. If this pays part of an existing balance, choose that expected payment above to reduce the balance.</p>
+    </>}
     <Input required label="Amount received (USD)" value={values.amount} onChange={(amount) => setValues({ ...values, amount })} inputMode="decimal" placeholder="750.00" />
     <Input required label="Received date" type="date" value={values.received_at} onChange={(received_at) => setValues({ ...values, received_at })} />
     <Select label="Payment method" value={values.payment_method} options={PAYMENT_METHODS} onChange={(payment_method) => setValues({ ...values, payment_method })} />
     <Input label="Reference note (optional)" value={values.reference_note} onChange={(reference_note) => setValues({ ...values, reference_note })} placeholder="Owner-confirmed Zelle payment" />
-    <button disabled={busy || !obligations.length} className="rounded-xl bg-orange-300 px-4 py-3 font-semibold text-slate-950 disabled:opacity-50">Record receipt</button>
+    {!clients.length && <p className="text-sm text-slate-400">Add an active customer in Clients first.</p>}
+    <button disabled={busy || !values.client_id || !values.financial_obligation_id} className="rounded-xl bg-orange-300 px-4 py-3 font-semibold text-slate-950 disabled:opacity-50">Record receipt</button>
   </form></FormPanel>
 }
 

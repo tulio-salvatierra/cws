@@ -72,6 +72,7 @@ async function runOwnerAction(req, res) {
   const body = parseBody(req.body)
   if (EXPENSE_ACTIONS.includes(body.action)) return expenseAction(context, body, res)
   if (body.action === 'create_financial_obligation') return createFinancialObligation(context, body, res)
+  if (body.action === 'record_customer_payment') return recordCustomerPayment(context, body, res)
   if (body.action === 'record_payment_receipt') return recordPaymentReceipt(context, body, res)
   if (body.action === 'resolve_financial_obligation') return resolveFinancialObligation(context, body, res)
   if (body.action === 'create_recurring_revenue') return createRecurringRevenue(context, body, res)
@@ -123,9 +124,10 @@ async function recordPaymentReceipt(context, body, res) {
     return res.status(400).json({ ok: false, error: 'Obligation, positive receipt amount, received date, and payment method are required.' })
   }
   const obligation = await context.client.from('financial_obligations')
-    .select('id, workspace_id, amount_cents, status').eq('id', obligationId).eq('workspace_id', context.workspaceId).maybeSingle()
+    .select('id, workspace_id, client_id, amount_cents, status').eq('id', obligationId).eq('workspace_id', context.workspaceId).maybeSingle()
   if (obligation.error) return res.status(502).json({ ok: false, error: 'The financial obligation could not be loaded.' })
   if (!obligation.data) return res.status(404).json({ ok: false, error: 'Financial obligation not found.' })
+  if (body.client_id && body.client_id !== obligation.data.client_id) return res.status(400).json({ ok: false, error: 'The expected payment must belong to the selected customer.' })
   if (obligation.data.status !== 'expected') return res.status(409).json({ ok: false, error: 'A receipt can only be recorded for an expected payment.' })
 
   const existing = await context.client.from('payment_receipts')
@@ -262,4 +264,26 @@ async function loadExpenseRows(context, table) {
     data.push(...(result.data || []))
     if ((result.data || []).length < 500) return { data, error: null }
   }
+}
+
+async function recordCustomerPayment(context, body, res) {
+  const clientId = cleanText(body.client_id, 50)
+  const projectId = cleanText(body.operations_project_id, 50) || null
+  const description = cleanText(body.description, 500)
+  const amount = cents(body.amount_cents)
+  const receivedAt = receiptTimestamp(body.received_at)
+  const method = cleanText(body.payment_method, 50)
+  if (!validUuid(clientId) || (projectId && !validUuid(projectId)) || !validUuid(body.receipt_id) || !description || !amount || !receivedAt || !PAYMENT_METHODS.includes(method)) {
+    return res.status(400).json({ ok: false, error: 'Customer, description, positive amount, received date, and payment method are required.' })
+  }
+  const linked = await validateClientAndProject(context, clientId, projectId)
+  if (linked.error) return res.status(linked.status).json({ ok: false, error: linked.error })
+  const result = await context.client.rpc('record_customer_payment', {
+    p_workspace_id: context.workspaceId, p_client_id: clientId, p_project_id: projectId,
+    p_description: description, p_amount_cents: amount, p_received_at: receivedAt,
+    p_payment_method: method, p_reference_note: cleanText(body.reference_note, 500) || null,
+    p_user_id: context.user.id, p_receipt_id: body.receipt_id,
+  })
+  if (result.error) return res.status(409).json({ ok: false, error: 'The customer payment could not be saved. Check the details and retry.' })
+  return res.status(201).json({ ok: true, receipt_id: result.data })
 }
