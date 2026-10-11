@@ -1,6 +1,8 @@
 # Subscriptions and expenses
 
-Implemented in Accounting. This change is local until the migration and application are released.
+Released to production on October 11, 2026. Live page: https://www.cicerowebstudio.xyz/admin/accounting
+
+Deployment: `dpl_4z2SaSWptBgZ3jqDYBT5gCkH7jCd` (READY). Migration `20261011185931_business_expenses` applied to the verified live database. The authenticated live page displayed the new subscription section and retained existing Accounting balances. A rolled-back live database transaction verified payment creation, project linking, and duplicate rejection; no test expenses remain. Browser verification was read-only; no real subscription has been entered yet.
 
 ## Release order
 
