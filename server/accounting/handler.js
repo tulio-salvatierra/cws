@@ -29,13 +29,11 @@ async function loadAccounting(req, res) {
   const context = await authenticateWorkspace(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
-  const [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses] = await Promise.all([
+  const [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers] = await Promise.all([
     context.client.from('financial_obligations')
       .select('id, workspace_id, client_id, operations_project_id, description, amount_cents, currency, obligation_type, due_date, status, created_at, updated_at')
       .eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
-    context.client.from('payment_receipts')
-      .select('id, workspace_id, financial_obligation_id, amount_cents, received_at, payment_method, reference_note, created_at')
-      .eq('workspace_id', context.workspaceId).order('received_at', { ascending: false }),
+    loadExpenseRows(context, 'payment_receipts'),
     context.client.from('recurring_revenue')
       .select('id, workspace_id, client_id, description, amount_cents, currency, cadence, status, provider, provider_reference, started_at, next_expected_at, ended_at, created_at, updated_at')
       .eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
@@ -45,8 +43,10 @@ async function loadAccounting(req, res) {
       .select('id, workspace_id, client_id, name, status').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     loadExpenseRows(context, 'expense_subscriptions'),
     loadExpenseRows(context, 'business_expenses'),
+    loadExpenseRows(context, 'project_costs'),
+    loadExpenseRows(context, 'offers'),
   ])
-  const failed = [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses].find((result) => result.error)
+  const failed = [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers].find((result) => result.error)
   if (failed) return res.status(502).json({ ok: false, error: failed.error.message })
 
   return res.status(200).json({
@@ -59,6 +59,9 @@ async function loadAccounting(req, res) {
       clients: clients.data || [],
       operationsProjects: projects.data || [],
     }),
+    payment_receipts: receipts.data || [],
+    project_costs: projectCosts.data || [],
+    offers: offers.data || [],
     expense_subscriptions: subscriptions.data || [],
     business_expenses: expenses.data || [],
     clients: clients.data || [],

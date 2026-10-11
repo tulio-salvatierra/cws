@@ -6,8 +6,10 @@ const money = (cents) => new Intl.NumberFormat('en-US', { style: 'currency', cur
 const button = 'rounded-xl border border-white/20 px-4 py-2 text-sm disabled:opacity-50'
 const panel = 'rounded-2xl border border-white/10 bg-white/[0.04] p-5'
 
-export default function BusinessExpenses({ subscriptions = [], expenses = [], projects = [], busy, onAction }) {
-  const [month, setMonth] = useState(() => businessToday().slice(0, 7))
+export default function BusinessExpenses({ subscriptions = [], expenses = [], projects = [], busy, onAction, selectedMonth, onMonthChange }) {
+  const [localMonth, setLocalMonth] = useState(() => businessToday().slice(0, 7))
+  const month = selectedMonth || localMonth
+  const setMonth = onMonthChange || setLocalMonth
   const [editing, setEditing] = useState(null)
   const [payment, setPayment] = useState(null)
   const overview = expenseOverview(subscriptions, expenses, month)

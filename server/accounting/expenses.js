@@ -1,10 +1,21 @@
 import { cents, cleanText, dateOnly, validUuid } from './shared.js'
 import { businessToday } from '../../src/lib/businessExpenses.js'
 
-export const EXPENSE_ACTIONS = ['save_expense_subscription', 'create_business_expense', 'pay_business_expense']
+export const EXPENSE_ACTIONS = ['mark_project_cost_paid', 'save_expense_subscription', 'create_business_expense', 'pay_business_expense']
 
 export async function expenseAction(context, body, res) {
   const fail = (message) => res.status(400).json({ ok: false, error: message })
+  if (body.action === 'mark_project_cost_paid') {
+    const date = dateOnly(body.paid_on)
+    if (!validUuid(body.id) || !date || date > businessToday()) return fail('Choose a project cost and a valid payment date no later than today.')
+    const linked = await context.client.from('business_expenses').select('id').eq('workspace_id', context.workspaceId).eq('project_cost_id', body.id).maybeSingle()
+    if (linked.error) return res.status(502).json({ ok: false, error: 'The linked expense could not be checked.' })
+    if (linked.data) return res.status(409).json({ ok: false, error: 'This cost is already tracked by its business expense.' })
+    const result = await context.client.from('project_costs').update({ paid_on: date }).eq('workspace_id', context.workspaceId).eq('id', body.id).is('paid_on', null).select('id').maybeSingle()
+    if (result.error) return res.status(502).json({ ok: false, error: 'The payment date could not be saved.' })
+    if (!result.data) return res.status(409).json({ ok: false, error: 'Cost not found or already confirmed. Refresh Accounting.' })
+    return res.status(200).json({ ok: true })
+  }
   if (body.action === 'pay_business_expense') {
     const paidOn = dateOnly(body.paid_on)
     if (!validUuid(body.id) || !cents(body.amount_cents) || !paidOn || paidOn > businessToday() || !['subscription', 'expense'].includes(body.kind)) return fail('Choose an expense, a positive actual amount, and a payment date no later than today.')

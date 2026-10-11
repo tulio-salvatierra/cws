@@ -1,3 +1,5 @@
+import Profitability from './Profitability'
+import { businessToday } from '../../lib/businessExpenses'
 import BusinessExpenses from './BusinessExpenses'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -30,6 +32,10 @@ const RECURRING_PROVIDERS = [
 const today = () => new Date().toISOString().slice(0, 10)
 
 export default function AccountingPage() {
+  const [month, setMonth] = useState(() => businessToday().slice(0, 7))
+  const [receipts, setReceipts] = useState([])
+  const [projectCosts, setProjectCosts] = useState([])
+  const [offers, setOffers] = useState([])
   const [accounting, setAccounting] = useState(null)
   const [expenses, setExpenses] = useState([])
   const [subscriptions, setSubscriptions] = useState([])
@@ -55,6 +61,9 @@ export default function AccountingPage() {
       return
     }
     setAccounting(payload.accounting)
+    setReceipts(payload.payment_receipts || [])
+    setProjectCosts(payload.project_costs || [])
+    setOffers(payload.offers || [])
     setExpenses(payload.business_expenses || [])
     setSubscriptions(payload.expense_subscriptions || [])
     setClients(payload.clients || [])
@@ -102,7 +111,9 @@ export default function AccountingPage() {
       <Summary label="MRR" cents={accounting?.summary?.monthly_recurring_revenue_cents} />
     </section>
 
-    <BusinessExpenses subscriptions={subscriptions} expenses={expenses} projects={projects} busy={busy} onAction={ownerAction} />
+    <Profitability receipts={receipts} expenses={expenses} projectCosts={projectCosts} subscriptions={subscriptions} month={month} onMonthChange={setMonth} loaded={Boolean(accounting)} busy={busy} onAction={ownerAction} />
+
+    <BusinessExpenses selectedMonth={month} onMonthChange={setMonth} subscriptions={subscriptions} expenses={expenses} projects={projects} busy={busy} onAction={ownerAction} />
 
     <section className="mt-8 flex flex-wrap gap-3" aria-label="Accounting actions">
       <button type="button" onClick={() => setShowObligation((open) => !open)} className="rounded-xl bg-orange-300 px-4 py-3 font-semibold text-slate-950">Add expected payment</button>
@@ -132,6 +143,7 @@ export default function AccountingPage() {
         ? accounting.recurring_revenue.map((item) => <RecurringRow key={item.id} item={item} busy={busy} onAction={ownerAction} onEdit={() => setEditingRecurring(item)} />)
         : <Empty message="No recurring revenue recorded yet." />}</div>
     </section>
+    <section className="mt-10" aria-label="Service catalog"><h2 className="text-2xl font-semibold">Service catalog</h2><p className="mt-2 text-sm text-slate-400">Draft packages are reference only. Existing customer prices remain unchanged. Billing start rules need confirmation before activation.</p><div className="mt-4 grid gap-3 sm:grid-cols-2">{offers.map((offer) => <article key={offer.id} className="rounded-2xl border border-white/10 p-5"><p className="text-xs uppercase text-orange-200">{offer.status}</p><h3 className="mt-1 text-lg font-semibold">{offer.name}</h3><p className="mt-2 font-semibold">{offer.price_display_override || money(offer.price_cents)}</p><p className="mt-2 whitespace-pre-line text-sm text-slate-400">{offer.description}</p></article>)}</div>{!offers.length && <p className="mt-3 text-slate-400">No service packages added yet.</p>}</section>
   </div></main>
 }
 
