@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildMarketingOccurrencePlan, buildWeeklySlotPlan, chooseNextAsset, EVERGREEN_ASSETS, isMissedMarketingSlot, marketingWeekStart, nextOpenMarketingSlot } from '../weeklySlots'
+import { isFullyPosted, isFailedWithoutPublication, buildMarketingOccurrencePlan, buildWeeklySlotPlan, chooseNextAsset, EVERGREEN_ASSETS, isMissedMarketingSlot, marketingWeekStart, nextOpenMarketingSlot } from '../weeklySlots'
 
 const assets = [
   { id: 'website-launch', assetPath: '/images/website-launch.png', label: 'Website Launch', defaultCaption: 'Launch.', enabled: true, rotationOrder: 1 },
@@ -187,5 +187,30 @@ describe('M6 missed-slot handling', () => {
       ],
     })
     expect(plan.missedSlots.map(slot => slot.slotKey)).toEqual(['2026-09-07:post-a'])
+  })
+})
+
+
+describe('Google Business destination history', () => {
+  const platforms = ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM', 'GOOGLE_BUSINESS']
+  it('preserves completed historical posts but requires Google for new posts', () => {
+    const legacy = successfulAttempt('website-launch')
+    expect(isFullyPosted(legacy)).toBe(true)
+    const current = { ...legacy, required_platforms: platforms }
+    expect(isFullyPosted(current)).toBe(false)
+    current.destination_results = [...legacy.destination_results, { platform: 'GOOGLE_BUSINESS', provider_status: 'processing' }]
+    expect(isFullyPosted(current)).toBe(false)
+    current.destination_results[3].provider_status = 'posted'
+    expect(isFullyPosted(current)).toBe(true)
+    current.destination_results[3] = { platform: 'INSTAGRAM', provider_status: 'posted' }
+    expect(isFullyPosted(current)).toBe(false)
+  })
+  it('never closes a four-channel failure with missing or published Google evidence', () => {
+    const attempt = { ...failedAttempt('website-launch'), required_platforms: platforms }
+    expect(isFailedWithoutPublication(attempt)).toBe(false)
+    attempt.destination_results.push({ platform: 'GOOGLE_BUSINESS', provider_status: 'error' })
+    expect(isFailedWithoutPublication(attempt)).toBe(true)
+    attempt.destination_results[3].provider_post_id = 'google-post'
+    expect(isFailedWithoutPublication(attempt)).toBe(false)
   })
 })

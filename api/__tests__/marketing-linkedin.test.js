@@ -10,6 +10,7 @@ vi.mock('node:fs/promises', async importOriginal => ({ ...(await importOriginal(
 import handler, { createOwnerConfirmationToken } from '../marketing-linkedin'
 
 const verifiedAccounts = [
+  { type: 'GOOGLE_BUSINESS', displayName: 'Cicero Web Studio', providerPageId: 'locations/cws', channels: [{ id: 'locations/cws', name: 'Cicero Web Studio' }] },
   { type: 'LINKEDIN', userDisplayName: 'Cicero Web Studio', userUsername: 'cicero-web-studio' },
   { type: 'FACEBOOK', displayName: 'Cicero Web Studio', username: 'Cicero Web Studio' },
   { type: 'INSTAGRAM', displayName: 'cicerowebstudio', username: 'cicerowebstudio' },
@@ -125,6 +126,28 @@ describe('M5 Marketing endpoint', () => {
   })
 
   afterEach(() => vi.useRealTimers())
+
+  it('rejects an overlong Google caption before creating any publishing records', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: { caption: 'x'.repeat(1501), slot_key: m5SlotKey, asset_id: 'website-launch', reference_key: m5Reference, owner_confirmation_token: ownerConfirmation() } }), response)
+    expect(response.statusCode).toBe(400)
+    expect(response.body.error).toContain('1,500')
+    expect(database.state.attemptInserts).toHaveLength(0)
+    expect(globalThis.fetch.mock.calls.every(([, options]) => !options?.method || options.method === 'GET')).toBe(true)
+  })
+
+  it.each([
+    { displayName: 'Cicero Web Studio' },
+    { displayName: 'Cicero Web Studio', providerPageId: 'missing', channels: [{ id: 'cws', name: 'Cicero Web Studio' }] },
+    { displayName: 'Cicero Web Studio', providerPageId: 'other', channels: [{ id: 'other', name: 'Other Business' }, { id: 'cws', name: 'Cicero Web Studio' }] },
+  ])('does not verify an absent or wrong selected Google location: %j', async account => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client)
+    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, { type: 'GOOGLE_BUSINESS', ...account }))
+    verifiedAccounts.slice(1).forEach(value => globalThis.fetch.mockResolvedValueOnce(providerResponse(200, value)))
+    const response = makeResponse(); await handler(request(), response)
+    expect(response.body.destinations.find(value => value.platform === 'GOOGLE_BUSINESS').verification_state).toBe('not_verified')
+  })
 
   it('requires authentication before provider discovery', async () => {
     const response = makeResponse(); await handler(request({ token: '' }), response)
@@ -243,9 +266,10 @@ describe('M5 Marketing endpoint', () => {
     const response = makeResponse(); await handler(request({ method: 'POST', body: { caption: 'M5 caption.', slot_key: m5SlotKey, asset_id: 'website-launch', reference_key: m5Reference, owner_confirmation_token: ownerConfirmation() } }), response)
     expect(response.statusCode).toBe(202)
     expect(database.state.attemptInserts).toEqual([expect.objectContaining({ destination: 'multi:cicero-web-studio', marketing_slot_key: m5SlotKey, asset_id: 'website-launch', asset_path: '/images/en-launch.png' })])
-    expect(database.state.destinationInserts).toHaveLength(3)
+    expect(database.state.destinationInserts).toHaveLength(4)
+    expect(database.state.attemptInserts[0].required_platforms).toEqual(['LINKEDIN', 'FACEBOOK', 'INSTAGRAM', 'GOOGLE_BUSINESS'])
     const createCall = globalThis.fetch.mock.calls.find(([url, options]) => url.endsWith('/post') && options?.method === 'POST')
-    expect(JSON.parse(createCall[1].body)).toMatchObject({ socialAccountTypes: ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'], data: { LINKEDIN: { uploadIds: ['upload-1'] }, FACEBOOK: { type: 'POST', uploadIds: ['upload-1'] }, INSTAGRAM: { type: 'POST', uploadIds: ['upload-1'] } } })
+    expect(JSON.parse(createCall[1].body)).toMatchObject({ socialAccountTypes: ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM', 'GOOGLE_BUSINESS'], data: { GOOGLE_BUSINESS: { topicType: 'STANDARD', languageCode: 'en', text: 'M5 caption.', uploadIds: ['upload-1'], callToActionType: 'LEARN_MORE', callToActionUrl: 'https://cicerowebstudio.xyz/' }, LINKEDIN: { uploadIds: ['upload-1'] }, FACEBOOK: { type: 'POST', uploadIds: ['upload-1'] }, INSTAGRAM: { type: 'POST', uploadIds: ['upload-1'] } } })
     queueVerifiedAccounts()
     const duplicate = makeResponse(); await handler(request({ method: 'POST', body: { caption: 'M5 caption.', slot_key: m5SlotKey, asset_id: 'website-launch', reference_key: m5Reference, owner_confirmation_token: ownerConfirmation() } }), duplicate)
     expect(duplicate.statusCode).toBe(409)

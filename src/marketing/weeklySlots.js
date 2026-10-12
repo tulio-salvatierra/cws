@@ -1,3 +1,4 @@
+import { MARKETING_PLATFORMS } from './channels.js'
 export const CHICAGO_TIME_ZONE = 'America/Chicago'
 
 export const WEEKLY_MARKETING_SLOTS = [
@@ -48,7 +49,17 @@ export const EVERGREEN_ASSETS = [
   },
 ]
 
-const REQUIRED_DESTINATIONS = new Set(['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'])
+const LEGACY_PLATFORMS = ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM']
+
+function hasRequiredResults(attempt, results) {
+  const required = attempt.required_platforms ?? LEGACY_PLATFORMS
+  return Array.isArray(required) && required.length >= 3
+    && new Set(required).size === required.length
+    && required.every(platform => MARKETING_PLATFORMS.includes(platform))
+    && LEGACY_PLATFORMS.every(platform => required.includes(platform))
+    && results.length === required.length
+    && required.every(platform => results.filter(result => result.platform === platform).length === 1)
+}
 
 export function buildWeeklySlotPlan({ now = new Date(), assets = EVERGREEN_ASSETS, attempts = [] } = {}) {
   const weekStart = marketingWeekStart(now)
@@ -193,8 +204,8 @@ function orderedRotationAssets(assets, attempts) {
 export function isFullyPosted(attempt) {
   if (attempt?.destination !== 'multi:cicero-web-studio' || attempt?.provider_status !== 'posted') return false
   const results = attempt.destination_results || []
-  return results.length === REQUIRED_DESTINATIONS.size
-    && results.every(result => REQUIRED_DESTINATIONS.has(result.platform) && result.provider_status === 'posted')
+  return hasRequiredResults(attempt, results)
+    && results.every(result => result.provider_status === 'posted')
 }
 
 // A failure can be closed only when every required destination has a terminal
@@ -204,9 +215,8 @@ export function isFullyPosted(attempt) {
 export function isFailedWithoutPublication(attempt) {
   if (attempt?.destination !== 'multi:cicero-web-studio' || attempt?.provider_status !== 'error') return false
   const results = attempt.destination_results || []
-  return results.length === REQUIRED_DESTINATIONS.size
-    && results.every(result => REQUIRED_DESTINATIONS.has(result.platform)
-      && result.provider_status === 'error'
+  return hasRequiredResults(attempt, results)
+    && results.every(result => result.provider_status === 'error'
       && !result.provider_post_id
       && !result.provider_permalink)
 }

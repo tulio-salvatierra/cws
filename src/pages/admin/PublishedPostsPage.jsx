@@ -116,14 +116,14 @@ export default function PublishedPostsPage() {
             <tbody className="divide-y divide-gray-800 bg-gray-950/40 text-gray-300">
               {state.posts.map(post => (
                 <tr key={post.id}>
-                  <td className="px-4 py-4 font-medium capitalize text-white">{post.platform}</td>
+                  <td className="px-4 py-4 font-medium capitalize text-white">{post.platform === 'google_business' ? 'Google Business Profile' : post.platform}</td>
                   <td className="whitespace-nowrap px-4 py-4">{formatPublishedAt(post.published_at)}</td>
                   <td className="px-4 py-4 uppercase">{post.language || '—'}</td>
                   <td className="px-4 py-4">{post.source}</td>
                   <td className="min-w-80 px-4 py-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <select
-                        aria-label={`Outcome for ${post.platform} post`}
+                        aria-label={`Outcome for ${post.platform === 'google_business' ? 'Google Business Profile' : post.platform} post`}
                         value={post.outcome_score || ''}
                         onChange={event => changeDraft(post.id, 'outcome_score', event.target.value)}
                         className="rounded-lg border border-gray-700 bg-gray-900 px-2 py-2 text-sm text-white"
@@ -132,7 +132,7 @@ export default function PublishedPostsPage() {
                         {OUTCOMES.map(outcome => <option key={outcome} value={outcome}>{outcome}</option>)}
                       </select>
                       <input
-                        aria-label={`Outcome note for ${post.platform} post`}
+                        aria-label={`Outcome note for ${post.platform === 'google_business' ? 'Google Business Profile' : post.platform} post`}
                         value={post.outcome_note || ''}
                         onChange={event => changeDraft(post.id, 'outcome_note', event.target.value)}
                         placeholder="Optional note"

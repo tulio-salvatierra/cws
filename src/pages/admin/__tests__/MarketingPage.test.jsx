@@ -9,6 +9,7 @@ vi.mock('../../../components/admin/LayaAssessmentPanel', () => ({ default: () =>
 import MarketingPage from '../MarketingPage'
 
 const verifiedDestinations = [
+  { platform: 'GOOGLE_BUSINESS', name: 'Google Business Profile — Cicero Web Studio', verification_state: 'verified', channel_name: 'Cicero Web Studio' },
   { platform: 'LINKEDIN', name: 'LinkedIn — Cicero Web Studio Company Page', verification_state: 'verified', channel_name: 'Cicero Web Studio' },
   { platform: 'FACEBOOK', name: 'Facebook — Cicero Web Studio Page', verification_state: 'verified', channel_name: 'Cicero Web Studio' },
   { platform: 'INSTAGRAM', name: 'Instagram — Cicero Web Studio Business Account', verification_state: 'verified', channel_name: 'cicerowebstudio' },
@@ -115,7 +116,7 @@ describe('MarketingPage M5', () => {
     const [, options] = globalThis.fetch.mock.calls[1]
     expect(JSON.parse(options.body)).toMatchObject({ slot_key: '2026-09-07:post-a', asset_id: 'website-launch', owner_confirmation_token: 'post-a-confirmation-token' })
     expect(JSON.parse(options.body).reference_key).toMatch(/^cws-marketing-m5:/)
-    expect(window.confirm).toHaveBeenCalledWith('Publish Post A — Website Launch — to LinkedIn, Facebook, and Instagram?')
+    expect(window.confirm).toHaveBeenCalledWith('Publish Post A — Website Launch — to LinkedIn, Facebook, Instagram, and Google Business Profile?')
   })
 
   it('cannot invoke Post B before the server authorizes that specific slot', async () => {
@@ -278,5 +279,34 @@ describe('MarketingPage failed-slot recovery', () => {
     })
     expect(window.confirm).toHaveBeenCalledWith('Close this failed slot? The failed attempt will remain in history. Nothing will be retried or published.')
     expect(screen.queryByRole('button', { name: 'Close failed slot' })).not.toBeInTheDocument()
+  })
+})
+
+
+describe('Marketing channel tabs', () => {
+  beforeEach(() => {
+    useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
+    globalThis.fetch = vi.fn().mockResolvedValue(response(statusBody()))
+  })
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('previews Google without publishing and preserves shared caption edits across tabs', async () => {
+    render(<MarketingPage />)
+    const caption = await screen.findByRole('textbox', { name: 'Post A caption' })
+    fireEvent.change(caption, { target: { value: 'Shared caption for every channel.' } })
+    const calls = globalThis.fetch.mock.calls.length
+    fireEvent.click(screen.getByRole('tab', { name: 'Google Business Profile' }))
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('id', 'channel-panel-GOOGLE_BUSINESS')
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Shared caption for every channel.')
+    expect(screen.getAllByRole('link', { name: 'Learn more →' })[0]).toHaveAttribute('href', 'https://cicerowebstudio.xyz/')
+    expect(globalThis.fetch).toHaveBeenCalledTimes(calls)
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Google Business Profile' }), { key: 'Home' })
+    expect(screen.getByRole('textbox', { name: 'Post A caption' })).toHaveValue('Shared caption for every channel.')
+  })
+
+  it('blocks confirmation when the shared caption exceeds the Google limit', async () => {
+    render(<MarketingPage />)
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Post A caption' }), { target: { value: 'x'.repeat(1501) } })
+    expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeDisabled()
   })
 })

@@ -6,6 +6,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { Buffer } from 'node:buffer'
 import { createClient } from '@supabase/supabase-js'
 import { buildMarketingOccurrencePlan, EVERGREEN_ASSETS, isFailedWithoutPublication, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
+import { MARKETING_PLATFORMS, MARKETING_CAPTION_LIMIT, GOOGLE_BUSINESS_CTA_URL } from '../src/marketing/channels.js'
 import { buildOfferCatalog } from '../server/marketing/offer-catalog.js'
 
 export const MARKETING_ENDPOINT_TIMEOUT_MS = 10_000
@@ -19,6 +20,7 @@ const SLOT_KEY_PATTERN = /^[0-9]{4}-[0-9]{2}-[0-9]{2}:post-[ab]$/
 const PROVIDER_STATUS = new Set(['preparing', 'scheduled', 'processing', 'posted', 'retrying', 'error'])
 const TERMINAL_STATUS = new Set(['posted', 'error'])
 const DESTINATION_DEFINITIONS = [
+  { platform: 'GOOGLE_BUSINESS', name: 'Google Business Profile — Cicero Web Studio', matcher: matchesCwsGoogleLocation },
   { platform: 'LINKEDIN', name: 'LinkedIn — Cicero Web Studio Company Page', matcher: matchesCwsCompanyPage },
   { platform: 'FACEBOOK', name: 'Facebook — Cicero Web Studio Page', matcher: matchesCwsFacebookPage },
   { platform: 'INSTAGRAM', name: 'Instagram — Cicero Web Studio Business Account', matcher: matchesCwsInstagramAccount },
@@ -126,6 +128,7 @@ async function createMarketingPost(res, client, context, destinations, body) {
       offer_media_id: slot.asset.offerMediaId || null,
       offer_caption_id: slot.asset.offerCaptionId || null,
       destination: M4_DESTINATION,
+      required_platforms: MARKETING_PLATFORMS,
       marketing_slot_key: slot.slotKey,
       provider_status: 'preparing',
       provider_external_data: {},
@@ -538,6 +541,14 @@ function allDestinationsVerified(destinations) {
   return destinations.every(destination => destination.verification_state === 'verified')
 }
 
+function matchesCwsGoogleLocation(account) {
+  const locationId = optionalText(account?.providerPageId)
+  if (!locationId) return false
+  const selected = account.channels?.find(channel => channel.id === locationId)
+  if (account.channels?.length && !selected) return false
+  return normalizeIdentifier(selected?.name || account.displayName) === 'cicerowebstudio'
+}
+
 function matchesCwsCompanyPage(account) {
   return candidateValues(account).some(value => normalizeIdentifier(value).includes('cicerowebstudio'))
 }
@@ -575,6 +586,7 @@ function providerIdentity(account) {
   if (!account) return {}
   return {
     type: optionalText(account.type),
+    provider_page_id: optionalText(account.providerPageId),
     display_name: optionalText(account.displayName),
     username: optionalText(account.username),
     user_display_name: optionalText(account.userDisplayName),
@@ -672,6 +684,7 @@ async function uploadAsset(client, asset) {
   const image = asset.assetSource === 'generated'
     ? await readGeneratedAsset(client, asset)
     : await readFile(join(process.cwd(), 'public', asset.assetPath))
+  if (image.length > 5 * 1024 * 1024) throw new ProviderError(400, 'Google Business Profile images must be 5 MB or smaller.')
   const form = new FormData()
   form.set('file', new Blob([image], { type: mimeTypeForAsset(asset.assetPath) }), assetFilename(asset))
   form.set('teamId', process.env.BUNDLE_SOCIAL_TEAM_ID)
@@ -708,8 +721,9 @@ async function createProviderPost(caption, referenceKey, uploadId) {
       postDate: new Date(Date.now() + 30_000).toISOString(),
       status: 'SCHEDULED',
       referenceKey,
-      socialAccountTypes: DESTINATION_DEFINITIONS.map(destination => destination.platform),
+      socialAccountTypes: MARKETING_PLATFORMS,
       data: {
+        GOOGLE_BUSINESS: { topicType: 'STANDARD', languageCode: 'en', text: caption, uploadIds: [uploadId], callToActionType: 'LEARN_MORE', callToActionUrl: GOOGLE_BUSINESS_CTA_URL },
         LINKEDIN: { text: caption, uploadIds: [uploadId] },
         FACEBOOK: { type: 'POST', text: caption, uploadIds: [uploadId] },
         INSTAGRAM: { type: 'POST', text: caption, uploadIds: [uploadId] },
@@ -783,6 +797,7 @@ function serializeAttempt(attempt) {
     asset_id: attempt.asset_id || null,
     asset_path: attempt.asset_path,
     destination: attempt.destination,
+    required_platforms: attempt.required_platforms || ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'],
     marketing_slot_key: attempt.marketing_slot_key || null,
     provider_status: attempt.provider_status,
     provider_error: attempt.provider_error,
@@ -889,10 +904,12 @@ async function loadSlotResolutions(client, workspaceId) {
 }
 
 async function getMarketingStorageAvailability(client) {
-  const [destinations, resolutions] = await Promise.all([
+  const [destinations, platformStorage, resolutions] = await Promise.all([
     client.from('marketing_publish_destination_results').select('id').limit(1),
+    client.from('marketing_publish_attempts').select('required_platforms').limit(1),
     client.from('marketing_slot_resolutions').select('id').limit(1),
   ])
+  if (platformStorage.error) return { ready: false, error: 'Google Business Profile storage update is required before publishing.' }
   if (destinations.error) return { ready: false, error: 'Destination storage is not available yet.' }
   if (resolutions.error) return { ready: false, error: 'Missed-slot decision storage is not available yet.' }
   return { ready: true, error: null }
@@ -930,7 +947,7 @@ function validatePublishRequest(body) {
   if (typeof body.asset_id !== 'string' || !body.asset_id.trim()) return 'A valid evergreen asset is required.'
   if (typeof body.owner_confirmation_token !== 'string' || body.owner_confirmation_token.length > 1024) return 'A valid owner confirmation is required.'
   if (typeof body.caption !== 'string' || !body.caption.trim()) return 'A caption is required.'
-  if (body.caption.trim().length > 3000) return 'Caption must be 3,000 characters or fewer.'
+  if (body.caption.trim().length > MARKETING_CAPTION_LIMIT) return 'Caption must be 1,500 characters or fewer for Google Business Profile.'
   return ''
 }
 
@@ -948,7 +965,7 @@ function validateSlotResolutionRequest(body) {
   if (typeof body.asset_id !== 'string' || !body.asset_id.trim()) return 'A valid evergreen asset is required.'
   if (typeof body.owner_confirmation_token !== 'string' || body.owner_confirmation_token.length > 1024) return 'A valid owner confirmation is required.'
   if (typeof body.caption !== 'string' || !body.caption.trim()) return 'A caption is required.'
-  if (body.caption.trim().length > 3000) return 'Caption must be 3,000 characters or fewer.'
+  if (body.caption.trim().length > MARKETING_CAPTION_LIMIT) return 'Caption must be 1,500 characters or fewer for Google Business Profile.'
   return ''
 }
 
@@ -1001,7 +1018,8 @@ function nextClosableFailedSlot(slots) {
 
 export function createOwnerConfirmationToken(context, slot, now = Date.now()) {
   const payload = {
-    version: 1,
+    version: 2,
+    platforms: MARKETING_PLATFORMS,
     workspace_id: context.workspaceId,
     user_id: context.userId,
     slot_key: slot.slotKey,
@@ -1024,7 +1042,8 @@ function isValidOwnerConfirmationToken(value, context, slot, now = Date.now()) {
 
   try {
     const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'))
-    return payload?.version === 1
+    return payload?.version === 2
+      && JSON.stringify(payload.platforms) === JSON.stringify(MARKETING_PLATFORMS)
       && payload.workspace_id === context.workspaceId
       && payload.user_id === context.userId
       && payload.slot_key === slot.slotKey

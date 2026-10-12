@@ -1,3 +1,4 @@
+import { MARKETING_PLATFORMS, MARKETING_CAPTION_LIMIT, GOOGLE_BUSINESS_CTA_URL, marketingPlatformName, marketingDestinationsVerified } from '../../marketing/channels.js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../Hooks/useAuth'
 import LayaAssessmentPanel from '../../components/admin/LayaAssessmentPanel'
@@ -11,7 +12,7 @@ const SLOT_DETAILS = {
   failed: { label: 'Failed — close required', detail: 'No destination was published. Close this failed occurrence to unlock the next slot without retrying it.' },
   resolved: { label: 'Decision recorded', detail: 'This occurrence has an owner decision and remains in Marketing history.' },
   processing: { label: 'In delivery', detail: 'bundle.social is reconciling this confirmed post.' },
-  posted: { label: 'Posted', detail: 'All three destinations are posted.' },
+  posted: { label: 'Posted', detail: 'All destinations for this post are published.' },
 }
 const DESTINATION_DETAILS = {
   preparing: { label: 'Preparing', detail: 'Preparing the publishing request.' },
@@ -30,6 +31,7 @@ const VERIFICATION_DETAILS = {
 
 export default function MarketingPage() {
   const [state, setState] = useState({ loading: true, destinations: [], slots: [], attemptHistory: [], offerCatalog: [], storageReady: false, storageError: '', pollAfterMs: null, error: '' })
+  const [activeChannel, setActiveChannel] = useState('overview')
   const [captions, setCaptions] = useState({})
   const [confirmingSlotKey, setConfirmingSlotKey] = useState('')
   const [resolvingSlotKey, setResolvingSlotKey] = useState('')
@@ -100,8 +102,8 @@ export default function MarketingPage() {
     const caption = captions[slot.slot_key] ?? slot.caption ?? ''
     if (!session?.access_token || confirmingSlotKey || !canConfirmSlot(state, slot, caption)) return
     const confirmation = slot.state === 'missed'
-      ? `Publish now: ${slot.asset.label} to LinkedIn, Facebook, and Instagram?`
-      : `Publish ${slot.label} — ${slot.asset.label} — to LinkedIn, Facebook, and Instagram?`
+      ? `Publish now: ${slot.asset.label} to LinkedIn, Facebook, Instagram, and Google Business Profile?`
+      : `Publish ${slot.label} — ${slot.asset.label} — to LinkedIn, Facebook, Instagram, and Google Business Profile?`
     if (!window.confirm(confirmation)) return
     setConfirmingSlotKey(slot.slot_key)
     setState(current => ({ ...current, error: '' }))
@@ -241,7 +243,7 @@ export default function MarketingPage() {
     })
   }
 
-  const allVerified = state.destinations.length === 3 && state.destinations.every(destination => destination.verification_state === 'verified')
+  const allVerified = marketingDestinationsVerified(state.destinations)
   const nextSlot = state.slots.find(slot => ['missed', 'failed', 'ready', 'processing'].includes(slot.state)) || state.slots.at(-1)
 
   return (
@@ -251,13 +253,32 @@ export default function MarketingPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-300">Marketing</p>
             <h1 className="mt-3 text-3xl font-semibold text-white">This week, clearly prepared.</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-400">Two fixed weekly slots. Each owner confirmation reuses the proven three-destination publisher.</p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-400">Tuesday and Friday posts, prepared once for four channels. Review each channel, then confirm from the weekly overview.</p>
           </div>
           <span className={`w-fit rounded-full border px-3 py-1.5 text-xs font-semibold ${allVerified ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200' : 'border-amber-400/30 bg-amber-400/10 text-amber-200'}`}>
             {state.loading ? 'Checking destinations…' : allVerified ? 'Destinations verified' : 'Destination setup required'}
           </span>
         </header>
 
+        <div role="tablist" aria-label="Marketing channels" className="mt-6 flex gap-2 overflow-x-auto pb-2">
+          {['overview', ...MARKETING_PLATFORMS].map((channel, index, channels) => <button
+            key={channel} id={`channel-tab-${channel}`} type="button" role="tab"
+            aria-selected={activeChannel === channel} aria-controls={`channel-panel-${channel}`}
+            tabIndex={activeChannel === channel ? 0 : -1}
+            onClick={() => setActiveChannel(channel)}
+            onKeyDown={event => {
+              let target
+              if (event.key === 'ArrowRight') target = channels[(index + 1) % channels.length]
+              if (event.key === 'ArrowLeft') target = channels[(index + channels.length - 1) % channels.length]
+              if (event.key === 'Home') target = channels[0]
+              if (event.key === 'End') target = channels.at(-1)
+              if (target) { event.preventDefault(); setActiveChannel(target); document.getElementById(`channel-tab-${target}`)?.focus() }
+            }}
+            className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${activeChannel === channel ? 'bg-indigo-500 text-white' : 'border border-gray-700 text-gray-300 hover:bg-gray-800'}`}
+          >{channel === 'overview' ? 'Weekly overview' : platformName(channel)}</button>)}
+        </div>
+        {activeChannel !== 'overview' && <ChannelPanel platform={activeChannel} state={state} captions={captions} onReview={() => setActiveChannel('overview')} />}
+        <div role="tabpanel" id="channel-panel-overview" aria-labelledby="channel-tab-overview" hidden={activeChannel !== 'overview'}>
         {nextSlot && <p className="mt-5 text-sm text-gray-400">Next slot: <span className="font-medium text-white">{nextSlot.label} — {nextSlot.weekday}</span></p>}
 
         <main className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -267,7 +288,7 @@ export default function MarketingPage() {
             destinations={state.destinations}
             caption={captions[slot.slot_key] ?? slot.caption ?? ''}
             onCaptionChange={value => setCaptions(current => ({ ...current, [slot.slot_key]: value }))}
-            onEvaluate={() => setAssessmentSelection({ topic: `${slot.asset?.label || slot.label} · LinkedIn, Facebook, Instagram`, draft: captions[slot.slot_key] ?? slot.caption ?? '' })}
+            onEvaluate={() => setAssessmentSelection({ topic: `${slot.asset?.label || slot.label} · LinkedIn, Facebook, Instagram, Google Business Profile`, draft: captions[slot.slot_key] ?? slot.caption ?? '' })}
             onConfirm={() => confirm(slot)}
             onResolve={action => resolveMissedSlot(slot, action)}
             onCloseFailed={() => closeFailedSlot(slot)}
@@ -302,13 +323,14 @@ export default function MarketingPage() {
           <h2 id="marketing-preview-heading" className="mt-2 text-xl font-semibold text-white">{nextSlot?.asset?.label || 'CWS social post'}</h2>
           <p className="mt-2 text-sm leading-6 text-gray-400">Caption edits appear below immediately. Marketing never schedules or auto-publishes a missed slot.</p>
           {nextSlot?.asset ? <article className="mt-5 max-w-md overflow-hidden rounded-xl border border-gray-700 bg-white text-gray-900 shadow-xl shadow-black/20">
-            <div className="flex items-center gap-3 px-4 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0a66c2] text-sm font-bold text-white">CW</div><div><p className="text-sm font-semibold">Cicero Web Studio</p><p className="text-xs text-gray-500">Social · Preview</p></div></div>
-            <p data-testid="marketing-preview-caption" className="whitespace-pre-wrap px-4 pb-4 text-sm leading-6">{captions[nextSlot.slot_key] ?? nextSlot.caption ?? 'Your caption will appear here.'}</p>
+            <div className="flex items-center gap-3 px-4 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0a66c2] text-sm font-bold text-white">CW</div><div><p className="text-sm font-semibold text-gray-900">Cicero Web Studio</p><p className="text-xs text-gray-500">Social · Preview</p></div></div>
+            <p data-testid="marketing-preview-caption" className="whitespace-pre-wrap px-4 pb-4 text-sm leading-6 text-gray-900">{captions[nextSlot.slot_key] ?? nextSlot.caption ?? 'Your caption will appear here.'}</p>
             <div className="bg-gray-100"><img src={nextSlot.asset.asset_url || nextSlot.asset.asset_path} alt={`${nextSlot.asset.label} post preview`} className="block max-h-[34rem] w-full object-contain" /></div>
             <div className="border-t border-gray-200 px-4 py-3 text-xs font-medium text-gray-500">Like · Comment · Repost · Send</div>
           </article> : <p className="mt-5 text-sm text-amber-200">Add a verified CWS evergreen offer graphic to prepare a post.</p>}
         </section>
 
+        </div>
         <details className="mt-8 rounded-2xl border border-gray-800 bg-gray-900/50 p-5 sm:p-6">
           <summary className="cursor-pointer text-sm font-semibold text-gray-100">Evergreen offer library</summary>
           <p className="mt-2 text-sm leading-6 text-gray-400">Manage approved offers, images, and captions used by the owner-confirmed publishing flow.</p>
@@ -317,6 +339,36 @@ export default function MarketingPage() {
       </div>
     </div>
   )
+}
+
+function ChannelPanel({ platform, state, captions, onReview }) {
+  const destination = state.destinations.find(item => item.platform === platform)
+  const google = platform === 'GOOGLE_BUSINESS'
+  return <section role="tabpanel" id={`channel-panel-${platform}`} aria-labelledby={`channel-tab-${platform}`} className="mt-5 space-y-5">
+    <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
+      <h2 className="text-xl font-semibold">{platformName(platform)}</h2>
+      <p className="mt-2 text-sm text-gray-400">{google ? 'Regular updates on Google Search and Maps, with a Learn more button to your website.' : 'Preview your shared weekly post and check delivery for this channel.'}</p>
+      <div className="mt-4">{destination ? <DestinationVerification destination={destination} /> : <p className="text-amber-200">{state.loading ? 'Checking connection…' : 'Connection could not be verified. Refresh the page to try again.'}</p>}</div>
+      <p className="mt-4 text-sm text-gray-400">{google ? 'Post analytics are not available through bundle.social for Google. Profile totals and tracked website visits need a separate reporting connection.' : 'Delivery results appear below. Reach, engagement, and website visits are not connected yet.'}</p>
+      <button type="button" onClick={onReview} className="mt-4 rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold">Review shared post</button>
+    </div>
+    <div className="grid gap-6 lg:grid-cols-2">{state.slots.map(slot => {
+      const result = (slot.destination_results || []).find(item => item.platform === platform)
+      const caption = captions[slot.slot_key] ?? slot.caption ?? ''
+      return <article key={slot.slot_key} className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
+        <p className="text-sm font-semibold text-indigo-300">{slot.label} · {slot.weekday}</p>
+        <p className="mt-1 text-xs text-gray-400">{formatSlotDate(slot.slot_date)}</p>
+        {slot.asset ? <div className="mt-4 overflow-hidden rounded-xl bg-white text-gray-900">
+          <div className="p-4"><p className="font-semibold text-gray-900">Cicero Web Studio</p><p className="text-xs text-gray-500">{platformName(platform)} · Preview</p></div>
+          <img src={slot.asset.asset_url || slot.asset.asset_path} alt={`${slot.asset.label} ${platformName(platform)} preview`} className="max-h-80 w-full object-contain" />
+          <p className="whitespace-pre-wrap p-4 text-sm leading-6 text-gray-900">{caption}</p>
+          {google && <div className="border-t border-gray-200 p-4"><a href={GOOGLE_BUSINESS_CTA_URL} target="_blank" rel="noreferrer" className="font-medium text-blue-700">Learn more →</a><p className="mt-1 text-xs text-gray-500">cicerowebstudio.xyz</p></div>}
+        </div> : <p className="mt-4 text-gray-400">No post asset is ready for this slot.</p>}
+        {caption.trim().length > MARKETING_CAPTION_LIMIT && <p role="alert" className="mt-3 text-sm text-rose-300">Shorten the shared caption to 1,500 characters before publishing.</p>}
+        <div className="mt-4">{result ? <DestinationResult result={result} /> : <p className="text-sm text-gray-400">{slot.attempt ? (slot.attempt.required_platforms?.includes(platform) ? 'Awaiting a delivery result for this channel.' : 'This channel was not included in this earlier post.') : 'Not submitted. Confirm all four channels from Weekly overview.'}</p>}</div>
+      </article>
+    })}</div>
+  </section>
 }
 
 function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVisual, onRetryVisual, onApproveVisual, onEvaluate }) {
@@ -343,7 +395,7 @@ function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVis
           const key = `visual:${run.id}:${idea.id}`
           return <section key={idea.id} className="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
             <p className="font-medium text-white">{idea.title}</p><p className="mt-2 text-sm text-gray-300">{idea.hook}</p><p className="mt-3 text-xs leading-5 text-gray-500">Suggested caption: {idea.caption}</p>
-            <button type="button" onClick={() => onEvaluate({ topic: `${idea.title} · LinkedIn, Facebook, Instagram`, draft: asset ? assetCaptions[asset.id] ?? idea.caption : idea.caption })} className="mt-3 block text-sm text-indigo-300">Check this text with Laya</button>
+            <button type="button" onClick={() => onEvaluate({ topic: `${idea.title} · LinkedIn, Facebook, Instagram, Google Business Profile`, draft: asset ? assetCaptions[asset.id] ?? idea.caption : idea.caption })} className="mt-3 block text-sm text-indigo-300">Check this text with Laya</button>
             {!asset && <button type="button" disabled={Boolean(busy)} onClick={() => onGenerateVisual(run.id, idea.id)} className="mt-4 rounded-full border border-indigo-300/50 px-3 py-2 text-sm font-semibold text-indigo-100 disabled:opacity-45">{busy === key ? 'Creating visual…' : 'Create visual draft'}</button>}
             {asset && <VisualDraft asset={asset} idea={idea} caption={assetCaptions[asset.id] ?? idea.caption} busy={busy === `approve:${asset.id}`} retrying={busy === key} onCaptionChange={value => setAssetCaptions(current => ({ ...current, [asset.id]: value }))} onRetry={() => onRetryVisual(asset)} onApprove={() => onApproveVisual(asset, assetCaptions[asset.id] ?? idea.caption)} />}
           </section>
@@ -389,7 +441,7 @@ function OfferCatalog({ offers, saving, onSave, embedded = false }) {
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Offer catalog</p>
     <h2 id="offer-catalog-heading" className="mt-2 text-xl font-semibold text-white">Approved services and Marketing variations</h2>
     <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Offers stay as reference data. An active offer enters rotation only when it has an active English caption and an image you have explicitly confirmed works for LinkedIn, Facebook, and Instagram.</p>
-    <p className="mt-3 text-sm text-amber-100">{activeReady ? `${activeReady} offer${activeReady === 1 ? '' : 's'} can currently enter rotation.` : 'No catalog offer is active and three-channel ready yet; the current approved rotation remains in use.'}</p>
+    <p className="mt-3 text-sm text-amber-100">{activeReady ? `${activeReady} offer${activeReady === 1 ? '' : 's'} can currently enter rotation.` : 'No catalog offer is active and shared-channel ready yet; the current approved rotation remains in use.'}</p>
 
     <div className="mt-5 grid gap-3">{offers.map(item => <article key={item.id} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-semibold text-white">{item.name}</h3><p className="mt-1 text-sm text-gray-400">{item.description || 'No description yet.'}</p></div><span className="rounded-full border border-gray-700 px-2.5 py-1 text-xs font-semibold text-gray-300">{item.status}</span></div><p className="mt-3 text-sm text-indigo-100">{item.price_display || 'Pricing still needs wording.'}{item.default_project_type ? ` · Default project type: ${item.default_project_type}` : ''}</p><p className="mt-3 text-xs text-gray-500">{item.media.length} image variation{item.media.length === 1 ? '' : 's'} · {item.captions.length} caption variation{item.captions.length === 1 ? '' : 's'}</p><button type="button" onClick={() => setOffer({ id: item.id, name: item.name, description: item.description || '', price_mode: item.price_mode, price: centsToDollars(item.price_cents), price_display_override: item.price_display_override || '', default_project_type: item.default_project_type || '', status: item.status })} className="mt-3 rounded-full border border-white/20 px-3 py-2 text-sm font-semibold text-white">Edit offer</button></article>)}</div>
 
@@ -398,7 +450,7 @@ function OfferCatalog({ offers, saving, onSave, embedded = false }) {
 
       <form onSubmit={saveMedia} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add image variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">The image must already exist in this deployed build under <code>/images/</code>. Compatibility is your explicit one-time confirmation; no image is uploaded here.</p><CatalogOfferSelect ariaLabel="Media offer" offers={offers} value={media.offer_id} onChange={value => setMedia(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Image path<input aria-label="Offer image path" required value={media.storage_path} onChange={event => setMedia(current => ({ ...current, storage_path: event.target.value }))} placeholder="/images/my-offer.png" className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><CompatibilityChecks media={media} onChange={setMedia} /><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer image status" value={media.status} onChange={event => setMedia(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save image variation'}</button></form>
 
-      <form onSubmit={saveCaption} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add caption variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">Only active English captions may enter the current three-channel rotation. Saving this text never creates a post.</p><CatalogOfferSelect ariaLabel="Caption offer" offers={offers} value={caption.offer_id} onChange={value => setCaption(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Locale<select aria-label="Caption locale" value={caption.locale} onChange={event => setCaption(current => ({ ...current, locale: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="en">English</option><option value="es">Spanish</option></select></label><label className="mt-3 block text-xs text-gray-400">Caption<textarea aria-label="Offer caption body" required value={caption.body} onChange={event => setCaption(current => ({ ...current, body: event.target.value }))} rows={5} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer caption status" value={caption.status} onChange={event => setCaption(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save caption variation'}</button></form>
+      <form onSubmit={saveCaption} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add caption variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">Only active English captions may enter the current shared-channel rotation. Saving this text never creates a post.</p><CatalogOfferSelect ariaLabel="Caption offer" offers={offers} value={caption.offer_id} onChange={value => setCaption(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Locale<select aria-label="Caption locale" value={caption.locale} onChange={event => setCaption(current => ({ ...current, locale: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="en">English</option><option value="es">Spanish</option></select></label><label className="mt-3 block text-xs text-gray-400">Caption<textarea aria-label="Offer caption body" required value={caption.body} onChange={event => setCaption(current => ({ ...current, body: event.target.value }))} rows={5} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer caption status" value={caption.status} onChange={event => setCaption(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save caption variation'}</button></form>
     </div>
   </section>
 }
@@ -430,7 +482,7 @@ function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, o
       {fallback && <p className="mt-2 text-xs leading-5 text-gray-500">No priced CWS offer creative is currently available in the repository. Add one to replace this fallback in rotation.</p>}
       <label htmlFor={`${slot.key}-caption`} className="mt-5 block text-sm font-medium text-gray-200">Caption</label>
       <textarea id={`${slot.key}-caption`} aria-label={`${slot.label} caption`} value={caption} onChange={event => onCaptionChange(event.target.value)} rows={4} disabled={locked} className="mt-2 w-full resize-y rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm leading-6 text-white outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 disabled:cursor-not-allowed disabled:opacity-60" />
-      <p className="mt-2 text-right text-xs text-gray-500">{caption.length} characters</p>
+      <p className="mt-2 text-right text-xs text-gray-500">{caption.length} / {MARKETING_CAPTION_LIMIT} characters · shared Google limit</p>
       <button type="button" onClick={onEvaluate} disabled={!caption.trim()} className="mt-3 text-sm text-indigo-300 disabled:opacity-50">Check this caption with Laya</button>
     </> : <div className="mt-5 rounded-xl border border-dashed border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">No eligible evergreen asset is available for this slot yet.</div>}
     <section aria-label={`${slot.label} destinations`} className="mt-5 rounded-xl border border-gray-800 bg-gray-950/60 p-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Destinations</p><div className="mt-3 space-y-2">{destinations.map(destination => <DestinationVerification key={destination.platform} destination={destination} />)}</div></section>
@@ -440,7 +492,7 @@ function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, o
       <button type="button" disabled={!canResolve || confirming || resolving} onClick={() => onResolve('move')} className="rounded-xl border border-indigo-400/50 px-4 py-3 text-sm font-semibold text-indigo-100 transition hover:bg-indigo-400/10 disabled:cursor-not-allowed disabled:opacity-45">{resolving ? 'Saving…' : 'Move to next slot'}</button>
       <button type="button" disabled={!canResolve || confirming || resolving} onClick={() => onResolve('skip')} className="rounded-xl border border-gray-700 px-4 py-3 text-sm font-semibold text-gray-200 transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-45">Skip</button>
     </div> : slot.state === 'failed' ? <button type="button" disabled={!canCloseFailed || resolving} onClick={onCloseFailed} className="mt-6 w-full rounded-xl border border-rose-400/50 px-4 py-3 text-sm font-semibold text-rose-100 transition hover:bg-rose-400/10 disabled:cursor-not-allowed disabled:opacity-45">{resolving ? 'Closing…' : 'Close failed slot'}</button> : <button type="button" disabled={!canConfirm || confirming} onClick={onConfirm} className="mt-6 w-full rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-45">{confirming ? 'Starting post…' : slot.state === 'resolved' ? 'Decision recorded' : slot.attempt ? 'Slot locked' : slot.asset && !slot.owner_confirmation_token ? 'Awaiting prior slot' : slot.asset ? `Confirm ${slot.label}` : 'Assets required'}</button>}
-    <p className="mt-2 text-center text-xs text-gray-500">{slot.state === 'failed' ? 'No destination was published. Closing preserves this failed attempt, does not retry it, and unlocks the next slot.' : slot.state === 'resolved' ? detail.detail : slot.attempt ? 'This slot is locked to its durable Marketing attempt. Posted destinations are never republished.' : slot.state === 'missed' ? 'Publish now still requires the exact owner confirmation. Move and Skip are internal decisions only.' : slot.asset && !slot.owner_confirmation_token ? 'This slot needs its own owner confirmation after the prior slot is complete.' : slot.asset ? 'Confirm is the single human authorization for LinkedIn, Facebook, and Instagram.' : detail.detail}</p>
+    <p className="mt-2 text-center text-xs text-gray-500">{slot.state === 'failed' ? 'No destination was published. Closing preserves this failed attempt, does not retry it, and unlocks the next slot.' : slot.state === 'resolved' ? detail.detail : slot.attempt ? 'This slot is locked to its durable Marketing attempt. Posted destinations are never republished.' : slot.state === 'missed' ? 'Publish now still requires the exact owner confirmation. Move and Skip are internal decisions only.' : slot.asset && !slot.owner_confirmation_token ? 'This slot needs its own owner confirmation after the prior slot is complete.' : slot.asset ? 'Confirm is the single human authorization for LinkedIn, Facebook, Instagram, and Google Business Profile.' : detail.detail}</p>
   </section>
 }
 
@@ -464,10 +516,10 @@ function AttemptHistory({ attempt }) {
   return <div className="rounded-lg border border-gray-800 bg-gray-950/60 p-3"><p className="font-medium text-white">Provider status: {detail.label}</p>{attempt.provider_error && <p className="mt-2 text-amber-200">{attempt.provider_error}</p>}{attempt.provider_permalink && <a className="mt-2 inline-block text-indigo-300 hover:text-indigo-200" href={attempt.provider_permalink} target="_blank" rel="noreferrer">Open LinkedIn post →</a>}<p className="mt-2 text-xs text-gray-500">Preserved as audit history.</p></div>
 }
 
-function canConfirmSlot(state, slot, caption) { return Boolean(state.storageReady && ['ready', 'missed'].includes(slot.state) && slot.asset && slot.owner_confirmation_token && !slot.attempt && state.destinations.length === 3 && state.destinations.every(destination => destination.verification_state === 'verified') && caption.trim() && caption.trim().length <= 3000) }
-function canResolveMissedSlot(state, slot, caption) { return Boolean(state.storageReady && slot.state === 'missed' && slot.asset && slot.owner_confirmation_token && !slot.attempt && caption.trim() && caption.trim().length <= 3000) }
+function canConfirmSlot(state, slot, caption) { return Boolean(state.storageReady && ['ready', 'missed'].includes(slot.state) && slot.asset && slot.owner_confirmation_token && !slot.attempt && marketingDestinationsVerified(state.destinations) && caption.trim() && caption.trim().length <= MARKETING_CAPTION_LIMIT) }
+function canResolveMissedSlot(state, slot, caption) { return Boolean(state.storageReady && slot.state === 'missed' && slot.asset && slot.owner_confirmation_token && !slot.attempt && caption.trim() && caption.trim().length <= MARKETING_CAPTION_LIMIT) }
 function canCloseFailedSlot(state, slot) { return Boolean(state.storageReady && slot.state === 'failed' && slot.asset && slot.owner_confirmation_token && slot.attempt?.provider_status === 'error') }
 function formatSlotDate(date) { return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`)) }
-function platformName(platform) { return platform === 'LINKEDIN' ? 'LinkedIn' : platform === 'FACEBOOK' ? 'Facebook' : 'Instagram' }
+function platformName(platform) { return marketingPlatformName(platform) }
 function requestMarketing(path, accessToken, body) { return fetch(path, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${accessToken}`, ...(body ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }) }
 async function readJson(response) { try { return await response.json() } catch { return {} } }
