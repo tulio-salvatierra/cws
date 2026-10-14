@@ -10,7 +10,7 @@ vi.mock('node:fs/promises', async importOriginal => ({ ...(await importOriginal(
 import handler, { createOwnerConfirmationToken } from '../marketing-linkedin'
 
 const verifiedAccounts = [
-  { type: 'GOOGLE_BUSINESS', displayName: 'Cicero Web Studio', providerPageId: 'locations/cws', channels: [{ id: 'locations/cws', name: 'Cicero Web Studio' }] },
+  { type: 'GOOGLE_BUSINESS', displayName: 'Cicero Web Studio', providerPageId: 'accounts/106728007753404552034/locations/17433452900398137275', channels: [{ id: 'accounts/106728007753404552034/locations/17433452900398137275', name: 'Cicero Web Studio' }] },
   { type: 'LINKEDIN', userDisplayName: 'Cicero Web Studio', userUsername: 'cicero-web-studio' },
   { type: 'FACEBOOK', displayName: 'Cicero Web Studio', username: 'Cicero Web Studio' },
   { type: 'INSTAGRAM', displayName: 'cicerowebstudio', username: 'cicerowebstudio' },
@@ -141,12 +141,27 @@ describe('M5 Marketing endpoint', () => {
     { displayName: 'Cicero Web Studio' },
     { displayName: 'Cicero Web Studio', providerPageId: 'missing', channels: [{ id: 'cws', name: 'Cicero Web Studio' }] },
     { displayName: 'Cicero Web Studio', providerPageId: 'other', channels: [{ id: 'other', name: 'Other Business' }, { id: 'cws', name: 'Cicero Web Studio' }] },
+    { displayName: 'Cicero Web Studio', channels: [{ id: 'accounts/1/locations/2', name: 'Cicero Web Studio' }, { id: 'accounts/1/locations/3', name: 'Cicero Web Studio' }] },
+    { displayName: 'Cicero Web Studio', channels: [{ id: 'accounts/1/locations/2', name: 'Cicero Web Studio' }] },
+    { displayName: 'Other Business', channels: [{ id: 'accounts/1/locations/2', name: 'Cicero Web Studio' }] },
+    { displayName: 'Cicero Web Studio', channels: [{ id: 'accounts/1/locations/2', name: 'Other Business' }] },
   ])('does not verify an absent or wrong selected Google location: %j', async account => {
     const database = createDatabase(); createClientMock.mockReturnValue(database.client)
     globalThis.fetch.mockResolvedValueOnce(providerResponse(200, { type: 'GOOGLE_BUSINESS', ...account }))
     verifiedAccounts.slice(1).forEach(value => globalThis.fetch.mockResolvedValueOnce(providerResponse(200, value)))
     const response = makeResponse(); await handler(request(), response)
     expect(response.body.destinations.find(value => value.platform === 'GOOGLE_BUSINESS').verification_state).toBe('not_verified')
+  })
+
+  it('verifies the sole matching Google location when bundle.social omits providerPageId', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client)
+    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, {
+      type: 'GOOGLE_BUSINESS', displayName: 'Cicero Web Studio',
+      channels: [{ id: 'accounts/106728007753404552034/locations/17433452900398137275', name: 'Cicero Web Studio' }],
+    }))
+    verifiedAccounts.slice(1).forEach(value => globalThis.fetch.mockResolvedValueOnce(providerResponse(200, value)))
+    const response = makeResponse(); await handler(request(), response)
+    expect(response.body.destinations.find(value => value.platform === 'GOOGLE_BUSINESS')).toEqual(expect.objectContaining({ verification_state: 'verified', channel_name: 'Cicero Web Studio' }))
   })
 
   it('requires authentication before provider discovery', async () => {
@@ -259,7 +274,12 @@ describe('M5 Marketing endpoint', () => {
   })
 
   it('creates only Post A from one confirmed Post A request and locks a duplicate request', async () => {
-    const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts(); readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); readFile.mockResolvedValue(new Uint8Array([1, 2, 3]))
+    globalThis.fetch.mockResolvedValueOnce(providerResponse(200, {
+      type: 'GOOGLE_BUSINESS', displayName: 'Cicero Web Studio',
+      channels: [{ id: 'accounts/106728007753404552034/locations/17433452900398137275', name: 'Cicero Web Studio' }],
+    }))
+    verifiedAccounts.slice(1).forEach(value => globalThis.fetch.mockResolvedValueOnce(providerResponse(200, value)))
     globalThis.fetch
       .mockResolvedValueOnce(providerResponse(200, { uploadId: 'upload-1' }))
       .mockResolvedValueOnce(providerResponse(200, { id: 'bundle-post-1', status: 'PROCESSING', externalData: {} }))
@@ -267,6 +287,7 @@ describe('M5 Marketing endpoint', () => {
     expect(response.statusCode).toBe(202)
     expect(database.state.attemptInserts).toEqual([expect.objectContaining({ destination: 'multi:cicero-web-studio', marketing_slot_key: m5SlotKey, asset_id: 'website-launch', asset_path: '/images/en-launch.png' })])
     expect(database.state.destinationInserts).toHaveLength(4)
+    expect(database.state.destinationInserts.find(value => value.platform === 'GOOGLE_BUSINESS').provider_identity.provider_page_id).toBe('accounts/106728007753404552034/locations/17433452900398137275')
     expect(database.state.attemptInserts[0].required_platforms).toEqual(['LINKEDIN', 'FACEBOOK', 'INSTAGRAM', 'GOOGLE_BUSINESS'])
     const createCall = globalThis.fetch.mock.calls.find(([url, options]) => url.endsWith('/post') && options?.method === 'POST')
     expect(JSON.parse(createCall[1].body)).toMatchObject({ socialAccountTypes: ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM', 'GOOGLE_BUSINESS'], data: { GOOGLE_BUSINESS: { topicType: 'STANDARD', languageCode: 'en', text: 'M5 caption.', uploadIds: ['upload-1'], callToActionType: 'LEARN_MORE', callToActionUrl: 'https://cicerowebstudio.xyz/' }, LINKEDIN: { uploadIds: ['upload-1'] }, FACEBOOK: { type: 'POST', uploadIds: ['upload-1'] }, INSTAGRAM: { type: 'POST', uploadIds: ['upload-1'] } } })

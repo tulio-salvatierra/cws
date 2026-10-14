@@ -1,67 +1,37 @@
-Task ID: CWS-MARKETING-M6
+Task ID: CWS-MARKETING-GBP-20261013
 Agent: Codex
-Objective: Add owner-controlled handling for weekly Marketing slots whose local scheduled day passed without a successful publication, without altering frozen M5 publishing behavior or creating external activity.
+Objective: Release Google Business Profile as a fourth owner-confirmed Marketing destination and verify the live channel tabs.
 Files inspected:
-- `.agents/codex-project-instructions.md`
-- `docs/product-definition.md`
-- `docs/technical-conventions.md`
-- `docs/decisions.md`
-- `docs/learnings.md`
-- `docs/project-log.md`
-- `docs/task-ledger.md`
-- `src/marketing/weeklySlots.js`
-- `src/pages/admin/MarketingPage.jsx`
-- `api/marketing-linkedin.js`
-- Existing Marketing migrations and tests
+- `api/marketing-linkedin.js`, `api/__tests__/marketing-linkedin.test.js`, `src/marketing/channels.js`, Marketing UI and tests, the Google migration, project conventions, and project memory.
 Files changed:
-- `src/marketing/weeklySlots.js`
-- `src/marketing/__tests__/weeklySlots.test.js`
-- `src/pages/admin/MarketingPage.jsx`
-- `src/pages/admin/__tests__/MarketingPage.test.jsx`
-- `api/marketing-linkedin.js`
-- `api/__tests__/marketing-linkedin.test.js`
-- `supabase/migrations/20260909034637_marketing_missed_slot_resolutions.sql`
-- `supabase/tests/marketing_missed_slot_resolutions_test.sql`
-- `docs/agent-handoffs/latest-codex.md`
-- `docs/project-log.md`
-- `docs/task-ledger.md`
-- `docs/decisions.md`
-- `docs/learnings.md`
+- `api/marketing-linkedin.js`, `api/__tests__/marketing-linkedin.test.js`, `docs/agent-handoffs/latest-codex.md`, `docs/project-log.md`, `docs/task-ledger.md`.
 Database or API changes:
-- Applied Production migration `20260909034637_marketing_missed_slot_resolutions`; it has RLS, no browser grants/policies, and only `SELECT, INSERT` for `service_role`.
-- GET returns a narrow read-only missed-slot signal and decision history. It continues to reconcile only non-terminal pre-existing publish attempts.
-- POST `move` and `skip` are owner-authenticated internal decisions that bypass provider verification and create no provider request. Publish now stays on the pre-existing M5 exact-slot signed-capability publishing path.
+- Production migration `20261012110804_marketing_google_business.sql` was applied. It adds Google destination support and per-attempt required platforms without changing historical three-channel attempts.
+- The owner-only Marketing API recognizes the observed sole CWS Google location when bundle.social omits `providerPageId`, pins verification to its exact Google location ID, and records that ID in destination identity.
 Security decisions:
-- DEC-029 approved: derive missed state from calendar/outcomes and persist only explicit immutable owner decisions.
-- Move/Skip require the same owner/slot/asset signed capability and are restricted to the oldest unresolved missed occurrence. A unique target-slot index prevents two moves occupying a target.
+- A missing selected-location ID is accepted only for one available location with the exact CWS Google ID and matching account/location names. Other locations, multiple locations, or identity mismatches fail closed. Publishing still requires the existing exact-slot owner confirmation.
 Decisions made:
-- M6 takes effect from the current Marketing calendar and does not retroactively classify frozen M0–M5 history as missed.
+- No social post was submitted during release verification.
 Assumptions:
-- Existing `America/Chicago` calendar behavior is the CWS business timezone.
+- The Google location returned by the connected production bundle.social team is the intended CWS destination.
 Tests added:
-- Date-boundary, reload, oldest-first, move/skip preservation, rotation, historical-record, UI, exact-slot authorization, and no-provider-mutation M6 coverage.
-- SQL security/constraint coverage for the new immutable resolution table.
+- Verified missing-selection single-location case and wrong/ambiguous Google location cases; confirmed persisted identity on a simulated publish.
 Tests run:
-- `npm run test:run` — 155 tests passed.
-- `npm run lint` — zero errors; existing unrelated `src/Hooks/useDrafts.js` warning remains.
-- `npm run build` — passed, including import-casing validation.
+- `npm run test:run` — 433 passed; `npm run lint` and `npm run build` passed.
+- Authenticated, read-only Production UI check showed all four destinations verified, tabs present, Post A reviewable, and Post B awaiting the prior slot.
 Known issues:
-- None for M6. Existing lint warning and Vite bundle-size warnings are unrelated to this scope.
+- No real four-channel post was sent, so provider publication and per-channel result ingestion remain unproven until an owner confirms a real post.
 Recommended next task:
-- None. M6 is complete and frozen; any new Marketing capability requires a separate scoped task.
+- Owner reviews Post A caption/image and uses Confirm Post A when ready; then inspect provider results and permalinks for all four channels.
 Questions requiring Tulio:
-- None.
+- None for deployment. Actual posting remains an explicit owner action.
 Project-memory files updated:
-- `docs/agent-handoffs/latest-codex.md`
-- `docs/project-log.md`
-- `docs/task-ledger.md`
-- `docs/decisions.md`
-- `docs/learnings.md`
+- `docs/agent-handoffs/latest-codex.md`, `docs/project-log.md`, `docs/task-ledger.md`.
 Permanent decisions added:
-- DEC-029 — Marketing missed occurrences are calendar-derived and owner-resolved.
+- None.
 Reusable learnings added:
-- Derive time-based state; persist only the owner decision.
+- None.
 Memory updates withheld:
 - None.
 Git diff summary:
-- M6 adds isolated Marketing missed-slot calculation, immutable resolution storage, owner-facing decision controls, focused tests, and the documentation above. Pre-existing M5 implementation, asset, migration, test, and documentation changes remain in the working tree and were preserved.
+- Targeted Google account verification/tests and project memory changed. Existing unrelated dirty files under tools, artifacts, output, client-project types, and a separate migration were left untouched.

@@ -1978,3 +1978,16 @@ remain two leads, zero promised actions, 16 outreach records, five Marketing
 attempts, and nine Marketing destination results. No email, upload, social
 post, or publication attempt was created. All 141 tests, lint, import-casing
 validation, production build, and diff validation pass.
+
+## 2026-10-13 — CWS-MARKETING-GBP-20261013 Google Business release
+
+The Google Business migration was applied to Production and historical
+three-channel attempts retained their required-platform list. The four-channel
+Marketing build and channel tabs were deployed. A read-only owner session showed
+that bundle.social omits `providerPageId` despite returning one connected CWS
+Google location. The API now verifies that exact Google location ID and name
+when it is the sole available location; another or ambiguous location fails
+closed. The live Marketing page shows Google Business Profile, LinkedIn,
+Facebook, and Instagram verified, with Post A reviewable and Post B awaiting
+its own later owner confirmation. No post was created during verification.
+All 433 tests, lint, import-casing validation, and build pass.

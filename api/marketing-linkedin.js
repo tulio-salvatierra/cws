@@ -14,6 +14,7 @@ export const MARKETING_POLL_INTERVAL_MS = 30_000
 export const OWNER_CONFIRMATION_TTL_MS = 10 * 60 * 1000
 
 const PROVIDER_BASE_URL = 'https://api.bundle.social/api/v1'
+const CWS_GOOGLE_LOCATION_ID = 'accounts/106728007753404552034/locations/17433452900398137275'
 const M4_DESTINATION = 'multi:cicero-web-studio'
 const REFERENCE_KEY_PATTERN = /^cws-marketing(?:-(?:linkedin|m4|m5))?:[0-9a-f-]{36}$/i
 const SLOT_KEY_PATTERN = /^[0-9]{4}-[0-9]{2}-[0-9]{2}:post-[ab]$/
@@ -543,10 +544,20 @@ function allDestinationsVerified(destinations) {
 
 function matchesCwsGoogleLocation(account) {
   const locationId = optionalText(account?.providerPageId)
-  if (!locationId) return false
-  const selected = account.channels?.find(channel => channel.id === locationId)
-  if (account.channels?.length && !selected) return false
-  return normalizeIdentifier(selected?.name || account.displayName) === 'cicerowebstudio'
+  const channels = Array.isArray(account?.channels) ? account.channels : []
+  if (locationId) {
+    if (locationId !== CWS_GOOGLE_LOCATION_ID) return false
+    const selected = channels.find(channel => channel.id === locationId)
+    if (channels.length && !selected) return false
+    return normalizeIdentifier(selected?.name || account.displayName) === 'cicerowebstudio'
+  }
+  // bundle.social omits providerPageId for a connected profile with a single
+  // available location. Require that sole location's exact Google ID and both
+  // names to match; an ambiguous or different account remains unverified.
+  return channels.length === 1
+    && channels[0]?.id === CWS_GOOGLE_LOCATION_ID
+    && normalizeIdentifier(channels[0]?.name) === 'cicerowebstudio'
+    && normalizeIdentifier(account?.displayName) === 'cicerowebstudio'
 }
 
 function matchesCwsCompanyPage(account) {
@@ -586,7 +597,8 @@ function providerIdentity(account) {
   if (!account) return {}
   return {
     type: optionalText(account.type),
-    provider_page_id: optionalText(account.providerPageId),
+    provider_page_id: optionalText(account.providerPageId)
+      || (account.type === 'GOOGLE_BUSINESS' && account.channels?.length === 1 ? optionalText(account.channels[0]?.id) : null),
     display_name: optionalText(account.displayName),
     username: optionalText(account.username),
     user_display_name: optionalText(account.userDisplayName),
