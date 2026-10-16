@@ -6,8 +6,9 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import { Buffer } from 'node:buffer'
 import { createClient } from '@supabase/supabase-js'
 import { buildMarketingOccurrencePlan, EVERGREEN_ASSETS, isFailedWithoutPublication, nextOpenMarketingSlot } from '../src/marketing/weeklySlots.js'
-import { MARKETING_PLATFORMS, MARKETING_CAPTION_LIMIT, GOOGLE_BUSINESS_CTA_URL } from '../src/marketing/channels.js'
+import { MARKETING_PLATFORMS, MARKETING_CAPTION_LIMIT, GOOGLE_BUSINESS_CTA_URL, marketingPlatformName } from '../src/marketing/channels.js'
 import { buildOfferCatalog } from '../server/marketing/offer-catalog.js'
+import { CATALOG_CAPTION_PLATFORMS, PLATFORM_CAPTION_LIMITS, effectivePlatformCaptions, normalizePlatformOverrides, platformCaptionError, platformCaptionTexts } from '../src/marketing/platformCaptions.js'
 
 export const MARKETING_ENDPOINT_TIMEOUT_MS = 10_000
 export const MARKETING_POLL_INTERVAL_MS = 30_000
@@ -116,6 +117,11 @@ async function createMarketingPost(res, client, context, destinations, body) {
   if (existing.error) return databaseFailure(res, existing.error)
   if (existing.data) return respondWithExistingAttempt(res, client, existing.data)
 
+  // The exact text each destination receives is fixed here, persisted before
+  // any provider request, and is immutable on the attempt afterwards.
+  const destinationCaptions = effectivePlatformCaptions(body.caption, body.platform_captions)
+  const platformCaptionRecord = buildPlatformCaptionRecord(destinationCaptions, slot.asset)
+
   const inserted = await client
     .from('marketing_publish_attempts')
     .insert({
@@ -130,6 +136,7 @@ async function createMarketingPost(res, client, context, destinations, body) {
       offer_caption_id: slot.asset.offerCaptionId || null,
       destination: M4_DESTINATION,
       required_platforms: MARKETING_PLATFORMS,
+      platform_captions: platformCaptionRecord,
       marketing_slot_key: slot.slotKey,
       provider_status: 'preparing',
       provider_external_data: {},
@@ -153,7 +160,7 @@ async function createMarketingPost(res, client, context, destinations, body) {
 
   try {
     const upload = await uploadAsset(client, slot.asset)
-    const createdPost = await createProviderPost(body.caption.trim(), body.reference_key, upload.id)
+    const createdPost = await createProviderPost(destinationCaptions, body.reference_key, upload.id)
     const persisted = await persistProviderPost(client, attempt, prepared.data, createdPost, upload.id)
     if (persisted.error) return databaseFailure(res, persisted.error)
     return res.status(202).json({ ok: true })
@@ -284,7 +291,11 @@ function normalizeOfferCaption(value) {
   if (!body || body.length > 3000) return { error: 'Caption text is required and must be 3,000 characters or fewer.' }
   if (!['en', 'es'].includes(value.locale)) return { error: 'Choose English or Spanish.' }
   if (!['draft', 'active', 'retired'].includes(value.status)) return { error: 'Choose a valid caption status.' }
-  return { data: { offer_id: value.offer_id, body, locale: value.locale, status: value.status } }
+  const platform = value.platform === undefined || value.platform === null || value.platform === '' ? null : value.platform
+  if (platform !== null && !Object.hasOwn(CATALOG_CAPTION_PLATFORMS, platform)) return { error: 'Choose Shared, Meta, LinkedIn, or Google Business Profile.' }
+  const limit = platform ? Math.min(...CATALOG_CAPTION_PLATFORMS[platform].map(target => PLATFORM_CAPTION_LIMITS[target])) : 3000
+  if (body.length > limit) return { error: `This caption must be ${limit.toLocaleString('en-US')} characters or fewer for its channel.` }
+  return { data: { offer_id: value.offer_id, body, locale: value.locale, platform, status: value.status } }
 }
 
 // Move and Skip are internal Marketing decisions. They deliberately run before
@@ -723,7 +734,17 @@ function assetFilename(asset) {
   return asset.assetSource === 'generated' ? `${asset.offerId || 'marketing'}-creative.png` : asset.assetPath.split('/').at(-1)
 }
 
-async function createProviderPost(caption, referenceKey, uploadId) {
+// Records which catalog caption each destination text came from. A text the
+// owner edited keeps no source id, so rotation history reflects real usage.
+function buildPlatformCaptionRecord(destinationCaptions, asset) {
+  const defaults = asset?.platformCaptionDefaults || {}
+  return Object.fromEntries(Object.entries(destinationCaptions).map(([platform, text]) => {
+    const source = defaults[platform]
+    return [platform, { text, offer_caption_id: source && source.text.trim() === text ? source.offerCaptionId : null }]
+  }))
+}
+
+async function createProviderPost(captions, referenceKey, uploadId) {
   const body = await providerRequest('/post', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -735,10 +756,10 @@ async function createProviderPost(caption, referenceKey, uploadId) {
       referenceKey,
       socialAccountTypes: MARKETING_PLATFORMS,
       data: {
-        GOOGLE_BUSINESS: { topicType: 'STANDARD', languageCode: 'en', text: caption, uploadIds: [uploadId], callToActionType: 'LEARN_MORE', callToActionUrl: GOOGLE_BUSINESS_CTA_URL },
-        LINKEDIN: { text: caption, uploadIds: [uploadId] },
-        FACEBOOK: { type: 'POST', text: caption, uploadIds: [uploadId] },
-        INSTAGRAM: { type: 'POST', text: caption, uploadIds: [uploadId] },
+        GOOGLE_BUSINESS: { topicType: 'STANDARD', languageCode: 'en', text: captions.GOOGLE_BUSINESS, uploadIds: [uploadId], callToActionType: 'LEARN_MORE', callToActionUrl: GOOGLE_BUSINESS_CTA_URL },
+        LINKEDIN: { text: captions.LINKEDIN, uploadIds: [uploadId] },
+        FACEBOOK: { type: 'POST', text: captions.FACEBOOK, uploadIds: [uploadId] },
+        INSTAGRAM: { type: 'POST', text: captions.INSTAGRAM, uploadIds: [uploadId] },
       },
     }),
   })
@@ -806,6 +827,7 @@ function serializeAttempt(attempt) {
     id: attempt.id,
     reference_key: attempt.reference_key,
     caption: attempt.caption,
+    platform_captions: platformCaptionTexts(attempt.platform_captions),
     asset_id: attempt.asset_id || null,
     asset_path: attempt.asset_path,
     destination: attempt.destination,
@@ -855,6 +877,7 @@ function serializeSlot(slot, ownerConfirmationToken = null) {
       fallback: slot.asset.fallback === true,
     } : null,
     caption: slot.caption,
+    platform_captions: slot.platformCaptions || {},
     owner_confirmation_token: ownerConfirmationToken,
     attempt: serializeAttempt(slot.attempt),
     destination_results: slot.destinationResults.map(serializeDestinationResult),
@@ -959,8 +982,14 @@ function validatePublishRequest(body) {
   if (typeof body.asset_id !== 'string' || !body.asset_id.trim()) return 'A valid evergreen asset is required.'
   if (typeof body.owner_confirmation_token !== 'string' || body.owner_confirmation_token.length > 1024) return 'A valid owner confirmation is required.'
   if (typeof body.caption !== 'string' || !body.caption.trim()) return 'A caption is required.'
-  if (body.caption.trim().length > MARKETING_CAPTION_LIMIT) return 'Caption must be 1,500 characters or fewer for Google Business Profile.'
-  return ''
+  if (body.caption.trim().length > 3000) return 'The shared caption must be 3,000 characters or fewer.'
+  if (body.platform_captions !== undefined && body.platform_captions !== null) {
+    if (!isPlainObject(body.platform_captions)) return 'Channel captions must be provided per channel.'
+    const unknown = Object.keys(body.platform_captions).filter(key => !MARKETING_PLATFORMS.includes(key))
+    if (unknown.length) return 'Channel captions may only target LinkedIn, Facebook, Instagram, or Google Business Profile.'
+    if (Object.values(body.platform_captions).some(value => typeof value !== 'string')) return 'Each channel caption must be text.'
+  }
+  return platformCaptionError(body.caption, normalizePlatformOverrides(body.platform_captions), marketingPlatformName) || ''
 }
 
 function isSlotResolutionRequest(body) {

@@ -81,3 +81,36 @@ describe('Marketing Offer Catalog', () => {
     expect(offerPriceDisplay({ ...offer, price_mode: 'by_scope', price_cents: null })).toBe('Price by scope')
   })
 })
+
+describe('per-platform caption variants', () => {
+  const platformCaptions = [
+    ...captions,
+    { id: 'linkedin-old', offer_id: 'offer-a', locale: 'en', platform: 'linkedin', body: 'LinkedIn A.', status: 'active', created_at: '2026-09-01T12:00:00.000Z' },
+    { id: 'linkedin-new', offer_id: 'offer-a', locale: 'en', platform: 'linkedin', body: 'LinkedIn B.', status: 'active', created_at: '2026-09-02T12:00:00.000Z' },
+    { id: 'google-draft', offer_id: 'offer-a', locale: 'en', platform: 'google_business', body: 'Draft Google.', status: 'draft', created_at: '2026-09-01T12:00:00.000Z' },
+    { id: 'meta-only', offer_id: 'offer-a', locale: 'en', platform: 'meta', body: 'Meta.', status: 'active', created_at: '2026-09-01T12:00:00.000Z' },
+  ]
+
+  it('keeps channel variants out of the shared rotation and maps Meta to Facebook and Instagram', () => {
+    const catalog = buildOfferCatalog({ offers: [offer], media, captions: platformCaptions, attempts: [] })
+    const [asset] = catalog.assets
+    expect(asset.offerCaptionId).toBe('caption-old')
+    expect(asset.platformCaptionDefaults).toEqual({
+      LINKEDIN: { text: 'LinkedIn A.', offerCaptionId: 'linkedin-old' },
+      FACEBOOK: { text: 'Meta.', offerCaptionId: 'meta-only' },
+      INSTAGRAM: { text: 'Meta.', offerCaptionId: 'meta-only' },
+    })
+  })
+
+  it('rotates a channel variant least-recently-used from what each destination actually received', () => {
+    const attempts = [successfulAttempt({ offer_id: 'offer-a', offer_media_id: 'media-old', offer_caption_id: 'caption-old', platform_captions: { LINKEDIN: { text: 'LinkedIn A.', offer_caption_id: 'linkedin-old' } } })]
+    const catalog = buildOfferCatalog({ offers: [offer], media, captions: platformCaptions, attempts })
+    const active = catalog.assets.find(asset => asset.enabled)
+    expect(active.platformCaptionDefaults.LINKEDIN).toEqual({ text: 'LinkedIn B.', offerCaptionId: 'linkedin-new' })
+  })
+
+  it('serializes each catalog caption with its channel', () => {
+    const catalog = buildOfferCatalog({ offers: [offer], media, captions: platformCaptions, attempts: [] })
+    expect(catalog.offers[0].captions.map(caption => [caption.id, caption.platform])).toEqual(expect.arrayContaining([['caption-old', null], ['linkedin-old', 'linkedin'], ['meta-only', 'meta']]))
+  })
+})

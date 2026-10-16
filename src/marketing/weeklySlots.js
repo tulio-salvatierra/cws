@@ -1,3 +1,4 @@
+import { platformCaptionTexts } from './platformCaptions.js'
 import { MARKETING_PLATFORMS } from './channels.js'
 export const CHICAGO_TIME_ZONE = 'America/Chicago'
 
@@ -167,6 +168,9 @@ function buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, incl
       slotDate,
       asset,
       caption: attempt?.caption || carriedResolution?.caption || resolution?.caption || asset?.defaultCaption || '',
+      platformCaptions: attempt
+        ? platformCaptionTexts(attempt.platform_captions) || {}
+        : carriedResolution || resolution ? {} : platformDefaultTexts(asset),
       state,
       attempt,
       resolution,
@@ -238,6 +242,11 @@ function lastSuccessfulPublication(asset, attempts) {
     .filter(Boolean)
     .sort()
   return matches.at(-1) || null
+}
+
+function platformDefaultTexts(asset) {
+  const defaults = asset?.platformCaptionDefaults || {}
+  return Object.fromEntries(Object.entries(defaults).filter(([, value]) => value?.text).map(([platform, value]) => [platform, value.text]))
 }
 
 function assetForAttempt(attempt, assets) {

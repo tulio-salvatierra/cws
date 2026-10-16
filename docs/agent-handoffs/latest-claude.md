@@ -1,45 +1,34 @@
-Task ID: CWS-ALIGN-20261016
+Task ID: CWS-MARKETING-CHANNEL-CAPTIONS
 Agent: Claude
-Objective: Align the repo and its docs with the system that actually runs in production, so future work stops second-guessing.
-
-Files inspected:
-- `docs/` (product definition, decisions, ledger, project log, learnings, conventions, handoffs), `AGENTS.md`, `.agents/*`, `src/App.jsx`, `src/components/admin/AdminLayout.jsx`, `api/ceo-today.js`, `vercel.json`
-- All remote branches
-- Production Supabase: table row counts, `supabase_migrations.schema_migrations`
+Objective: Let each Marketing destination receive its own caption (Meta, LinkedIn, Google) while keeping the shared caption as the fallback and the exact-slot owner confirmation unchanged.
 
 Files changed:
-- `main` fast-forwarded to `codex/ceo-today-integration` (`9f799c7`). Production was already running that code.
-- `docs/product-definition.md`: rewritten as v2 (approved).
-- `docs/decisions.md`: added an index, normalized DEC-027 and closed its follow-ups, fixed the phantom DEC-021 reference (now DEC-030), added DEC-032 and DEC-033.
-- `docs/technical-conventions.md`: corrected the stack, added environments, migration-parity, and definition-of-done sections.
-- `AGENTS.md`, `README.md`, `.agents/*-project-instructions.md`: removed stale n8n and "no tests" claims.
-- `supabase/migrations/`:
-  - Renamed 20 files to their exact remote versions. Content was verified identical to the applied SQL by whitespace-normalized MD5.
-  - Recovered `20260820213137_content_variant_channel_id.sql` (exact applied SQL).
-  - Recovered `20261011194152_client_projects.sql` as schema only; the real client seed row was omitted because the repo is public.
-- Updated migration file references in two migration tests and two verify scripts.
-- Task ledger: backfilled 12 milestones from Sep 10 to Oct 11.
+- `src/marketing/platformCaptions.js` (new): per-destination limits, catalog channel map, effective-text and validation helpers.
+- `server/marketing/offer-catalog.js`: shared rotation excludes channel variants; per-channel LRU defaults on each asset.
+- `src/marketing/weeklySlots.js`: `slot.platformCaptions` comes from the attempt record, or from catalog defaults for an open slot.
+- `api/marketing-linkedin.js`:
+  - validates and normalizes `platform_captions`;
+  - persists the immutable per-destination record before the provider call;
+  - sends each platform's own text to bundle.social;
+  - catalog captions accept `platform`;
+  - serializers expose the texts.
+- `src/pages/admin/MarketingPage.jsx`:
+  - each channel tab has its own caption editor with a limit counter and a "Use shared caption" button;
+  - the overview shows chips for which channels use their own text;
+  - the confirmation dialog names the channels with custom text;
+  - the catalog caption form has a Channel select.
+- `supabase/migrations/20261016142931_marketing_platform_captions.sql`: applied to production.
+- Tests: the new `platformCaptions.test.js`, plus additions to the API, catalog, and Marketing page tests.
 
-Tests run:
-- Local versions compared with remote history: 62 of 62, zero differences.
-- `npm run test:run` — see the project log entry.
+Tests run: `npm run test:run` (451 passed), `npm run lint`, and the build with placeholder env.
 
-Decisions made:
-- DEC-032 (owner-approved): v2 scope. Content Operations is frozen, the live system is English-only, CWS-001 ships as a Marketing creative asset, and the authority model is AUTO/PREPARE/CONFIRM.
-- DEC-033: one new destination proven end-to-end before adding another.
+Decisions:
+- Confirmation stays bound to owner + slot + asset (DEC-028). The owner's authenticated Confirm request carries every text, and those texts are persisted before any provider call. So what was confirmed is exactly what is recorded and sent.
+- An offer still needs an active shared English caption to enter rotation. Channel variants only replace it on their own channel.
+- Moving a missed slot carries only the shared caption. Channel defaults are not carried into a moved slot.
 
-Not merged on purpose:
-- `agent/n8n-dry-run-bridge` (retired, DEC-030).
-- Old `agent/*` branches. Their changes already landed through squash PRs, or they belong to the frozen layer.
+Not done / follow-ups:
+- Carousel (multi-image) posts are not supported. Each post is a single image.
+- Per-post analytics are still not connected.
 
-Problems discovered:
-- `client_projects` has no `workspace_id`, which breaks DEC-007. Every authenticated user can read every row. It is acceptable for a solo owner but must be fixed before any second user exists.
-- The applied `client_projects` migration seeded real client data. Keep seed data out of migrations in this public repo.
-- Applying a migration through MCP assigns a new timestamp. Rename the local file afterwards (now a convention).
-
-Recommended next actions (owner):
-1. Finish the CWS-001 English master in Final Cut Pro.
-2. Confirm Post A, the first four-channel post.
-3. Resume 5 outreach emails a day.
-
-Recommended next ticket: OFFER-CREATIVE-001 (link the offer catalog to Marketing slots).
+Recommended next step (owner): add Básico channel captions in the catalog, preview each tab, and Confirm Post A.

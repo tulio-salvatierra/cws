@@ -116,7 +116,7 @@ describe('MarketingPage M5', () => {
     const [, options] = globalThis.fetch.mock.calls[1]
     expect(JSON.parse(options.body)).toMatchObject({ slot_key: '2026-09-07:post-a', asset_id: 'website-launch', owner_confirmation_token: 'post-a-confirmation-token' })
     expect(JSON.parse(options.body).reference_key).toMatch(/^cws-marketing-m5:/)
-    expect(window.confirm).toHaveBeenCalledWith('Publish Post A — Website Launch — to LinkedIn, Facebook, Instagram, and Google Business Profile?')
+    expect(window.confirm).toHaveBeenCalledWith('Publish Post A — Website Launch — to LinkedIn, Facebook, Instagram, and Google Business Profile?\n\nAll four channels use the shared caption.')
   })
 
   it('cannot invoke Post B before the server authorizes that specific slot', async () => {
@@ -308,5 +308,58 @@ describe('Marketing channel tabs', () => {
     render(<MarketingPage />)
     fireEvent.change(await screen.findByRole('textbox', { name: 'Post A caption' }), { target: { value: 'x'.repeat(1501) } })
     expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeDisabled()
+  })
+})
+
+describe('Marketing per-channel captions', () => {
+  beforeEach(() => {
+    useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(true))
+  })
+
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('prefills channel captions from the catalog, lets the owner edit one channel, and sends exactly those texts on Confirm', async () => {
+    const withDefaults = { ...slot('post-a'), platform_captions: { FACEBOOK: 'Meta default.', INSTAGRAM: 'Meta default.' } }
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(statusBody({ slots: [withDefaults, slot('post-b')] })))
+      .mockResolvedValue(response({ ok: true }))
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeEnabled())
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Facebook' }))
+    expect(screen.getByRole('textbox', { name: 'Post A Facebook caption' })).toHaveValue('Meta default.')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'LinkedIn' }))
+    expect(screen.getByRole('textbox', { name: 'Post A LinkedIn caption' })).toHaveValue('Launch clearly.')
+    fireEvent.change(screen.getByRole('textbox', { name: 'Post A LinkedIn caption' }), { target: { value: 'LinkedIn-only text.' } })
+    expect(screen.getAllByTestId('channel-preview-caption-LINKEDIN')[0]).toHaveTextContent('LinkedIn-only text.')
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Weekly overview' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm Post A' }))
+    await waitFor(() => expect(globalThis.fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(true))
+    const [, options] = globalThis.fetch.mock.calls.find(([, call]) => call?.method === 'POST')
+    expect(JSON.parse(options.body)).toMatchObject({
+      caption: 'Launch clearly.',
+      platform_captions: { LINKEDIN: 'LinkedIn-only text.', FACEBOOK: 'Meta default.', INSTAGRAM: 'Meta default.' },
+    })
+    expect(JSON.parse(options.body).platform_captions.GOOGLE_BUSINESS).toBeUndefined()
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('Channel-specific text: LinkedIn, Facebook, Instagram.'))
+  })
+
+  it('blocks Confirm when a channel caption exceeds that channel limit and restores the shared caption on request', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response(statusBody()))
+    render(<MarketingPage />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeEnabled())
+    fireEvent.click(screen.getByRole('tab', { name: 'Instagram' }))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Post A Instagram caption' }), { target: { value: 'x'.repeat(2201) } })
+    expect(screen.getAllByRole('alert').some(node => node.textContent.includes('2,200'))).toBe(true)
+    fireEvent.click(screen.getByRole('tab', { name: 'Weekly overview' }))
+    expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('tab', { name: 'Instagram' }))
+    fireEvent.click(screen.getAllByRole('button', { name: 'Use shared caption' })[0])
+    expect(screen.getByRole('textbox', { name: 'Post A Instagram caption' })).toHaveValue('Launch clearly.')
+    fireEvent.click(screen.getByRole('tab', { name: 'Weekly overview' }))
+    expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeEnabled()
   })
 })

@@ -520,3 +520,133 @@ describe('failed Marketing slot recovery', () => {
     expect(readFile).not.toHaveBeenCalled()
   })
 })
+
+describe('per-platform Marketing captions', () => {
+  const offerId = '33333333-3333-4333-8333-333333333333'
+  const mediaId = '44444444-4444-4444-8444-444444444444'
+  const sharedId = '55555555-5555-4555-8555-555555555555'
+  const linkedinId = '66666666-6666-4666-8666-666666666666'
+  const metaId = '77777777-7777-4777-8777-777777777777'
+  const catalogAssetId = `catalog:${offerId}:${mediaId}:${sharedId}`
+  const catalog = {
+    offers: [{ id: offerId, workspace_id: 'workspace-1', name: 'Negocio Listo — Básico', description: 'Monthly plan for local businesses.', price_mode: 'fixed', price_cents: 14900, status: 'active', created_at: '2026-09-01T00:00:00.000Z' }],
+    media: [{ id: mediaId, workspace_id: 'workspace-1', offer_id: offerId, storage_path: '/images/negocio-listo/en-02-basico.png', media_source: 'local', linkedin_compatible: true, facebook_compatible: true, instagram_compatible: true, status: 'active', created_at: '2026-09-01T00:00:00.000Z' }],
+    captions: [
+      { id: sharedId, workspace_id: 'workspace-1', offer_id: offerId, locale: 'en', platform: null, body: 'Shared Básico caption.', status: 'active', created_at: '2026-09-01T00:00:00.000Z' },
+      { id: linkedinId, workspace_id: 'workspace-1', offer_id: offerId, locale: 'en', platform: 'linkedin', body: 'LinkedIn Básico caption.', status: 'active', created_at: '2026-09-01T00:00:01.000Z' },
+      { id: metaId, workspace_id: 'workspace-1', offer_id: offerId, locale: 'en', platform: 'meta', body: 'Meta Básico caption.', status: 'active', created_at: '2026-09-01T00:00:02.000Z' },
+    ],
+  }
+  const tokenFor = assetId => createOwnerConfirmationToken({ workspaceId: 'workspace-1', userId: 'owner-1' }, { slotKey: m5SlotKey, asset: { id: assetId } })
+  function postBody(overrides = {}) {
+    return { caption: 'Shared Básico caption.', slot_key: m5SlotKey, asset_id: catalogAssetId, reference_key: m5Reference, owner_confirmation_token: tokenFor(catalogAssetId), ...overrides }
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers(); vi.setSystemTime(new Date('2026-09-08T17:00:00.000Z'))
+    process.env.GENERATION_SUPABASE_URL = 'https://project.supabase.co'
+    process.env.GENERATION_SUPABASE_SERVICE_ROLE_KEY = 'service-role-key'
+    process.env.BUNDLE_SOCIAL_API_KEY = 'bundle-key'
+    process.env.BUNDLE_SOCIAL_TEAM_ID = 'team-1'
+    createClientMock.mockReset(); readFile.mockReset(); globalThis.fetch = vi.fn()
+  })
+
+  afterEach(() => vi.useRealTimers())
+
+  it('offers catalog channel captions as slot defaults and keeps the shared caption as the rotation key', async () => {
+    const database = createDatabase(catalog); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    const response = makeResponse(); await handler(request(), response)
+    const postA = response.body.slots.find(slot => slot.slot_key === m5SlotKey)
+    expect(postA.asset.id).toBe(catalogAssetId)
+    expect(postA.caption).toBe('Shared Básico caption.')
+    expect(postA.platform_captions).toEqual({ LINKEDIN: 'LinkedIn Básico caption.', FACEBOOK: 'Meta Básico caption.', INSTAGRAM: 'Meta Básico caption.' })
+    expect(database.state.attemptInserts).toEqual([])
+  })
+
+  it('sends each destination its own text and records the exact text and catalog source per platform', async () => {
+    const database = createDatabase(catalog); createClientMock.mockReturnValue(database.client); readFile.mockResolvedValue(new Uint8Array([1, 2, 3])); queueVerifiedAccounts()
+    globalThis.fetch
+      .mockResolvedValueOnce(providerResponse(200, { uploadId: 'upload-1' }))
+      .mockResolvedValueOnce(providerResponse(200, { id: 'bundle-post-1', status: 'PROCESSING', externalData: {} }))
+    const longShared = `Shared ${'x'.repeat(1600)}`
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: postBody({
+      caption: longShared,
+      platform_captions: { LINKEDIN: 'Edited LinkedIn caption.', FACEBOOK: 'Meta Básico caption.', INSTAGRAM: 'Meta Básico caption.', GOOGLE_BUSINESS: 'Short Google caption.' },
+    }) }), response)
+
+    expect(response.statusCode).toBe(202)
+    const createCall = globalThis.fetch.mock.calls.find(([url, options]) => url.endsWith('/post') && options?.method === 'POST')
+    const data = JSON.parse(createCall[1].body).data
+    expect(data.LINKEDIN.text).toBe('Edited LinkedIn caption.')
+    expect(data.FACEBOOK.text).toBe('Meta Básico caption.')
+    expect(data.INSTAGRAM.text).toBe('Meta Básico caption.')
+    expect(data.GOOGLE_BUSINESS.text).toBe('Short Google caption.')
+    expect(database.state.attemptInserts[0].platform_captions).toEqual({
+      LINKEDIN: { text: 'Edited LinkedIn caption.', offer_caption_id: null },
+      FACEBOOK: { text: 'Meta Básico caption.', offer_caption_id: metaId },
+      INSTAGRAM: { text: 'Meta Básico caption.', offer_caption_id: metaId },
+      GOOGLE_BUSINESS: { text: 'Short Google caption.', offer_caption_id: null },
+    })
+    expect(database.state.attemptInserts[0].caption).toBe(longShared)
+  })
+
+  it('falls back to the shared caption for any channel without its own text', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); readFile.mockResolvedValue(new Uint8Array([1, 2, 3])); queueVerifiedAccounts()
+    globalThis.fetch
+      .mockResolvedValueOnce(providerResponse(200, { uploadId: 'upload-1' }))
+      .mockResolvedValueOnce(providerResponse(200, { id: 'bundle-post-1', status: 'PROCESSING', externalData: {} }))
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: { caption: 'M5 caption.', platform_captions: { LINKEDIN: '  ' }, slot_key: m5SlotKey, asset_id: 'website-launch', reference_key: m5Reference, owner_confirmation_token: ownerConfirmation() } }), response)
+    expect(response.statusCode).toBe(202)
+    const data = JSON.parse(globalThis.fetch.mock.calls.find(([url, options]) => url.endsWith('/post') && options?.method === 'POST')[1].body).data
+    expect(['LINKEDIN', 'FACEBOOK', 'INSTAGRAM', 'GOOGLE_BUSINESS'].map(platform => data[platform].text)).toEqual(['M5 caption.', 'M5 caption.', 'M5 caption.', 'M5 caption.'])
+  })
+
+  it.each([
+    [{ TIKTOK: 'Not a CWS destination.' }, /LinkedIn, Facebook, Instagram, or Google Business Profile/],
+    [{ GOOGLE_BUSINESS: 'x'.repeat(1501) }, /Google Business Profile caption must be 1,500/],
+    [{ INSTAGRAM: 'x'.repeat(2201) }, /Instagram caption must be 2,200/],
+    [{ LINKEDIN: 42 }, /must be text/],
+  ])('rejects invalid channel captions before any record or provider post: %j', async (platformCaptions, message) => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: { caption: 'M5 caption.', platform_captions: platformCaptions, slot_key: m5SlotKey, asset_id: 'website-launch', reference_key: m5Reference, owner_confirmation_token: ownerConfirmation() } }), response)
+    expect(response.statusCode).toBe(400)
+    expect(response.body.error).toMatch(message)
+    expect(database.state.attemptInserts).toHaveLength(0)
+    expect(globalThis.fetch.mock.calls.every(([, options]) => !options?.method || options.method === 'GET')).toBe(true)
+  })
+
+  it('still enforces the Google limit on a shared caption when Google has no text of its own', async () => {
+    const database = createDatabase(); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()
+    const response = makeResponse()
+    await handler(request({ method: 'POST', body: { caption: 'x'.repeat(1501), platform_captions: { LINKEDIN: 'LinkedIn only.' }, slot_key: m5SlotKey, asset_id: 'website-launch', reference_key: m5Reference, owner_confirmation_token: ownerConfirmation() } }), response)
+    expect(response.statusCode).toBe(400)
+    expect(response.body.error).toContain('1,500')
+    expect(database.state.attemptInserts).toHaveLength(0)
+  })
+
+  it('saves a channel caption variant and rejects an unknown channel or an over-limit Meta caption', async () => {
+    const database = createDatabase({ offers: [{ id: offerId, workspace_id: 'workspace-1' }] }); createClientMock.mockReturnValue(database.client)
+    const saved = makeResponse()
+    await handler(request({ method: 'POST', body: { action: 'save_marketing_offer_caption', caption: { offer_id: offerId, locale: 'en', platform: 'meta', body: 'Meta caption.', status: 'active' } } }), saved)
+    expect(saved.statusCode).toBe(200)
+    expect(database.state.catalogInserts[0].data).toMatchObject({ platform: 'meta', body: 'Meta caption.' })
+
+    const unknown = makeResponse()
+    await handler(request({ method: 'POST', body: { action: 'save_marketing_offer_caption', caption: { offer_id: offerId, locale: 'en', platform: 'tiktok', body: 'Nope.', status: 'active' } } }), unknown)
+    expect(unknown.statusCode).toBe(400)
+
+    const tooLong = makeResponse()
+    await handler(request({ method: 'POST', body: { action: 'save_marketing_offer_caption', caption: { offer_id: offerId, locale: 'en', platform: 'meta', body: 'x'.repeat(2201), status: 'active' } } }), tooLong)
+    expect(tooLong.statusCode).toBe(400)
+    expect(tooLong.body.error).toContain('2,200')
+
+    const shared = makeResponse()
+    await handler(request({ method: 'POST', body: { action: 'save_marketing_offer_caption', caption: { offer_id: offerId, locale: 'en', body: 'Shared caption.', status: 'active' } } }), shared)
+    expect(shared.statusCode).toBe(200)
+    expect(database.state.catalogInserts[1].data.platform).toBeNull()
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+  })
+})

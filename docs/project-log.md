@@ -2027,3 +2027,35 @@ Checks:
   intentionally refuses to run without Supabase env vars.
 
 No database writes, deployments, posts, or emails were made.
+
+## 2026-10-16 — CWS-MARKETING-CHANNEL-CAPTIONS
+
+Agent: Claude
+Status: Completed and merged to `main`
+
+Before this change, every Marketing post sent one caption to all four
+destinations. Now:
+
+- `offer_captions.platform` (meta, linkedin, google_business, or NULL for
+  shared) lets the catalog hold channel-specific variants. Each variant rotates
+  least-recently-used, based on what each destination actually received.
+- The slot pre-fills each channel tab with its catalog variant. The owner can
+  edit a channel's text or reset it to the shared caption.
+- Validation runs on the effective text per destination. The limits are
+  LinkedIn 3,000, Facebook 3,000, Instagram 2,200, and Google 1,500. A shared
+  caption over 1,500 is allowed only when Google has its own text.
+- The confirmation dialog names every channel using its own text. The POST
+  carries `platform_captions`.
+- Before any provider request, the server persists the exact per-destination
+  text, and the source catalog id when the text is unedited, in
+  `marketing_publish_attempts.platform_captions`. The identity trigger now
+  makes that column immutable.
+- bundle.social receives each platform's own text in the existing single
+  request. The upload, slot capability, and idempotency are unchanged.
+
+Migration `20261016142931_marketing_platform_captions` was applied to
+production before the code deploy. The security advisor reports no new
+findings.
+
+Checks: 451 tests (18 new), lint, and the build all pass. No post was
+published.

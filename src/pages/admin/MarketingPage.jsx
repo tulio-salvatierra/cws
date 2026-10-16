@@ -1,4 +1,5 @@
 import { MARKETING_PLATFORMS, MARKETING_CAPTION_LIMIT, GOOGLE_BUSINESS_CTA_URL, marketingPlatformName, marketingDestinationsVerified } from '../../marketing/channels.js'
+import { CATALOG_CAPTION_PLATFORM_LABELS, PLATFORM_CAPTION_LIMITS, effectivePlatformCaptions, platformCaptionError } from '../../marketing/platformCaptions.js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../Hooks/useAuth'
 import LayaAssessmentPanel from '../../components/admin/LayaAssessmentPanel'
@@ -33,6 +34,8 @@ export default function MarketingPage() {
   const [state, setState] = useState({ loading: true, destinations: [], slots: [], attemptHistory: [], offerCatalog: [], storageReady: false, storageError: '', pollAfterMs: null, error: '' })
   const [activeChannel, setActiveChannel] = useState('overview')
   const [captions, setCaptions] = useState({})
+  // Per-slot channel overrides the owner typed; null means "use shared".
+  const [channelEdits, setChannelEdits] = useState({})
   const [confirmingSlotKey, setConfirmingSlotKey] = useState('')
   const [resolvingSlotKey, setResolvingSlotKey] = useState('')
   const [catalogSaving, setCatalogSaving] = useState(false)
@@ -100,10 +103,15 @@ export default function MarketingPage() {
 
   async function confirm(slot) {
     const caption = captions[slot.slot_key] ?? slot.caption ?? ''
-    if (!session?.access_token || confirmingSlotKey || !canConfirmSlot(state, slot, caption)) return
-    const confirmation = slot.state === 'missed'
+    const overrides = slotChannelOverrides(slot, channelEdits)
+    if (!session?.access_token || confirmingSlotKey || !canConfirmSlot(state, slot, caption, overrides)) return
+    const custom = MARKETING_PLATFORMS.filter(platform => overrides[platform])
+    const textSummary = custom.length
+      ? `\n\nChannel-specific text: ${custom.map(platformName).join(', ')}. Every other channel uses the shared caption.`
+      : '\n\nAll four channels use the shared caption.'
+    const confirmation = (slot.state === 'missed'
       ? `Publish now: ${slot.asset.label} to LinkedIn, Facebook, Instagram, and Google Business Profile?`
-      : `Publish ${slot.label} — ${slot.asset.label} — to LinkedIn, Facebook, Instagram, and Google Business Profile?`
+      : `Publish ${slot.label} — ${slot.asset.label} — to LinkedIn, Facebook, Instagram, and Google Business Profile?`) + textSummary
     if (!window.confirm(confirmation)) return
     setConfirmingSlotKey(slot.slot_key)
     setState(current => ({ ...current, error: '' }))
@@ -112,6 +120,7 @@ export default function MarketingPage() {
     try {
       const response = await requestMarketing('/api/marketing-linkedin', session.access_token, {
         caption,
+        platform_captions: overrides,
         slot_key: slot.slot_key,
         asset_id: slot.asset.id,
         reference_key: referenceKeysRef.current[slot.slot_key],
@@ -277,7 +286,14 @@ export default function MarketingPage() {
             className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${activeChannel === channel ? 'bg-indigo-500 text-white' : 'border border-gray-700 text-gray-300 hover:bg-gray-800'}`}
           >{channel === 'overview' ? 'Weekly overview' : platformName(channel)}</button>)}
         </div>
-        {activeChannel !== 'overview' && <ChannelPanel platform={activeChannel} state={state} captions={captions} onReview={() => setActiveChannel('overview')} />}
+        {activeChannel !== 'overview' && <ChannelPanel
+          platform={activeChannel}
+          state={state}
+          captions={captions}
+          channelEdits={channelEdits}
+          onChannelCaptionChange={(slotKey, value) => setChannelEdits(current => ({ ...current, [slotKey]: { ...(current[slotKey] || {}), [activeChannel]: value } }))}
+          onReview={() => setActiveChannel('overview')}
+        />}
         <div role="tabpanel" id="channel-panel-overview" aria-labelledby="channel-tab-overview" hidden={activeChannel !== 'overview'}>
         {nextSlot && <p className="mt-5 text-sm text-gray-400">Next slot: <span className="font-medium text-white">{nextSlot.label} — {nextSlot.weekday}</span></p>}
 
@@ -287,6 +303,8 @@ export default function MarketingPage() {
             slot={slot}
             destinations={state.destinations}
             caption={captions[slot.slot_key] ?? slot.caption ?? ''}
+            channelOverrides={slotChannelOverrides(slot, channelEdits)}
+            onOpenChannel={setActiveChannel}
             onCaptionChange={value => setCaptions(current => ({ ...current, [slot.slot_key]: value }))}
             onEvaluate={() => setAssessmentSelection({ topic: `${slot.asset?.label || slot.label} · LinkedIn, Facebook, Instagram, Google Business Profile`, draft: captions[slot.slot_key] ?? slot.caption ?? '' })}
             onConfirm={() => confirm(slot)}
@@ -294,7 +312,7 @@ export default function MarketingPage() {
             onCloseFailed={() => closeFailedSlot(slot)}
             confirming={confirmingSlotKey === slot.slot_key}
             resolving={resolvingSlotKey === slot.slot_key}
-            canConfirm={canConfirmSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '')}
+            canConfirm={canConfirmSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '', slotChannelOverrides(slot, channelEdits))}
             canResolve={canResolveMissedSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '')}
             canCloseFailed={canCloseFailedSlot(state, slot)}
           />)}
@@ -341,30 +359,40 @@ export default function MarketingPage() {
   )
 }
 
-function ChannelPanel({ platform, state, captions, onReview }) {
+function ChannelPanel({ platform, state, captions, channelEdits, onChannelCaptionChange, onReview }) {
   const destination = state.destinations.find(item => item.platform === platform)
   const google = platform === 'GOOGLE_BUSINESS'
   return <section role="tabpanel" id={`channel-panel-${platform}`} aria-labelledby={`channel-tab-${platform}`} className="mt-5 space-y-5">
     <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
       <h2 className="text-xl font-semibold">{platformName(platform)}</h2>
-      <p className="mt-2 text-sm text-gray-400">{google ? 'Regular updates on Google Search and Maps, with a Learn more button to your website.' : 'Preview your shared weekly post and check delivery for this channel.'}</p>
+      <p className="mt-2 text-sm text-gray-400">{google ? 'Regular updates on Google Search and Maps, with a Learn more button to your website.' : 'Preview this channel\'s version of the weekly post and check its delivery.'} Edit the text below to give this channel its own caption; leave it matching the shared caption to use that instead.</p>
       <div className="mt-4">{destination ? <DestinationVerification destination={destination} /> : <p className="text-amber-200">{state.loading ? 'Checking connection…' : 'Connection could not be verified. Refresh the page to try again.'}</p>}</div>
       <p className="mt-4 text-sm text-gray-400">{google ? 'Post analytics are not available through bundle.social for Google. Profile totals and tracked website visits need a separate reporting connection.' : 'Delivery results appear below. Reach, engagement, and website visits are not connected yet.'}</p>
       <button type="button" onClick={onReview} className="mt-4 rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold">Review shared post</button>
     </div>
     <div className="grid gap-6 lg:grid-cols-2">{state.slots.map(slot => {
       const result = (slot.destination_results || []).find(item => item.platform === platform)
-      const caption = captions[slot.slot_key] ?? slot.caption ?? ''
+      const shared = captions[slot.slot_key] ?? slot.caption ?? ''
+      const overrides = slotChannelOverrides(slot, channelEdits)
+      const caption = effectivePlatformCaptions(shared, overrides)[platform] || shared
+      const custom = Boolean(overrides[platform])
+      const editable = !slot.attempt && ['ready', 'missed'].includes(slot.state) && Boolean(slot.asset)
+      const limit = PLATFORM_CAPTION_LIMITS[platform]
       return <article key={slot.slot_key} className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5">
         <p className="text-sm font-semibold text-indigo-300">{slot.label} · {slot.weekday}</p>
         <p className="mt-1 text-xs text-gray-400">{formatSlotDate(slot.slot_date)}</p>
         {slot.asset ? <div className="mt-4 overflow-hidden rounded-xl bg-white text-gray-900">
           <div className="p-4"><p className="font-semibold text-gray-900">Cicero Web Studio</p><p className="text-xs text-gray-500">{platformName(platform)} · Preview</p></div>
           <img src={slot.asset.asset_url || slot.asset.asset_path} alt={`${slot.asset.label} ${platformName(platform)} preview`} className="max-h-80 w-full object-contain" />
-          <p className="whitespace-pre-wrap p-4 text-sm leading-6 text-gray-900">{caption}</p>
+          <p data-testid={`channel-preview-caption-${platform}`} className="whitespace-pre-wrap p-4 text-sm leading-6 text-gray-900">{caption}</p>
           {google && <div className="border-t border-gray-200 p-4"><a href={GOOGLE_BUSINESS_CTA_URL} target="_blank" rel="noreferrer" className="font-medium text-blue-700">Learn more →</a><p className="mt-1 text-xs text-gray-500">cicerowebstudio.xyz</p></div>}
         </div> : <p className="mt-4 text-gray-400">No post asset is ready for this slot.</p>}
-        {caption.trim().length > MARKETING_CAPTION_LIMIT && <p role="alert" className="mt-3 text-sm text-rose-300">Shorten the shared caption to 1,500 characters before publishing.</p>}
+        {editable && <div className="mt-4">
+          <div className="flex items-center justify-between gap-3"><label htmlFor={`${slot.key}-${platform}-caption`} className="text-sm font-medium text-gray-200">{platformName(platform)} caption</label><span className={`rounded-full px-2 py-0.5 text-xs ${custom ? 'bg-indigo-400/15 text-indigo-100' : 'bg-gray-800 text-gray-400'}`}>{custom ? 'Channel-specific' : 'Using shared caption'}</span></div>
+          <textarea id={`${slot.key}-${platform}-caption`} aria-label={`${slot.label} ${platformName(platform)} caption`} value={caption} onChange={event => onChannelCaptionChange(slot.slot_key, event.target.value === shared ? null : event.target.value)} rows={5} className="mt-2 w-full resize-y rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm leading-6 text-white outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20" />
+          <div className="mt-1 flex items-center justify-between text-xs text-gray-500"><span>{caption.trim().length} / {limit.toLocaleString('en-US')} characters</span>{custom && <button type="button" onClick={() => onChannelCaptionChange(slot.slot_key, null)} className="text-indigo-300">Use shared caption</button>}</div>
+        </div>}
+        {caption.trim().length > limit && <p role="alert" className="mt-3 text-sm text-rose-300">Shorten the {platformName(platform)} caption to {limit.toLocaleString('en-US')} characters before publishing.</p>}
         <div className="mt-4">{result ? <DestinationResult result={result} /> : <p className="text-sm text-gray-400">{slot.attempt ? (slot.attempt.required_platforms?.includes(platform) ? 'Awaiting a delivery result for this channel.' : 'This channel was not included in this earlier post.') : 'Not submitted. Confirm all four channels from Weekly overview.'}</p>}</div>
       </article>
     })}</div>
@@ -450,7 +478,7 @@ function OfferCatalog({ offers, saving, onSave, embedded = false }) {
 
       <form onSubmit={saveMedia} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add image variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">The image must already exist in this deployed build under <code>/images/</code>. Compatibility is your explicit one-time confirmation; no image is uploaded here.</p><CatalogOfferSelect ariaLabel="Media offer" offers={offers} value={media.offer_id} onChange={value => setMedia(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Image path<input aria-label="Offer image path" required value={media.storage_path} onChange={event => setMedia(current => ({ ...current, storage_path: event.target.value }))} placeholder="/images/my-offer.png" className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><CompatibilityChecks media={media} onChange={setMedia} /><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer image status" value={media.status} onChange={event => setMedia(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save image variation'}</button></form>
 
-      <form onSubmit={saveCaption} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add caption variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">Only active English captions may enter the current shared-channel rotation. Saving this text never creates a post.</p><CatalogOfferSelect ariaLabel="Caption offer" offers={offers} value={caption.offer_id} onChange={value => setCaption(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Locale<select aria-label="Caption locale" value={caption.locale} onChange={event => setCaption(current => ({ ...current, locale: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="en">English</option><option value="es">Spanish</option></select></label><label className="mt-3 block text-xs text-gray-400">Caption<textarea aria-label="Offer caption body" required value={caption.body} onChange={event => setCaption(current => ({ ...current, body: event.target.value }))} rows={5} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer caption status" value={caption.status} onChange={event => setCaption(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save caption variation'}</button></form>
+      <form onSubmit={saveCaption} className="rounded-xl border border-gray-800 bg-gray-950/60 p-4"><h3 className="font-semibold text-white">Add caption variation</h3><p className="mt-2 text-xs leading-5 text-gray-500">Every offer needs an active English shared caption to enter rotation. Channel captions (Meta, LinkedIn, Google) replace it on that channel only. Saving this text never creates a post.</p><CatalogOfferSelect ariaLabel="Caption offer" offers={offers} value={caption.offer_id} onChange={value => setCaption(current => ({ ...current, offer_id: value }))} /><label className="mt-3 block text-xs text-gray-400">Channel<select aria-label="Caption channel" value={caption.platform} onChange={event => setCaption(current => ({ ...current, platform: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white">{Object.entries(CATALOG_CAPTION_PLATFORM_LABELS).map(([value, label]) => <option key={value || 'shared'} value={value}>{label}</option>)}</select></label><label className="mt-3 block text-xs text-gray-400">Locale<select aria-label="Caption locale" value={caption.locale} onChange={event => setCaption(current => ({ ...current, locale: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="en">English</option><option value="es">Spanish</option></select></label><label className="mt-3 block text-xs text-gray-400">Caption<textarea aria-label="Offer caption body" required value={caption.body} onChange={event => setCaption(current => ({ ...current, body: event.target.value }))} rows={5} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white" /></label><label className="mt-3 block text-xs text-gray-400">Status<select aria-label="Offer caption status" value={caption.status} onChange={event => setCaption(current => ({ ...current, status: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm text-white"><option value="draft">Draft</option><option value="active">Active</option><option value="retired">Retired</option></select></label><button type="submit" disabled={saving || !offers.length} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save caption variation'}</button></form>
     </div>
   </section>
 }
@@ -465,12 +493,12 @@ function CompatibilityChecks({ media, onChange }) {
 
 function blankOffer() { return { id: '', name: '', description: '', price_mode: 'by_scope', price: '', price_display_override: '', default_project_type: '', status: 'draft' } }
 function blankMedia() { return { offer_id: '', storage_path: '', linkedin_compatible: false, facebook_compatible: false, instagram_compatible: false, status: 'draft' } }
-function blankCaption() { return { offer_id: '', locale: 'en', body: '', status: 'draft' } }
+function blankCaption() { return { offer_id: '', platform: '', locale: 'en', body: '', status: 'draft' } }
 function isCompatibleActiveMedia(media) { return media.status === 'active' && media.linkedin_compatible && media.facebook_compatible && media.instagram_compatible }
 function dollarsToCents(value) { const match = String(value || '').trim().match(/^(\d+)(?:\.(\d{1,2}))?$/); return match ? Number(match[1]) * 100 + Number((match[2] || '').padEnd(2, '0')) : null }
 function centsToDollars(value) { return Number.isInteger(value) ? String(value / 100) : '' }
 
-function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed, onEvaluate }) {
+function WeeklySlot({ slot, destinations, caption, channelOverrides = {}, onOpenChannel, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed, onEvaluate }) {
   const detail = SLOT_DETAILS[slot.state] || SLOT_DETAILS.processing
   const locked = Boolean(slot.attempt) || confirming || resolving || slot.state === 'resolved'
   const fallback = slot.asset?.fallback === true
@@ -480,9 +508,10 @@ function WeeklySlot({ slot, destinations, caption, onCaptionChange, onConfirm, o
       <div className="mt-5 overflow-hidden rounded-xl border border-gray-700 bg-gray-100"><img src={slot.asset.asset_url || slot.asset.asset_path} alt={slot.asset.label} className="block max-h-[34rem] w-full object-contain" /></div>
       <div className="mt-4 flex items-center gap-2"><h3 className="font-medium text-white">{slot.asset.label}</h3>{slot.asset.price && <span className="text-sm text-gray-400">{slot.asset.price}</span>}{fallback && <span className="rounded bg-amber-400/10 px-2 py-0.5 text-xs text-amber-100">Fallback asset</span>}</div>
       {fallback && <p className="mt-2 text-xs leading-5 text-gray-500">No priced CWS offer creative is currently available in the repository. Add one to replace this fallback in rotation.</p>}
-      <label htmlFor={`${slot.key}-caption`} className="mt-5 block text-sm font-medium text-gray-200">Caption</label>
+      <label htmlFor={`${slot.key}-caption`} className="mt-5 block text-sm font-medium text-gray-200">Shared caption</label>
       <textarea id={`${slot.key}-caption`} aria-label={`${slot.label} caption`} value={caption} onChange={event => onCaptionChange(event.target.value)} rows={4} disabled={locked} className="mt-2 w-full resize-y rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm leading-6 text-white outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 disabled:cursor-not-allowed disabled:opacity-60" />
-      <p className="mt-2 text-right text-xs text-gray-500">{caption.length} / {MARKETING_CAPTION_LIMIT} characters · shared Google limit</p>
+      <p className="mt-2 text-right text-xs text-gray-500">{caption.length} / {channelOverrides.GOOGLE_BUSINESS ? '3,000' : MARKETING_CAPTION_LIMIT.toLocaleString('en-US')} characters{channelOverrides.GOOGLE_BUSINESS ? '' : ' · Google limit while shared'}</p>
+      <div aria-label={`${slot.label} channel captions`} className="mt-2 flex flex-wrap gap-2">{MARKETING_PLATFORMS.map(platform => <button key={platform} type="button" onClick={() => onOpenChannel?.(platform)} className={`rounded-full border px-2.5 py-1 text-xs ${channelOverrides[platform] ? 'border-indigo-400/50 text-indigo-100' : 'border-gray-700 text-gray-400'}`}>{platformName(platform)}: {channelOverrides[platform] ? 'own text' : 'shared'}</button>)}</div>
       <button type="button" onClick={onEvaluate} disabled={!caption.trim()} className="mt-3 text-sm text-indigo-300 disabled:opacity-50">Check this caption with Laya</button>
     </> : <div className="mt-5 rounded-xl border border-dashed border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">No eligible evergreen asset is available for this slot yet.</div>}
     <section aria-label={`${slot.label} destinations`} className="mt-5 rounded-xl border border-gray-800 bg-gray-950/60 p-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Destinations</p><div className="mt-3 space-y-2">{destinations.map(destination => <DestinationVerification key={destination.platform} destination={destination} />)}</div></section>
@@ -516,7 +545,18 @@ function AttemptHistory({ attempt }) {
   return <div className="rounded-lg border border-gray-800 bg-gray-950/60 p-3"><p className="font-medium text-white">Provider status: {detail.label}</p>{attempt.provider_error && <p className="mt-2 text-amber-200">{attempt.provider_error}</p>}{attempt.provider_permalink && <a className="mt-2 inline-block text-indigo-300 hover:text-indigo-200" href={attempt.provider_permalink} target="_blank" rel="noreferrer">Open LinkedIn post →</a>}<p className="mt-2 text-xs text-gray-500">Preserved as audit history.</p></div>
 }
 
-function canConfirmSlot(state, slot, caption) { return Boolean(state.storageReady && ['ready', 'missed'].includes(slot.state) && slot.asset && slot.owner_confirmation_token && !slot.attempt && marketingDestinationsVerified(state.destinations) && caption.trim() && caption.trim().length <= MARKETING_CAPTION_LIMIT) }
+function canConfirmSlot(state, slot, caption, overrides = {}) { return Boolean(state.storageReady && ['ready', 'missed'].includes(slot.state) && slot.asset && slot.owner_confirmation_token && !slot.attempt && marketingDestinationsVerified(state.destinations) && caption.trim() && caption.trim().length <= 3000 && !platformCaptionError(caption, overrides)) }
+// Channel overrides in effect for a slot: the owner's unsaved edits win, then the
+// catalog's channel variants (or the attempt's recorded text once posted).
+function slotChannelOverrides(slot, channelEdits) {
+  const edits = channelEdits[slot.slot_key] || {}
+  const overrides = {}
+  for (const platform of MARKETING_PLATFORMS) {
+    const value = Object.hasOwn(edits, platform) ? edits[platform] : slot.platform_captions?.[platform]
+    if (typeof value === 'string' && value.trim()) overrides[platform] = value
+  }
+  return overrides
+}
 function canResolveMissedSlot(state, slot, caption) { return Boolean(state.storageReady && slot.state === 'missed' && slot.asset && slot.owner_confirmation_token && !slot.attempt && caption.trim() && caption.trim().length <= MARKETING_CAPTION_LIMIT) }
 function canCloseFailedSlot(state, slot) { return Boolean(state.storageReady && slot.state === 'failed' && slot.asset && slot.owner_confirmation_token && slot.attempt?.provider_status === 'error') }
 function formatSlotDate(date) { return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`)) }

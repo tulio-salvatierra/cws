@@ -1,4 +1,5 @@
 import { isFullyPosted } from '../../src/marketing/weeklySlots.js'
+import { CATALOG_CAPTION_PLATFORMS } from '../../src/marketing/platformCaptions.js'
 
 const ACTIVE = 'active'
 
@@ -18,13 +19,15 @@ export function buildOfferCatalog({ offers = [], media = [], captions = [], atte
       attempts,
       'offer_media_id',
     )
+    const offerCaptions = (captionsByOffer.get(offer.id) || []).filter(caption => caption.status === ACTIVE && caption.locale === 'en')
     const selectedCaption = leastRecentlyUsed(
-      (captionsByOffer.get(offer.id) || []).filter(caption => caption.status === ACTIVE && caption.locale === 'en'),
+      offerCaptions.filter(caption => !caption.platform),
       attempts,
       'offer_caption_id',
     )
     if (!selectedMedia || !selectedCaption) continue
-    activeAssets.push(toAsset({ offer, media: selectedMedia, caption: selectedCaption, attempts, enabled: true }))
+    const platformCaptions = selectPlatformCaptions(offerCaptions, attempts)
+    activeAssets.push(toAsset({ offer, media: selectedMedia, caption: selectedCaption, attempts, enabled: true, platformCaptions }))
   }
 
   const activeAssetIds = new Set(activeAssets.map(asset => asset.id))
@@ -97,12 +100,13 @@ function serializeCaption(caption) {
     id: caption.id,
     offer_id: caption.offer_id,
     locale: caption.locale,
+    platform: caption.platform || null,
     body: caption.body,
     status: caption.status,
   }
 }
 
-function toAsset({ offer, media, caption, attempts, enabled }) {
+function toAsset({ offer, media, caption, attempts, enabled, platformCaptions = {} }) {
   const generated = media.media_source === 'generated'
   return {
     id: `catalog:${offer.id}:${media.id}:${caption.id}`,
@@ -117,10 +121,29 @@ function toAsset({ offer, media, caption, attempts, enabled }) {
     label: offer.name,
     price: offerPriceDisplay(offer),
     defaultCaption: caption.body,
+    platformCaptionDefaults: platformCaptions,
     enabled,
     fallback: false,
     lastPublishedAt: lastPublishedAt(attempts, 'offer_id', offer.id),
   }
+}
+
+// Each platform variant (meta, linkedin, google_business) rotates on its own,
+// least-recently-used first, using the caption ids recorded per destination on
+// earlier fully posted attempts. Platforms without a variant use the shared caption.
+function selectPlatformCaptions(captions, attempts) {
+  const defaults = {}
+  for (const [variant, platforms] of Object.entries(CATALOG_CAPTION_PLATFORMS)) {
+    const candidates = captions.filter(caption => caption.platform === variant)
+    if (!candidates.length) continue
+    const usage = attempts.map(attempt => ({
+      ...attempt,
+      platform_caption_id: platforms.map(platform => attempt.platform_captions?.[platform]?.offer_caption_id).find(Boolean) || null,
+    }))
+    const selected = leastRecentlyUsed(candidates, usage, 'platform_caption_id')
+    for (const platform of platforms) defaults[platform] = { text: selected.body, offerCaptionId: selected.id }
+  }
+  return defaults
 }
 
 function groupByOffer(records) {
