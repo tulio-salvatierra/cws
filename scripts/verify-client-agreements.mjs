@@ -14,7 +14,7 @@ create table operations_projects(id uuid primary key, workspace_id uuid,client_i
 create function private.is_workspace_member(uuid) returns boolean language sql as $$ select true $$;
 create function public.update_updated_at() returns trigger language plpgsql as $$ begin new.updated_at=now(); return new; end $$;
 grant usage on schema extensions to service_role; grant select on workspace_members,clients,operations_projects to service_role;`)
-await db.exec(readFileSync(new URL('../supabase/migrations/20260913195836_accounting_financial_state_foundation.sql', import.meta.url),'utf8'))
+await db.exec(readFileSync(new URL('../supabase/migrations/20260913202328_accounting_financial_state_foundation.sql', import.meta.url),'utf8'))
 await db.exec(readFileSync(new URL('../supabase/migrations/20261011192034_customer_payment_intake.sql', import.meta.url),'utf8'))
 const w='11111111-1111-4111-8111-111111111111',u='22222222-2222-4222-8222-222222222222',c='33333333-3333-4333-8333-333333333333',r='44444444-4444-4444-8444-444444444444'
 await db.exec(`insert into auth.users values('${u}');insert into workspaces values('${w}');insert into workspace_members values('${w}','${u}','owner','active');insert into clients values('${c}','${w}','active');set role service_role;`)

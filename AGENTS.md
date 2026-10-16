@@ -1,17 +1,33 @@
 # AGENTS.md
 
-## Cursor Cloud specific instructions
+Read `docs/product-definition.md` first; it is the canonical scope (v2, DEC-032).
+Role-specific instructions live in `.agents/`. Project memory lives in `docs/`
+(`decisions.md`, `learnings.md`, `task-ledger.md`, `project-log.md`, `agent-handoffs/`).
 
-This repo (`cws`, "Cicero Web Studio") is a single Vite + React 18 marketing SPA (npm, Node 22). There is no monorepo, backend server, or database to run for local dev — the `api/*` handlers are Vercel serverless functions mounted as Vite middleware, Supabase is a no-op stub, and the n8n/Google Sheets/Resend integrations are optional external services.
+## What this repo is
 
-### Services and commands
-There is one service: the Vite dev server. Standard scripts live in `package.json`:
-- Dev server: `npm run dev` → http://localhost:5174 (fixed via `strictPort`).
-- Lint: `npm run lint` (ESLint flat config, passes clean).
-- Build: `npm run build`.
-- Tests: `npm run test:run` (Vitest). Note: there are currently **no test files** in the repo, so this exits reporting "No test files found" — that is expected, not a failure.
+One Vite + React 18 app (npm, Node 22) with two parts:
 
-### Non-obvious caveats
-- The intro loader (`src/Hooks/Loader.ts`) waits for the browser `window` `load` event (i.e. all page assets) before revealing content. Because the home/gallery pages load large video assets (one is ~6 MB), first paint can take a long time and the loader may appear "stuck" at 100% on heavy/cold loads. Give it 20-40s, or do a normal reload; this is app behavior, not an environment problem.
-- Dependencies do not require any secrets/`.env` to run, lint, build, or view the marketing site. `npm run env:check` requires Supabase + Google Sheets keys and will fail without them, but it is only relevant for the (currently inactive) client-portal/email integrations — skip it for normal frontend dev.
-- `npm run env:setup` copies `.env.example` → `.env` (placeholders only). Safe but unnecessary for viewing the site.
+- The public Cicero Web Studio marketing site (`/`).
+- CWS OS, the authenticated owner admin (`/admin`). It has six surfaces: CEO Today,
+  Sales, Marketing, Operations, Accounting, and Compliance.
+
+Server logic is Vercel serverless functions under `/api` (not Next.js). Supabase is
+the only state store. Supabase project `cws-os-staging` is **production**.
+
+## Commands
+
+- Dev server: `npm run dev` → http://localhost:5174 (`strictPort`). `/api` handlers are mounted as Vite middleware.
+- Tests: `npm run test:run` (Vitest; 430+ tests).
+- Lint: `npm run lint`.
+- Build: `npm run build` (runs the import-casing check first; Vercel's Linux build is case-sensitive).
+- Env: `npm run env:pull` (Vercel) or `npm run env:setup` (placeholders). The admin needs Supabase keys; the public site does not.
+
+## Rules that bite
+
+- Production deploys from `main`. A ticket is not done until it is merged.
+- Migration files must use the **exact** remote version (see `docs/technical-conventions.md`).
+- External actions (publishing, email) require exact-resource owner confirmation. Never trigger them from GET, reload, or tests.
+- Vercel Hobby caps the function count. Add routes with `vercel.json` rewrites into existing handlers.
+- This repo is **public**. Never commit client data, secrets, or seed rows containing real customer details.
+- The intro loader waits for the window `load` event, so heavy video pages can sit at 100% for 20–40 s on a cold load. That is expected.

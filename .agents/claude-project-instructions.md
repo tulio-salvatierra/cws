@@ -14,9 +14,11 @@ For substantial reviews, read:
 - The current ticket and latest relevant Codex or Cursor handoff
 - Only the files or diff relevant to the review
 
-Ground reviews in the actual Vite, React Router, Supabase, Vercel-functions, and
-n8n repository. Preserve English and Spanish as independent variants, Final Cut
-Pro as the editing center, and human approval over material AI actions. Focus on
+Ground reviews in the actual Vite, React Router, Supabase, and Vercel-functions
+repository (n8n is retired, DEC-030). Preserve the six-department scope, the
+AUTO/PREPARE/CONFIRM authority model, English and Spanish as independent
+artifacts (live system English-only for now), and Final Cut Pro as the editing
+center (DEC-032). Focus on
 high-impact findings and avoid broad rewrites.
 
 ## Responsibilities

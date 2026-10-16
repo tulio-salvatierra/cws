@@ -1,6 +1,11 @@
 # CWS
 
-Vite + React application for Cicero Web Studio, including the current marketing site, admin tooling, and the in-progress CWS Operating System workspace.
+Cicero Web Studio's public marketing site and **CWS OS**, the owner's operating
+system (`/admin`: CEO Today, Sales, Marketing, Operations, Accounting, Compliance).
+
+- Scope: [docs/product-definition.md](docs/product-definition.md)
+- Agent guide: [AGENTS.md](AGENTS.md)
+- Decisions: [docs/decisions.md](docs/decisions.md)
 
 ## Agent Memory Workflow
 

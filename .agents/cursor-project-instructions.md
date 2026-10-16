@@ -26,7 +26,8 @@ Prefer small, reviewable changes and do not modify unrelated files.
 - Responsive behavior, accessibility, frontend tests, and local refactoring
 
 Do not redesign the database without an approved migration, combine English and
-Spanish variants, add social publishing, automate Final Cut Pro, expose secrets,
+Spanish content, add an external action without exact owner confirmation,
+build on the frozen Content Operations layer, automate Final Cut Pro, expose secrets,
 or expand the current ticket.
 
 ## Direct Project-Memory Updates

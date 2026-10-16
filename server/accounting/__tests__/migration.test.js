@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import process from 'node:process'
 import { describe, expect, it } from 'vitest'
 
-const migration = readFileSync(resolve(process.cwd(), 'supabase/migrations/20260913195836_accounting_financial_state_foundation.sql'), 'utf8')
+const migration = readFileSync(resolve(process.cwd(), 'supabase/migrations/20260913202328_accounting_financial_state_foundation.sql'), 'utf8')
 
 describe('Accounting database boundary', () => {
   it('uses workspace-scoped foreign keys, integer cents, RLS, and append-only receipts', () => {

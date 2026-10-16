@@ -1991,3 +1991,39 @@ closed. The live Marketing page shows Google Business Profile, LinkedIn,
 Facebook, and Instagram verified, with Post A reviewable and Post B awaiting
 its own later owner confirmation. No post was created during verification.
 All 433 tests, lint, import-casing validation, and build pass.
+
+## 2026-10-16 — CWS-ALIGN-20261016 repo/doc alignment
+
+Agent: Claude
+Status: Completed and merged to `main`
+
+`main` was fast-forwarded to `codex/ceo-today-integration` (`9f799c7`), the code
+production was already running. Tulio approved product definition v2 (DEC-032):
+
+- six live departments;
+- the Content Operations layer frozen;
+- English-only live;
+- CWS-001 to ship as a Marketing creative asset after its Final Cut Pro export.
+
+DEC-033 records the one-destination-at-a-time rule, which project memory had
+previously cited under the colliding number DEC-026.
+
+Migration parity is restored, 62 of 62 versions:
+
+- 20 local files were renamed to the versions production assigned when they
+  were applied. Their contents are whitespace-identical to the applied SQL.
+- Two never-committed files were recovered from `schema_migrations`.
+  `client_projects` is schema-only; the real client seed row was not committed
+  because the repo is public.
+
+The task ledger was backfilled for Sep 10–Oct 11. Stale n8n and "no tests"
+claims were removed from the conventions and agent instructions.
+
+Checks:
+
+- All 433 tests pass.
+- Lint passes.
+- The production build passes with placeholder client env. The build
+  intentionally refuses to run without Supabase env vars.
+
+No database writes, deployments, posts, or emails were made.

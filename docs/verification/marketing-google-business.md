@@ -15,7 +15,7 @@ Implemented locally on 2026-10-12. Not deployed; no posts were sent.
 
 ## Release order
 
-1. Apply `supabase/migrations/20261012110804_marketing_google_business.sql` to the verified target database before deploying code. It expands channel storage and the published-post enum, adds an immutable required-platform set, and preserves existing defaults/history. No RLS/grant expansion.
+1. Apply `supabase/migrations/20261014021704_marketing_google_business.sql` to the verified target database before deploying code. It expands channel storage and the published-post enum, adds an immutable required-platform set, and preserves existing defaults/history. No RLS/grant expansion.
 2. Deploy the application.
 3. Verify the connected Google location is Cicero Web Studio and all four destinations show verified.
 4. Open each tab, edit a shared caption in Weekly overview, and verify the previews retain it. Check the Learn more URL and the 1,500-character validation.

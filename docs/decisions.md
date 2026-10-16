@@ -1,3 +1,34 @@
+# Decisions
+
+Architecture and product decisions for CWS OS. Newest decisions are at the bottom.
+Numbers DEC-001–003 and DEC-014–024 were never recorded in this file; do not reuse them.
+
+## Index
+
+| DEC | Title | Status |
+| --- | --- | --- |
+| 004 | Existing social publishing pipeline separate during MVP | Superseded by 030 |
+| 005 | New workspace routes use `/workspace` | Superseded by 011 |
+| 006 | Existing publishing integration deferred | Superseded by 030 |
+| 007 | New CWS OS tables use explicit ownership | Approved |
+| 008 | Channels are first-class workspace records | Approved (frozen layer, 032) |
+| 009 | Owners control sensitive workspace transitions | Approved |
+| 010 | Dedicated CWS Supabase project (`cws-os-staging` = production) | Approved |
+| 011 | Consolidate CWS OS routes under `/admin` | Approved |
+| 012 | Markdown project memory vs. workspace knowledge records | Approved |
+| 013 | Workspace RLS helpers in a non-exposed schema | Approved |
+| 025 | Every publish records to CWS OS | Approved |
+| 026 | Revive n8n through a dry-run bridge | Superseded by 030 |
+| 027 | Channel-centric restructure of Content Operations | Schema done; nav superseded by 032 |
+| 028 | Marketing publication confirmation is slot-bound | Approved |
+| 029 | Missed occurrences are calendar-derived and owner-resolved | Approved |
+| 030 | n8n is retired from CWS OS | Approved |
+| 031 | Sales command queue is deterministic and owner-confirmed | Approved |
+| 032 | Product definition v2: six-department OS, Content Ops frozen, English-only live | Approved |
+| 033 | Prove one new destination end-to-end before adding another | Approved |
+
+---
+
 ## DEC-004 — Existing social publishing pipeline remains separate during MVP
 
 Date: 2026-07-21
@@ -256,13 +287,13 @@ remains disabled until a separately approved workflow implements `DEC-025`,
 including the authenticated publication return path and idempotent verification.
 
 
-# DEC-027 — Channel-Centric Restructure of Content Operations
+## DEC-027 — Channel-Centric Restructure of Content Operations
 
-**Status:** approved
-**Date:** 2026-08-20
+Date: 2026-08-20
+Status: Approved — schema implemented; navigation superseded by DEC-032 (Content Operations frozen)
 **Scope:** Content Operations / Channels module only. Does not govern Goals, Initiatives, or Projects navigation — that IA is being defined separately by Tulio.
 
-## Context
+### Context
 
 Publishing infrastructure work has produced capability without moving `published_posts` off zero across multiple tickets (see prior handoffs). Part of the root cause: the app's navigation and data model are Campaign-first, but a large share of real content (routine social posts, text content) doesn't originate from a campaign and doesn't fit the video-oriented Content Variant status ladder.
 
@@ -270,7 +301,7 @@ A UI flow proposal for a Channels menu (per-platform pages: LinkedIn, YouTube, I
 
 Separately, Tulio clarified this is a solo-operator workspace — the operator drafts and publishes their own content — so an approval gate between the operator and themselves adds process without adding value.
 
-## Decision
+### Decision
 
 1. **`content_variants.channel_id`** — new column, NOT NULL. Every content variant belongs to a channel directly, independent of whether it also belongs to a campaign.
 2. **`content_variants.campaign_id`** — becomes nullable. Campaigns become an optional grouping across variants, not a mandatory container.
@@ -278,27 +309,27 @@ Separately, Tulio clarified this is a solo-operator workspace — the operator d
 4. **Channels becomes the top-level nav spine for Content Operations.** All existing features — video pipeline and social/text — move to live under their channel, side by side, rather than under separate Campaign-first flows.
 5. **Shell-first build order.** The Channels nav and routing ship first, with real data reads wherever the underlying table already exists (post history, channel brief, topics) and an honest "not built yet" state for anything that isn't (analytics, AI generation, trend recommendations, scheduling). Each later ticket replaces one stub with a real feature.
 6. **Testing is owned by each feature ticket, not the shell ticket.** The shell ticket has no functional feature to test beyond routing/data-read correctness.
-7. **Legacy n8n-era tables (`media_assets`, `content_drafts`, `research_topics`, `keywords`) are out of scope for this restructure.** They belong to the retired n8n pipeline (DEC-021) and are candidates for later cleanup, not touched here.
+7. **Legacy n8n-era tables (`media_assets`, `content_drafts`, `research_topics`, `keywords`) are out of scope for this restructure.** They belong to the retired n8n pipeline (DEC-030) and are candidates for later cleanup, not touched here.
 
-## Explicit Non-Goals
+### Explicit Non-Goals
 
 - No video file upload or storage in CWS OS at any point in this workflow. Final Cut Pro remains the sole editing environment; the dashboard continues to store only references (`export_reference`, `transcript`, `editing_notes`, `caption_text`), per the existing Final Cut Pro constraints in product-definition.md. This was already the design, not a new restriction.
 - No change to Goals / Initiatives / Projects navigation structure. That is being worked separately by Tulio and this decision does not presume where Channels docks relative to it.
-- DEC-026 (one platform fully working before starting a second) still applies to feature-polish tickets after the shell exists — this decision unifies the navigation, not the platform build sequence.
+- The one-destination-at-a-time rule (recorded as DEC-033; previously cited here as DEC-026) still applies to feature-polish tickets after the shell exists — this decision unifies the navigation, not the platform build sequence.
 
-## Consequences
+### Consequences
 
 - Two schema migrations required before the shell ticket can be built: add `content_variants.channel_id` (NOT NULL), alter `content_variants.campaign_id` to nullable.
 - product-definition.md requires a scoped patch: Core Structure tree, approval-model note, and moving "social publishing" / "social OAuth integrations" from "Do not build yet" to "Build now" (already true in practice, doc is catching up).
 - Content Variant status ladder needs a `type` split (short ladder for text: `draft → ready_for_review → approved → published`; full ladder retained for video) — tracked as follow-up, not blocking this decision.
 - Approval bypass is scoped to this solo-operator context. If CWS OS is ever used by more than one person, or extended to client-facing use where a second reviewer matters, this decision should be revisited rather than assumed to still hold.
 
-## Follow-ups
+### Follow-ups
 
-- [ ] Migration ticket: `content_variants.channel_id` + nullable `campaign_id`
-- [ ] product-definition.md patch (Core Structure, approval model, scope-list correction)
-- [ ] Shell-nav ticket (Channels menu, per-channel routing, stub states) — blocked on migration ticket and on Tulio confirming where Channels docks in the higher-level nav
-- [ ] Content Variant `type` field / short status ladder for text content — separate ticket, not blocking
+- [x] Migration ticket: `content_variants.channel_id` + nullable `campaign_id` (CWS-DEC-027, migration `20260820213137`)
+- [x] product-definition.md patch — superseded by product definition v2 (DEC-032)
+- [x] Shell-nav ticket — not built; superseded by the six-department navigation and the Content Operations freeze (DEC-032)
+- [x] Content Variant `type` field — not built; frozen with Content Operations (DEC-032)
 
 ---
 
@@ -429,3 +460,63 @@ Every external Sales email remains subject to S0's separate owner-bound,
 exact-lead/recipient/send-type/template/draft confirmation, durable
 persist-before-provider record, and stable idempotency boundary. S1 does not
 create a generic CRM, task, approval, workflow, event, or CEO framework.
+
+---
+
+## DEC-032 — Product definition v2: six-department OS
+
+Date: 2026-10-16
+Status: Approved (Tulio)
+
+### Decision
+
+`docs/product-definition.md` v2 replaces v1. CWS OS is defined as the six live
+admin surfaces: CEO Today, Sales, Marketing, Operations, Accounting, and Compliance.
+Owner decisions recorded with it:
+
+1. **The Content Operations layer is frozen.** This covers goals, initiatives,
+   projects, tasks, decisions, learnings, channels, campaigns, content variants,
+   approvals, exports, channel briefs, the topic ledger, and agent runs. Its data
+   stays read-only and its routes keep redirecting. No work happens on it without
+   a new decision naming the surface it would serve.
+2. **The live system is English-only for now.** Spanish starts by adding an
+   explicit `lang` field to Marketing/Sales records with independently written
+   content, never by adding a translation step.
+3. **The CWS-001 intro ad enters the live system as a Marketing creative asset**
+   once its Final Cut Pro master is exported. It does not go in as a
+   campaign/variant.
+4. **One authority vocabulary — AUTO / PREPARE / CONFIRM — replaces
+   Ask/Propose/Execute.** A confirmation, which authorizes one exact external
+   action, is distinct from an approval, which is a content-review log.
+
+### Reason
+
+v1 described a Content Operations workspace that has not been in the UI since
+2026-09-17. Agents treated it as their #2 source of truth, which kept producing
+second-guessing and contradictory tickets.
+
+### Consequence
+
+The definition of done now requires two things: work merged to `main`, and
+migration-version parity with production. Repo docs are canonical; the Claude
+Project mirrors them.
+
+---
+
+## DEC-033 — Prove one new destination end-to-end before adding another
+
+Date: 2026-10-16 (recording a rule in use since 2026-08)
+Status: Approved
+
+### Decision
+
+A new external destination must publish real content with a durable recorded
+result before work starts on the next destination. This applies to a social
+network, an email channel, or any other provider target.
+
+### Reason
+
+Earlier capability work stacked above a zero-output layer. This rule was
+previously cited as "DEC-026" in project memory, which collided with the
+repo's DEC-026 (n8n revival).
+

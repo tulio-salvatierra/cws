@@ -1,3 +1,5 @@
+> Historical (2026-07). Superseded: the migration it describes is reconciled — see `latest-claude.md` (CWS-ALIGN-20261016).
+
 # Latest Cursor Handoff
 
 Task ID: CWS-DB-MIGRATION-RECONCILE-001

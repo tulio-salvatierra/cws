@@ -13,8 +13,10 @@ For substantial tasks, read:
 - The current ticket and latest relevant handoff
 
 Inspect the existing repository before editing. Follow the current Vite, React,
-React Router, TypeScript, Supabase, and Vercel-function architecture. Preserve
-the legacy n8n social-publishing pipeline unless a task explicitly includes it.
+React Router, TypeScript, Supabase, and Vercel-function architecture. n8n is retired
+(DEC-030); never add or restore an n8n path. Do not build on the frozen Content
+Operations layer (DEC-032). Every applied migration needs a committed file whose
+version exactly matches the remote version.
 Prefer the smallest reversible change and do not modify unrelated files.
 
 ## Responsibilities

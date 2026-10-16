@@ -301,3 +301,17 @@ rows just because time passed. Persist only an explicit human decision that
 cannot be reconstructed safely, with its original resource, carried data, and
 timestamp. This keeps reloads mutation-free, makes date-edge tests
 deterministic, and prevents a passive status view from becoming an automation.
+
+## Rename migration files to the version production assigns
+
+Date: 2026-10-16
+
+Verified by: CWS-ALIGN-20261016
+
+Applying a migration through the Supabase MCP or dashboard records a new
+timestamp, not the local file's prefix. Twenty files had silently drifted this
+way, and two were never committed at all. After every apply, rename the local
+file to the remote version and diff `schema_migrations` against
+`supabase/migrations/`. Applied SQL can be recovered from
+`supabase_migrations.schema_migrations.statements`. Strip any real client data
+before committing to this public repo.

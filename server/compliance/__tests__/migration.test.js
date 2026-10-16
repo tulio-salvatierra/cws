@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import process from 'node:process'
 import { describe, expect, it } from 'vitest'
 
-const migration = readFileSync(resolve(process.cwd(), 'supabase/migrations/20260914022216_compliance_verified_obligation_foundation.sql'), 'utf8')
+const migration = readFileSync(resolve(process.cwd(), 'supabase/migrations/20260914074611_compliance_verified_obligation_foundation.sql'), 'utf8')
 
 describe('Compliance database boundary', () => {
   it('requires owner verification for applicable truth and preserves append-only completion history', () => {
