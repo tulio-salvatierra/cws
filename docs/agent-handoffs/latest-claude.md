@@ -1,34 +1,25 @@
-Task ID: CWS-MARKETING-CHANNEL-CAPTIONS
+Task ID: CWS-BIZ-MODEL-20261017
 Agent: Claude
-Objective: Let each Marketing destination receive its own caption (Meta, LinkedIn, Google) while keeping the shared caption as the fallback and the exact-slot owner confirmation unchanged.
+Objective: Give agents durable business-model context (offer, pricing, go-to-market) without bloating the product definition.
 
 Files changed:
-- `src/marketing/platformCaptions.js` (new): per-destination limits, catalog channel map, effective-text and validation helpers.
-- `server/marketing/offer-catalog.js`: shared rotation excludes channel variants; per-channel LRU defaults on each asset.
-- `src/marketing/weeklySlots.js`: `slot.platformCaptions` comes from the attempt record, or from catalog defaults for an open slot.
-- `api/marketing-linkedin.js`:
-  - validates and normalizes `platform_captions`;
-  - persists the immutable per-destination record before the provider call;
-  - sends each platform's own text to bundle.social;
-  - catalog captions accept `platform`;
-  - serializers expose the texts.
-- `src/pages/admin/MarketingPage.jsx`:
-  - each channel tab has its own caption editor with a limit counter and a "Use shared caption" button;
-  - the overview shows chips for which channels use their own text;
-  - the confirmation dialog names the channels with custom text;
-  - the catalog caption form has a Channel select.
-- `supabase/migrations/20261016142931_marketing_platform_captions.sql`: applied to production.
-- Tests: the new `platformCaptions.test.js`, plus additions to the API, catalog, and Marketing page tests.
+- `docs/business-model.md` (new): one-line model, target customer, positioning, offer and pricing table, fee rules, ownership and promises, client acquisition, economics and targets, price-change rules, agent rules.
+- `AGENTS.md`: one pointer to `docs/business-model.md` for Sales, Marketing, offer, pricing, and proposal work.
+- `docs/task-ledger.md`, `docs/project-log.md`: entries for this task.
 
-Tests run: `npm run test:run` (451 passed), `npm run lint`, and the build with placeholder env.
+Files inspected: `AGENTS.md`, `.agents/claude-project-instructions.md`, `docs/product-definition.md`, `docs/task-ledger.md`, `docs/project-log.md` (tail), `docs/agent-handoffs/latest-claude.md`, `docs/accounting/profitability-and-catalog.md`.
+
+Tests run: none (docs only).
 
 Decisions:
-- Confirmation stays bound to owner + slot + asset (DEC-028). The owner's authenticated Confirm request carries every text, and those texts are persisted before any provider call. So what was confirmed is exactly what is recorded and sent.
-- An offer still needs an active shared English caption to enter rotation. Channel variants only replace it on their own channel.
-- Moving a missed slot carries only the shared caption. Channel defaults are not carried into a moved slot.
+- Business model lives in its own doc, referenced from `AGENTS.md`, instead of expanding the product definition (which stays the CWS OS scope document).
+- Content is limited to owner-approved terms from the October 2026 offer work. No client names, contacts, or financials (public repo).
 
 Not done / follow-ups:
-- Carousel (multi-image) posts are not supported. Each post is a single image.
-- Per-post analytics are still not connected.
+- The `offers` catalog draft descriptions (2026-10-11) may still describe the earlier waived setup fee. Sync them to §4 in a separate ticket.
+- No `docs/decisions.md` entry was added; the pricing terms are recorded in the business-model doc only.
 
-Recommended next step (owner): add Básico channel captions in the catalog, preview each tab, and Confirm Post A.
+Memory updates withheld:
+- A DEC entry for "business model doc is the pricing source of truth" — needs Tulio's explicit approval.
+
+Recommended next step (owner): review and merge the PR.

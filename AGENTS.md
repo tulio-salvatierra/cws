@@ -1,6 +1,8 @@
 # AGENTS.md
 
 Read `docs/product-definition.md` first; it is the canonical scope (v2, DEC-032).
+For Sales, Marketing, offer, pricing, or proposal work, also read `docs/business-model.md`
+(the Negocio Listo offer, prices, terms, and go-to-market).
 Role-specific instructions live in `.agents/`. Project memory lives in `docs/`
 (`decisions.md`, `learnings.md`, `task-ledger.md`, `project-log.md`, `agent-handoffs/`).
 

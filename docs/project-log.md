@@ -2059,3 +2059,21 @@ findings.
 
 Checks: 451 tests (18 new), lint, and the build all pass. No post was
 published.
+
+---
+
+## 2026-10-17 — CWS-BIZ-MODEL-20261017
+
+Agent: Claude
+Status: Completed — PR open
+
+Added `docs/business-model.md` so agents have the business context behind CWS OS:
+the Negocio Listo offer (Básico $149, Crecer $249, Destacado $349, Contenido +$300),
+the non-waived sign-up fee ($300/$300/$400), early-termination and buyout rules,
+the target customer, positioning, sales motion, economics and the 10-client
+milestone, price-change triggers, and agent rules. `AGENTS.md` now points to it
+for Sales, Marketing, offer, pricing, and proposal work.
+
+Docs only. No code, schema, or tests changed. No client data added (public repo).
+Noted that the `offers` draft descriptions from 2026-10-11 may predate the
+sign-up fee change; the new doc says it wins until the catalog is updated.
