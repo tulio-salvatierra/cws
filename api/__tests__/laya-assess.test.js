@@ -33,11 +33,12 @@ function query(result) {
   return chain
 }
 
-function database({ membership = { workspace_id: 'workspace-1' }, run = null } = {}) {
+function database({ membership = { workspace_id: 'workspace-1' }, run = null, channel = null } = {}) {
   const updates = []
   const client = {
     auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }) },
     from: vi.fn((table) => {
+      if (table === 'channels') return query({ data: channel, error: null })
       if (table === 'workspace_members') return query({ data: membership, error: null })
       if (table === 'agent_runs') {
         return {
@@ -110,4 +111,17 @@ describe('Laya existing-draft assessment API', () => {
     expect(res.status).toHaveBeenCalledWith(404)
     expect(assessDraftSafelyMock).not.toHaveBeenCalled()
   })
+
+ it('uses only retained channel context for a pasted draft', async () => {
+   const channel = { id: 'channel-1', name: 'CWS', audience: 'Owners', voice: 'Practical' }
+   const db = database({ channel })
+   createClientMock.mockReturnValue(db.client)
+   assessDraftSafelyMock.mockResolvedValue({ available: false })
+   const res = response()
+   await handler(request({ channel_id: channel.id, topic: 'Tips', draft: 'Caption' }), res)
+   expect(res.status).toHaveBeenCalledWith(200)
+   expect(db.client.from.mock.calls.map(([table]) => table)).toEqual(['workspace_members', 'channels', 'agent_runs'])
+   expect(assessDraftSafelyMock).toHaveBeenCalledWith({ topic: 'Tips', draft: 'Caption', brief: expect.objectContaining({ audience: 'Owners', tone: 'Practical', source: expect.objectContaining({ table: 'channels', id: channel.id }) }) })
+ })
+
 })

@@ -1,4 +1,5 @@
 import { assessDraftSafely } from './assess.js'
+import { CHANNEL_CONTEXT_FIELDS, channelContext } from './channel-context.js'
 
 export const ASSESSMENT_KEY = 'marketing-laya-assessment'
 export const REVIEW_KEY = 'marketing-laya-review'
@@ -33,11 +34,11 @@ export async function handleMarketingAssessment(req, res, client, context, body 
     if (req.method === 'GET') {
       const [assessments, briefs] = await Promise.all([
         loadAssessments(client, context.workspaceId),
-        client.from('channel_brief').select('id,channel_id,language,version,audience,tone,topics_allowed,topics_forbidden,cta,geography,example_good,example_bad,channels(name)')
-          .eq('workspace_id', context.workspaceId).eq('is_active', true),
+        client.from('channels').select(CHANNEL_CONTEXT_FIELDS)
+          .eq('workspace_id', context.workspaceId),
       ])
-      if (briefs.error) throw new Error('Active business briefs could not load.')
-      return res.status(200).json({ ok: true, assessments, briefs: briefs.data || [] })
+      if (briefs.error) throw new Error('Channel context could not load.')
+      return res.status(200).json({ ok: true, assessments, briefs: (briefs.data || []).map(channelContext) })
     }
     if (body.action === 'review_laya_assessment') {
       if (!UUID.test(body.assessment_id || '')) return res.status(400).json({ ok: false, error: 'Select a saved assessment.' })
@@ -51,14 +52,15 @@ export async function handleMarketingAssessment(req, res, client, context, body 
     const topic = typeof body.topic === 'string' ? body.topic.trim() : ''
     const draft = typeof body.draft === 'string' ? body.draft.trim() : ''
     if (!topic || topic.length > 300 || !draft || draft.length > 12000 || !UUID.test(body.brief_id || '')) {
-      return res.status(400).json({ ok: false, error: 'Choose an active brief, enter a title (up to 300 characters) and asset text (up to 12,000 characters).' })
+      return res.status(400).json({ ok: false, error: 'Choose a channel, enter a title (up to 300 characters) and asset text (up to 12,000 characters).' })
     }
-    const brief = await client.from('channel_brief').select('*').eq('workspace_id', context.workspaceId)
-      .eq('id', body.brief_id).eq('is_active', true).maybeSingle()
-    if (brief.error) throw new Error('Business brief could not load.')
-    if (!brief.data) return res.status(404).json({ ok: false, error: 'That active brief is not available.' })
-    const laya = await assessDraftSafely({ topic, draft, brief: brief.data })
-    const run = await saveRun(client, context, ASSESSMENT_KEY, { topic, draft, brief_snapshot: brief.data }, { laya })
+    const brief = await client.from('channels').select(CHANNEL_CONTEXT_FIELDS).eq('workspace_id', context.workspaceId)
+      .eq('id', body.brief_id).maybeSingle()
+    if (brief.error) throw new Error('Channel context could not load.')
+    if (!brief.data) return res.status(404).json({ ok: false, error: 'That channel is not available.' })
+    const snapshot = channelContext(brief.data)
+    const laya = await assessDraftSafely({ topic, draft, brief: snapshot })
+    const run = await saveRun(client, context, ASSESSMENT_KEY, { topic, draft, brief_snapshot: snapshot }, { laya })
     return res.status(201).json({ ok: true, assessment: { ...run, reviewed: false } })
   } catch (error) {
     return res.status(502).json({ ok: false, error: error.message || 'Assessment could not be saved.' })

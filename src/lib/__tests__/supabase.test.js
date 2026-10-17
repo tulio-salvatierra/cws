@@ -24,6 +24,6 @@ describe('supabase client', () => {
 
     const { supabase, isSupabaseConfigured } = await import('../supabase.js')
     expect(isSupabaseConfigured()).toBe(false)
-    expect(() => supabase.from('keywords')).toThrow(/Supabase is not configured/)
+    expect(() => supabase.from('channels')).toThrow(/Supabase is not configured/)
   })
 })

@@ -111,8 +111,6 @@ function App() {
               </Suspense>
             } />
             <Route path="/admin/reset-password" element={<Suspense fallback={null}><ResetPasswordPage /></Suspense>} />
-            {/* Retired generic workspace screens stay harmless for saved links. */}
-            <Route path="/workspace/*" element={<Navigate to="/admin" replace />} />
             <Route
               path="/admin"
               element={
@@ -124,9 +122,7 @@ function App() {
               }
             >
               <Route index element={<AdminOverview />} />
-              <Route path="legacy-queue" element={<Navigate to="/admin/marketing" replace />} />
               <Route path="published" element={<Navigate to="/admin/marketing" replace />} />
-              <Route path="keywords" element={<Navigate to="/admin" replace />} />
               <Route path="calendar" element={<Navigate to="/admin/marketing" replace />} />
               <Route path="analytics" element={<Navigate to="/admin/marketing" replace />} />
               <Route path="clients" element={<ClientsPage />} />
@@ -134,15 +130,6 @@ function App() {
               <Route path="sales" element={<SalesPage />} />
               <Route path="mailing-list" element={<Navigate to="/admin" replace />} />
               <Route path="settings" element={<Navigate to="/admin" replace />} />
-              <Route path="workspace/*" element={<Navigate to="/admin" replace />} />
-              <Route path="channels/*" element={<Navigate to="/admin" replace />} />
-              <Route path="campaigns/*" element={<Navigate to="/admin" replace />} />
-              <Route path="variants/*" element={<Navigate to="/admin" replace />} />
-              <Route path="tasks/*" element={<Navigate to="/admin" replace />} />
-              <Route path="planning/*" element={<Navigate to="/admin" replace />} />
-              <Route path="projects/*" element={<Navigate to="/admin" replace />} />
-              <Route path="knowledge/*" element={<Navigate to="/admin" replace />} />
-            <Route path="agent-runs/*" element={<Navigate to="/admin/marketing#laya-assessments" replace />} />
               <Route path="marketing" element={<MarketingPage />} />
               <Route path="operations" element={<OperationsPage />} />
               <Route path="operations/:projectId" element={<OperationsProjectPage />} />

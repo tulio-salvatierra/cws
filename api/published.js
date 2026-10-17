@@ -182,8 +182,6 @@ function validatePayload(body) {
 function buildInsertPayload(body, workspaceId, externalPostId) {
   const optionalFields = [
     'channel_id',
-    'campaign_id',
-    'content_variant_id',
     'external_url',
     'language',
     'brief_version',

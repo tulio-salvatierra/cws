@@ -2063,3 +2063,7 @@ published.
 ## 2026-10-17 — DOCS-V3
 
 Prepared v3 scope against origin/main `edc0a8c` in an isolated worktree. DEC-033 was already assigned. Cursor historical marker and DEC-030 references were already corrected upstream. Corrected premature completed-retirement claims. No runtime or database changes.
+
+## 2026-10-17 — RETIRE-001
+
+Prepared dormant page/redirect and draft-endpoint removal after DOCS-V3. Removed remaining retiring-table reads from live Laya paths using source-backed retained channel context, kept assessment history and confirmation behavior, and stopped publication-webhook writes to retired relationship columns. Updated obsolete database tests without running them against production. See `docs/verification/retire-001.md`. No migration, export, or database mutation.

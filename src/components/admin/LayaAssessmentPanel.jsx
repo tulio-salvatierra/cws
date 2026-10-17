@@ -68,15 +68,15 @@ export default function LayaAssessmentPanel({ token, selection }) {
   const selectedBrief = data.briefs.find(brief => brief.id === briefId)
   return <section id="laya-assessments" aria-labelledby="laya-heading" className="mt-8 scroll-mt-6 rounded-2xl border border-indigo-400/30 bg-gray-900/60 p-6">
     <h2 id="laya-heading" className="text-xl font-semibold text-white">Content check · Laya</h2>
-    <p className="mt-2 text-sm text-gray-400">Check social captions, carousel text, or other marketing copy against your saved business brief. Text only—not image inspection. Nothing is approved, scheduled, or published here.</p>
-    {loading && <p className="mt-4 text-sm">Loading your business briefs…</p>}
+    <p className="mt-2 text-sm text-gray-400">Check social captions, carousel text, or other marketing copy against your saved channel audience and voice. Text only—not image inspection. Nothing is approved, scheduled, or published here.</p>
+    {loading && <p className="mt-4 text-sm">Loading your channel context…</p>}
     {error && <p role="alert" className="mt-4 text-sm text-rose-200">{error} <button type="button" className="underline" onClick={() => refresh().then(() => setError('')).catch(err => setError(err.message))}>Reload</button></p>}
-    {!loading && !data.briefs.length && <p className="mt-4 text-amber-200">No active business brief is available. Add or activate a channel brief before evaluating content.</p>}
+    {!loading && !data.briefs.length && <p className="mt-4 text-amber-200">No channel context is available. Configure a workspace channel before evaluating content.</p>}
     <form onSubmit={assess} className="mt-5 space-y-4">
       <label className="block text-sm">Business context
         <select className={field} value={briefId} onChange={event => setBriefId(event.target.value)} disabled={busy || !data.briefs.length} required>
-          <option value="">{data.briefs.length ? 'Choose the business and language' : 'No active brief'}</option>
-          {data.briefs.map(brief => <option key={brief.id} value={brief.id}>{brief.channels?.name || 'Channel'} · {brief.language} · Brief v{brief.version}</option>)}
+          <option value="">{data.briefs.length ? 'Choose a channel' : 'No channel context'}</option>
+          {data.briefs.map(brief => <option key={brief.id} value={brief.id}>{brief.channels?.name || 'Channel'}</option>)}
         </select>
       </label>
       {selectedBrief && <details className="text-sm text-gray-300"><summary className="cursor-pointer">See what Laya knows about your business</summary><dl className="mt-3 space-y-2">
@@ -90,7 +90,7 @@ export default function LayaAssessmentPanel({ token, selection }) {
       <h3 className="font-semibold">Assessment history · latest 100</h3>
       {data.assessments.map(run => <article id={`laya-run-${run.id}`} key={run.id} className="rounded-xl border border-gray-700 p-4">
         <h4 className="font-semibold">{run.input.topic}</h4>
-        <p className="mt-1 text-xs text-gray-400">{new Date(run.created_at).toLocaleString()} · Brief v{run.input.brief_snapshot?.version} · {run.reviewed ? 'Owner reviewed' : 'Awaiting owner review'}</p>
+        <p className="mt-1 text-xs text-gray-400">{new Date(run.created_at).toLocaleString()} · {run.input.brief_snapshot?.source?.table === 'channels' ? 'Channel context' : `Brief v${run.input.brief_snapshot?.version ?? '?'}`} · {run.reviewed ? 'Owner reviewed' : 'Awaiting owner review'}</p>
         <AssessmentResult assessment={run.output?.laya} />
         <details className="mt-3 text-sm text-gray-400"><summary className="cursor-pointer">Exact text assessed</summary><p className="mt-2 whitespace-pre-wrap">{run.input.draft}</p></details>
         {!run.reviewed && <button type="button" className={`${button} mt-4`} disabled={busy} onClick={() => markReviewed(run.id)}>I reviewed this feedback</button>}

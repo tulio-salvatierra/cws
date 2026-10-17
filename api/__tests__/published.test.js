@@ -87,6 +87,17 @@ describe('published posts API', () => {
     expect(response.json).toHaveBeenCalledWith({ ok: false, error: 'published_at is required.' })
   })
 
+  it('never writes retired relationship columns from a legacy caller', async () => {
+    const database = createSupabaseMock({ inserted: { id: 'published-1' } })
+    createClientMock.mockReturnValue(database.client)
+    const res = createResponse()
+    await handler(request({ platform: 'linkedin', external_post_id: 'external-1', published_at: '2026-10-17T12:00:00Z', campaign_id: 'legacy', content_variant_id: 'legacy' }), res)
+    expect(res.status).toHaveBeenCalledWith(201)
+    expect(database.insert).toHaveBeenCalledTimes(1)
+    expect(database.insert.mock.calls[0][0]).not.toHaveProperty('campaign_id')
+    expect(database.insert.mock.calls[0][0]).not.toHaveProperty('content_variant_id')
+  })
+
   it('inserts a publish event and retains the full request body', async () => {
     const body = {
       platform: 'youtube',

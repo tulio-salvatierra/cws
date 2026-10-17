@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { handleMarketingAssessment, loadReviewSummary, ASSESSMENT_KEY, REVIEW_KEY } from './marketing.js'
 import { assessDraftSafely } from './assess.js'
+import { channelContext } from './channel-context.js'
 
 vi.mock('./assess.js', () => ({ assessDraftSafely: vi.fn() }))
 const id = '11111111-1111-4111-8111-111111111111'
@@ -30,11 +31,11 @@ describe('Marketing assessments', () => {
     const res = response()
     await handleMarketingAssessment({ method: 'POST' }, res, client, context, { action: 'assess_marketing_asset', topic: 'Tips', draft: 'Text', brief_id: id })
     expect(chains[0].eq).toHaveBeenCalledWith('workspace_id', context.workspaceId)
-    expect(chains[0].eq).toHaveBeenCalledWith('is_active', true)
-    expect(assessDraftSafely).toHaveBeenCalledWith({ topic: 'Tips', draft: 'Text', brief })
-    expect(chains[1].insert).toHaveBeenCalledWith(expect.objectContaining({ command_level: 'ask', agent_key: ASSESSMENT_KEY, created_by: 'owner-a', input: { topic: 'Tips', draft: 'Text', brief_snapshot: brief }, output: { laya: { available: false, status: 'unavailable' } } }))
+    expect(chains[0].eq).toHaveBeenCalledWith('id', id)
+    expect(assessDraftSafely).toHaveBeenCalledWith({ topic: 'Tips', draft: 'Text', brief: channelContext(brief) })
+    expect(chains[1].insert).toHaveBeenCalledWith(expect.objectContaining({ command_level: 'ask', agent_key: ASSESSMENT_KEY, created_by: 'owner-a', input: { topic: 'Tips', draft: 'Text', brief_snapshot: channelContext(brief) }, output: { laya: { available: false, status: 'unavailable' } } }))
     expect(res.status).toHaveBeenCalledWith(201)
-    expect(client.from.mock.calls.map(([table]) => table)).toEqual(['channel_brief', 'agent_runs'])
+    expect(client.from.mock.calls.map(([table]) => table)).toEqual(['channels', 'agent_runs'])
   })
   it('rejects a brief from outside the authenticated workspace without calling Laya', async () => {
     const { client } = db([{ data: null }])
@@ -76,4 +77,14 @@ describe('Marketing assessments', () => {
     const { client } = db([{ error: { message: 'database failure' } }])
     expect(await loadReviewSummary(client, context.workspaceId)).toEqual({ available: false, pending: [] })
   })
+})
+
+it('loads live channel context without reading retired storage or changing history', async () => {
+  const channel = { id, name: 'CWS', audience: 'Owners', voice: 'Practical', updated_at: '2026-10-17T12:00:00Z' }
+  const { client } = db([{ data: [] }, { data: [channel] }])
+  const res = response()
+  await handleMarketingAssessment({ method: 'GET' }, res, client, context)
+  expect(client.from.mock.calls.map(([table]) => table)).toEqual(['agent_runs', 'channels'])
+  expect(res.json).toHaveBeenCalledWith({ ok: true, assessments: [], briefs: [channelContext(channel)] })
+  expect(assessDraftSafely).not.toHaveBeenCalled()
 })
