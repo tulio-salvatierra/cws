@@ -85,4 +85,4 @@
 
 | DOCS-V3 | Codex | Prepared locally; review pending | Adopted v3 and DEC-034–038; retirement explicitly pending | Review separately, then RETIRE-001; no database changes |
 
-| RETIRE-001 | Codex | Code prepared; release verification pending | Removed dormant UI/endpoints and database accesses; live Laya reads retained channel context; publication webhook ignores retired relationship IDs | Merge docs PR first, then code PR; verify six surfaces and Marketing preview after deployment. No database changes |
+| RETIRE-001 | Codex | Merged and production surfaces/preview verified; Sales backlink correction prepared | #28 merged before retargeted #29; production 23b5aea READY; six authenticated surfaces and Marketing overview/LinkedIn previews verified without publishing | Ship the residual Sales back-link fix; RETIRE-002 remains deferred. No database changes |

@@ -26,6 +26,14 @@ Literal word matches remain in public marketing prose, SEO keywords, ordinary pr
 - No pgTAP execution: no local database was started; production was not used as a test database.
 - Production browser baseline: authenticated CEO Today loaded. This does not verify the pending branch deployment.
 
-## Remaining release checks
+## Production verification — 2026-10-17
 
-Merge DOCS-V3 first, retarget this PR to main, review and merge RETIRE-001, then verify the deployed commit, all six authenticated surfaces, and one Marketing publish preview without confirming a post. RETIRE-002 remains out of scope; do not apply the supplied drop SQL.
+- #28 merged first as `0050cfe`; #29 retargeted to main and merged as `23b5aea`.
+- Vercel CWS production deployment `dpl_9DSAm9GvXzXrgTGqJno7tur3grhw` is READY for `23b5aea70f2fc062829059eeba24a54c9863946f`, with the cicerowebstudio.xyz and www aliases assigned.
+- Authenticated Chrome verification on www.cicerowebstudio.xyz: CEO Today priorities/history loaded; Sales queue/prospect review loaded; Operations readiness projects loaded; Accounting summary/registers loaded; Compliance requirements/history loaded; Marketing slots, destination verification, assessment history and channel context loaded.
+- Marketing overview showed image/caption preview; LinkedIn tab showed both slot image/caption previews and existing delivery results. All four destinations were verified. Both current slots were already Posted with Slot locked controls. No new action was confirmed; no caption, asset, business record, or owner review was changed.
+- Found and corrected one residual Sales back link to the removed Workspace route; it now returns to CEO Today.
+- No provider publish/send, export, SQL execution, migration, or table drop was performed.
+- Separate cws-laya-release project lacks its public Supabase client variables; no configuration or credentials changed.
+
+RETIRE-002 remains explicitly deferred. The supplied drop SQL must not be applied.
