@@ -2067,3 +2067,7 @@ Prepared v3 scope against origin/main `edc0a8c` in an isolated worktree. DEC-033
 ## 2026-10-17 — RETIRE-001
 
 Prepared dormant page/redirect and draft-endpoint removal after DOCS-V3. Removed remaining retiring-table reads from live Laya paths using source-backed retained channel context, kept assessment history and confirmation behavior, and stopped publication-webhook writes to retired relationship columns. Updated obsolete database tests without running them against production. See `docs/verification/retire-001.md`. No migration, export, or database mutation.
+
+## 2026-10-17 — RETIRE-001 production checks
+
+Merged #28, retargeted #29 to main, then merged #29. Confirmed CWS production deployment 23b5aea READY and custom domains assigned. Authenticated browser checks loaded all six department surfaces and Marketing overview/LinkedIn caption-image previews; four destinations verified, existing slots locked. No publishing, sending, record edits, SQL, migrations, exports, or table drops. Found and corrected the residual Sales Workspace backlink.

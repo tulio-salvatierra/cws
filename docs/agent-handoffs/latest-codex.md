@@ -9,11 +9,12 @@ Decisions made: Follow DOCS-V3 (#28), with RETIRE-001 as a separate stacked PR. 
 Assumptions: This is code retirement only, not DECISIONS-001 or LAYA-001. Missing channel guidance remains unspecified; it is not translated or invented.
 Tests added: Retired relationship fields cannot become publication columns; pasted-draft API uses workspace channel context; assessment GET only loads channel context/history. Updated snapshot and UI tests.
 Tests run: Full Vitest 406 tests in 53 files passed. ESLint passed. Import casing, test-mode Vite build, production build with existing public client configuration, and git diff --check passed. Production build has existing chunk-size/lottie warnings. Database tests were edited but not executed.
-Known issues: Post-merge/deployment verification of all six surfaces and one Marketing preview remains pending. Authenticated production CEO Today loaded as a baseline only. Literal protocol field channel_brief remains in transport/local service/tests; zero retired database queries remain. The app still uses pre-existing advisory behavior; v3 evaluator implementation is separately scoped.
-Recommended next task: Merge docs PR, retarget code PR to main, review/merge, confirm deployment and six-surface/Marketing-preview checks. Do not execute RETIRE-002 yet.
+Production verification: #28 merged, #29 retargeted/merged; 23b5aea deployed READY with custom domains. All six authenticated surfaces and Marketing overview/LinkedIn previews loaded. Four destinations verified; both current slots already Posted/locked. No publishing, sending, record edits, SQL, or table drops. Found and corrected a residual Sales Workspace backlink.
+Known issues: Sales backlink correction prepared for release. Literal protocol field channel_brief remains in transport/local service/tests; zero retired database queries remain. The app still uses pre-existing advisory behavior; v3 evaluator implementation is separately scoped.
+Recommended next task: Release the small Sales backlink correction and retain the production verification record. Do not execute RETIRE-002.
 Questions requiring Tulio: None for these two PRs; production table retirement is explicitly deferred by the user.
 Project-memory files updated: Product definition, task ledger, project log, this handoff; docs/verification/retire-001.md records audit and release checks.
 Permanent decisions added: None in this code PR.
 Reusable learnings added: None.
-Memory updates withheld: No claim of production deployment, export, SQL execution, or table drops.
+Memory updates withheld: No export, SQL execution, or table drops.
 Git diff summary: Separate code PR based on docs PR; approximately 4,000 lines of dormant code/tests removed. No migration files changed.

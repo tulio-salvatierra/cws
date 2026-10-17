@@ -109,7 +109,7 @@ export default function SalesPage() {
   const { summary } = sales
   const prospectDiscovery = sales.prospectDiscovery || { configured: false }
   return <main className="min-h-screen bg-slate-950 px-5 py-8 text-white md:px-10 md:py-12"><div className="mx-auto max-w-5xl">
-    <Link className="text-sm font-semibold text-orange-300" to="/admin/workspace">← Workspace</Link>
+    <Link className="text-sm font-semibold text-orange-300" to="/admin">← CEO Today</Link>
     <p className="mt-10 text-xs font-semibold uppercase tracking-[0.25em] text-orange-200">Sales</p>
     <h1 className="mt-3 text-4xl font-semibold">Today’s command queue</h1>
     <p className="mt-3 text-slate-400">Who needs attention, why, and the next useful action. Preparing or viewing a draft never sends email.</p>
