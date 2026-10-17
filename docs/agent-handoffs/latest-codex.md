@@ -1,19 +1,19 @@
-Task ID: DOCS-V3
+Task ID: RETIRE-001
 Agent: Codex
-Objective: Adopt supplied CWS OS v3 scope and preserve truthful retirement status.
-Files inspected: Four supplied documents; AGENTS.md; .agents/codex-project-instructions.md; product definition, conventions, decisions, learnings, ledger, project log, relevant handoffs.
-Files changed: AGENTS.md; docs/product-definition.md; docs/technical-conventions.md; docs/decisions.md; docs/task-ledger.md; docs/project-log.md; this handoff.
-Database or API changes: None.
-Security decisions: Supplied approval assertions do not themselves authorize a production drop. Exact-resource owner confirmation remains required for external actions.
-Decisions made: Recorded supplied v3 policy as DEC-034–038; existing DEC-033 retained.
-Assumptions: Future tables and evaluator behavior are target scope, not claimed deployed.
-Tests added: None (docs only).
-Tests run: git diff --check and document consistency assertions passed.
-Known issues: RETIRE-001 and RETIRE-002 pending. Public repo: inspect any database export for private data before committing.
-Recommended next task: Separate RETIRE-001 change, then export-first RETIRE-002.
-Questions requiring Tulio: Explicit authorization before executing the production drop.
-Project-memory files updated: decisions, task ledger, project log, this handoff.
-Permanent decisions added: DEC-034–038 from supplied v3 scope.
+Objective: Remove dormant v1 application dependencies without changing production tables.
+Files inspected: Supplied retirement ticket/audit/SQL; canonical product definition; conventions, decisions, learnings, ledger, project log, relevant handoffs; admin routes/pages; APIs; Laya helpers/transport; local service; Vite/Vercel config; database and application tests.
+Files changed: Dormant UI/endpoints/tests removed; live assessment queries use retained channels; publication webhook drops obsolete relation fields; Vite/Vercel routes cleaned; back links fixed; mixed pgTAP test retains live publication/decision checks; product scope, ledger, project log, verification record, this handoff updated.
+Database or API changes: No migration or database change. Removed generate-draft and review-generated-draft APIs. Existing assessment response shape retained; context IDs now identify workspace channels and new snapshots cite channels. History/review receipts are unchanged.
+Security decisions: Exact-resource owner confirmation unchanged; no posts, emails, or provider actions. Original homepage changes untouched in the primary checkout. No secrets committed.
+Decisions made: Follow DOCS-V3 (#28), with RETIRE-001 as a separate stacked PR. Keep existing Laya wire field for service compatibility; it is not a database reference.
+Assumptions: This is code retirement only, not DECISIONS-001 or LAYA-001. Missing channel guidance remains unspecified; it is not translated or invented.
+Tests added: Retired relationship fields cannot become publication columns; pasted-draft API uses workspace channel context; assessment GET only loads channel context/history. Updated snapshot and UI tests.
+Tests run: Full Vitest 406 tests in 53 files passed. ESLint passed. Import casing, test-mode Vite build, production build with existing public client configuration, and git diff --check passed. Production build has existing chunk-size/lottie warnings. Database tests were edited but not executed.
+Known issues: Post-merge/deployment verification of all six surfaces and one Marketing preview remains pending. Authenticated production CEO Today loaded as a baseline only. Literal protocol field channel_brief remains in transport/local service/tests; zero retired database queries remain. The app still uses pre-existing advisory behavior; v3 evaluator implementation is separately scoped.
+Recommended next task: Merge docs PR, retarget code PR to main, review/merge, confirm deployment and six-surface/Marketing-preview checks. Do not execute RETIRE-002 yet.
+Questions requiring Tulio: None for these two PRs; production table retirement is explicitly deferred by the user.
+Project-memory files updated: Product definition, task ledger, project log, this handoff; docs/verification/retire-001.md records audit and release checks.
+Permanent decisions added: None in this code PR.
 Reusable learnings added: None.
-Memory updates withheld: No claim of merge, deployment, export, migration, or live verification.
-Git diff summary: Documentation only; original checkout homepage edits untouched.
+Memory updates withheld: No claim of production deployment, export, SQL execution, or table drops.
+Git diff summary: Separate code PR based on docs PR; approximately 4,000 lines of dormant code/tests removed. No migration files changed.

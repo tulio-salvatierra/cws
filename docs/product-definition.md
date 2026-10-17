@@ -127,7 +127,7 @@ Avoid:
 
 ## 6. Retired layer
 
-The v1 Content Operations layer and the pre-OS n8n tables are **approved for retirement** (DEC-037). Implementation is pending: remove and deploy dormant code (RETIRE-001), then export and verify all 20 tables before applying RETIRE-002. No export or database drop is claimed here.
+The v1 Content Operations layer and the pre-OS n8n tables are **approved for retirement** (DEC-037). RETIRE-001 code removal is prepared for review; deployment and live checks remain pending. Then export and verify all 20 tables before applying RETIRE-002. No export or database drop is claimed here.
 
 - **Tables to retire (RETIRE-002):**
   - goals, initiatives, projects, tasks, learnings

@@ -2,6 +2,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { assessDraftSafely } from '../server/laya/assess.js'
+import { CHANNEL_CONTEXT_FIELDS, channelContext } from '../server/laya/channel-context.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' })
@@ -48,10 +49,10 @@ export default async function handler(req, res) {
   if (!run.data) return res.status(404).json({ ok: false, error: 'Agent run not found.' })
 
   if (!runId) {
-    const brief = await client.from('channel_brief').select('*').eq('workspace_id', membership.data.workspace_id).eq('channel_id', body.channel_id).eq('language', body.language || 'en').eq('is_active', true).maybeSingle()
+    const brief = await client.from('channels').select(CHANNEL_CONTEXT_FIELDS).eq('workspace_id', membership.data.workspace_id).eq('id', body.channel_id).maybeSingle()
     if (brief.error) return databaseError(res, brief.error)
-    if (!brief.data) return res.status(400).json({ ok: false, error: 'No active brief for this channel and language.' })
-    run.data.input.brief_snapshot = brief.data
+    if (!brief.data) return res.status(400).json({ ok: false, error: 'No channel context is available.' })
+    run.data.input.brief_snapshot = channelContext(brief.data)
   }
 
   const draft = typeof run.data.output?.draft_text === 'string' ? run.data.output.draft_text.trim() : ''

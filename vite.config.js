@@ -8,7 +8,6 @@ import {
   GoogleSheetsWebhookTimeoutError,
   postGoogleSheetsWebhook,
 } from './server/google-sheets-webhook.js'
-import generateDraftHandler from './api/generate-draft.js'
 import layaAssessHandler from './api/laya-assess.js'
 import { SERVER_ENV_KEYS } from './env.keys.js'
 
@@ -20,15 +19,6 @@ function clientPortalApiPlugin(env) {
   return {
     name: 'client-portal-local-api',
     configureServer(server) {
-      server.middlewares.use('/api/generate-draft', async (req, res) => {
-        const body = await readJsonBody(req).catch(() => null)
-        if (body === null) {
-          sendJson(res, 400, { ok: false, error: 'Request body must be valid JSON.' })
-          return
-        }
-        await generateDraftHandler({ method: req.method, headers: req.headers, body }, createVercelResponse(res))
-      })
-
       server.middlewares.use('/api/laya-assess', async (req, res) => {
         const body = await readJsonBody(req).catch(() => null)
         if (body === null) {

@@ -10,12 +10,6 @@
     "api/client-portal-intake.js": {
       "maxDuration": 60
     },
-    "api/generate-draft.js": {
-      "maxDuration": 60
-    },
-    "api/review-generated-draft.js": {
-      "maxDuration": 30
-    },
     "api/marketing-linkedin.js": {
       "maxDuration": 30,
       "includeFiles": "public/images/logo.png"

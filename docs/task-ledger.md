@@ -84,3 +84,5 @@
 | CWS-MARKETING-CHANNEL-CAPTIONS | Claude | Completed — merged to `main`; migration `20261016142931` applied | Offer captions take an optional channel (Meta → Facebook+Instagram, LinkedIn, Google); slots prefill channel text from the catalog; each channel tab edits its own caption (shared fallback, per-channel limits 3,000/3,000/2,200/1,500); attempts persist immutable exact per-destination text plus source caption id; Confirm sends and names every channel's text; 451 tests, lint, build pass | Owner: add Básico captions per channel, confirm Post A |
 
 | DOCS-V3 | Codex | Prepared locally; review pending | Adopted v3 and DEC-034–038; retirement explicitly pending | Review separately, then RETIRE-001; no database changes |
+
+| RETIRE-001 | Codex | Code prepared; release verification pending | Removed dormant UI/endpoints and database accesses; live Laya reads retained channel context; publication webhook ignores retired relationship IDs | Merge docs PR first, then code PR; verify six surfaces and Marketing preview after deployment. No database changes |

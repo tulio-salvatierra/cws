@@ -1,14 +1,7 @@
 begin;
 
-select plan(22);
+select plan(12);
 
-select has_column('public', 'learnings', 'status', 'learnings have a lifecycle status');
-select has_column('public', 'learnings', 'trigger', 'learnings retain the trigger');
-select has_column('public', 'learnings', 'evidence', 'learnings retain evidence');
-select has_column('public', 'learnings', 'action', 'learnings retain an action');
-select has_column('public', 'learnings', 'exceptions', 'learnings retain exceptions');
-select has_column('public', 'learnings', 'last_verified', 'learnings retain their verification date');
-select has_column('public', 'learnings', 'scope', 'learnings retain their scope');
 select has_column('public', 'decisions', 'observed_outcome', 'decisions retain their observed outcome');
 
 insert into auth.users (
@@ -101,22 +94,6 @@ select is(
   (select external_post_id from public.published_posts where workspace_id = 'abababab-0000-0000-0000-000000000001' and platform = 'instagram'),
   'marketing-attempt:abababab-0000-0000-0000-000000000004:instagram',
   'the no-ID fallback is deterministic rather than duplicating records'
-);
-
-insert into public.learnings (id, workspace_id, title, body, created_by) values
-  ('abababab-0000-0000-0000-000000000005', 'abababab-0000-0000-0000-000000000001', 'A test learning', 'Existing learning body remains intact.', 'abababab-abab-abab-abab-abababababab');
-select is(
-  (select status from public.learnings where id = 'abababab-0000-0000-0000-000000000005'),
-  'provisional',
-  'existing and new learnings receive the provisional default'
-);
-select lives_ok(
-  $$update public.learnings set status = 'verified', trigger = 'A test trigger', evidence = 'A test evidence record', action = 'A test action', exceptions = 'None', last_verified = '2026-09-15', scope = 'CWS' where id = 'abababab-0000-0000-0000-000000000005'$$,
-  'learning metadata is optional and supports verified learnings'
-);
-select throws_ok(
-  $$update public.learnings set status = 'unsupported' where id = 'abababab-0000-0000-0000-000000000005'$$,
-  '23514', null, 'the learning lifecycle rejects unsupported states'
 );
 
 insert into public.decisions (id, workspace_id, title, decision, created_by) values
