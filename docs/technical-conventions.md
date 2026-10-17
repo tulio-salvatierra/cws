@@ -13,7 +13,8 @@
 - bundle.social for social publishing (LinkedIn, Facebook, Instagram, Google Business Profile)
 - Resend for outreach email and signed delivery/bounce webhooks
 - Google Sheets + Apps Script for the client intake relay
-- Laya advisory evaluator (`/api/laya-assess`), AUTO tier only
+- Laya in-app advisory evaluator (`/api/laya-assess`): deterministic verdicts,
+  sourced claims, owner-response persistence only; LLM calls wait for §9a
 - Final Cut Pro for video editing (references only, never automated)
 - n8n is retired (DEC-030); do not add or restore any n8n path
 

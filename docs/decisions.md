@@ -27,6 +27,12 @@ Numbers DEC-001–003 and DEC-014–024 were never recorded in this file; do not
 | 032 | Product definition v2: six-department OS, Content Ops frozen, English-only live | Approved |
 | 033 | Prove one new destination end-to-end before adding another | Approved |
 
+| 034 | AI authority is AUTO + PREPARE only | Approved; implementation pending where applicable |
+| 035 | Laya is the advisory evaluator only | Approved; implementation pending where applicable |
+| 036 | Business decisions serve CEO Today | Approved; implementation pending where applicable |
+| 037 | Retire the dormant v1 and n8n layers | Approved; implementation pending where applicable |
+| 038 | Owner-entered whole project hours | Approved; implementation pending where applicable |
+
 ---
 
 ## DEC-004 — Existing social publishing pipeline remains separate during MVP
@@ -520,3 +526,48 @@ Earlier capability work stacked above a zero-output layer. This rule was
 previously cited as "DEC-026" in project memory, which collided with the
 repo's DEC-026 (n8n revival).
 
+
+## DEC-034 — AI authority is AUTO + PREPARE only
+
+Date: 2026-10-17
+Status: Approved (supplied product definition v3)
+
+### Decision
+
+AI has no execute tier. External actions require exact-resource owner confirmation. In-app LLM calls wait for product definition §9a: three clients through the Negocio Listo lifecycle and four consecutive weeks at the DEC-031 rate.
+
+## DEC-035 — Laya is the advisory evaluator only
+
+Date: 2026-10-17
+Status: Approved (supplied product definition v3)
+
+### Decision
+
+Rules set verdicts; every claim cites a source row. Evaluations are computed live and `laya_evaluations` is written only on owner Act or Dismiss. Laya never changes CEO Today ordering. The shared contract is defined in product definition §3a.
+
+## DEC-036 — Business decisions serve CEO Today
+
+Date: 2026-10-17
+Status: Approved (supplied product definition v3)
+
+### Decision
+
+Reshape dormant `decisions` into `business_decisions` under DECISIONS-001. Only the owner sets `active`. Active decisions require a review date and revisit condition; CEO Today derives review items. Architecture decisions stay in this file (DEC-012).
+
+## DEC-037 — Retire the dormant v1 and n8n layers
+
+Date: 2026-10-17
+Status: Approved (supplied product definition v3)
+
+### Decision
+
+Retire dormant code under RETIRE-001, deploy and verify, then export and validate all 20 tables before dropping under RETIRE-002. Keep live `agent_runs`, `channels`, `decisions`, and shared `update_updated_at()`. Implementation remains pending until export, migration parity, and live checks are recorded.
+
+## DEC-038 — Owner-entered whole project hours
+
+Date: 2026-10-17
+Status: Approved (supplied product definition v3)
+
+### Decision
+
+Track whole hours per project, entered by the owner. Implement integer `hours` in `project_time_entries` under the separately scoped LIFECYCLE-001 ticket.
