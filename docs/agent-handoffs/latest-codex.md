@@ -1,37 +1,19 @@
-Task ID: CWS-MARKETING-GBP-20261013
+Task ID: DOCS-V3
 Agent: Codex
-Objective: Release Google Business Profile as a fourth owner-confirmed Marketing destination and verify the live channel tabs.
-Files inspected:
-- `api/marketing-linkedin.js`, `api/__tests__/marketing-linkedin.test.js`, `src/marketing/channels.js`, Marketing UI and tests, the Google migration, project conventions, and project memory.
-Files changed:
-- `api/marketing-linkedin.js`, `api/__tests__/marketing-linkedin.test.js`, `docs/agent-handoffs/latest-codex.md`, `docs/project-log.md`, `docs/task-ledger.md`.
-Database or API changes:
-- Production migration `20261012110804_marketing_google_business.sql` was applied. It adds Google destination support and per-attempt required platforms without changing historical three-channel attempts.
-- The owner-only Marketing API recognizes the observed sole CWS Google location when bundle.social omits `providerPageId`, pins verification to its exact Google location ID, and records that ID in destination identity.
-Security decisions:
-- A missing selected-location ID is accepted only for one available location with the exact CWS Google ID and matching account/location names. Other locations, multiple locations, or identity mismatches fail closed. Publishing still requires the existing exact-slot owner confirmation.
-Decisions made:
-- No social post was submitted during release verification.
-Assumptions:
-- The Google location returned by the connected production bundle.social team is the intended CWS destination.
-Tests added:
-- Verified missing-selection single-location case and wrong/ambiguous Google location cases; confirmed persisted identity on a simulated publish.
-Tests run:
-- `npm run test:run` — 433 passed; `npm run lint` and `npm run build` passed.
-- Authenticated, read-only Production UI check showed all four destinations verified, tabs present, Post A reviewable, and Post B awaiting the prior slot.
-Known issues:
-- No real four-channel post was sent, so provider publication and per-channel result ingestion remain unproven until an owner confirms a real post.
-Recommended next task:
-- Owner reviews Post A caption/image and uses Confirm Post A when ready; then inspect provider results and permalinks for all four channels.
-Questions requiring Tulio:
-- None for deployment. Actual posting remains an explicit owner action.
-Project-memory files updated:
-- `docs/agent-handoffs/latest-codex.md`, `docs/project-log.md`, `docs/task-ledger.md`.
-Permanent decisions added:
-- None.
-Reusable learnings added:
-- None.
-Memory updates withheld:
-- None.
-Git diff summary:
-- Targeted Google account verification/tests and project memory changed. Existing unrelated dirty files under tools, artifacts, output, client-project types, and a separate migration were left untouched.
+Objective: Adopt supplied CWS OS v3 scope and preserve truthful retirement status.
+Files inspected: Four supplied documents; AGENTS.md; .agents/codex-project-instructions.md; product definition, conventions, decisions, learnings, ledger, project log, relevant handoffs.
+Files changed: AGENTS.md; docs/product-definition.md; docs/technical-conventions.md; docs/decisions.md; docs/task-ledger.md; docs/project-log.md; this handoff.
+Database or API changes: None.
+Security decisions: Supplied approval assertions do not themselves authorize a production drop. Exact-resource owner confirmation remains required for external actions.
+Decisions made: Recorded supplied v3 policy as DEC-034–038; existing DEC-033 retained.
+Assumptions: Future tables and evaluator behavior are target scope, not claimed deployed.
+Tests added: None (docs only).
+Tests run: git diff --check and document consistency assertions passed.
+Known issues: RETIRE-001 and RETIRE-002 pending. Public repo: inspect any database export for private data before committing.
+Recommended next task: Separate RETIRE-001 change, then export-first RETIRE-002.
+Questions requiring Tulio: Explicit authorization before executing the production drop.
+Project-memory files updated: decisions, task ledger, project log, this handoff.
+Permanent decisions added: DEC-034–038 from supplied v3 scope.
+Reusable learnings added: None.
+Memory updates withheld: No claim of merge, deployment, export, migration, or live verification.
+Git diff summary: Documentation only; original checkout homepage edits untouched.

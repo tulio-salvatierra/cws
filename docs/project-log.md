@@ -2059,3 +2059,7 @@ findings.
 
 Checks: 451 tests (18 new), lint, and the build all pass. No post was
 published.
+
+## 2026-10-17 — DOCS-V3
+
+Prepared v3 scope against origin/main `edc0a8c` in an isolated worktree. DEC-033 was already assigned. Cursor historical marker and DEC-030 references were already corrected upstream. Corrected premature completed-retirement claims. No runtime or database changes.
