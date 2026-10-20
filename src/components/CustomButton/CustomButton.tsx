@@ -1,8 +1,15 @@
+import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import "./CustomButton.css";
 
+export type ButtonVariant = "primary" | "secondary";
+
 interface CustomButtonProps {
-  label: string;
+  label?: string;
+  children?: ReactNode;
   href?: string;
+  to?: string;
+  variant?: ButtonVariant;
   secondary?: boolean;
   light?: boolean;
   newTab?: boolean;
@@ -14,7 +21,10 @@ interface CustomButtonProps {
 
 export default function CustomButton({
   label,
+  children,
   href,
+  to,
+  variant,
   secondary = false,
   light = false,
   newTab = false,
@@ -23,9 +33,12 @@ export default function CustomButton({
   className = "",
   fullWidth = false,
 }: CustomButtonProps) {
+  const resolvedVariant: ButtonVariant =
+    variant ?? (secondary ? "secondary" : "primary");
+
   const classes = [
     "custom-btn",
-    secondary ? "custom-btn--secondary" : "",
+    `custom-btn--${resolvedVariant}`,
     light ? "custom-btn--light" : "",
     fullWidth ? "custom-btn--full" : "",
     className,
@@ -33,7 +46,17 @@ export default function CustomButton({
     .filter(Boolean)
     .join(" ");
 
-  const content = <span className="custom-btn__label">{label}</span>;
+  const content = (
+    <span className="custom-btn__label">{children ?? label}</span>
+  );
+
+  if (to) {
+    return (
+      <Link to={to} className={classes} onClick={onClick}>
+        {content}
+      </Link>
+    );
+  }
 
   if (href) {
     return (

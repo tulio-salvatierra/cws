@@ -87,33 +87,6 @@
   gap: clamp(0.75rem, 2vw, 1.5rem);
 }
 
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: clamp(4rem, 7vw, 6.25rem);
-  padding: 0 2rem;
-  border-radius: 3.75rem;
-  font-family: "Clash", sans-serif;
-  font-size: clamp(0.95rem, 1.25vw, 1.125rem);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.hero-cta:hover {
-  transform: scale(0.97);
-}
-
-.hero-cta--primary {
-  background: #f5892f;
-  color: #000;
-}
-
-.hero-cta--secondary {
-  background: rgba(90, 84, 84, 0.8);
-  color: #fff;
-}
-
 .hero-cta--desktop {
   display: inline-flex;
 }

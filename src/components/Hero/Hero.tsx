@@ -1,6 +1,6 @@
 import { useRef } from "react";
-import { Link } from "react-router-dom";
 import { PHONE } from "../../Constants/Constants";
+import CustomButton from "../CustomButton";
 import { useLoaderReady } from "../../context/LoaderContext";
 import { waitForAppFonts } from "../../lib/waitForAppFonts";
 
@@ -111,21 +111,24 @@ export default function Hero() {
         </div>
 
         <div className="hero-actions">
-          <a
+          <CustomButton
             href={`tel:+1${PHONE}`}
-            className="hero-cta hero-cta--primary hero-cta--desktop"
-          >
-            Call now!
-          </a>
-          <Link
+            variant="primary"
+            className="hero-cta hero-cta--desktop"
+            label="Call now!"
+          />
+          <CustomButton
             to="/#contact"
-            className="hero-cta hero-cta--primary hero-cta--mobile"
-          >
-            Contact
-          </Link>
-          <Link to="/#projects" className="hero-cta hero-cta--secondary">
-            Work
-          </Link>
+            variant="primary"
+            className="hero-cta hero-cta--mobile"
+            label="Contact"
+          />
+          <CustomButton
+            to="/#projects"
+            variant="secondary"
+            className="hero-cta"
+            label="Work"
+          />
         </div>
       </div>
     </section>

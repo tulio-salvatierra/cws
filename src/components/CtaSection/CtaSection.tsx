@@ -3,6 +3,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PHONE } from "../../Constants/Constants";
+import CustomButton from "../CustomButton";
 import websiteVideo from "../../assets/video/website.mp4";
 import "./CtaSection.css";
 
@@ -86,12 +87,16 @@ export default function CtaSection() {
           shape it into sharp positioning and a website strategy that connects in
           seconds.
         </p>
-        <a href={`tel:+1${PHONE}`} className="cta-section__button">
+        <CustomButton
+          href={`tel:+1${PHONE}`}
+          variant="primary"
+          className="cta-section__button"
+        >
           <span className="cta-section__button-label--desktop">Call now!</span>
           <span className="cta-section__button-label--mobile">
             {formatPhone(PHONE)}
           </span>
-        </a>
+        </CustomButton>
       </div>
     </section>
   );

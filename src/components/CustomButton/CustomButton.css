@@ -2,13 +2,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: clamp(10rem, 23vw, 21.375rem);
-  height: clamp(3.5rem, 7vw, 6.25rem);
-  padding: 0 clamp(1.5rem, 3vw, 2rem);
+  min-width: 10.5rem;
+  height: clamp(4rem, 7vw, 6.25rem);
+  padding: 0 2rem;
   border: 0;
   border-radius: 3.75rem;
-  background: #f5892f;
-  color: #000;
   font-family: "Clash", sans-serif;
   font-size: clamp(0.95rem, 1.25vw, 1.125rem);
   font-weight: 600;
@@ -17,11 +15,17 @@
   text-align: center;
   cursor: pointer;
   appearance: none;
+  white-space: nowrap;
   transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
 .custom-btn:hover {
   transform: scale(0.97);
+}
+
+.custom-btn--primary {
+  background: #f5892f;
+  color: #000;
 }
 
 .custom-btn--secondary {
@@ -40,8 +44,10 @@
 }
 
 .custom-btn__label {
-  display: block;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
 }
 
 /* Legacy btn-bounce markup — same visual system for older call sites */
@@ -49,9 +55,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: clamp(10rem, 23vw, 21.375rem);
-  height: clamp(3.5rem, 7vw, 6.25rem);
-  padding: 0 clamp(1.5rem, 3vw, 2rem);
+  min-width: 10.5rem;
+  height: clamp(4rem, 7vw, 6.25rem);
+  padding: 0 2rem;
   border: 0;
   border-radius: 3.75rem;
   background: #f5892f;

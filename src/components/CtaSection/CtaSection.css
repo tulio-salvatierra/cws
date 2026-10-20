@@ -66,25 +66,9 @@
 }
 
 .cta-section__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   min-width: min(100%, 28.75rem);
   height: clamp(4.25rem, 10vw, 6.25rem);
   margin-top: clamp(0.5rem, 2vw, 1.5rem);
-  padding: 0 2.5rem;
-  border-radius: 3.75rem;
-  background: #f5892f;
-  color: #000;
-  font-family: "Clash", sans-serif;
-  font-size: clamp(1rem, 1.25vw, 1.125rem);
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.cta-section__button:hover {
-  transform: scale(0.98);
 }
 
 .cta-section__button-label--mobile {
