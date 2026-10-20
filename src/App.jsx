@@ -17,6 +17,7 @@ import BlogPost from "./components/BlogPost";
 import Contact from "./components/Contact";
 import LandingPage from "./components/LandingPage";
 import Gallery from "./components/Gallery";
+import NegocioListo from "./components/NegocioListo";
 import { getLandingPageData } from "./data/landingPagesData";
 
 const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
@@ -65,11 +66,16 @@ function LandingPageWrapper() {
   return <LandingPage data={landingPageData} />;
 }
 
+// Ad and DM traffic lands on the Negocio Listo pages: skip the intro loader so the
+// page (and its video) is usable immediately instead of waiting for window load.
+const NEGOCIO_LISTO_PATH = /^\/(en\/)?negocio-listo\/?$/;
+const skipIntroLoader = typeof window !== "undefined" && NEGOCIO_LISTO_PATH.test(window.location.pathname);
+
 function App() {
   useLenis(); // Custom hook for smooth scrolling
 
-  const [loading, setLoading] = useState(true);
-  const [heroReady, setHeroReady] = useState(false);
+  const [loading, setLoading] = useState(!skipIntroLoader);
+  const [heroReady, setHeroReady] = useState(skipIntroLoader);
   const heroDelayTimerRef = useRef(null);
 
   useEffect(() => {
@@ -104,6 +110,8 @@ function App() {
               <Route path="client-portal" element={<Navigate to="/" replace />} />
               {/* Dynamic landing page routes inside layout so providers apply */}
               <Route path="landing/:id" element={<LandingPageWrapper />} />
+              <Route path="negocio-listo" element={<NegocioListo lang="es" />} />
+              <Route path="en/negocio-listo" element={<NegocioListo lang="en" />} />
             </Route>
             <Route path="/admin/login" element={
               <Suspense fallback={null}>

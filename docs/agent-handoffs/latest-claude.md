@@ -1,34 +1,30 @@
-Task ID: CWS-MARKETING-CHANNEL-CAPTIONS
+Task ID: CWS-NL-LANDING
 Agent: Claude
-Objective: Let each Marketing destination receive its own caption (Meta, LinkedIn, Google) while keeping the shared caption as the fallback and the exact-slot owner confirmation unchanged.
+Objective: Add a bilingual Negocio Listo landing page with a video hero, a timed lead popup and an inline lead form, using the site's existing styles, with SEO-friendly URLs.
 
 Files changed:
-- `src/marketing/platformCaptions.js` (new): per-destination limits, catalog channel map, effective-text and validation helpers.
-- `server/marketing/offer-catalog.js`: shared rotation excludes channel variants; per-channel LRU defaults on each asset.
-- `src/marketing/weeklySlots.js`: `slot.platformCaptions` comes from the attempt record, or from catalog defaults for an open slot.
-- `api/marketing-linkedin.js`:
-  - validates and normalizes `platform_captions`;
-  - persists the immutable per-destination record before the provider call;
-  - sends each platform's own text to bundle.social;
-  - catalog captions accept `platform`;
-  - serializers expose the texts.
-- `src/pages/admin/MarketingPage.jsx`:
-  - each channel tab has its own caption editor with a limit counter and a "Use shared caption" button;
-  - the overview shows chips for which channels use their own text;
-  - the confirmation dialog names the channels with custom text;
-  - the catalog caption form has a Channel select.
-- `supabase/migrations/20261016142931_marketing_platform_captions.sql`: applied to production.
-- Tests: the new `platformCaptions.test.js`, plus additions to the API, catalog, and Marketing page tests.
+- `src/data/negocioListo.js` (new): all ES/EN copy, plan data, FAQ, video transcripts, URLs and the JSON-LD graph (ProfessionalService, Service + three Offers, VideoObject, FAQPage). Plain ESM so the build script can import it.
+- `src/components/NegocioListo/` (new): `NegocioListo.jsx` (page + SEO hook), `NegocioListoLeadForm.jsx` (popup/inline variants), `NegocioListoPopup.jsx` (portal dialog), `NegocioListo.css`.
+- `src/lib/negocioListoLead.ts` (new): submit helper, UTM capture, popup suppression (session dismiss, lead sent).
+- `server/outreach/public-lead.js` (new) and `api/outreach.js`: unauthenticated `POST /api/outreach/public-lead`.
+- `scripts/prerender-negocio-listo.mjs` (new), `package.json` build, `vercel.json` rewrites for both routes.
+- `src/App.jsx`: two routes; intro loader skipped on these paths.
+- `public/videos/negocio-listo-{es,en}.mp4`, `public/images/negocio-listo/{poster-es,poster-en,og}.jpg`, `public/sitemap.xml`, `public/llms.txt`.
+- `docs/product-definition.md` §2: one sentence on the public lead path.
+- Tests: `server/outreach/__tests__/public-lead.test.js`, `scripts/__tests__/prerender-negocio-listo.test.js`.
 
-Tests run: `npm run test:run` (451 passed), `npm run lint`, and the build with placeholder env.
+Tests run: `npm run test:run` (414 passed), `npm run lint`, `npm run build` with placeholder client env. Playwright against `vite preview` (desktop 1440, mobile 390): popup at 3 s on desktop, bottom sheet only after scroll on mobile, both forms post the expected payload (API mocked), no horizontal overflow, title/lang/hreflang correct.
 
-Decisions:
-- Confirmation stays bound to owner + slot + asset (DEC-028). The owner's authenticated Confirm request carries every text, and those texts are persisted before any provider call. So what was confirmed is exactly what is recorded and sent.
-- An offer still needs an active shared English caption to enter rotation. Channel variants only replace it on their own channel.
-- Moving a missed slot carries only the shared caption. Channel defaults are not carried into a moved slot.
+Decisions (implementation, not DEC entries):
+- Leads go to the existing `leads` table as `sales_classification = inbound`, `created_by` = the active workspace owner. Business type, plan, website and UTM are packed into `source` (≤200 chars) to avoid a migration.
+- A second submission from the same phone within 30 minutes updates that row instead of inserting.
+- Spam: hidden honeypot field and a 1 s minimum fill time; both return a silent 202 with no write.
+- Section backgrounds use `nl-bg-*` class names because `index.css` forces `main section:not([class*="bg-"])` transparent.
 
-Not done / follow-ups:
-- Carousel (multi-image) posts are not supported. Each post is a single image.
-- Per-post analytics are still not connected.
+Not verified:
+- The live endpoint against production Supabase (no service-role key in this environment). Needs one real test submission on the preview deploy.
+- Vercel serving `/negocio-listo` from the prerendered file via the new rewrites (verify on the preview deploy with "view source").
 
-Recommended next step (owner): add Básico channel captions in the catalog, preview each tab, and Confirm Post A.
+Open owner questions:
+- Reels say "$150/mes"; the site and graphics say $149.
+- Setup fee shown as "según el plan" (graphics) while the product definition says $300.

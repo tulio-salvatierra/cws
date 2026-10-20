@@ -1,6 +1,7 @@
 import draft from '../server/outreach/draft.js'
 import leads from '../server/outreach/leads.js'
 import mailingListSend from '../server/outreach/mailing-list-send.js'
+import publicLead from '../server/outreach/public-lead.js'
 import send from '../server/outreach/send.js'
 import subscribers from '../server/outreach/subscribers.js'
 import templates from '../server/outreach/templates.js'
@@ -9,6 +10,7 @@ const handlers = {
   '/draft': draft,
   '/leads': leads,
   '/mailing-list-send': mailingListSend,
+  '/public-lead': publicLead,
   '/send': send,
   '/subscribers': subscribers,
   '/templates': templates,

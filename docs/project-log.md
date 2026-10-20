@@ -2071,3 +2071,8 @@ Prepared dormant page/redirect and draft-endpoint removal after DOCS-V3. Removed
 ## 2026-10-17 — RETIRE-001 production checks
 
 Merged #28, retargeted #29 to main, then merged #29. Confirmed CWS production deployment 23b5aea READY and custom domains assigned. Authenticated browser checks loaded all six department surfaces and Marketing overview/LinkedIn caption-image previews; four destinations verified, existing slots locked. No publishing, sending, record edits, SQL, migrations, exports, or table drops. Found and corrected the residual Sales Workspace backlink.
+
+## 2026-10-20 — CWS-NL-LANDING
+
+Added the Negocio Listo landing pages in Spanish (`/negocio-listo`) and English (`/en/negocio-listo`) with the owner's EN/ES reels in a phone-frame player, plan copy taken from `public/images/negocio-listo`, a lead popup and an inline form. Leads post to a new public route on the existing outreach function (no new Vercel function) and land as `inbound` rows in `leads` with a compact `source` tag; no email or other external action. A build step writes prerendered HTML for both routes so link previews and crawlers get the page's own metadata. The intro loader is skipped on these routes. No migration or database change.
+

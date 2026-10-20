@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:imports && vite build",
+    "build": "npm run check:imports && vite build && node scripts/prerender-negocio-listo.mjs",
     "check:imports": "node scripts/check-import-casing.mjs",
     "lint": "eslint .",
     "preview": "vite preview",

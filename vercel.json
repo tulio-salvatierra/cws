@@ -33,6 +33,14 @@
       "destination": "/api/outreach"
     },
     {
+      "source": "/negocio-listo",
+      "destination": "/negocio-listo.html"
+    },
+    {
+      "source": "/en/negocio-listo",
+      "destination": "/en/negocio-listo.html"
+    },
+    {
       "source": "/((?!api/|assets/|.*\\..*).*)",
       "destination": "/index.html"
     }

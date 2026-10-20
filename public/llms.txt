@@ -4,6 +4,11 @@
 
 Cicero Web Studio provides affordable, high-quality web design and development services with a focus on mobile-first design, performance optimization, and local SEO. We help small businesses establish a strong online presence with custom websites, photo/video content, and digital marketing solutions.
 
+## Negocio Listo (primary offer)
+
+- [Negocio Listo (Español)](https://cicerowebstudio.xyz/negocio-listo): Plan mensual para contratistas y negocios locales en Cicero, Berwyn y Chicago: sitio web bilingüe, perfil de Google y optimización para IA. Básico $149/mes, Crecer $249/mes, Destacado $349/mes. Revisión gratis del perfil de Google.
+- [Negocio Listo (English)](https://cicerowebstudio.xyz/en/negocio-listo): Monthly plan for contractors and local businesses in Cicero, Berwyn and Chicago: bilingual website, Google Business Profile and AI search optimization. Básico $149/mo, Crecer $249/mo, Destacado $349/mo. Free Google profile check.
+
 ## Core Pages
 
 - [Home](https://cicerowebstudio.xyz/): Main landing page featuring services, portfolio, and company information

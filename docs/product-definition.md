@@ -51,7 +51,7 @@ The admin app (`/admin`) has six surfaces. These are the product.
 
 `agent_runs` is live shared infrastructure. It records AI PREPARE runs: creative drafts and prospect briefs.
 
-Also live: the public marketing site (`cicerowebstudio.xyz`). The public client portal is **disabled**; intake runs through Vercel and Google Apps Script.
+Also live: the public marketing site (`cicerowebstudio.xyz`). The public client portal is **disabled**; intake runs through Vercel and Google Apps Script. The Negocio Listo landing pages (`/negocio-listo`, `/en/negocio-listo`) capture leads through `POST /api/outreach/public-lead`, which inserts or merges one `inbound` `leads` row owned by the workspace owner and triggers no external action.
 
 ## 3. Authority model
 
