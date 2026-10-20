@@ -31,16 +31,16 @@ All tiers: **12-month minimum**, billed monthly in advance by autopay. Each tier
 
 | Tier | Monthly | Sign-up fee (retainer) | Includes |
 | --- | --- | --- | --- |
-| Básico | $149 | $300, due at signing | Bilingual website (ES + EN, written separately), hosting, Google Business Profile setup and optimization, local SEO and directory listings, 30 min of edits/month |
-| Crecer (recommended) | $249 | $300, due at signing | Básico + 4 Google profile posts/month (2 ES, 2 EN), review requests and replies, missed-call text-back, 30-min monthly review session with a one-page report |
-| Destacado | $349 | $400, due at signing | Crecer + AI search optimization (schema, crawler access, Bing/Apple listings), one bilingual FAQ or service page/month, monthly AI visibility check |
+| Básico | $150 | $300, due at signing | Bilingual website (ES + EN, written separately), hosting, Google Business Profile setup and optimization, local SEO and directory listings, 30 min of edits/month |
+| Crecer (recommended) | $250 | $300, due at signing | Básico + 4 Google profile posts/month (2 ES, 2 EN), review requests and replies, missed-call text-back, 30-min monthly review session with a one-page report |
+| Destacado | $350 | $400, due at signing | Crecer + AI search optimization (schema, crawler access, Bing/Apple listings), one bilingual FAQ or service page/month, monthly AI visibility check |
 | Contenido (add-on) | +$300 | — | Quarterly photo/video shoot turned into monthly posts |
 
 Other rates:
 
 | Item | Price |
 | --- | --- |
-| Edits beyond 30 min/month | $95/hour, quoted first |
+| Edits beyond 30 min/month | $100/hour, quoted first |
 | Extra website page | $150/page, both languages |
 | One-off custom site | From $2,500, always with a monthly care plan |
 
@@ -50,7 +50,7 @@ Fee rules:
 - **Early termination:** the client pays a fee that covers the website build: 3 months of the plan for a one-page site, 6 months for a multi-page site (or the remaining months, if fewer).
 - **Website buyout** after leaving: 6 months of the plan's fee.
 - Price is locked for the first 12 months, then month to month with 30 days' notice for changes.
-- **Existing-client exception:** a client whose site is already paid for may get Crecer at **$199/month** with no sign-up fee and a shorter minimum. Any other exception needs Tulio's decision.
+- **Existing-client exception:** a client whose site is already paid for may get Crecer at **$200/month** with no sign-up fee and a shorter minimum. Any other exception needs Tulio's decision.
 
 The `offers` table in Accounting holds draft entries for these tiers (added 2026-10-11). If their descriptions disagree with this section, this section is newer and wins until the catalog is updated.
 
@@ -96,7 +96,7 @@ Raise prices when any of these is true:
 3. A tier's tracked effective rate falls below target.
 4. 3–5 clients have results with real numbers to show.
 
-How: new clients first, in $50 steps (e.g. $199/$299/$399). The first 10 clients keep launch pricing for their 12 months as founding clients. Existing clients change only at renewal, 5–10%, with 30 days' notice. Never discount to close a deal.
+How: new clients first, in $50 steps (e.g. $200/$300/$400). The first 10 clients keep launch pricing for their 12 months as founding clients. Existing clients change only at renewal, 5–10%, with 30 days' notice. Never discount to close a deal.
 
 ## 9. Rules for agents
 

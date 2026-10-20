@@ -2068,7 +2068,7 @@ Agent: Claude
 Status: Completed — PR open
 
 Added `docs/business-model.md` so agents have the business context behind CWS OS:
-the Negocio Listo offer (Básico $149, Crecer $249, Destacado $349, Contenido +$300),
+the Negocio Listo offer (Básico $150, Crecer $250, Destacado $350, Contenido +$300),
 the non-waived sign-up fee ($300/$300/$400), early-termination and buyout rules,
 the target customer, positioning, sales motion, economics and the 10-client
 milestone, price-change triggers, and agent rules. `AGENTS.md` now points to it
