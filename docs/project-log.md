@@ -2084,3 +2084,7 @@ Applied exact approved data seed as production migration `20261021151033`; 64/64
 ## 2026-10-21 — CANSPAM-FIX-001
 
 Implemented the approved P1 fixes: full commercial footer before exact owner confirmation, persistent workspace/email suppression, public token and legacy-link opt-out, and owner-recorded reply opt-outs. Hardened retained mailing-list sends to require exact owner confirmation. Migration `20261021152507` applied; four templates updated, prior suppression backfilled, browser table access denied, security advisor unchanged. Postal address configured server-side without committing it. 430 tests, lint, import casing and production build pass; test peer lockfile repaired for clean installs. Release verification pending; see `docs/verification/canspam-fix-001.md`. No real email sent.
+
+## 2026-10-21 — CWS-NL-FIX-001
+
+Fixed landing-page footer Contact navigation and stale form-error language. Error text derives from status and current copy, preserving entered values and in-flight state. 430 tests, lint, production build/prerender and diff checks passed. No data or API changes. Production verification pending.

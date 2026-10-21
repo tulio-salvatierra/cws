@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   ABOUT_URL,
   CONTACT_URL,
@@ -49,6 +49,10 @@ function formatFooterDate(date: Date) {
 
 export default function Footer() {
   const lenisRef = useRef<{ scrollTo: (target: number, options?: { duration?: number }) => void } | null>(null);
+  const { pathname } = useLocation();
+  const contactUrl = pathname === "/negocio-listo" || pathname === "/en/negocio-listo"
+    ? "#formulario"
+    : CONTACT_URL;
   const footerDate = formatFooterDate(new Date());
 
   useEffect(() => {
@@ -94,7 +98,7 @@ export default function Footer() {
               {FOOTER_NAV.map((item) => (
                 <Link
                   key={item.label}
-                  to={item.url}
+                  to={item.label === "Contact" ? contactUrl : item.url}
                   className="site-footer__nav-link"
                 >
                   {item.label}

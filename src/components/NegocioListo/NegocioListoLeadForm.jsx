@@ -10,7 +10,7 @@ export default function NegocioListoLeadForm({ copy, variant, selectedPlan, onPl
   const t = copy.form
   const startedAt = useRef(Date.now())
   const [status, setStatus] = useState('idle')
-  const [message, setMessage] = useState('')
+  const message = status === 'invalid' ? t.required : status === 'error' ? t.error : ''
   const idPrefix = `nl-${variant}`
   const isInline = variant === 'inline'
 
@@ -21,11 +21,9 @@ export default function NegocioListoLeadForm({ copy, variant, selectedPlan, onPl
     const phone = String(data.get('phone') || '').trim()
     if (!name || !hasValidUsPhone(phone)) {
       setStatus('invalid')
-      setMessage(t.required)
       return
     }
     setStatus('sending')
-    setMessage('')
     try {
       await submitNegocioListoLead({
         form: variant,
@@ -44,7 +42,6 @@ export default function NegocioListoLeadForm({ copy, variant, selectedPlan, onPl
       onDone?.()
     } catch {
       setStatus('error')
-      setMessage(t.error)
     }
   }
 
