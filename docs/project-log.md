@@ -2072,6 +2072,8 @@ Prepared dormant page/redirect and draft-endpoint removal after DOCS-V3. Removed
 
 Merged #28, retargeted #29 to main, then merged #29. Confirmed CWS production deployment 23b5aea READY and custom domains assigned. Authenticated browser checks loaded all six department surfaces and Marketing overview/LinkedIn caption-image previews; four destinations verified, existing slots locked. No publishing, sending, record edits, SQL, migrations, exports, or table drops. Found and corrected the residual Sales Workspace backlink.
 
+Final check: #30 merged; production 8af5739 READY. Authenticated Sales loaded and corrected back navigation reached CEO Today. All 11 Sales tests passed.
+
 ## 2026-10-20 — CWS-NL-LANDING
 
 Added the Negocio Listo landing pages in Spanish (`/negocio-listo`) and English (`/en/negocio-listo`) with the owner's EN/ES reels in a phone-frame player, plan copy taken from `public/images/negocio-listo`, a lead popup and an inline form. Leads post to a new public route on the existing outreach function (no new Vercel function) and land as `inbound` rows in `leads` with a compact `source` tag; no email or other external action. A build step writes prerendered HTML for both routes so link previews and crawlers get the page's own metadata. The intro loader is skipped on these routes. No migration or database change.
@@ -2087,4 +2089,14 @@ Implemented the approved P1 fixes: full commercial footer before exact owner con
 
 ## 2026-10-21 — CWS-NL-FIX-001
 
-Fixed landing-page footer Contact navigation and stale form-error language. Error text derives from status and current copy, preserving entered values and in-flight state. 430 tests, lint, production build/prerender and diff checks passed. No data or API changes. Production a31b744 deployed to cws as dpl_E99LWLkvAQkTuApQcDXYFLMko5k4 (READY, custom domains assigned). Live browser verified both footer targets and ES→EN→ES validation language updates; no leads submitted.
+Fixed landing-page footer Contact navigation and stale form-error language. Error text derives from status and current copy, preserving entered values and in-flight state. 430 tests, lint, production build/prerender and diff checks passed. No data or API changes. Production verification pending.
+
+## 2026-10-21 — RETIRE-002 prerequisite verification
+
+Confirmed production intact after interrupted rehearsal: all 20 tables, posts 39, sends 17, agent_runs 24, channels 2, decisions 1; no active rehearsal. Incorporated newer main including both compliance/email migrations and confirmed 65/65 pre-existing version parity. Reverified the committed archive SHA-256 and all production row hashes; fresh local restore matched 20 tables/87 rows. Native pg_dump source was an exact typed MCP snapshot because direct IPv6/pooler CLI export failed; the manifest discloses this. Corrected pre-existing pgTAP policy function and privilege argument order; all 46 assertions pass with fixtures/extension rolled back. Full app suite: 430 tests in 57 files; lint passed. §9a exception authorized by Tulio recorded as DEC-039; §6 corrected locally. Automatic approval review blocked pushing the archive to the public remote because internal database records would be exposed. Backup destination approval pending; no production retirement DDL or migration applied.
+
+## 2026-10-21 — RETIRE-002 applied with private archive
+
+Per direct owner instruction, saved the exact export, inspection schema and manifest in Documents/CWS-backups (0700/0600); checksum and fresh restore of all 20 tables/87 rows matched production hashes. Created a clean branch from current main excluding every archive-bearing commit and added a gitignore guard. Applied retirement migration 20261021155615 with hash/FK guards and no CASCADE; exact remote SQL matches the file and all 66 versions match locally/remotely. Confirmed zero retired tables/topic view, retained agent_runs/channels/decisions/update_updated_at(), all four NULL live columns, and unchanged posts 39/sends 17 (agent runs 24, channels 2, decisions 1). Regenerated types. Post-drop pgTAP 46 assertions, Vitest 430 tests, lint, build/prerenders and diff checks passed; advisors unchanged. Authenticated all six production surfaces and Marketing overview/LinkedIn image-caption previews loaded. No publishing, sending, owner review, or business-record edit. §6 records completed retirement; §9a and DEC-039 grandfather only the existing advisory Marketing assessment.
+
+Verification follow-up: Marketing GET reconciliation persisted four provider results for an existing attempt created earlier (2026-10-21T11:35:57.535876Z). The publication ledger is now 43; sends remain 17. No publish control was used and no new Marketing attempt was created.

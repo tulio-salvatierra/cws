@@ -34,7 +34,7 @@ the only state store. Supabase project `cws-os-staging` is **production**.
 
 ## Product v3 boundaries
 
-- AI is AUTO + PREPARE only. In-app LLM work waits for product definition §9a.
+- AI is AUTO + PREPARE only. New in-app LLM work waits for product definition §9a; the existing advisory Marketing assessment is grandfathered (DEC-039).
 - Laya rules set verdicts with source-backed claims; only owner responses persist evaluations.
 - Retirement order: code removal and deployment, verified export, database migration. Keep `agent_runs`, `channels`, `decisions`, and shared `update_updated_at()`.
 - Project time is owner-entered whole hours.

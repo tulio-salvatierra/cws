@@ -1,21 +1,19 @@
-Task ID: CWS-NL-FIX-001
+Task ID: RETIRE-002
 Agent: Codex
-Objective: Fix both verified landing-page issues and deploy to cws production.
-Files inspected: Product definition, conventions, decisions, learnings, ledger, log, prior handoff, Footer, NegocioListo form/page/popup, package scripts.
-Files changed: Footer.tsx, NegocioListoLeadForm.jsx and required memory files.
-Database or API changes: None.
-Security decisions: No production lead submissions or provider actions.
-Decisions made: Route-specific footer destination; derive localized errors from existing status rather than storing translated text.
-Assumptions: Preserve entered fields, selected plan and submission state when changing language.
-Tests added: None; small reversible change checked with existing suite and planned live browser verification.
-Tests run: 430 tests in 57 files, lint, production build/prerender, git diff --check passed; live browser confirmed footer targets on both routes and validation text updates in both directions.
-Known issues: Existing build chunk-size warnings. Production a31b744 verified READY (dpl_E99LWLkvAQkTuApQcDXYFLMko5k4), custom domains assigned; live footer targets and ES→EN→ES validation language verified without submitting leads.
-Recommended next task: No further landing-page work required.
+Objective: Complete owner-authorized retirement with a private verified archive and existing Marketing-assessment exception.
+Files inspected: Canonical product scope, AGENTS and role guidance, conventions/decisions/learnings, supplied SQL/audit, newer main and compliance/email migrations, private archive/manifest, current schema/history, live department pages.
+Files changed: Guarded migration renamed to 20261021155615; regenerated src/types/supabase.ts; corrected three pgTAP files; product §6/§9a, DEC-039, AGENTS, conventions, ledger/log/verification, this handoff; gitignore prevents accidental archive inclusion. Retained prior RETIRE-001 final verification updates.
+Database or API changes: Applied retire_v1_dormant_layer on production ddbhxqkckzpwzwvnoxqt. Dropped exactly 20 dormant tables, topic_performance and 15 dedicated functions; detached four live-parent FKs. Kept live columns (all NULL), agent_runs, channels, decisions, update_updated_at(), and newer compliance/email objects. No application endpoint change in this ticket.
+Security decisions: Exact data archive kept only in owner-approved Documents/CWS-backups, outside GitHub. A clean branch excludes the rejected archive-bearing history. Directory/file modes 0700/0600. No publish, send, owner-review action, credential exposure or Auth/permission change. Marketing GET reconciliation wrote four existing-attempt platform results, increasing posts from 39 immediately after the drop to 43 after preview; the attempt was created before this work and no new Marketing attempt was created.
+Decisions made: Existing Marketing advisory assessment grandfathered under §9a/DEC-039; new in-app AI features remain gated. Private backup destination overrides the original public archive instruction.
+Assumptions: Preserve current main and both newer compliance/email migrations. Export filenames retain the original 2026-10-17 ticket identifier; capture timestamp is disclosed in the private manifest.
+Tests added: None. Corrected unsupported pgTAP policy assertion and reversed privilege arguments; no runtime grants changed.
+Tests run: Fresh private-folder restore and checksum; all 20 production row hashes/counts match (87 rows). 46 pgTAP assertions before/after drop with fixture/extension rollback. 430 Vitest tests in 57 files, ESLint, production build, both landing prerenders, diff checks. 66/66 migration versions match; remote history SQL equals the local migration byte-for-byte. Advisors unchanged. All six authenticated production surfaces plus Marketing overview/LinkedIn image-caption previews load.
+Known issues: Existing build chunk/lottie warnings and existing security advisor baseline remain. Export method is exact typed MCP snapshot -> native pg_dump from verified local replica, because direct IPv6 access timed out and pooler rejected CLI credentials; not a full schema backup. Historical migrations and private inspection schema support recovery. No archive content is included in the public branch.
+Recommended next task: Separately scope DECISIONS-001; no additional lifecycle or Laya work is authorized by this retirement.
 Questions requiring Tulio: None.
-Project-memory files updated: This handoff, project log, task ledger.
-Permanent decisions added: None.
+Project-memory files updated: Product definition, decisions, technical conventions, AGENTS, ledger, log, RETIRE-001/002 verification and this handoff.
+Permanent decisions added: DEC-039 from direct owner instruction.
 Reusable learnings added: None.
-Memory updates withheld: No new policy or scope decision required.
-Git diff summary: Two focused component edits plus required memory. Working tree initially clean.
-
-CANSPAM-FIX-001 completed independently: see docs/agent-handoffs/canspam-fix-001-codex.md and docs/verification/canspam-fix-001.md. The concurrent CWS-NL-FIX-001 handoff above is preserved.
+Memory updates withheld: No inference of a social publish or email delivery test; none was performed.
+Git diff summary: Archive-free branch based on current main. Only migration/types/tests/docs/ignore changes; original user checkout untouched. PR records release merge/deployment disposition.
