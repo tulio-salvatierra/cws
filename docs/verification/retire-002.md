@@ -1,19 +1,35 @@
 # RETIRE-002 verification — 2026-10-21
 
-Status: prerequisites verified; production retirement not applied.
+Production: `cws-os-staging` (`ddbhxqkckzpwzwvnoxqt`). Migration `20261021155615_retire_v1_dormant_layer` applied successfully. No publishing, email, billing, or other external action was performed.
 
-Production project: `cws-os-staging` (`ddbhxqkckzpwzwvnoxqt`). Current main was `eeacd84` at resumption. All 20 target tables remain after the interrupted rehearsal. No active rehearsal query was found. Live counts: published_posts 39, outreach_sends 17, agent_runs 24, channels 2, decisions 1. Shared update_updated_at() remains.
+## Private export and restore
 
-Pre-existing migration parity: 65 remote versions exactly match 65 committed local versions, including 20261021151033 and 20261021152507. The retirement file is intentionally excluded until applied; no broad db push or migration repair was run.
+The exact archive, typed inspection schema, and manifest are saved in `/Users/tuliosalvatierra/Documents/CWS-backups`, with directory mode 0700 and files 0600. The owner explicitly requires keeping the archive out of GitHub. A clean branch was created from current main without any archive-bearing commit; a gitignore rule prevents accidental inclusion. The original rejected push did not run.
 
-The archive committed as 2727276 contains all 87 rows from the 20 target tables. Its SHA-256 matches the manifest (`c4c8eaca71e51670e8f1731683d2d03936aad35afda12b4101c6f1ac42a801c7`). Fresh production per-table counts and MD5 hashes of sorted to_jsonb(row)::text match the manifest. A fresh local restore into cws_retire_recheck_20261021 matched every count/hash. Actual snapshot capture time is 2026-10-19T01:44:25.239599Z; the 2026-10-17 filename is the supplied ticket identifier. See archive README for the MCP snapshot → typed local replica → native pg_dump method and its scope. It is not a full production schema backup.
+The archive has all 20 tables and 87 rows. Its SHA-256 is `c4c8eaca71e51670e8f1731683d2d03936aad35afda12b4101c6f1ac42a801c7`. Immediately before dropping, every production table count and MD5 of sorted `to_jsonb(row)::text` matched the private manifest in UTC. The exact files were then restored from the private folder into a fresh local PostgreSQL database; every count/hash matched again.
 
-All five pgTAP files ran against the current production schema via temporary functions with rollback subtransactions. All 46 assertions passed; fixtures and temporary pgTAP extension changes were rolled back. Corrected unsupported hasnt_policy calls to policies_are with an empty array and table_privs_are argument order to schema/table/role. These were test defects, not production permission changes. The CLI runner itself could not run because Docker is absent.
+The 2026-10-17 filename is the supplied ticket identifier. Actual source capture time is 2026-10-19T01:44:25.239599Z. Direct IPv6 PostgreSQL access timed out and the pooler rejected CLI temporary credentials, so the export uses a consistent read-only MCP snapshot, exact typed local replica, then native PostgreSQL 17 `pg_dump --data-only --column-inserts --disable-triggers`. This method is disclosed in the private manifest. The inspection schema intentionally omits production constraints/RLS/triggers/defaults: this is a verified data archive, not a full production schema backup. Historical committed migrations preserve the schema history.
 
-Full Vitest suite: 430 tests in 57 files passed. ESLint passed. Production build and both landing-page prerenders passed. No new tests were added for the documentation change.
+## Database verification
 
-Archive content review found test/brand drafts, no client-linked project, email, phone, or credential patterns. Despite that review, automatic approval review rejected the remote push because the repository is public and the exact archive contains internal business/content records. User has been asked to approve exact public publication or provide a private backup destination. No bypass or indirect publication was attempted.
+All 20 retirement tables and `topic_performance` are gone. All 15 dedicated functions were targeted by explicit DROP FUNCTION statements; no CASCADE was used. Retained: `agent_runs` (24 rows), `channels` (2), `decisions` (1), and `update_updated_at()`. `published_posts` remains 39 rows and `outreach_sends` remains 17. All four unused nullable relationship columns remain, all NULL; their four retiring-parent FKs were removed. Newer compliance/email migrations and objects were retained.
 
-The guarded migration aborts on changed export counts/hashes or non-NULL retired live FKs, uses short lock/statement timeouts, and does not use CASCADE. It retains agent_runs, channels, decisions, update_updated_at(), live relationship columns, and all newer compliance/email objects. Do not apply it until backup-destination approval is resolved.
+The guarded migration locks target/live relationship tables briefly, checks every archived table count/content hash, and aborts on any changed export data or non-NULL live relationship. It uses 5-second lock and 30-second statement timeouts.
 
-Pending: approved backup destination, migration apply and exact remote-version/content parity, regenerated database types, post-drop counts and object inventory, security advisor comparison, post-drop production six-surface/Marketing-preview checks, PR/merge. No publishing or sending is authorized or performed.
+Remote history assigned version `20261021155615`; the local file was renamed to match. The remote history contains one statement identical byte-for-byte to the applied local SQL (SHA-256 `69c6e642f786bf7dbd431f75252496ad6092e8625bde1adfa7457f1856287de1`). There are 66 remote migrations and 66 local files. Final committed version-set verification is recorded in the handoff. No migration repair or broad db push was used.
+
+## Tests and advisors
+
+All five repository pgTAP files passed before and after retirement: 46 assertions each run. They ran against the production schema through temporary session functions with rollback subtransactions; fixtures and temporary pgTAP extension changes were rolled back. Corrected unsupported `hasnt_policy` assertions to `policies_are` with empty policy arrays and corrected `table_privs_are` arguments to schema/table/role. These were pre-existing test defects, not permission changes. Docker is unavailable, so the CLI pgTAP wrapper could not run; pgTAP itself did run.
+
+430 Vitest tests in 57 files, ESLint, production build, both landing-page prerenders, and diff checks passed before migration. Post-type-generation validation also passed: 430 tests in 57 files, ESLint, production build, both prerenders and diff checks.
+
+Security advisors are unchanged from the immediate pre-drop baseline. No permission or Auth configuration was changed. Regenerated production database types are in `src/types/supabase.ts` and contain no archived row data.
+
+## Product scope
+
+§6 now records completed retirement and the owner-authorized private backup location. §9a and DEC-039 grandfather only the existing advisory Marketing assessment; new in-app AI features remain gated. The assessment cannot approve or publish.
+
+## Production browser checks
+
+Authenticated Chrome checks after the drop passed for all six surfaces: CEO Today priorities and content reviews; Sales queue; Operations readiness projects; Accounting summaries/registers; Compliance requirements (including newer checklist items); Marketing slots, retained assessment history and channel context. Marketing overview showed the image/caption preview with destinations verified; LinkedIn tab showed both slot image/caption previews and its verified destination. Only navigation and channel-tab controls were used. No publish/send/review-confirmation or business-record mutation occurred.

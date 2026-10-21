@@ -24,10 +24,7 @@ serverless functions under `/api`.
 
 ## Row-Level Security
 
-- Legacy tables (`research_topics`, `keywords`, `content_drafts`, `platform_posts`,
-  `media_assets`, `post_analytics`) retain their existing blanket
-  `to authenticated using (true) with check (true)` policy. Do not extend this
-  pattern to new tables — see DEC-007.
+- The dormant v1/n8n tables were dropped by migration `20261021155615`. Their historical blanket authenticated RLS pattern must not be reused (DEC-007).
 - New CWS Operating System tables use explicit `workspace_id` / `created_by`
   ownership columns with workspace-authorized RLS policies, per DEC-007.
 

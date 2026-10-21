@@ -83,7 +83,7 @@
 | CWS-ALIGN-20261016 | Claude | Completed — merged to `main` | Fast-forwarded `main` to `codex/ceo-today-integration` (`9f799c7`); product definition v2 adopted (DEC-032/033); migration files renamed to exact remote versions and two missing files recovered — 62/62 parity; decision index, technical conventions, AGENTS.md, ledger backfill | Owner: export CWS-001 master, confirm Post A, resume 5/day outreach |
 | CWS-MARKETING-CHANNEL-CAPTIONS | Claude | Completed — merged to `main`; migration `20261016142931` applied | Offer captions take an optional channel (Meta → Facebook+Instagram, LinkedIn, Google); slots prefill channel text from the catalog; each channel tab edits its own caption (shared fallback, per-channel limits 3,000/3,000/2,200/1,500); attempts persist immutable exact per-destination text plus source caption id; Confirm sends and names every channel's text; 451 tests, lint, build pass | Owner: add Básico captions per channel, confirm Post A |
 
-| DOCS-V3 | Codex | Prepared locally; review pending | Adopted v3 and DEC-034–038; retirement explicitly pending | Review separately, then RETIRE-001; no database changes |
+| DOCS-V3 | Codex | Completed — merged as #28 | Adopted v3 and DEC-034–038; follow-up §6/§9a corrections are in RETIRE-002 | Canonical scope maintained with retirement status and DEC-039 |
 
 | RETIRE-001 | Codex | Completed — merged and production verified | #28 merged before retargeted #29; production 23b5aea READY; six authenticated surfaces and Marketing overview/LinkedIn previews verified without publishing | Sales backlink shipped/verified via #30 (8af5739); RETIRE-002 remains deferred. No database changes |
 
@@ -95,4 +95,4 @@
 
 | CWS-NL-FIX-001 | Codex | Implemented; production verification pending | Footer Contact targets formulario on both landing routes; validation and request errors derive from current language without resetting form state; 430 tests, lint, build pass | Verify production release |
 
-| RETIRE-002 | Codex | Prerequisites verified; backup-publication approval pending | Production intact after interruption; 65/65 pre-existing migration parity; all 20 export counts/hashes match, 87 rows restored; 46 pgTAP and 430 Vitest assertions pass; §9a exception and §6 status updated locally | Automatic review blocked publishing internal archive to public repo; resolve backup destination before drop. No retirement migration applied |
+| RETIRE-002 | Codex | Applied and production verified | Private-folder backup restored/verified (87 rows); migration 20261021155615 retires 20 tables; 66/66 version and exact SQL parity; retained counts 39/17/24/2/1; 46 pgTAP and 430 app tests pass; all six surfaces and Marketing previews load | Next work requires separately scoped DECISIONS-001; archive remains private; no publishing performed |

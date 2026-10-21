@@ -129,9 +129,9 @@ Avoid:
 
 ## 6. Retired layer
 
-The v1 Content Operations layer and the pre-OS n8n tables are **approved for retirement** (DEC-037). RETIRE-001 was merged, deployed, and production-verified through PRs #29–30. RETIRE-002 has a committed local export at `docs/archive/v1-dormant-export-2026-10-17.sql`, verified against all 20 production tables and restored successfully into a fresh local database. The export's approved backup destination is pending; the table-drop migration has not been applied. Actual capture time and hashes are recorded in the companion manifest.
+The v1 Content Operations layer and the pre-OS n8n tables are **retired** (DEC-037). RETIRE-001 was merged, deployed, and production-verified through PRs #29–30. After verifying all 87 archived rows and a fresh restore from the owner's private backup folder, RETIRE-002 dropped all 20 tables and their dedicated functions in migration `20261021155615`. The exact archive is kept outside GitHub at `/Users/tuliosalvatierra/Documents/CWS-backups/v1-dormant-export-2026-10-17.sql`, with its typed inspection schema and verification manifest. This private destination supersedes the original public-repository export requirement. Actual capture time, method, and hashes are in that private manifest; public evidence is in `docs/verification/retire-002.md`.
 
-- **Tables to retire (RETIRE-002):**
+- **Retired tables (RETIRE-002):**
   - goals, initiatives, projects, tasks, learnings
   - campaigns, content_variants, approvals, content_variant_exports, content_variant_revision_events
   - channel_brief, channel_topics, topic_proposals, topic_coverage

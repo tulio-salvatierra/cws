@@ -565,6 +565,8 @@ Status: Approved (supplied product definition v3)
 
 Retire dormant code under RETIRE-001, deploy and verify, then export and validate all 20 tables before dropping under RETIRE-002. Keep live `agent_runs`, `channels`, `decisions`, and shared `update_updated_at()`. Implementation remains pending until export, migration parity, and live checks are recorded.
 
+Implementation, 2026-10-21: migration `20261021155615` retired all 20 tables after a restore-verified private export. Per direct owner instruction, the exact backup remains in `Documents/CWS-backups` and is excluded from GitHub.
+
 ## DEC-038 — Owner-entered whole project hours
 
 Date: 2026-10-17
