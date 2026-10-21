@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import GoalPace from './GoalPace'
 import BusinessDecisions from './BusinessDecisions'
 import { supabase } from '../../lib/supabase'
 
@@ -55,6 +56,8 @@ export default function AdminOverview() {
 
       {error && <p role="alert" className="mt-6 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">{error}</p>}
       {!error && !ceo && <p className="mt-6 text-sm text-gray-400">Loading today’s priorities…</p>}
+
+      {ceo?.goal_pace && <GoalPace pace={ceo.goal_pace} />}
 
       {ceo && <section className="mt-7 space-y-3" aria-label="CEO Today actions">
         {actions.map((item) => <CeoActionCard key={item.id} item={item} onNotNow={() => setNotNow((current) => new Set(current).add(item.id))} />)}

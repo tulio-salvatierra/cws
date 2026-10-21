@@ -197,6 +197,7 @@ describe('CEO Today endpoint', () => {
     const res=response();await handler({method:'GET'},res)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json.mock.calls[0][0].negocio_listo).toMatchObject({available:false,items:[]})
+    expect(res.json.mock.calls[0][0].goal_pace).toMatchObject({verdict:"needs_data",recorded_agreements:null,goal:{recorded:null},checkpoint:{recorded:null}})
   })
 
   it.each(['act','dismiss'])('persists only owner %s response evidence through POST', async choice => {

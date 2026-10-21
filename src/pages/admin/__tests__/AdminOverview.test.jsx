@@ -9,6 +9,7 @@ vi.mock('../../../lib/supabase', () => ({
 }))
 
 import AdminOverview from '../AdminOverview'
+import { buildGoalPace } from '../../../../server/ceo/goal-pace.js'
 
 function response(payload) {
   return { ok: true, json: vi.fn().mockResolvedValue(payload) }
@@ -45,6 +46,20 @@ describe('AdminOverview CEO Today', () => {
   })
 
   afterEach(() => vi.unstubAllGlobals())
+
+  it('pins evidence gaps above actions and keeps them visible after Not now without writes', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...ceoToday, goal_pace: buildGoalPace({workspaceId:'w',now:new Date('2026-10-21T12:00:00Z')}) }))
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+    const goal = await screen.findByRole('region', {name:'Negocio Listo goal pace'})
+    const actions = screen.getByRole('region', {name:'CEO Today actions'})
+    expect(goal.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    fireEvent.click(screen.getAllByRole('button', {name:'Not now'})[0])
+    expect(goal).toBeInTheDocument()
+    expect(screen.getByText(/Active: unknown/)).toBeInTheDocument()
+    expect(screen.getByText(/missing records cannot be counted as zero/)).toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('button', {name:/activate|publish|send/i})).not.toBeInTheDocument()
+  })
 
   it('shows pending assessments separately without adding authority or changing priorities', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(response({ ...ceoToday, laya_reviews: { available: true, pending: [{ id: 'review-1', title: 'Five ChatGPT tips', available: false }] } }))

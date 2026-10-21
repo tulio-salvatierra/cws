@@ -33,6 +33,7 @@ const COMPLIANCE_STATE_ORDER = {
 // CEO Today deliberately owns only this pure, read-side projection. The
 // underlying Sales and Marketing records remain the systems of record.
 export function buildCeoToday({
+  goalPace = null,
   lifecycle = {available:true,items:[]},
   leads = [],
   promisedActions = [],
@@ -68,6 +69,7 @@ export function buildCeoToday({
     all_actions: actions,
     sales_summary: salesQueue.summary,
     negocio_listo: lifecycle,
+    goal_pace: goalPace,
   }
 }
 
