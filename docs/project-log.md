@@ -2162,3 +2162,7 @@ Extended existing signed owner response flow/table to goal_pace and lead/agreeme
 ## 2026-10-21 — Goal/deal responses released
 
 Merged #41 (`cad679d`); READY production verified with goal Act and deal Dismiss open/cancel/reload. 609 app tests,54 rolled-back DB assertions,lint/build and CI passed (existing Operations timeout cleared on retry). 74/74 migration parity. No saved production responses or active decisions; decision fingerprint and publish/send counts unchanged. No CEO API runtime errors. See `agent-handoffs/laya-goal-deal-responses-verification-2026-10-21.md`.
+
+## 2026-10-21 — LAYA-UNIFIED-HISTORY
+
+Added a unified owner-only history panel in CEO Today with Decision/Goal pace/Deal fit filters, timestamps/subject IDs, saved reasons and expandable exact historical input/output. Reuses the existing latest30 workspace read; nonowner/failed membership never queries history; failures explicitly unavailable. No schema or write-path changes. 616 tests,lint/build passed; release pending. No real responses or external actions.
