@@ -7,7 +7,7 @@ const review={can_respond:true,review_token:'exact-signed-review',history_availa
 beforeEach(()=>{vi.clearAllMocks();getSession.mockResolvedValue({data:{session:{access_token:'owner-token'}}});vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({ok:true,response_id:'saved'})}))})
 afterEach(()=>vi.unstubAllGlobals())
 describe('goal/deal owner responses',()=>{
- it.each(['Goal pace','Deal fit'])('opens and cancels %s without persistence',label=>{
+ it.each(['Goal pace','Deal fit','Lifecycle'])('opens and cancels %s without persistence',label=>{
   render(<LayaOwnerResponse review={review} label={label} onReload={vi.fn()}/>)
   fireEvent.click(screen.getByRole('button',{name:'Act',exact:true}))
   expect(screen.getByRole('form',{name:`${label} owner response`})).toBeInTheDocument()

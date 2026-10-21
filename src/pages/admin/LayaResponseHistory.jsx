@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
-const types = { decision_review: 'Decision', goal_pace: 'Goal pace', deal_fit: 'Deal fit' }
+const types = { decision_review: 'Decision', goal_pace: 'Goal pace', deal_fit: 'Deal fit', lifecycle: 'Lifecycle' }
 
 export default function LayaResponseHistory({ history }) {
   const [state, setState] = useState({ pages: [history], index: 0, filter: 'all', response: 'all', from: '', to: '', search: '' })
