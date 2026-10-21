@@ -2186,3 +2186,7 @@ Added combined Act/Dismiss and inclusive Chicago saved-response date filters to 
 ## 2026-10-21 — History response/date filters released
 
 #44 merged `c9cddae`;643 tests,lint/build and CI passed (existing Operations race cleared on retry). READY production verified Act/Dismiss, native Chicago date entry2026-11-01 through2026-11-21, combined Goal pace filter and Clear filters. Automation fill alone did not update React date state; native key input did and applied summary confirmed exact criteria. No real responses fabricated; final responses0/active decisions0/posts43/sends17/migrations74 and decision fingerprint unchanged; CEO API runtime errors none in15m.
+
+## 2026-10-21 — LAYA-HISTORY-SEARCH
+
+Added bounded80-character literal saved-text search to existing owner-only CEO history GET. Searches reasons, subject IDs/types and saved decision/lead/agreement descriptions before pagination; no live-source joins. JSON-quoted PostgREST imatch with PostgreSQL literal mode prevents wildcard/regex interpretation and grammar injection; cursor binds search with all criteria. UI explicit Search history/blank clear/all clear, saved subject display and exact retry/pagination retained. 663 tests,lint/build passed; production SQL literal matching verified read-only; baseline unchanged. Release pending.

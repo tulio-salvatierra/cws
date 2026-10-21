@@ -1,19 +1,19 @@
-Task ID: LAYA-HISTORY-FILTERS
+Task ID: LAYA-HISTORY-SEARCH
 Agent: Codex
-Objective: Add Act/Dismiss and saved-response date filters while retaining owner-only history, pagination and exact saved evidence.
-Files inspected: Product/role/conventions/decisions/learnings/memory; history helper/API/UI/fixtures; Supabase skill/docs.
-Files changed: History helper/API/UI and corresponding fixtures; product/conventions/memory.
-Database or API changes: Existing CEO GET history view adds response/from/to. No migration/new endpoint. Combined filters apply before31-row lookahead/30page; same created_at+id keyset.
-Security decisions: Active ownership/workspace checks unchanged before history reads. Allowlisted response, strictly validated real dates/open ranges; reversed ranges rejected before SELECT. Cursors bind workspace/type/response/from/to. Legacy cursors valid only for unfiltered response/dates. Reads only; activation separate.
-Decisions made: User-requested scope; no permanent decision.
-Assumptions: Date range refers to saved-response created_at on inclusive Chicago calendar days, not evaluation date. Next-day exclusive bound preserves microseconds and DST23/25-hour days. Date drafts apply explicitly; header reflects applied criteria. Successful filter changes reset page1; failure/retry preserves exact attempted criteria and displayed page. Refresh resets.
-Tests added: Combined filters through older pages, cursor mismatch, impossible/leap/reversed/array/injected dates, open bounds, DST/year/leap-day boundaries, owner API validation/filter forwarding; UI apply/clear/Act/Dismiss/paging/retry/reversed range and existing exact evidence/stale refresh.
-Tests run:643 app tests/72files,lint/build passed. Production precheck0responses/0active decisions/43posts/17sends/74migrations,decision fingerprint unchanged. CI39677203595 passed on retry after the existing Operations test race (642 other tests passed on first attempt). #44 merged c9cddae; READY production dpl_8BVDMBUXkBZh5ARhbN7bwHAyte3Q assigned www alias. Owner browser verified Act/Dismiss, native dates2026-11-01 through2026-11-21 and combined Goal pace filter, then Clear filters. Final counts/fingerprint unchanged; no CEO API runtime errors in15m.
-Known issues: Production has no saved responses; populated filtering verified with synthetic fixtures only.
-Recommended next task: Owner may review actual responses when recorded.
+Objective: Owner-only search by saved reason and subject, retaining combined filters, cursor pagination and exact snapshots.
+Files inspected: Product/role/conventions/decisions/learnings/memory; history helper/API/UI/tests; Supabase skill/docs, official PostgREST/PG pattern grammar, installed client OR construction.
+Files changed: History helper/API/UI and fixtures; product/conventions/memory.
+Database or API changes: Existing CEO history GET search parameter. No migration/endpoint. Same fixed30 page31 lookahead and timestamp+ID keyset.
+Security decisions: Existing active-owner/workspace gate before queries. Search max80 scalar characters, trims whitespace, rejects controls; JSON-quoted PostgreSQL (?q) literal pattern through PostgREST imatch keeps punctuation/wildcards/regex literal. Search OR and cursor OR are ANDed with workspace/type/response/date filters. Cursor binds exact applied search; legacy cursor defaults empty search. No source joins or business writes. Activation separate.
+Decisions made: Direct requested scope; no permanent decision.
+Assumptions: Searches reasons, subject IDs/types, saved decision title/text, lead name/company, agreement product_name. No live names or entire unrelated snapshot fields. Search drafts apply explicitly; blank removes search only, Clear filters resets all. Applied summary uses successful search; failures retain page and exact retry context. Saved subject text is React text from original JSON.
+Tests added: Historical subject/reason fields, combined filtered older pages/cursor mismatch, punctuation/Unicode, malformed/non-scalar/control/oversized search, API owner scope, UI search/apply/blank/clear/filter/page/retry and exact evidence.
+Tests run:663 app tests/72files,lint/build passed. Read-only production PG confirmed case folding and literal wildcard/regex behavior. Baseline responses0/active decisions0/posts43/sends17/migrations74,decision fingerprint unchanged. Release pending.
+Known issues: Production has no saved responses; populated results verified with synthetic fixtures only.
+Recommended next task: Owner may review actual saved responses when ready.
 Questions requiring Tulio: None.
 Project-memory files updated: Product/conventions,ledger/log/latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No fabricated owner responses or activation.
-Git diff summary: Isolated codex/laya-history-filters; original three dirty memory files/private backup untouched. CI39677203595 passed on retry after the existing Operations test race (642 other tests passed on first attempt). #44 merged c9cddae; READY production dpl_8BVDMBUXkBZh5ARhbN7bwHAyte3Q assigned www alias. Owner browser verified Act/Dismiss, native dates2026-11-01 through2026-11-21 and combined Goal pace filter, then Clear filters. Final counts/fingerprint unchanged; no CEO API runtime errors in15m.
+Memory updates withheld: No fabricated production responses or activation.
+Git diff summary: Isolated codex/laya-history-search; original three dirty memory files/private archive untouched. Release pending.

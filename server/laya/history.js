@@ -29,7 +29,10 @@ function filters(options = {}) {
   if (!['all', 'act', 'dismiss'].includes(response)) throw new Error('Invalid history response.')
   const from = date(options.from), to = date(options.to)
   if (from && to && from > to) throw new Error('History start date must be on or before end date.')
-  return { response, from, to }
+  const rawSearch = options.search === undefined ? '' : options.search
+  if (typeof rawSearch !== 'string' || rawSearch.length > 80 || Array.from(rawSearch).some(char => char.codePointAt(0) < 32 || char.codePointAt(0) === 127)) throw new Error('History search must be at most 80 characters without control characters.')
+  const search = rawSearch.trim()
+  return { response, from, to, search }
 }
 
 // Cursors are read positions, never authorization. Every query is owner-gated
@@ -38,16 +41,24 @@ export function parseHistoryPosition(type = 'all', cursor = null, workspaceId, o
   if (!types.includes(type)) throw new Error('Invalid history type.')
   const selected = filters(options)
   if (!cursor) return { type, ...selected, cursor: null }
-  if (typeof cursor !== 'string' || cursor.length > 700 || !/^[A-Za-z0-9_-]+$/.test(cursor)) throw new Error('Invalid history cursor.')
+  if (typeof cursor !== 'string' || cursor.length > 1600 || !/^[A-Za-z0-9_-]+$/.test(cursor)) throw new Error('Invalid history cursor.')
   let value
   try { value = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8')) } catch { throw new Error('Invalid history cursor.') }
-  if (!value || value.type !== type || value.workspace !== workspaceId || (value.response ?? 'all') !== selected.response || (value.from ?? '') !== selected.from || (value.to ?? '') !== selected.to || !uuid.test(value.id) || typeof value.at !== 'string' || !timestamp.test(value.at) || !Number.isFinite(Date.parse(value.at))) throw new Error('Invalid history cursor.')
+  if (!value || value.type !== type || value.workspace !== workspaceId || (value.response ?? 'all') !== selected.response || (value.from ?? '') !== selected.from || (value.to ?? '') !== selected.to || (value.search ?? '') !== selected.search || !uuid.test(value.id) || typeof value.at !== 'string' || !timestamp.test(value.at) || !Number.isFinite(Date.parse(value.at))) throw new Error('Invalid history cursor.')
   return { type, ...selected, cursor: value }
 }
 
 export async function loadResponseHistory(context, position = { type: 'all', cursor: null }) {
   let query = context.client.from('laya_evaluations').select(fields).eq('workspace_id', context.workspaceId)
   const selected = filters(position)
+  if (selected.search) {
+    // PostgreSQL q treats the rest as literal text; imatch supplies case folding.
+    // JSON string quoting protects PostgREST's OR grammar, including quotes,
+    // backslashes and commas. No user pattern or live source join is accepted.
+    const literal = JSON.stringify(`(?q)${selected.search}`)
+    const columns = ['reason', 'subject_id', 'subject_type', 'input_snapshot->decision->>title', 'input_snapshot->decision->>decision', 'input_snapshot->inputs->lead->>name', 'input_snapshot->inputs->lead->>company', 'input_snapshot->inputs->agreement->>product_name']
+    query = query.or(columns.map(column => `${column}.imatch.${literal}`).join(','))
+  }
   if (selected.response !== 'all') query = query.eq('response', selected.response)
   if (selected.from) query = query.gte('created_at', midnight(selected.from))
   if (selected.to) {

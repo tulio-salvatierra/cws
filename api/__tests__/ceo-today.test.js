@@ -28,6 +28,7 @@ function query(result) {
     in: vi.fn(() => chain),
     gte: vi.fn(() => chain),
     lt: vi.fn(() => chain),
+    or: vi.fn(() => chain),
     limit: vi.fn(() => chain),
     maybeSingle: vi.fn(() => chain),
     order: vi.fn(() => chain),
@@ -267,7 +268,7 @@ describe('CEO Today endpoint', () => {
     expect(payload.deal_fit.items[0].owner_response.can_respond).toBe(true)
     if(failed==='history') {
       expect(payload.goal_pace.owner_response.history_available).toBe(false)
-      expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30,type:'all',response:'all',from:'',to:'',next_cursor:null})
+      expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30,type:'all',response:'all',from:'',to:'',search:'',next_cursor:null})
     } else expect(payload.laya_response_history.available).toBe(true)
   })
 
@@ -279,7 +280,7 @@ describe('CEO Today endpoint', () => {
     const res=response(); await handler({method:'GET'},res)
     const payload=res.json.mock.calls[0][0]
     if(role==='owner') {
-      expect(payload.laya_response_history).toEqual({can_view:true,available:true,items:saved,limit:30,type:'all',response:'all',from:'',to:'',next_cursor:null})
+      expect(payload.laya_response_history).toEqual({can_view:true,available:true,items:saved,limit:30,type:'all',response:'all',from:'',to:'',search:'',next_cursor:null})
       expect(historyQuery.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
       expect(historyQuery.order).toHaveBeenCalledWith('created_at',{ascending:false})
       expect(historyQuery.limit).toHaveBeenCalledWith(31)
@@ -293,7 +294,7 @@ describe('CEO Today endpoint', () => {
     const historyQuery=query({data:[],error:null})
     const client={from:vi.fn(table=>table==='laya_evaluations'?historyQuery:query({data:role?{role}:null,error:role==='failed'?{message:'failed'}:null}))}
     mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'actor'}})
-    const res=response();await handler({method:'GET',url:'/api/ceo-today?view=laya_history&type=deal_fit'},res)
+    const res=response();await handler({method:'GET',url:'/api/ceo-today?view=laya_history&type=deal_fit&search=historical'},res)
     expect(res.status).toHaveBeenCalledWith(role==='owner'?200:role==='failed'?502:403)
     if(role==='owner') {
       expect(historyQuery.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
@@ -327,6 +328,26 @@ describe('CEO Today endpoint', () => {
     const client={from:vi.fn(()=>query({data:{role:'owner'}}))}
     mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'owner'}})
     const res=response();await handler({method:'GET',query:{view:'laya_history',...filters}},res)
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(client.from.mock.calls).toEqual([['workspace_members']])
+  })
+
+  it('scopes saved-text search and all filters to owner history only',async()=>{
+    const historyQuery=query({data:[],error:null})
+    const client={from:vi.fn(table=>table==='laya_evaluations'?historyQuery:query({data:{role:'owner'}}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'owner'}})
+    const res=response();await handler({method:'GET',query:{view:'laya_history',type:'deal_fit',response:'act',from:'2026-10-01',search:'100%_terms*'}},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(historyQuery.or).toHaveBeenCalledWith(expect.stringContaining('reason.imatch."(?q)100%_terms*"'))
+    expect(historyQuery.or).toHaveBeenCalledWith(expect.stringContaining('input_snapshot->inputs->lead->>company.imatch.'))
+    expect(historyQuery.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
+    expect(historyQuery.eq).toHaveBeenCalledWith('response','act')
+    expect(client.from.mock.calls).toEqual([['workspace_members'],['laya_evaluations']])
+  })
+  it.each(['a'.repeat(81),['search'],'zero\0'])('rejects invalid search before history SELECT',async search=>{
+    const client={from:vi.fn(()=>query({data:{role:'owner'}}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'owner'}})
+    const res=response();await handler({method:'GET',query:{view:'laya_history',search}},res)
     expect(res.status).toHaveBeenCalledWith(400)
     expect(client.from.mock.calls).toEqual([['workspace_members']])
   })
