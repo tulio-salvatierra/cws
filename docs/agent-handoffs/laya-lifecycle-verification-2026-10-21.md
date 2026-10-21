@@ -1,0 +1,13 @@
+# Laya lifecycle verification — 2026-10-21
+
+PR #46 merged as `b6570d884e4867164ab75ff2bb229840288dc6e1`. CI39683143336 passed. Production deployment `dpl_GpLfFf44Q2bWB9Uksf8zDSs3ciLp` READY and assigned www alias.
+
+703 app tests/74files, lint and production build passed. Deterministic fixtures cover inquiry, payment, delivery, waiting, paused, launch and term states with exact source claims, missing/truncated/invalid data, duplicate billing links, unsafe totals and future receipts. Existing stage derivation and CEO ordering remain unchanged. API/UI fixtures cover active-owner controls, exact input/output persistence despite later edits/body overrides, token actor/workspace/tamper/expiry, private-input stripping, required reasons, cancellation and lifecycle history filtering.
+
+Migration `20261021215655` extends evaluator/subject constraints and the existing private invoker append guard. No grant, evidence rewrite, activation or TypeScript row-shape change. Exact75/75 migration parity and SQL MD5 `97abc31cd9a54fc06d17ad1ff295af58` verified. 25 lifecycle assertions passed rolled-back rehearsal and postapply;36 legacy response and18 activation assertions passed postapply/rolled back. Security advisor findings unchanged. Initial fixture-only issues (pgTAP expected-query syntax and a new test's principal input) were corrected before final passes; no residue retained.
+
+Production owner browser verified the recorded inquiry's prospect/do advice, lifecycle-v1 policy/clock, exact source-field evidence and advisory assumptions. Act and Dismiss each opened a required-reason form; both canceled without submission. Lifecycle history filter returned a successful empty result; Clear filters restored All types/defaults/page1. No provider action or real owner response was triggered. Production has no NL agreements; agreement persistence/evidence was verified only with synthetic fixtures and rolled-back DB tests, not fabricated records.
+
+Final read-only safety check: responses0,posts43,sends17,active decisions0 and decision fingerprint unchanged;75 migrations. CEO API runtime errors none in last15m. New lifecycle rows would retain exact signed evaluator inputs, full output, response/reason and authenticated actor/time in immutable owner-readable history; oversized reviews withhold saving rather than truncate. Snapshot size limit and existing latest30 per-card window remain; unified history pages older records.
+
+Activation remains a separate explicit owner action. No new LLM calls, publishing, sending, charging, launch or business mutation. Original checkout's three pre-existing dirty memory files and private backup untouched. No permanent decisions or reusable learnings added.

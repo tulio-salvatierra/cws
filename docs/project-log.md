@@ -2198,3 +2198,7 @@ Added bounded80-character literal saved-text search to existing owner-only CEO h
 ## 2026-10-21 — LAYA-LIFECYCLE-001
 
 Decorated existing lifecycle cards with deterministic source-backed verdicts, missing-data safeguards and owner-only signed Act/Dismiss preserving exact scoped evaluator inputs/output/reason. Stages and CEO ordering unchanged; future receipts excluded from balances but retained in snapshots. Added lifecycle to existing history filters/search/pagination. Migration20261021215655 extends existing constraints/private invoker guard with no grants or evidence rewrites;75/75 parity and exact SQL MD5 match.25-assertion rehearsal/postapply,36 legacy response and18 activation tests rolled back;security findings unchanged.703 app tests,lint/build passed; release pending. No real response/LLM/publish/send.
+
+## 2026-10-21 — Laya lifecycle released
+
+#46 merged `b6570d8`;703 app tests,79 postapply DB assertions,lint/build and CI39683143336 passed. READY production verified existing inquiry prospect/do with exact source evidence and clock; both owner Act/Dismiss reason forms opened/canceled without saving. Lifecycle history filter read verified, defaults restored. Final responses0/posts43/sends17/active decisions0/fingerprint unchanged,75/75 migrations; no CEO API runtime errors in15m. No real response, activation, LLM, publish or send.
