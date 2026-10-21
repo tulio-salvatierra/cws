@@ -40,6 +40,12 @@ describe('owner budget completeness',()=>{
   fireEvent.click(screen.getByRole('button',{name:'Record complete budget and capacity'}))
   expect(await screen.findByRole('alert')).toHaveTextContent('Records changed; reload')
  })
+ it('guides owners from inquiry-only records to agreement and project evidence',()=>{
+  render(<MemoryRouter><DealFits summary={{available:true,items:[]}} canManage onReload={vi.fn()}/></MemoryRouter>)
+  expect(screen.getByText(/To record owner budgets/)).toBeInTheDocument()
+  expect(screen.getByRole('link',{name:'Accounting'})).toHaveAttribute('href','/admin/accounting#client-agreements')
+  expect(from).not.toHaveBeenCalled()
+ })
  it('offers no recording controls to nonowners',()=>{
   render(<MemoryRouter><DealFits summary={summary} canManage={false}/></MemoryRouter>)
   expect(screen.queryByText('Owner · Record labor, costs and dated capacity')).not.toBeInTheDocument()
