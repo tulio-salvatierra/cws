@@ -21,6 +21,12 @@ export default async function handler(req, res) {
     let query = context.client.from('leads').select('id, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false })
     if (status) query = query.eq('status', status)
     const result = await query
+    if (!result.error) {
+      const preferences = await context.client.from('outreach_email_preferences').select('email').eq('workspace_id', context.workspaceId).not('unsubscribed_at', 'is', null)
+      if (preferences.error) return res.status(503).json({ ok: false, error: 'Email preferences could not be loaded.' })
+      const suppressed = new Set((preferences.data || []).map((row) => row.email))
+      result.data = (result.data || []).map((lead) => ({ ...lead, email_suppressed: suppressed.has(String(lead.email || '').trim().toLowerCase()) }))
+    }
     return result.error
       ? res.status(502).json({ ok: false, error: result.error.message })
       : res.status(200).json({ ok: true, leads: result.data || [] })

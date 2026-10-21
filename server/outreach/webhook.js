@@ -1,3 +1,4 @@
+import { suppressEmail } from './compliance.js'
 /* global process */
 
 import { Buffer } from 'node:buffer'
@@ -36,9 +37,13 @@ export default async function handler(req, res) {
   const messageId = event.data?.email_id
   if (!status || !messageId) return res.status(200).json({ ok: true, ignored: true })
   const client = createOutreachClient()
-  const send = await client.from('outreach_sends').select('id, subscriber_id').eq('resend_message_id', messageId).maybeSingle()
+  const send = await client.from('outreach_sends').select('id, subscriber_id, workspace_id, to_email').eq('resend_message_id', messageId).maybeSingle()
   if (send.error) return res.status(502).json({ ok: false, error: send.error.message })
   if (!send.data) return res.status(200).json({ ok: true, ignored: true })
+  if (['bounced', 'complained'].includes(status)) {
+    try { await suppressEmail(client, send.data.workspace_id, send.data.to_email, status) }
+    catch { return res.status(503).json({ ok: false, error: 'Recipient suppression could not be saved.' }) }
+  }
   const updated = await client.from('outreach_sends').update({ status }).eq('id', send.data.id)
   if (updated.error) return res.status(502).json({ ok: false, error: updated.error.message })
   if (['bounced', 'complained'].includes(status) && send.data.subscriber_id) {

@@ -43,7 +43,7 @@ The admin app (`/admin`) has six surfaces. These are the product.
 | Surface | What it does | Key tables |
 | --- | --- | --- |
 | **CEO Today** (`/admin`) | Deterministic daily command view. Priority order: **urgent → GET MONEY → Marketing → DELIVER**. No scores or weights. Shows Negocio Listo lifecycle items, decision-review items, a pinned Goal pace line, and a Laya verdict on each item. Laya never changes the order. | reads from all departments, plus `business_decisions` |
-| **Sales** | Prospect discovery, owner selection, deterministic command queue, Day 0/4/10 follow-up, owner-confirmed Resend email. Target: 5 initial prospect emails per Chicago business day (DEC-031). | `leads`, `clients`, `outreach_sends`, `sales_*` |
+| **Sales** | Prospect discovery, owner selection, deterministic command queue, Day 0/4/10 follow-up, owner-confirmed Resend email. Target: 5 initial prospect emails per Chicago business day (DEC-031). | `leads`, `clients`, `outreach_sends`, `outreach_email_preferences`, `sales_*` |
 | **Marketing** | Weekly slots, offer catalog, owner-reviewed creative drafts. One owner-confirmed publish to LinkedIn, Facebook, Instagram, and Google Business Profile via bundle.social. Durable per-destination results and write-back to `published_posts`. | `marketing_*`, `offers`, `published_posts`, `channels` |
 | **Operations** | Client delivery projects, their requirements and readiness, and hours per project (whole hours, owner-entered). | `operations_projects`, `project_requirements`, `client_projects`, `project_time_entries` |
 | **Accounting** | Obligations, payment receipts, recurring revenue, expenses and subscriptions, project financials, client service agreements and installments, monthly cash profitability. | `financial_obligations`, `payment_receipts`, `business_expenses`, `client_service_agreements`, … |
@@ -68,6 +68,8 @@ Rules:
 - Time-based state is derived, never stored. Only the owner's decision or response is persisted (DEC-029).
 - **Confirmation ≠ approval.** A *confirmation* is the owner authorizing one exact external action, and it is always a gate. There is no separate approval gate in the solo-operator model.
 - AI must never invent metrics, contact leads, spend money, publish, or change goals on its own.
+
+Commercial email includes the owner-configured postal address, marketing disclosure, and recipient opt-out link in the exact draft the owner reviews. Workspace/email opt-outs persist across Sales, mailing lists, and duplicate records. Recipients record opt-outs by POST from the public unsubscribe page; GET and reload never change preferences. The owner can record opt-outs received by reply.
 
 ## 3a. Laya — the evaluator
 

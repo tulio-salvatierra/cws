@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { createClientMock, verifyMock } = vi.hoisted(() => ({ createClientMock: vi.fn(), verifyMock: vi.fn() }))
 vi.mock('@supabase/supabase-js', () => ({ createClient: createClientMock }))
 vi.mock('resend', () => ({ Resend: function Resend() { return { webhooks: { verify: verifyMock } } } }))
+vi.mock('../../server/outreach/compliance.js', () => ({ suppressEmail: vi.fn(async () => {}) }))
 import handler from '../outreach-webhook.js'
 
 function response() { const res = { status: vi.fn(() => res), json: vi.fn(() => res) }; return res }

@@ -1,4 +1,5 @@
 import "./App.css";
+import UnsubscribePage from "./pages/UnsubscribePage";
 import { BrowserRouter as Router, Navigate, Routes, Route, useParams } from "react-router-dom";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Loader from "./components/Loader";
@@ -69,7 +70,7 @@ function LandingPageWrapper() {
 // Ad and DM traffic lands on the Negocio Listo pages: skip the intro loader so the
 // page (and its video) is usable immediately instead of waiting for window load.
 const NEGOCIO_LISTO_PATH = /^\/(en\/)?negocio-listo\/?$/;
-const skipIntroLoader = typeof window !== "undefined" && NEGOCIO_LISTO_PATH.test(window.location.pathname);
+const skipIntroLoader = typeof window !== "undefined" && (NEGOCIO_LISTO_PATH.test(window.location.pathname) || /^\/unsubscribe\/?$/.test(window.location.pathname));
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling
@@ -98,6 +99,7 @@ function App() {
       <div className={`app-shell ${loading ? "app-shell--loading" : ""}`}>
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
+            <Route path="/unsubscribe" element={<UnsubscribePage />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="services" element={<ServicesPage />} />

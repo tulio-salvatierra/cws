@@ -1,3 +1,4 @@
+import { emailPreference, validCommercialBody } from './compliance.js'
 import { getFromEmail, sendResendEmail } from '../../api/lib/resend.js'
 import { authenticateOwner, cleanText, draftHash, missingOutreachEnv, parseBody, validSalesConfirmationToken } from './shared.js'
 
@@ -27,6 +28,11 @@ export default async function handler(req, res) {
   if (templateResult.data.type !== body.send_type) return res.status(400).json({ ok: false, error: 'send_type must match the selected template.' })
   const values = { leadId: leadResult.data.id, recipient: leadResult.data.email, templateId: templateResult.data.id, sendType: body.send_type, subject, body: message }
   if (!validSalesConfirmationToken(body.owner_confirmation_token, context, values)) return res.status(403).json({ ok: false, error: 'This owner confirmation is expired, invalid, or bound to a different Sales draft.' })
+  try {
+    const preference = await emailPreference(context.client, context.workspaceId, leadResult.data.email)
+    if (preference.unsubscribed_at) return res.status(409).json({ ok: false, error: 'This recipient has opted out of marketing email.' })
+    if (!validCommercialBody(message, preference) || /{{[^}]+}}/.test(subject)) return res.status(400).json({ ok: false, error: 'Review a complete commercial email footer before confirming.' })
+  } catch (error) { return res.status(503).json({ ok: false, error: error.message }) }
   const suppressed = await context.client.from('outreach_sends').select('id').eq('workspace_id', context.workspaceId).eq('lead_id', leadResult.data.id).in('status', ['bounced', 'complained']).limit(1)
   if (suppressed.error) return res.status(502).json({ ok: false, error: suppressed.error.message })
   if (suppressed.data?.length) return res.status(409).json({ ok: false, error: 'This lead is suppressed after a bounce or complaint.' })

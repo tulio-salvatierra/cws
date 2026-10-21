@@ -2080,3 +2080,7 @@ Added the Negocio Listo landing pages in Spanish (`/negocio-listo`) and English 
 ## 2026-10-21 — COMPLIANCE-SEED-001
 
 Applied exact approved data seed as production migration `20261021151033`; 64/64 migration parity. All live preconditions matched. Verified 11 active/1 retired, annual report due 2026-11-30 with original owner verification intact, ten new unverified items, zero completions, successful no-op rerun, unchanged security advisor, and authenticated production Compliance display. No schema or app changes. Vitest: 354 passing tests, 14 suites blocked by missing local @testing-library/dom; local peer-install attempt failed with npm edgesOut error. Referenced review file was absent. See latest Codex handoff.
+
+## 2026-10-21 — CANSPAM-FIX-001
+
+Implemented the approved P1 fixes: full commercial footer before exact owner confirmation, persistent workspace/email suppression, public token and legacy-link opt-out, and owner-recorded reply opt-outs. Hardened retained mailing-list sends to require exact owner confirmation. Migration `20261021152507` applied; four templates updated, prior suppression backfilled, browser table access denied, security advisor unchanged. Postal address configured server-side without committing it. 430 tests, lint, import casing and production build pass; test peer lockfile repaired for clean installs. Release verification pending; see `docs/verification/canspam-fix-001.md`. No real email sent.

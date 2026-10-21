@@ -1,3 +1,5 @@
+import unsubscribe from '../server/outreach/unsubscribe.js'
+import suppress from '../server/outreach/suppress.js'
 import draft from '../server/outreach/draft.js'
 import leads from '../server/outreach/leads.js'
 import mailingListSend from '../server/outreach/mailing-list-send.js'
@@ -7,6 +9,8 @@ import subscribers from '../server/outreach/subscribers.js'
 import templates from '../server/outreach/templates.js'
 
 const handlers = {
+  '/unsubscribe': unsubscribe,
+  '/suppress': suppress,
   '/draft': draft,
   '/leads': leads,
   '/mailing-list-send': mailingListSend,

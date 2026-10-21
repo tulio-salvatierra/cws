@@ -1,19 +1,19 @@
-Task ID: COMPLIANCE-SEED-001
+Task ID: CANSPAM-FIX-001
 Agent: Codex
-Objective: Apply the owner-approved Illinois compliance checklist data seed.
-Files inspected: Product definition, Codex instructions, technical conventions, decisions, learnings, ledger, project log, latest handoff, supplied ticket, migration history, package.json.
-Files changed: supabase/migrations/20261021151033_compliance_seed_illinois_checklist.sql; this handoff; project log; task ledger.
-Database or API changes: Production migration 20261021151033 applied with the exact supplied SQL; no schema or application changes. All live preconditions matched. Referenced claude/compliance-review-2026-10-20.md was absent.
-Security decisions: No applicability changes or external sends/publishing. Security advisor unchanged: seven RLS/no-policy INFO findings, existing create_workspace SECURITY DEFINER warning and leaked-password-protection warning.
-Decisions made: Renamed CLI-generated migration to exact remotely assigned version; 64/64 local/remote migration versions match.
-Assumptions: Supplied ticket is the approved seed content; no independent legal-content revision.
-Tests added: None (data-only).
-Tests run: ESLint and git diff --check passed. SQL exactly matches ticket. Acceptance 1: active 11, retired 1. Acceptance 2: annual report applies, annual, due 2026-11-30; verified_by_owner_at unchanged at 2026-09-15T02:09:41.821+00:00. Acceptance 3: all ten new rows needs_verification and null verification. Acceptance 4: zero completions. Acceptance 5: reran exact SQL successfully, still 12 rows and last updated_at remains original migration time 2026-10-21T15:10:33.730985+00:00; already-applied guard present (connector does not surface NOTICE text). Acceptance 6: no new security findings. Acceptance 7: authenticated production Compliance loaded with Verified 1, Needs verification 10, annual report due 2026-11-30 and retired history. Vitest: 354 passed across 41 files; 14 suites could not load due to missing local @testing-library/dom. Attempted local-only peer restoration failed with npm edgesOut error; no manifest or lockfile edit requested.
-Known issues: Full test suite blocked by existing local dependency installation. No live precondition differences.
-Recommended next task: CANSPAM-AUDIT (read-only), separately scoped; owner verifies ten new checklist items.
+Objective: Fix the P1 CANSPAM-AUDIT findings together while preserving exact-draft owner confirmation; test without sending real emails and push.
+Files inspected: Product definition, Codex instructions, conventions, decisions, learnings, memory, Sales/templates/send/draft/mailing-list/webhook routes, UI, migrations, env registry, tests.
+Files changed: Outreach compliance/preferences/unsubscribe/owner opt-out handlers and tests; Sales draft/send/mailing-list/webhook/leads; outreach route map; public unsubscribe page and Leads controls; migration 20261021152507; env registry/example; lockfile peer entries; scope and verification/memory docs.
+Database or API changes: Production migration 20261021152507 adds service-only RLS email preferences, backfills known suppressions and appends footer placeholders to four templates. No sends or provider mutations. POST opt-out endpoints use the existing outreach function. Production-only postal address configured using the exact owner-supplied value; no address committed.
+Security decisions: Persistent non-expiring random opt-out bearer tokens; no browser table access; workspace/email suppression cannot be cleared by draft upserts or delayed delivery events. GET is read-only. Reviewed footer is part of the signed exact draft; all sends remain owner-confirmed. Legacy mailing-list API hardened to require exact owner confirmation and durable pre-provider attempts.
+Decisions made: Follow authorized P1 scope; use existing function routing and Supabase only. No new product surface, language, or automation.
+Assumptions: Owner supplied the valid postal address for commercial emails.
+Tests added: Handler integration tests with actual confirmation signing, in-memory database and mocked provider; public unsubscribe UI tests.
+Tests run: 430 tests across 57 files pass; lint, import casing, production build/prerender, diff checks pass. Clean npm install verified after repairing missing lockfile peer entries. See docs/verification/canspam-fix-001.md.
+Known issues: Production UI checks pending release. Retired mailing-list screen remains redirected; safe retained API requires prepare/send draft tokens. Existing build warnings and security advisor findings unchanged.
+Recommended next task: Verify deployed synthetic opt-out/legacy-link flows and zero new sends, then freeze this fix.
 Questions requiring Tulio: None.
-Project-memory files updated: This handoff, docs/project-log.md, docs/task-ledger.md.
+Project-memory files updated: This handoff, project log, task ledger; product definition documents commercial-email behavior.
 Permanent decisions added: None.
-Reusable learnings added: None; migration parity convention already documented.
-Memory updates withheld: No legal-content changes or owner applicability determinations.
-Git diff summary: One data migration and three required memory files; no pre-existing changes.
+Reusable learnings added: None.
+Memory updates withheld: No real customer fixtures or owner postal address committed; no real email sent.
+Git diff summary: Focused CAN-SPAM fix plus necessary test lockfile repair and required project memory. No pre-existing changes.

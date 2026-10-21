@@ -24,6 +24,8 @@ vi.mock('../../../api/lib/resend.js', () => ({
   sendResendEmail: mocks.sendResendEmail,
 }))
 
+vi.mock('../compliance.js', () => ({ emailPreference: vi.fn(async () => ({ id: 'preference', unsubscribed_at: null })), validCommercialBody: vi.fn(() => true) }))
+
 import handler from '../send.js'
 
 function response() {
