@@ -2158,3 +2158,7 @@ DEAL-FIT-EVIDENCE release: PR39 merged9e0fba7 and PR40 merged310d85b; Tests runs
 ## 2026-10-21 — LAYA-GOAL-DEAL-RESPONSES
 
 Extended existing signed owner response flow/table to goal_pace and lead/agreement deal_fit; legacy decision tokens/history unchanged. Exact evaluator inputs/output are signed for15 minutes, owner/workspace-bound; body replacements ignored, identical retries idempotent, conflicting retries rejected. Generated subject metadata and source/owner guards preserve append-only server insertion and owner reads. New forms capture opened tokens, reset on refresh, require reason and reveal exact saved evidence. Oversized reviews withheld without truncation. Existing GET/order/activation unchanged; history failures explicit. Migration20261021204343 applied after36-assertion rehearsal;36 response+18 activation postchecks rolled back,74/74 exact parity/newSQL match,advisors unchanged.607 app tests/lint/build passed before final availability assertions; release pending. No real response/LLM/publish/send.
+
+## 2026-10-21 — Goal/deal responses released
+
+Merged #41 (`cad679d`); READY production verified with goal Act and deal Dismiss open/cancel/reload. 609 app tests,54 rolled-back DB assertions,lint/build and CI passed (existing Operations timeout cleared on retry). 74/74 migration parity. No saved production responses or active decisions; decision fingerprint and publish/send counts unchanged. No CEO API runtime errors. See `agent-handoffs/laya-goal-deal-responses-verification-2026-10-21.md`.

@@ -8,7 +8,7 @@ Security decisions: Active owner verified before POST and in DB actor guard. Sig
 Decisions made: Direct user scope implemented; no permanent decision added.
 Assumptions: Responses describe reviewed historical evidence even if source facts later change; surviving deal source must remain in the workspace. History latest30 across all Laya, filtered per subject; failure explicit. Oversized evidence withheld instead of truncated. Metadata derives without rewriting old snapshots. Goal subject ID binds current approved2026 target.
 Tests added: Goal/lead/agreement exact snapshot persistence, altered later state/body claims, tamper/expiry/actor/workspace, retry conflicts/oversize, owner/nonowner GET/POST/history scoping, required reason/open/cancel/no action and token capture;36 pgTAP includes17 legacy cases.
-Tests run:609 app tests/70 files,lint/build passed including final availability assertions.36 response rehearsal+postapply and18 activation assertions rolled back;74/74 parity/newSQL match,advisors unchanged. Release pending.
+Tests run:609 app tests/70 files,lint/build passed including final availability assertions.36 response rehearsal+postapply and18 activation assertions rolled back;74/74 parity/newSQL match,advisors unchanged. CI passed on retry after an existing Operations wait timeout; #41 merged cad679d. READY production dpl_2KoxLaSyuGgwiUTon4D57nRHuFEN verified: goal Act/deal Dismiss reason forms opened/canceled, clean reload, zero runtime errors.
 Known issues: No real responses saved for verification. Current goal/inquiry needs_data can receive advisory responses; they do not fill missing facts. Existing build/advisor warnings. Review token limit100,000chars and history latest30 are explicit.
 Recommended next task: Owner may record actual responses when ready; activation remains a separate explicit owner action.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product/conventions,ledger/log/handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No real response, fact update or decision activation fabricated.
-Git diff summary: Isolated codex/laya-goal-deal-responses; original three dirty memory files and private archive untouched. Public schema/code/synthetic fixtures only; release pending.
+Git diff summary: Isolated codex/laya-goal-deal-responses; original three dirty memory files and private archive untouched. Public schema/code/synthetic fixtures only; merged #41, production verified.
