@@ -1,3 +1,4 @@
+import LayaOwnerResponse from './LayaOwnerResponse'
 import GoalEvidence from './GoalEvidence'
 export default function GoalPace({ pace, canManage, onReload }) {
   return <section aria-label="Negocio Listo goal pace" className="mt-7 rounded-2xl border border-amber-400/30 bg-gray-900/60 p-5">
@@ -13,6 +14,7 @@ export default function GoalPace({ pace, canManage, onReload }) {
       <ul className="mt-2 list-disc pl-5">{pace.missing_data.map(item => <li key={item}>{item}</li>)}</ul>
       {pace.why.map(item => <p key={item.source.id} className="mt-2 break-words">{item.claim} {item.source.table} · {item.source.id} · {Object.entries(item.source.fields).map(([key,value]) => `${key}: ${value ?? 'not recorded'}`).join(' · ')}</p>)}
     </details>
+    <LayaOwnerResponse key={pace.owner_response?.review_token || 'goal-response'} review={pace.owner_response} label="Goal pace" onReload={onReload} />
     {canManage && <GoalEvidence pace={pace} onReload={onReload} />}
   </section>
 }

@@ -13,6 +13,16 @@ export function createResponseToken(context, decision, evaluation, now = Date.no
   return `${encoded}.${sign(encoded)}`
 }
 
+export function createEvaluationResponseToken(context, inputs, evaluation, now = Date.now()) {
+  const input_snapshot = { subject: evaluation.subject, inputs, evaluated_at: evaluation.evaluated_at, business_date: evaluation.business_date, time_zone: evaluation.time_zone }
+  const payload = { v: 2, purpose: 'laya_owner_response', id: randomUUID(), workspace_id: context.workspaceId,
+    user_id: context.user.id, expires_at: now + lifetime, input_snapshot, evaluation }
+  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url')
+  const token = `${encoded}.${sign(encoded)}`
+  // Do not truncate evidence to fit a token. Withhold responses instead.
+  return token.length <= 100000 ? token : null
+}
+
 export function readResponseToken(token, context, now = Date.now()) {
   if (typeof token !== 'string' || token.length > 100000) return null
   const [encoded, signature, extra] = token.split('.')
@@ -21,10 +31,23 @@ export function readResponseToken(token, context, now = Date.now()) {
   if (received.length !== expected.length || !timingSafeEqual(expected, received)) return null
   try {
     const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'))
-    if (payload.v !== 1 || payload.purpose !== 'laya_owner_response' || payload.workspace_id !== context.workspaceId
+    if (![1,2].includes(payload.v) || payload.purpose !== 'laya_owner_response' || payload.workspace_id !== context.workspaceId
       || payload.user_id !== context.user.id || !Number.isFinite(payload.expires_at) || payload.expires_at <= now
-      || payload.expires_at > now + lifetime || payload.evaluation?.subject?.id !== payload.input_snapshot?.decision?.id
-      || payload.evaluation?.subject?.workspace_id !== context.workspaceId) return null
+      || payload.expires_at > now + lifetime || payload.evaluation?.subject?.workspace_id !== context.workspaceId) return null
+    if(payload.v===1) {
+      if(payload.evaluation?.evaluator!=='decision_review' || payload.evaluation.subject.id!==payload.input_snapshot?.decision?.id) return null
+    } else {
+      const evaluation=payload.evaluation, snapshot=payload.input_snapshot, subject=evaluation?.subject
+      if(!snapshot?.inputs || snapshot.inputs.workspaceId!==context.workspaceId || JSON.stringify(snapshot.subject)!==JSON.stringify(subject)
+        || snapshot.evaluated_at!==evaluation.evaluated_at || snapshot.business_date!==evaluation.business_date || snapshot.time_zone!==evaluation.time_zone
+        || snapshot.inputs.now!==evaluation.evaluated_at) return null
+      if(evaluation.evaluator==='goal_pace') {
+        if(subject.type!=='negocio_listo_goal' || subject.id!=='negocio-listo-2026-12-31')return null
+      } else if(evaluation.evaluator==='deal_fit') {
+        const row=subject.type==='lead'?snapshot.inputs.lead:subject.type==='client_service_agreement'?snapshot.inputs.agreement:null
+        if(!row || row.id!==subject.id || row.workspace_id!==context.workspaceId)return null
+      } else return null
+    }
     return payload
   } catch { return null }
 }
@@ -37,7 +60,7 @@ export async function saveOwnerResponse(context, body) {
   }
   const reviewed = readResponseToken(body.review_token, context)
   if (!reviewed) return { status: 409, error: 'This review expired or is invalid. Reload CEO Today and review it again.' }
-  const values = { id: reviewed.id, workspace_id: context.workspaceId, decision_id: reviewed.input_snapshot.decision.id,
+  const values = { id: reviewed.id, workspace_id: context.workspaceId, decision_id: reviewed.evaluation.evaluator==='decision_review'?reviewed.input_snapshot.decision.id:null,
     evaluator: reviewed.evaluation.evaluator, policy_version: reviewed.evaluation.policy_version,
     input_snapshot: reviewed.input_snapshot, evaluation: reviewed.evaluation, response, reason, created_by: context.user.id }
   const saved = await context.client.from('laya_evaluations').insert(values).select('id').single()

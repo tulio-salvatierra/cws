@@ -825,7 +825,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
-          decision_id: string
+          decision_id: string | null
           evaluation: Json
           evaluator: string
           id: string
@@ -833,12 +833,14 @@ export type Database = {
           policy_version: string
           reason: string
           response: string
+          subject_id: string | null
+          subject_type: string | null
           workspace_id: string
         }
         Insert: {
           created_at?: string
           created_by: string
-          decision_id: string
+          decision_id?: string | null
           evaluation: Json
           evaluator: string
           id: string
@@ -846,12 +848,14 @@ export type Database = {
           policy_version: string
           reason: string
           response: string
+          subject_id?: string | null
+          subject_type?: string | null
           workspace_id: string
         }
         Update: {
           created_at?: string
           created_by?: string
-          decision_id?: string
+          decision_id?: string | null
           evaluation?: Json
           evaluator?: string
           id?: string
@@ -859,6 +863,8 @@ export type Database = {
           policy_version?: string
           reason?: string
           response?: string
+          subject_id?: string | null
+          subject_type?: string | null
           workspace_id?: string
         }
         Relationships: [

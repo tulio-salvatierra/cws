@@ -34,7 +34,7 @@ export function buildGoalPace({workspaceId,agreements=[],evidence=[],completenes
   if(confirmation)why.push({claim:'Owner confirmed all Negocio Listo agreements, signatures and subscription statuses are recorded, including explicit exclusions.',source:{table:'negocio_listo_completeness',id:confirmation.id,workspace_id:workspaceId,fields:{confirmed_on:confirmation.confirmed_on,source_note:confirmation.source_note,created_by:confirmation.created_by,created_at:confirmation.created_at}}})
   const reached=verified && goal.remaining===0 && checkpoint.remaining===0
   return {
-    evaluator:'goal_pace',policy_version:'goal-pace-v2',subject:{type:'negocio_listo_goal',workspace_id:workspaceId},
+    evaluator:'goal_pace',policy_version:'goal-pace-v2',subject:{type:'negocio_listo_goal',id:'negocio-listo-2026-12-31',workspace_id:workspaceId},
     verdict:!verified?'needs_data':reached?'hold':'do',business_date:today,time_zone:'America/Chicago',evaluated_at:now.toISOString(),
     goal,checkpoint,recorded_agreements:available?rows.length:null,verified,
     next_action:!verified?'Review agreement evidence and confirm the complete Negocio Listo register for today before using counts.':reached?'Targets are met in current owner-verified records; review status again when it changes.':`Verified gap: ${goal.remaining} active subscriptions and ${checkpoint.remaining} signatures dated by the checkpoint. Review Sales; no on-track forecast is inferred.`,
