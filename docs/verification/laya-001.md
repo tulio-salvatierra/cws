@@ -23,4 +23,8 @@ The shared contract includes evaluator, policy_version, subject, verdict, next_a
 - Added GitHub Actions on PRs and main pushes: Node22, npm ci, full test suite (verdict regressions fail), lint and placeholder-env build; no credentials/providers required.
 - No schema, policy, grant or migration changed. Production baseline is 67 migrations, one proposed decision/zero active, posts43/sends17; no laya_evaluations table yet because no owner response is offered in this milestone.
 - Full decision-row baseline hash: `9ef3704692d721930dbd7d70cc0e1aad`.
-- Release, CI and live verification pending.
+- PR #33 merged at `7adc611f0f2989560642d70f04ce0f67f02a8c4f`. GitHub Actions [Tests run 39643952356](https://github.com/tulio-salvatierra/cws/actions/runs/39643952356) passed npm ci, full tests, lint and build; Vercel preview check also passed.
+- Production `dpl_ECtznNE9zvxJQJoEnC9x6yfarQcH` is READY on the verified www/root aliases, built from the merge SHA.
+- Signed-in CEO Today renders the existing proposal as `needs_data`, naming its unset review_by/revisit_condition. Expanded source evidence shows the decision ID, proposed status, exact absent-field values, policy version, Chicago date and condition-observation limitation. Source-anchor navigation and reload work. Existing owner controls remain separate; none clicked.
+- Final full decision-row hash matches baseline exactly. Still one proposed/zero active, posts43/sends17, 67 migrations, no evaluation table. No decision or evaluation was persisted by verification.
+- CEO Today runtime error scan for the final 15-minute window found no errors.

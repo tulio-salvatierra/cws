@@ -99,4 +99,4 @@
 
 | DECISIONS-001 | Codex | Completed — merged #32 and production verified | Renamed table in place; existing proposal/hash retained; owner-only activation with actor/time and required review terms; CEO Today review panel; migration 20261021161456, 67/67 parity; 18 new + 46 existing pgTAP and 442 app tests pass; READY production 1c1e9c5 verified | Owner alone activates; existing row remains proposed; no publish/send |
 
-| LAYA-001 | Codex | Implemented; release pending | Pure source-backed decision_review shared contract in CEO Today; deterministic verdict fixtures, evidence UI and CI; 463 tests, lint/build pass; no schema/activation/provider change | Merge, CI and read-only production verification; response persistence remains separately scoped |
+| LAYA-001 | Codex | Completed — merged #33 and production verified | Pure source-backed decision_review shared contract in CEO Today; deterministic verdict fixtures, evidence UI and CI; 463 tests, CI, lint/build pass; READY production 7adc611 source evidence verified; unchanged decision hash/counts | Owner-only activation unchanged; no LLM/publish/send; response persistence remains separately scoped |
