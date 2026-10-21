@@ -2,7 +2,7 @@ begin;
 
 select plan(12);
 
-select has_column('public', 'decisions', 'observed_outcome', 'decisions retain their observed outcome');
+select has_column('public', 'business_decisions', 'observed_outcome', 'decisions retain their observed outcome');
 
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password,
@@ -96,10 +96,13 @@ select is(
   'the no-ID fallback is deterministic rather than duplicating records'
 );
 
-insert into public.decisions (id, workspace_id, title, decision, created_by) values
+insert into public.business_decisions (id, workspace_id, title, decision, created_by) values
   ('abababab-0000-0000-0000-000000000006', 'abababab-0000-0000-0000-000000000001', 'A test decision', 'Keep existing decision behavior.', 'abababab-abab-abab-abab-abababababab');
+insert into public.workspace_members (workspace_id,user_id,role,status,created_by) values
+  ('abababab-0000-0000-0000-000000000001','abababab-abab-abab-abab-abababababab','owner','active','abababab-abab-abab-abab-abababababab');
+set local request.jwt.claim.sub = 'abababab-abab-abab-abab-abababababab';
 select lives_ok(
-  $$update public.decisions set observed_outcome = 'Outcome observed without changing the established decision status.' where id = 'abababab-0000-0000-0000-000000000006'$$,
+  $$update public.business_decisions set observed_outcome = 'Outcome observed without changing the established decision status.' where id = 'abababab-0000-0000-0000-000000000006'$$,
   'a decision can store an observed outcome without changing its status vocabulary'
 );
 

@@ -25,6 +25,7 @@ function query(result) {
     not: vi.fn(() => chain),
     in: vi.fn(() => chain),
     limit: vi.fn(() => chain),
+    maybeSingle: vi.fn(() => chain),
     order: vi.fn(() => chain),
   }
   chain.then = (resolve, reject) => Promise.resolve(result).then(resolve, reject)
@@ -142,6 +143,7 @@ describe('CEO Today endpoint', () => {
       'compliance_completions',
       'marketing_publish_destination_results',
       'agent_runs',
+      'business_decisions',
     ])
     for (const { table, current } of queries) {
       if (table !== 'marketing_publish_destination_results') expect(current.eq).toHaveBeenCalledWith('workspace_id', 'workspace-a')
@@ -158,6 +160,29 @@ describe('CEO Today endpoint', () => {
     ]))
     expect(fetchSpy).not.toHaveBeenCalled()
     vi.unstubAllGlobals()
+  })
+
+  it('scopes decisions and owner controls to the authenticated workspace', async () => {
+    const queries = []
+    const client = { from: vi.fn(table => {
+      const data = table === 'workspace_members' ? { role: 'owner' }
+        : table === 'business_decisions' ? [{ id: 'decision-a', workspace_id: 'workspace-a', status: 'active', review_by: '2026-09-11' }, { id: 'other', workspace_id: 'workspace-b', status: 'active', review_by: '2026-09-11' }] : []
+      const current = query({ data, error: null }); queries.push({ table, current }); return current
+    }) }
+    mocks.authenticateWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
+    const res = response()
+    await handler({ method: 'GET' }, res)
+    expect(res.json.mock.calls[0][0].business_decisions).toMatchObject({ can_manage: true, due_count: 1, items: [expect.objectContaining({ id: 'decision-a' })] })
+    expect(queries.find(q => q.table === 'workspace_members').current.eq).toHaveBeenCalledWith('user_id', 'owner-a')
+  })
+
+  it('keeps department priorities available if the decision read fails', async () => {
+    const client = { from: vi.fn(table => query({ data: [], error: table === 'business_decisions' ? { message: 'unavailable' } : null })) }
+    mocks.authenticateWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a' })
+    const res = response()
+    await handler({ method: 'GET' }, res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json.mock.calls[0][0]).toMatchObject({ ok: true, business_decisions: { available: false, items: [] } })
   })
 
   it('rejects non-read methods without changing Sales or Marketing state', async () => {

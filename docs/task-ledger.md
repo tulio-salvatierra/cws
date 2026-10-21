@@ -96,3 +96,5 @@
 | CWS-NL-FIX-001 | Codex | Implemented; production verification pending | Footer Contact targets formulario on both landing routes; validation and request errors derive from current language without resetting form state; 430 tests, lint, build pass | Verify production release |
 
 | RETIRE-002 | Codex | Applied and production verified | Private-folder backup restored/verified (87 rows); migration 20261021155615 retires 20 tables; 66/66 version and exact SQL parity; retained counts 39/17/24/2/1; 46 pgTAP and 430 app tests pass; all six surfaces and Marketing previews load | Next work requires separately scoped DECISIONS-001; archive remains private; no publishing performed |
+
+| DECISIONS-001 | Codex | Implemented; production migration verified; release pending | Renamed table in place; existing proposal/hash retained; owner-only activation with actor/time and required review terms; CEO Today review panel; migration 20261021161456, 67/67 parity; 18 new + 46 existing pgTAP pass | Merge/release and authenticated read-only verification; owner alone activates |
