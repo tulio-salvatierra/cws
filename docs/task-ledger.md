@@ -90,6 +90,6 @@
 
 | COMPLIANCE-SEED-001 | Codex | Applied and production verified | Exact approved migration `20261021151033`; 64/64 parity; 11 active/1 retired; Nov 30 annual report, ten owner-unverified items, zero completions; no-op rerun and unchanged security advisor; authenticated Compliance verified | Owner verifies applicability; separately scope CANSPAM-AUDIT; full local Vitest blocked by missing peer dependency |
 
-| CANSPAM-FIX-001 | Codex | Implemented; migration applied; release verification pending | Full pre-confirmation footer, persistent shared email opt-outs, restored public/legacy unsubscribe flow, owner reply-opt-out action, safe mailing-list confirmation; migration `20261021152507`; 430 tests, lint/build pass | Release, verify synthetic opt-out flow and zero new sends |
+| CANSPAM-FIX-001 | Codex | Pushed to main; production verified | Full pre-confirmation footer, persistent shared email opt-outs, restored public/legacy unsubscribe flow, owner reply-opt-out action, safe mailing-list confirmation; migration `20261021152507`; 430 tests, lint/build pass | Runtime ff32084 READY; synthetic opt-outs/legacy links/owner action verified and cleaned; sends unchanged at 17; freeze fix |
 
 | CWS-NL-FIX-001 | Codex | Implemented; production verification pending | Footer Contact targets formulario on both landing routes; validation and request errors derive from current language without resetting form state; 430 tests, lint, build pass | Verify production release |

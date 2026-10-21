@@ -20,6 +20,20 @@
 
 ## Production database
 
-Migration `20261021152507_canspam_outreach_preferences` applied. Four live templates include the footer placeholders. Existing one unsubscribed address backfilled. RLS enabled and `anon`/`authenticated` SELECT denied. Security advisor findings unchanged (seven existing INFO findings and two existing warnings). Baseline: 17 outreach send rows.
+Migration `20261021152507_canspam_outreach_preferences` applied; all 65 local/remote versions match. Four live templates include the footer placeholders. Existing one unsubscribed address backfilled. RLS enabled and `anon`/`authenticated` SELECT denied. Security advisor findings unchanged (seven existing INFO findings and two existing warnings). Baseline: 17 outreach send rows.
 
-Deployment and synthetic opt-out verification: pending release.
+## Production release and no-email verification
+
+Runtime commits `47af36d` and `ff32084` pushed to main. Final deployment `dpl_B2ZBMep71nV9cHSkDRhT6SK6YjWy` (`ff32084`) READY, with the public custom domain confirmed assigned to it. A delayed Git deployment of the earlier seed-only commit (`018b457`) briefly replaced the release during checks; promoted the verified final production deployment and rechecked the custom-domain API and draft output. No Git state was lost or rewritten.
+
+Using temporary synthetic `.invalid` recipients only:
+
+- Authenticated production draft preview showed the explicit advertisement notice, exact configured postal address and resolved persistent unsubscribe link before confirmation. No Confirm/send button was used.
+- Public token GET returned success without changing `unsubscribed_at`. Explicit browser Unsubscribe showed the success state and persisted `recipient_opt_out`.
+- Re-review of the already-prepared synthetic draft was refused after opt-out.
+- The original subscriber link worked; repeated token and legacy requests preserved the first opt-out timestamp.
+- On the final runtime, prepared a second synthetic address and verified the explicit advertisement wording. The owner action then persisted `owner_recorded_opt_out`, with the owner recorded; Leads showed “Opted out of marketing”.
+- Synthetic lead, subscriber and two preference rows were removed afterward. Outreach send count remained **17** throughout; zero emails sent and zero synthetic rows remain.
+- Screenshot of the synthetic public success state saved outside the repository. No customer data, bearer tokens or owner address committed.
+
+No new security findings. The retired mailing-list UI remains retired; its retained API now requires the safe prepare/confirm contract.

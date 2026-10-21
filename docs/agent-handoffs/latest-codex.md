@@ -17,3 +17,5 @@ Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No new policy or scope decision required.
 Git diff summary: Two focused component edits plus required memory. Working tree initially clean.
+
+CANSPAM-FIX-001 completed independently: see docs/agent-handoffs/canspam-fix-001-codex.md and docs/verification/canspam-fix-001.md. The concurrent CWS-NL-FIX-001 handoff above is preserved.
