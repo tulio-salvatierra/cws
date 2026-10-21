@@ -7,10 +7,12 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../../server/outreach/shared.js', () => ({
   authenticateWorkspace: mocks.authenticateWorkspace,
+  parseBody: body => body || {},
   missingOutreachEnv: mocks.missingOutreachEnv,
 }))
 
 import handler from '../ceo-today.js'
+import { createResponseToken, readResponseToken } from '../../server/laya/responses.js'
 
 function response() {
   const res = { status: vi.fn(() => res), json: vi.fn(() => res) }
@@ -60,11 +62,12 @@ function neededClientRequirement(overrides = {}) {
 describe('CEO Today endpoint', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubEnv('GENERATION_SUPABASE_SERVICE_ROLE_KEY', 'test-secret')
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-09-11T15:00:00Z'))
     mocks.missingOutreachEnv.mockReturnValue([])
   })
-  afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals() })
+  afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.unstubAllEnvs() })
 
   it('requires authenticated workspace access before reading any department state', async () => {
     mocks.authenticateWorkspace.mockResolvedValue({ error: 'Authentication required.', status: 401 })
@@ -173,6 +176,7 @@ describe('CEO Today endpoint', () => {
     const res = response()
     await handler({ method: 'GET' }, res)
     expect(res.json.mock.calls[0][0].business_decisions).toMatchObject({ can_manage: true, due_count: 1, items: [expect.objectContaining({ id: 'decision-a', evaluation: expect.objectContaining({ evaluator: 'decision_review', verdict: 'do', money_at_stake: null, why: expect.arrayContaining([expect.objectContaining({ source: expect.objectContaining({ table: 'business_decisions', id: 'decision-a', workspace_id: 'workspace-a' }) })]) }) })] })
+    expect(readResponseToken(res.json.mock.calls[0][0].business_decisions.items[0].review_token, {workspaceId:'workspace-a',user:{id:'owner-a'}})).toMatchObject({input_snapshot:{decision:{id:'decision-a'}}})
     expect(queries.find(q => q.table === 'workspace_members').current.eq).toHaveBeenCalledWith('user_id', 'owner-a')
   })
 
@@ -185,10 +189,43 @@ describe('CEO Today endpoint', () => {
     expect(res.json.mock.calls[0][0]).toMatchObject({ ok: true, business_decisions: { available: false, items: [] } })
   })
 
-  it('rejects non-read methods without changing Sales or Marketing state', async () => {
+  it.each(['act','dismiss'])('persists only owner %s response evidence through POST', async choice => {
+    const source={id:'decision-a',workspace_id:'workspace-a',status:'proposed',decision:'Reviewed terms'}
+    const evaluation={evaluator:'decision_review',policy_version:'decision-review-v1',subject:{id:'decision-a',workspace_id:'workspace-a'},evaluated_at:'2026-09-11T15:00:00Z',business_date:'2026-09-11',time_zone:'America/Chicago'}
+    const insert=vi.fn(()=>({select:()=>({single:async()=>({data:{id:'saved-response'}})})}))
+    const client={from:vi.fn(table=>table==='workspace_members'?query({data:{role:'owner'}}):{insert})}
+    const context={client,workspaceId:'workspace-a',user:{id:'owner-a'}}
+    mocks.authenticateWorkspace.mockResolvedValue(context)
+    const review_token=createResponseToken(context,source,evaluation)
+    const res=response()
+    await handler({method:'POST',body:{action:'laya_response',response:choice,reason:'Owner reason',review_token,created_by:'forged'}},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(client.from.mock.calls).toEqual([['workspace_members'],['laya_evaluations']])
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({created_by:'owner-a',response:choice,reason:'Owner reason',input_snapshot:expect.objectContaining({decision:source}),evaluation}))
+  })
+
+  it.each(['member', null])('denies Laya responses for non-owner role %s', async role => {
+    const client = { from: vi.fn(() => query({ data: role ? { role } : null })) }
+    mocks.authenticateWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'member-a' } })
+    const res=response()
+    await handler({ method:'POST', body:{action:'laya_response',response:'act',reason:'reason'} },res)
+    expect(res.status).toHaveBeenCalledWith(403)
+    expect(client.from.mock.calls).toEqual([['workspace_members']])
+  })
+
+  it('accepts only the Laya response action, never a decision activation action', async () => {
+    const client = { from: vi.fn(() => query({ data: {role:'owner'} })) }
+    mocks.authenticateWorkspace.mockResolvedValue({client, workspaceId:'workspace-a', user:{id:'owner-a'}})
+    const res=response()
+    await handler({method:'POST',body:{action:'activate',status:'active'}},res)
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(client.from.mock.calls).toEqual([['workspace_members']])
+  })
+
+  it('rejects unsupported methods without changing business state', async () => {
     const res = response()
 
-    await handler({ method: 'POST' }, res)
+    await handler({ method: 'PATCH' }, res)
 
     expect(res.status).toHaveBeenCalledWith(405)
     expect(mocks.authenticateWorkspace).not.toHaveBeenCalled()

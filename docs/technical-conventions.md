@@ -14,7 +14,7 @@
 - Resend for outreach email and signed delivery/bounce webhooks
 - Google Sheets + Apps Script for the client intake relay
 - Laya deterministic `decision_review` lives in `server/laya/decision-review.js` and is projected through the existing CEO Today GET. Source claims include table, row ID, workspace, row version and exact fields; the evaluation includes its Chicago date/clock. It performs no I/O or persistence. Verdict fixtures run in GitHub Actions.
-- The legacy Marketing `/api/laya-assess` flow remains advisory under §9a/DEC-039; new LLM calls remain gated. Evaluation persistence is reserved for explicit owner responses, never GET/reload.
+- The legacy Marketing `/api/laya-assess` flow remains advisory under §9a/DEC-039; new LLM calls remain gated. Explicit owner responses use the existing CEO Today POST with `action=laya_response`. Server verifies ownership and an owner/workspace-bound signed snapshot/evaluation before append-only insertion into `laya_evaluations`; browser inserts are denied. Reasons are required; review IDs make identical retries idempotent and conflicting retries fail. GET/reload never persist. Activation uses its separate owner-JWT path.
 - Final Cut Pro for video editing (references only, never automated)
 - n8n is retired (DEC-030); do not add or restore any n8n path
 

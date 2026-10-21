@@ -91,10 +91,11 @@ Laya is the advisory evaluator. It is not the name of the assistant or of the OS
   - `deal_fit` ($50/h floor, setup fee, capacity)
   - `goal_pace`
   - `decision_review`
-- LAYA-001 implements read-only `decision_review` evaluations in CEO Today through its existing GET: rules return the shared contract, cite the decision row and exact field values, and expose the Chicago evaluation date. Missing/invalid review data returns `needs_data`; due active reviews return `do`; future reviews and complete proposals return `hold`; closed decisions return `skip`. Free-text conditions still require owner observation. It adds no LLM call, decision mutation, new endpoint, Act/Dismiss control, or evaluation persistence. Owner-response storage remains required before introducing those response controls.
+- LAYA-001 implements read-only `decision_review` evaluations in CEO Today through its existing GET: rules return the shared contract, cite the decision row and exact field values, and expose the Chicago evaluation date. Missing/invalid review data returns `needs_data`; due active reviews return `do`; future reviews and complete proposals return `hold`; closed decisions return `skip`. Free-text conditions still require owner observation. It adds no LLM call, decision mutation, or new endpoint. Owner responses are implemented as follows.
 - After the gate (§9a), an LLM may only write the `why` text and drafts, using the same snapshot. It never sets or changes a verdict.
 - A claim without a source is a bug. Missing data produces `needs_data`, never a guess.
-- Evaluations are computed live (AUTO). A row is written to `laya_evaluations` only when the owner clicks Act or Dismiss. That row records the input snapshot, output, response, and reason.
+- Evaluations are computed live (AUTO). Only an explicit owner Act/Dismiss save with a reason writes `laya_evaluations`, preserving the exact reviewed input snapshot, evaluation, authenticated actor, response, reason and timestamp. Opening/canceling a form, GET and reload never write. Act records intent to follow the advice; it does not perform the advice, activate/edit a decision, dismiss a decision, or change priorities.
+- The existing CEO Today route verifies active ownership and a 15-minute signed review bound to that owner/workspace and exact snapshot/evaluation. History is append-only, owner-readable, and accepts identical retries once. A later change to the decision does not rewrite the reviewed evidence; the response describes the signed snapshot, not an inferred current state.
 - To add a capability, add one evaluator and its fixtures. Do not add a new engine, agent, or endpoint. All of Laya is served through one route.
 
 ## 3b. Business decisions

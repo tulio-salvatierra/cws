@@ -821,6 +821,63 @@ export type Database = {
           },
         ]
       }
+      laya_evaluations: {
+        Row: {
+          created_at: string
+          created_by: string
+          decision_id: string
+          evaluation: Json
+          evaluator: string
+          id: string
+          input_snapshot: Json
+          policy_version: string
+          reason: string
+          response: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          decision_id: string
+          evaluation: Json
+          evaluator: string
+          id: string
+          input_snapshot: Json
+          policy_version: string
+          reason: string
+          response: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          decision_id?: string
+          evaluation?: Json
+          evaluator?: string
+          id?: string
+          input_snapshot?: Json
+          policy_version?: string
+          reason?: string
+          response?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "laya_evaluations_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "business_decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "laya_evaluations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           company: string | null
