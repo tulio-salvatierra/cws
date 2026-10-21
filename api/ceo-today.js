@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     if (owner.error) return res.status(502).json({ ok: false, error: 'Ownership could not be verified.' })
     if (owner.data?.role !== 'owner') return res.status(403).json({ ok: false, error: 'Only the workspace owner can read Laya history.' })
     let position
-    try { position = parseHistoryPosition(query.type, query.cursor, context.workspaceId) }
+    try { position = parseHistoryPosition(query.type, query.cursor, context.workspaceId, { response: query.response, from: query.from, to: query.to }) }
     catch (error) { return res.status(400).json({ ok: false, error: error.message }) }
     const history = await loadResponseHistory(context, position)
     return res.status(history.available ? 200 : 502).json(history.available
