@@ -1,19 +1,19 @@
-Task ID: LAYA-HISTORY-SEARCH
+Task ID: LAYA-LIFECYCLE-001
 Agent: Codex
-Objective: Owner-only search by saved reason and subject, retaining combined filters, cursor pagination and exact snapshots.
-Files inspected: Product/role/conventions/decisions/learnings/memory; history helper/API/UI/tests; Supabase skill/docs, official PostgREST/PG pattern grammar, installed client OR construction.
-Files changed: History helper/API/UI and fixtures; product/conventions/memory.
-Database or API changes: Existing CEO history GET search parameter. No migration/endpoint. Same fixed30 page31 lookahead and timestamp+ID keyset.
-Security decisions: Existing active-owner/workspace gate before queries. Search max80 scalar characters, trims whitespace, rejects controls; JSON-quoted PostgreSQL (?q) literal pattern through PostgREST imatch keeps punctuation/wildcards/regex literal. Search OR and cursor OR are ANDed with workspace/type/response/date filters. Cursor binds exact applied search; legacy cursor defaults empty search. No source joins or business writes. Activation separate.
+Objective: Deterministic source-backed lifecycle advice and exact owner Act/Dismiss responses in CEO Today.
+Files inspected: Product/role/conventions/decisions/learnings/memory; lifecycle projection/CEO ordering/API; signed response/history/UI/schema/tests; Supabase skill/docs/live constraints/advisors/baseline.
+Files changed: Lifecycle evaluator+fixtures, CEO input capture/owner metadata+fixtures, signed token support+fixtures, lifecycle panel/owner response/history filter+UI tests, migration/pgTAP, product/conventions/memory.
+Database or API changes: Existing laya_evaluations evaluator/subject constraints and private invoker append guard extended to lifecycle lead/agreement; migration20261021215655,75/75 versions and SQL MD5 match. No new endpoint/grant/table/type shape.
+Security decisions: Existing active-owner API/DB actor gates; signed15-minute owner/workspace snapshot, exact historical inputs/output, body overrides ignored, retry/expiry/size guards retained. Lifecycle source must identify NL and match same-workspace principal; no decision FK. Browser inserts/rewrites/deletes denied, saved history owner-only. Activation remains separate.
 Decisions made: Direct requested scope; no permanent decision.
-Assumptions: Searches reasons, subject IDs/types, saved decision title/text, lead name/company, agreement product_name. No live names or entire unrelated snapshot fields. Search drafts apply explicitly; blank removes search only, Clear filters resets all. Applied summary uses successful search; failures retain page and exact retry context. Saved subject text is React text from original JSON.
-Tests added: Historical subject/reason fields, combined filtered older pages/cursor mismatch, punctuation/Unicode, malformed/non-scalar/control/oversized search, API owner scope, UI search/apply/blank/clear/filter/page/retry and exact evidence.
-Tests run:663 app tests/72files,lint/build passed. Read-only production PG confirmed case folding and literal wildcard/regex behavior. Baseline responses0/active decisions0/posts43/sends17/migrations74,decision fingerprint unchanged. CI39680222130 passed; #45 merged0c0e969. READY production dpl_9QQcDPfPAYdwfm8SRqg2jehRWVcR assigned www alias; owner browser verified punctuation-heavy search with quotes/backslash/wildcards, retained through Deal fit filter, then Clear filters restored all/blank/page1. No CEO API runtime errors in15m; final counts/fingerprint unchanged.
-Known issues: Production has no saved responses; populated results verified with synthetic fixtures only.
-Recommended next task: Owner may review actual saved responses when ready.
+Assumptions: Verdict mapping documented in product. Dates/receipts use exact Chicago evaluation clock; future receipts retained but not counted. Reads hitting1000 rows produce needs_data, critical failures retain CEO error behavior. Only explicit links, no customer-name matching. No live provider status, signature or payment inference. Inputs scoped per item and stripped before priority projection. Existing stages/order untouched.
+Tests added: Lifecycle stage/verdict/source fixtures, missing/truncated/invalid/duplicate/non-USD/unsafe totals/future receipts, source scoping and ordering; owner/nonowner API and exact snapshot/private-field absence, signed historical persistence/replay/tamper/expiry/offer validation; UI source evidence/Act/Dismiss/reason/cancel/nonowner/history filter;25 DB response assertions.
+Tests run:703 app tests/74files,lint/build passed.25 lifecycle rehearsal+postapply assertions,36 legacy response and18 activation assertions all rolled back.75/75 parity,SQL MD5 97abc31cd9a54fc06d17ad1ff295af58,security advisors unchanged (7server-only no-policy INFO,existing create_workspace/password warnings). Baseline responses0/posts43/sends17/active decisions0,fingerprint unchanged. Release pending.
+Known issues: Production currently has no NL agreements; existing inquiry can verify lifecycle advice/form/cancel. No real response saved; agreement persistence exercised with synthetic fixtures and rolled-back DB tests. Existing build/advisor warnings. Snapshot limit100000 chars withholds oversized saving; per-card latest30 plus unified paginated history.
+Recommended next task: Owner may record actual responses and business evidence when ready.
 Questions requiring Tulio: None.
 Project-memory files updated: Product/conventions,ledger/log/latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No fabricated production responses or activation.
-Git diff summary: Isolated codex/laya-history-search; original three dirty memory files/private archive untouched. CI39680222130 passed; #45 merged0c0e969. READY production dpl_9QQcDPfPAYdwfm8SRqg2jehRWVcR assigned www alias; owner browser verified punctuation-heavy search with quotes/backslash/wildcards, retained through Deal fit filter, then Clear filters restored all/blank/page1. No CEO API runtime errors in15m; final counts/fingerprint unchanged.
+Memory updates withheld: No fabricated production evidence, responses or activation.
+Git diff summary: Isolated codex/laya-lifecycle; original three dirty memory files/private backup untouched. Release pending.

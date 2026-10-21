@@ -2194,3 +2194,7 @@ Added bounded80-character literal saved-text search to existing owner-only CEO h
 ## 2026-10-21 — Saved-history search released
 
 #45 merged `0c0e969`; CI39680222130 passed; READY production verified. Owner browser applied literal punctuation-heavy search including quotes/backslash/wildcard characters; retained search with Deal fit and restored blank search/all criteria/page1 using Clear filters. No runtime error or response/business writes. Final responses0/active decisions0/posts43/sends17/migrations74 and decision fingerprint unchanged. Populated historical matches/pages verified by synthetic fixtures only.
+
+## 2026-10-21 — LAYA-LIFECYCLE-001
+
+Decorated existing lifecycle cards with deterministic source-backed verdicts, missing-data safeguards and owner-only signed Act/Dismiss preserving exact scoped evaluator inputs/output/reason. Stages and CEO ordering unchanged; future receipts excluded from balances but retained in snapshots. Added lifecycle to existing history filters/search/pagination. Migration20261021215655 extends existing constraints/private invoker guard with no grants or evidence rewrites;75/75 parity and exact SQL MD5 match.25-assertion rehearsal/postapply,36 legacy response and18 activation tests rolled back;security findings unchanged.703 app tests,lint/build passed; release pending. No real response/LLM/publish/send.

@@ -1,3 +1,4 @@
+import { evaluateLifecycleItems } from '../server/laya/lifecycle.js'
 import { loadResponseHistory, parseHistoryPosition } from '../server/laya/history.js'
 import { buildDealFits } from '../server/laya/deal-fit.js'
 import { buildGoalPace } from '../server/ceo/goal-pace.js'
@@ -79,6 +80,9 @@ export default async function handler(req, res) {
       unavailable_reason:token?null:'The exact evidence is too large to sign safely; no response can be saved for this view.',
       responses:(history.data || []).filter(item=>item.evaluator===evaluation.evaluator && item.subject_type===evaluation.subject.type && item.subject_id===evaluation.subject.id)}
   }
+  for (const item of loaded.data.negocio_listo?.items || []) {
+    item.owner_response = attachResponse(item.evaluation, loaded.review_inputs.lifecycle[item.id])
+  }
   loaded.data.goal_pace.owner_response=attachResponse(loaded.data.goal_pace,loaded.review_inputs.goal)
   for(const item of loaded.data.deal_fit?.items || []) {
     item.owner_response=attachResponse(item.evaluation,item.response_input)
@@ -152,14 +156,18 @@ export async function loadCeoToday(context, now = new Date()) {
     now,
   })
 
-  const lifecycle = agreements.error || installments.error
-    ? {available:false,items:[]}
-    : buildNegocioListoLifecycle({workspaceId:context.workspaceId,leads:leads.data || [],agreements:agreements.data || [],installments:installments.data || [],obligations:obligations.data || [],receipts:receipts.data || [],projects:operationsProjects.data || [],requirements:operationsRequirements.data || [],clients:operationsClients.data || [],now})
+  const lifecycleInput = {workspaceId:context.workspaceId,leads:leads.data || [],agreements:agreements.data || [],installments:installments.data || [],obligations:obligations.data || [],receipts:receipts.data || [],projects:operationsProjects.data || [],requirements:operationsRequirements.data || [],clients:operationsClients.data || [],available:[leads,agreements,installments,obligations,receipts,operationsProjects,operationsRequirements,operationsClients].every(result=>!result.error && (result.data || []).length<1000),now}
+  const lifecycle = evaluateLifecycleItems(agreements.error || installments.error ? {available:false,items:[]} : buildNegocioListoLifecycle(lifecycleInput), lifecycleInput)
+  const lifecycleReviewInputs = Object.fromEntries(lifecycle.items.map(item => {
+    const inputs = item.response_input
+    delete item.response_input
+    return [item.id, inputs]
+  }))
   const goalInput={workspaceId:context.workspaceId,agreements:agreements.data || [],evidence:goalEvidence.data || [],completeness:goalCompleteness.data || [],available:!agreements.error && !goalEvidence.error && !goalCompleteness.error && (agreements.data || []).length<1000 && (goalEvidence.data || []).length<1000,now}
   const dealInput={workspaceId:context.workspaceId,agreements:agreements.data || [],leads:leads.data || [],projects:operationsProjects.data || [],budgets:dealBudgets.data || [],costs:dealCosts.data || [],available:!agreements.error && !dealBudgets.error && !dealCosts.error && [agreements,leads,operationsProjects,dealBudgets,dealCosts].every(result=>(result.data || []).length<1000),now}
   const goalPace=buildGoalPace(goalInput)
   return {
-    review_inputs:{goal:goalInput},
+    review_inputs:{goal:goalInput,lifecycle:lifecycleReviewInputs},
     data: buildCeoToday({
       dealFits: buildDealFits(dealInput),
       goalPace,

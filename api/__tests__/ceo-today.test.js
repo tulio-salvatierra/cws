@@ -266,6 +266,7 @@ describe('CEO Today endpoint', () => {
     const payload=res.json.mock.calls[0][0]
     expect(payload.goal_pace.owner_response.can_respond).toBe(true)
     expect(payload.deal_fit.items[0].owner_response.can_respond).toBe(true)
+    expect(payload.negocio_listo.items[0].owner_response.can_respond).toBe(true)
     if(failed==='history') {
       expect(payload.goal_pace.owner_response.history_available).toBe(false)
       expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30,type:'all',response:'all',from:'',to:'',search:'',next_cursor:null})
@@ -352,10 +353,41 @@ describe('CEO Today endpoint', () => {
     expect(client.from.mock.calls).toEqual([['workspace_members']])
   })
 
-  it.each(['goal_pace','deal_fit'])('persists owner %s response without activating or recomputing',async evaluator=>{
+  it.each(['owner','member'])('exposes current lifecycle advice with owner-only exact response capabilities: %s',async role=>{
+    const lead={...activeLead(),workspace_id:'workspace-a',source:'negocio-listo|inline'}
+    const history=[{id:'lifecycle-history',evaluator:'lifecycle',subject_type:'lead',subject_id:'lead-a'},{id:'other-evaluator',evaluator:'deal_fit',subject_type:'lead',subject_id:'lead-a'}]
+    const client={from:vi.fn(table=>query({data:table==='workspace_members'?{role}:table==='leads'?[lead]:table==='laya_evaluations'?history:[],error:null}))}
+    const context={client,workspaceId:'workspace-a',user:{id:'actor'}};mocks.authenticateWorkspace.mockResolvedValue(context)
+    const res=response();await handler({method:'GET'},res)
+    const payload=res.json.mock.calls[0][0],item=payload.negocio_listo.items[0]
+    expect(item.evaluation).toMatchObject({evaluator:'lifecycle',verdict:'do',stage:'prospect'})
+    expect(JSON.stringify(payload)).not.toContain('response_input')
+    expect(payload.review_inputs).toBeUndefined()
+    if(role==='owner'){
+      const signed=readResponseToken(item.owner_response.review_token,context)
+      expect(signed.input_snapshot.inputs.lead).toEqual(lead)
+      expect(signed.input_snapshot.inputs.now).toBe(item.evaluation.evaluated_at)
+      expect(signed.evaluation).toEqual(item.evaluation)
+      expect(item.owner_response.responses.map(row=>row.id)).toEqual(['lifecycle-history'])
+    }else expect(item.owner_response).toEqual({can_respond:false})
+  })
+
+  it('signs exact agreement lifecycle inputs without leaking private inputs into priority cards',async()=>{
+    const agreement={id:'agreement-a',workspace_id:'workspace-a',client_id:'client-a',product_name:'Negocio Listo Básico',setup_cents:30000,monthly_cents:14900,term_months:12}
+    const client={from:vi.fn(table=>query({data:table==='workspace_members'?{role:'owner'}:table==='client_service_agreements'?[agreement]:[],error:null}))}
+    const context={client,workspaceId:'workspace-a',user:{id:'owner'}};mocks.authenticateWorkspace.mockResolvedValue(context)
+    const res=response();await handler({method:'GET'},res)
+    const payload=res.json.mock.calls[0][0],item=payload.negocio_listo.items[0]
+    expect(item.evaluation.verdict).toBe('needs_data')
+    expect(readResponseToken(item.owner_response.review_token,context).input_snapshot.inputs).toMatchObject({agreement,projects:[],installments:[],available:true})
+    expect(JSON.stringify(payload)).not.toContain('response_input')
+    expect(payload.review_inputs).toBeUndefined()
+  })
+
+  it.each(['goal_pace','deal_fit','lifecycle'])('persists owner %s response without activating or recomputing',async evaluator=>{
     const subject=evaluator==='goal_pace'?{type:'negocio_listo_goal',id:'negocio-listo-2026-12-31',workspace_id:'workspace-a'}:{type:'lead',id:'lead-a',workspace_id:'workspace-a'}
     const evaluation={evaluator,policy_version:'v2',subject,verdict:'needs_data',evaluated_at:new Date().toISOString(),business_date:'2026-09-11',time_zone:'America/Chicago'}
-    const inputs={workspaceId:'workspace-a',now:evaluation.evaluated_at,...(evaluator==='deal_fit'?{lead:{id:'lead-a',workspace_id:'workspace-a'}}:{agreements:[]})}
+    const inputs={workspaceId:'workspace-a',now:evaluation.evaluated_at,...(evaluator!=='goal_pace'?{lead:{id:'lead-a',workspace_id:'workspace-a',source:'negocio-listo|test'}}:{agreements:[]})}
     const insert=vi.fn(()=>({select:()=>({single:async()=>({data:{id:'saved'}})})}))
     const client={from:vi.fn(table=>table==='workspace_members'?query({data:{role:'owner'}}):{insert})}
     const context={client,workspaceId:'workspace-a',user:{id:'owner-a'}};mocks.authenticateWorkspace.mockResolvedValue(context)

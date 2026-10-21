@@ -162,6 +162,15 @@ describe('paginated Laya history', () => {
     await waitFor(()=>expect(screen.getByLabelText('Search saved reason or subject')).toHaveValue(''))
     expect(fetch).toHaveBeenLastCalledWith('/api/ceo-today?view=laya_history&type=deal_fit&response=dismiss&from=2026-10-01',expect.anything())
   })
+  it('includes lifecycle evaluations in the existing owner history type filter',async()=>{
+    const row={...items[0],evaluator:'lifecycle'}
+    render(<LayaResponseHistory history={page([])} />)
+    fetch.mockResolvedValueOnce(response(page([row])))
+    fireEvent.change(screen.getByLabelText('Review type'),{target:{value:'lifecycle'}})
+    expect(await screen.findByRole('heading',{name:'Lifecycle · Act'})).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledWith('/api/ceo-today?view=laya_history&type=lifecycle',expect.anything())
+    expect(screen.getByText('Reason: Saved reason 0')).toBeInTheDocument()
+  })
   it('ignores a stale request after fresh CEO data and hides all rows from nonowners', async () => {
     let finish
     fetch.mockReturnValueOnce(new Promise(resolve => { finish = resolve }))

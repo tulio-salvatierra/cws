@@ -43,9 +43,10 @@ export function readResponseToken(token, context, now = Date.now()) {
         || snapshot.inputs.now!==evaluation.evaluated_at) return null
       if(evaluation.evaluator==='goal_pace') {
         if(subject.type!=='negocio_listo_goal' || subject.id!=='negocio-listo-2026-12-31')return null
-      } else if(evaluation.evaluator==='deal_fit') {
+      } else if(['deal_fit','lifecycle'].includes(evaluation.evaluator)) {
         const row=subject.type==='lead'?snapshot.inputs.lead:subject.type==='client_service_agreement'?snapshot.inputs.agreement:null
         if(!row || row.id!==subject.id || row.workspace_id!==context.workspaceId)return null
+        if(evaluation.evaluator==='lifecycle' && (subject.type==='lead' ? String(row.source || '').split('|')[0]!=='negocio-listo' : !/^negocio listo(?:\s|$|[—-])/i.test(String(row.product_name || '').trim())))return null
       } else return null
     }
     return payload

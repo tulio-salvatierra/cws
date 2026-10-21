@@ -122,3 +122,5 @@
 | LAYA-HISTORY-FILTERS | Codex | Done — #44 merged c9cddae; production verified | Combined server Act/Dismiss and inclusive Chicago saved-date ranges, open bounds, all-criteria cursor binding, Apply dates/Clear filters with page reset and exact retry | 643 tests,lint/build and CI passed; live Act/Dismiss/combined Chicago dates/type/clear verified; no migration, activation, LLM, publish or send |
 
 | LAYA-HISTORY-SEARCH | Codex | Done — #45 merged 0c0e969; production verified | Owner-only case-insensitive literal saved reason/subject search across combined filters and cursor pages; explicit apply/clear, saved subject context and exact evidence/retry retained | 663 tests,lint/build and CI passed; live punctuation search/type combination/clear verified; no migration, activation, LLM, publish or send |
+
+| LAYA-LIFECYCLE-001 | Codex | Implemented — release pending | Source-backed deterministic lifecycle verdicts, exact signed owner Act/Dismiss and immutable history; migration20261021215655,75/75 parity;25 lifecycle+36 legacy response+18 activation DB assertions | 703 app tests,lint/build passed; no real response, activation, LLM, publish or send |

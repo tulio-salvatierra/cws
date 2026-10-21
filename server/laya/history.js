@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 
 const fields = 'id,decision_id,evaluator,subject_type,subject_id,response,reason,created_at,input_snapshot,evaluation'
 const pageSize = 30
-const types = ['all', 'decision_review', 'goal_pace', 'deal_fit']
+const types = ['all', 'decision_review', 'goal_pace', 'deal_fit', 'lifecycle']
 const timestamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

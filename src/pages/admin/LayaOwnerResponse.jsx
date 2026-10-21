@@ -18,7 +18,7 @@ export default function LayaOwnerResponse({review,label,onReload}) {
   }catch(err){setError(err.message || 'Response could not be saved.')}finally{setBusy(false)}
  }
  return <div className="mt-4 border-t border-sky-300/20 pt-3 text-sm" aria-label={`${label} responses`}>
-  <p className="text-xs text-gray-400">Act/Dismiss records your response to this exact evaluation. It does not change goals, budgets, subscriptions or priorities, accept a deal, reserve capacity, or activate a decision.</p>
+  <p className="text-xs text-gray-400">Act/Dismiss records your response to this exact evaluation. It does not change goals, budgets, subscriptions or priorities, accept a deal, reserve capacity, change delivery/launch/payment records, or activate a decision.</p>
   {review.can_respond && <div className="mt-3 flex gap-4 text-sky-200">{['act','dismiss'].map(value=><button key={value} disabled={busy} type="button" onClick={()=>{setChoice(value);setReviewToken(review.review_token);setReason('');setError('');setNotice('')}}>{value==='act'?'Act':'Dismiss'}</button>)}</div>}
   {review.unavailable_reason && <p className="mt-2 text-amber-200">{review.unavailable_reason}</p>}
   {review.history_available===false && <p className="mt-2 text-amber-200">Response history is unavailable. Reload to try again.</p>}

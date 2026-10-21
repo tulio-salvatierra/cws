@@ -92,3 +92,29 @@ describe('goal pace and deal-fit reviewed responses',()=>{
   expect((await saveOwnerResponse(ctx,{review_token:token,response,reason})).status).toBe(status)
  })
 })
+
+
+describe('signed lifecycle response compatibility',()=>{
+ it.each(['lead','client_service_agreement'])('saves original %s lifecycle inputs/output after source edits and ignores body overrides',async type=>{
+  const ctx={workspaceId:'w',user:{id:'owner'},client:null}
+  const row={id:'subject',workspace_id:'w',source:'negocio-listo|inline',product_name:'Negocio Listo Básico',name:'Original'}
+  const inputs={workspaceId:'w',now:'2026-10-21T18:00:00.000Z',available:false,[type==='lead'?'lead':'agreement']:row,projects:[],receipts:[]}
+  const evaluation={evaluator:'lifecycle',policy_version:'lifecycle-v1',subject:{id:'subject',type,workspace_id:'w'},verdict:'needs_data',evaluated_at:inputs.now,business_date:'2026-10-21',time_zone:'America/Chicago',why:[{claim:'Exact historical claim',source:{id:'subject'}}]}
+  const token=createEvaluationResponseToken(ctx,inputs,evaluation)
+  row.name='Changed';inputs.available=true;evaluation.verdict='do'
+  const insert=vi.fn(()=>({select:()=>({single:async()=>({data:{id:'saved'}})})}));ctx.client={from:vi.fn(()=>({insert}))}
+  expect((await saveOwnerResponse(ctx,{review_token:token,response:'dismiss',reason:'Owner original reason',evaluation:{verdict:'do'},input_snapshot:{inputs:{available:true}},decision_id:'activate'})).status).toBe(200)
+  expect(insert).toHaveBeenCalledWith(expect.objectContaining({evaluator:'lifecycle',decision_id:null,response:'dismiss',reason:'Owner original reason',evaluation:expect.objectContaining({verdict:'needs_data'}),input_snapshot:expect.objectContaining({inputs:expect.objectContaining({available:false,[type==='lead'?'lead':'agreement']:expect.objectContaining({name:'Original'})})})}))
+  expect(ctx.client.from.mock.calls).toEqual([['laya_evaluations']])
+  expect(readResponseToken(token,{...ctx,user:{id:'other'}})).toBeNull()
+  expect(readResponseToken(token,{...ctx,workspaceId:'other'})).toBeNull()
+  expect(readResponseToken(token+'x',ctx)).toBeNull()
+  vi.advanceTimersByTime(15*60*1000);expect(readResponseToken(token,ctx)).toBeNull()
+ })
+ it('rejects an unrelated offer before any insert',()=>{
+  const ctx={workspaceId:'w',user:{id:'owner'}}
+  const evaluation={evaluator:'lifecycle',subject:{id:'l',type:'lead',workspace_id:'w'},evaluated_at:new Date().toISOString()}
+  const inputs={workspaceId:'w',now:evaluation.evaluated_at,lead:{id:'l',workspace_id:'w',source:'unrelated'}}
+  expect(readResponseToken(createEvaluationResponseToken(ctx,inputs,evaluation),ctx)).toBeNull()
+ })
+})
