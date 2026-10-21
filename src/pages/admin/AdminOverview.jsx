@@ -72,7 +72,7 @@ export default function AdminOverview() {
         {ceo.negocio_listo.items.map(item=><article key={item.id} className="mt-4 border-t border-gray-800 pt-3"><p className="text-xs text-emerald-200">{item.stage.replaceAll('_',' ')}</p><h3 className="mt-1 font-semibold text-white">{item.title}</h3><p className="mt-2 text-sm text-gray-300">{item.why_now}</p><Link to={item.href} className="mt-2 inline-block text-sm text-emerald-200">{item.cta_label}</Link><details className="mt-2 text-xs text-gray-400"><summary>Lifecycle source evidence</summary>{item.sources.map((source,index)=><p key={index} className="mt-1 break-words">{source.table} · {source.id} · {Object.entries(source.fields).map(([field,value])=>`${field}: ${value ?? 'not recorded'}`).join(' · ')}</p>)}</details></article>)}
       </section>}
 
-      {ceo?.deal_fit && <DealFits summary={ceo.deal_fit} />}
+      {ceo?.deal_fit && <DealFits summary={ceo.deal_fit} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
 
       <BusinessDecisions summary={ceo?.business_decisions} onReload={async () => setCeo(await loadCeoToday())} />
 

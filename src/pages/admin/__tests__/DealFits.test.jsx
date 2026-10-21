@@ -12,7 +12,7 @@ describe('Deal fit evidence UI',()=>{
   expect(screen.getByText('$50/hour floor · needs data')).toBeInTheDocument()
   expect(screen.getByText('Capacity · needs data')).toBeInTheDocument()
   fireEvent.click(screen.getByText('Deal-fit sources and missing data'))
-  expect(screen.getByText(/Owner availability for a dated/)).toBeInTheDocument()
+  expect(screen.getByText(/Complete current owner labor/)).toBeInTheDocument()
   expect(screen.getByRole('link',{name:'Review source records'})).toHaveAttribute('href','/admin/accounting?client=c#client-agreements')
   expect(screen.queryByRole('button',{name:/act|activate|accept|send|publish/i})).not.toBeInTheDocument()
  })
