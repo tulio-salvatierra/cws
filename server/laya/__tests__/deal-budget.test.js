@@ -45,6 +45,14 @@ describe('verified deal budgets',()=>{
   data.budgets[0].snapshot=dealSnapshot({...data,agreementId:'a'})
   expect(result(data).verdict).toBe('needs_data')
  })
+ it('invalidates other-deal availability or commitment changes',()=>{
+  const data=input();data.agreements.push({...a,id:'b'});data.budgets.push({...base,agreement_id:'b',revision:2})
+  const before=dealSnapshot({...data,agreementId:'a'})
+  for(const key of ['available_hours','committed_hours']){
+   const changed={...data,budgets:[...data.budgets,{...base,agreement_id:'b',revision:3,[key]:base[key]+1}]}
+   expect(canonical(dealSnapshot({...changed,agreementId:'a'}))).not.toBe(canonical(before))
+  }
+ })
  it('does not circularly invalidate identical other-plan reviews',()=>{
   const data=input();data.agreements.push({...a,id:'b'});data.budgets.push({...base,agreement_id:'b',revision:2})
   const before=dealSnapshot({...data,agreementId:'a'})

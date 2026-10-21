@@ -46,6 +46,19 @@ describe('owner budget completeness',()=>{
   expect(screen.getByRole('link',{name:'Accounting'})).toHaveAttribute('href','/admin/accounting#client-agreements')
   expect(from).not.toHaveBeenCalled()
  })
+ it.each(['date','snapshot'])('requires new completeness review when displayed %s changes',kind=>{
+  const {rerender}=render(<MemoryRouter><DealFits summary={summary} canManage onReload={vi.fn()}/></MemoryRouter>)
+  fireEvent.click(screen.getByText('Owner · Record labor, costs and dated capacity'))
+  for(const checkbox of screen.getAllByRole('checkbox'))fireEvent.click(checkbox)
+  fireEvent.change(screen.getByLabelText('Budget and capacity sources / correction reason'),{target:{value:'Reviewed previous context'}})
+  expect(screen.getByRole('button',{name:'Record complete budget and capacity'})).not.toBeDisabled()
+  const changed=kind==='date'?{...summary,today:'2026-10-22'}:{...summary,items:summary.items.map(row=>({...row,budget_snapshot:{...row.budget_snapshot,projects:[{id:'new',status:'setup',actual_hours:null}]}}))}
+  rerender(<MemoryRouter><DealFits summary={changed} canManage onReload={vi.fn()}/></MemoryRouter>)
+  fireEvent.click(screen.getByText('Owner · Record labor, costs and dated capacity'))
+  expect(screen.getByRole('button',{name:'Record complete budget and capacity'})).toBeDisabled()
+  expect(screen.getByLabelText('Budget and capacity sources / correction reason')).toHaveValue('')
+  expect(from).not.toHaveBeenCalled()
+ })
  it('offers no recording controls to nonowners',()=>{
   render(<MemoryRouter><DealFits summary={summary} canManage={false}/></MemoryRouter>)
   expect(screen.queryByText('Owner · Record labor, costs and dated capacity')).not.toBeInTheDocument()
