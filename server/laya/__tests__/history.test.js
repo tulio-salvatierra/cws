@@ -6,12 +6,17 @@ const id = n => `00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const at = '2026-10-21T20:00:00.123456+00:00'
 const source = Array.from({length:65},(_,i)=>({id:id(i+1),workspace_id:'w',created_at:at,evaluator:i%2?'goal_pace':'deal_fit',reason:`reason-${i}`,input_snapshot:{original:i},evaluation:{verdict:'hold'}}))
 function context(rows = source, error = null) {
-  let filters=[], boundary, lower, upper
+  let filters=[], boundary, lower, upper, searchFields
   const query={
     select:vi.fn(()=>query),eq:vi.fn((key,value)=>{filters.push([key,value]);return query}),
     gte:vi.fn((key,value)=>{lower=value;return query}),lt:vi.fn((key,value)=>{upper=value;return query}),
-    or:vi.fn(value=>{boundary=value;return query}),order:vi.fn(()=>query),limit:vi.fn(limit=>{
+    or:vi.fn(value=>{
+      if(value.startsWith('created_at.')) boundary=value
+      else searchFields=[...value.matchAll(/([^,]+)\.imatch\.("(?:[^"\\]|\\.)*")(?=,|$)/g)].map(match=>({path:match[1].split(/->>?/),text:JSON.parse(match[2]).slice(4).toLocaleLowerCase()}))
+      return query
+    }),order:vi.fn(()=>query),limit:vi.fn(limit=>{
       let data=rows.filter(row=>filters.every(([key,value])=>row[key]===value))
+      if(searchFields)data=data.filter(row=>searchFields.some(({path,text})=>String(path.reduce((value,key)=>value?.[key],row) ?? '').toLocaleLowerCase().includes(text)))
       if(lower)data=data.filter(row=>Date.parse(row.created_at)>=Date.parse(lower))
       if(upper)data=data.filter(row=>Date.parse(row.created_at)<Date.parse(upper))
       data.sort((a,b)=>b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id))
@@ -80,6 +85,42 @@ describe('Laya cursor history',()=>{
     await loadResponseHistory(to,parseHistoryPosition('all',null,'w',{to:'2026-10-21',response:'dismiss'}))
     expect(to.query.gte).not.toHaveBeenCalled()
     for(const options of [{response:'publish'},{response:['act']},{from:'2026-02-30'},{to:'2026-02-29'},{from:'2026-1-01'},{from:['2026-10-21']},{from:'2026-10-21,foo'},{from:'0000-01-01'},{from:'2026-10-22',to:'2026-10-21'}])expect(()=>parseHistoryPosition('all',null,'w',options)).toThrow()
+  })
+  it('searches saved reasons and subjects before pagination and binds the exact search to cursors',async()=>{
+    const rows=source.map(row=>({...row,reason:'Owner saved NEEDLE',response:'act'}))
+    const selected={response:'act',from:'2026-10-21',to:'2026-10-21',search:' needle '}
+    const first=await loadResponseHistory(context(rows),parseHistoryPosition('goal_pace',null,'w',selected))
+    const secondCtx=context(rows)
+    const second=await loadResponseHistory(secondCtx,parseHistoryPosition('goal_pace',first.next_cursor,'w',selected))
+    expect([...first.items,...second.items]).toHaveLength(32)
+    expect(first.search).toBe('needle')
+    expect(secondCtx.query.or).toHaveBeenCalledTimes(2)
+    expect(()=>parseHistoryPosition('goal_pace',first.next_cursor,'w',{...selected,search:'other'})).toThrow('cursor')
+    expect(second.items[0].input_snapshot).toEqual(rows[3].input_snapshot)
+  })
+  it.each([
+    {reason:'Saved CoMPaNy terms'}, {subject_id:'subject-company-id'}, {subject_type:'company_subject'},
+    {input_snapshot:{decision:{title:'Company priority'}}}, {input_snapshot:{decision:{decision:'Review Company policy'}}},
+    {input_snapshot:{inputs:{lead:{name:'Company lead'}}}}, {input_snapshot:{inputs:{lead:{company:'Company LLC'}}}},
+    {input_snapshot:{inputs:{agreement:{product_name:'Company plan'}}}},
+  ])('finds historical subject/reason text without joining current sources: %j',async saved=>{
+    const row={...source[0],...saved},ctx=context([row,{...source[1],reason:'unrelated'}])
+    const result=await loadResponseHistory(ctx,parseHistoryPosition('all',null,'w',{search:'company'}))
+    expect(result.items).toEqual([row])
+    expect(ctx.client.from.mock.calls).toEqual([['laya_evaluations']])
+  })
+  it.each(['100%_done*', 'comma,paren()"quote"\\path', '(?i).*|', 'mañana'])('treats punctuation and Unicode literally: %s',async search=>{
+    const row={...source[0],reason:`Saved ${search} exactly`}
+    const ctx=context([row,{...source[1],reason:'unrelated'},{...source[2],reason:'100XdoneOTHER'}])
+    expect((await loadResponseHistory(ctx,parseHistoryPosition('all',null,'w',{search}))).items).toEqual([row])
+    const expression=ctx.query.or.mock.calls[0][0]
+    expect(expression).toContain(`reason.imatch.${JSON.stringify('(?q)'+search)}`)
+  })
+  it('validates search length/type/control characters and treats blank as unfiltered',async()=>{
+    for(const search of ['a'.repeat(81),['reason'],null,'line\nnext','zero\0']) expect(()=>parseHistoryPosition('all',null,'w',{search})).toThrow('search')
+    const ctx=context([])
+    expect((await loadResponseHistory(ctx,parseHistoryPosition('all',null,'w',{search:'  '}))).search).toBe('')
+    expect(ctx.query.or).not.toHaveBeenCalled()
   })
   it.each([[[]],[source.slice(0,30)]])('does not invent a next page at an exact end',async rows=>{
     expect((await loadResponseHistory(context(rows))).next_cursor).toBeNull()
