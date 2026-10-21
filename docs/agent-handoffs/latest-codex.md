@@ -8,7 +8,7 @@ Security decisions: Active owner membership required before query and metadata e
 Decisions made: Direct user scope; no permanent decision.
 Assumptions: Unified view filters the same explicitly labeled latest30 window; older records remain saved. It does not depend on live subject cards or source versions.
 Tests added: All three filters and exact historical JSON/reasons, nonowner concealment, unavailable/empty/unmatched states; API owner/member/failed-verification scope and unavailable history.
-Tests run:616 app tests/71 files,lint/build passed. Production precheck:0responses,0active decisions,43posts,17sends,74migrations; decision fingerprint unchanged. Release pending.
+Tests run:616 app tests/71 files,lint/build passed. Production precheck:0responses,0active decisions,43posts,17sends,74migrations; decision fingerprint unchanged. CI run39674411246 passed; #42 merged ee3cc74; READY production dpl_C9LWq8zr9WY3wsXSBhiQdKDyZRva assigned www alias. Owner browser verified empty history, all three type filters and All types restoration. CEO API runtime errors none in last15m. Final counts unchanged.
 Known issues: No real production responses exist; populated history verified with synthetic fixtures only. Latest30 is explicit.
 Recommended next task: Owner may save actual responses when ready.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product/conventions,ledger/log/latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No fabricated production responses or activation.
-Git diff summary: Isolated codex/laya-unified-history; original dirty memory/private archive untouched. Release pending.
+Git diff summary: Isolated codex/laya-unified-history; original dirty memory/private archive untouched. CI run39674411246 passed; #42 merged ee3cc74; READY production dpl_C9LWq8zr9WY3wsXSBhiQdKDyZRva assigned www alias. Owner browser verified empty history, all three type filters and All types restoration. CEO API runtime errors none in last15m. Final counts unchanged.

@@ -2166,3 +2166,7 @@ Merged #41 (`cad679d`); READY production verified with goal Act and deal Dismiss
 ## 2026-10-21 — LAYA-UNIFIED-HISTORY
 
 Added a unified owner-only history panel in CEO Today with Decision/Goal pace/Deal fit filters, timestamps/subject IDs, saved reasons and expandable exact historical input/output. Reuses the existing latest30 workspace read; nonowner/failed membership never queries history; failures explicitly unavailable. No schema or write-path changes. 616 tests,lint/build passed; release pending. No real responses or external actions.
+
+## 2026-10-21 — Unified history released
+
+#42 merged `ee3cc74`; CI passed and READY production verified. Owner view shows unified empty history and explicit latest30 window; Decision, Goal pace, Deal fit and All types filters selected successfully. No production responses fabricated. Final responses0/active decisions0/posts43/sends17/migrations74 and decision fingerprint unchanged; no CEO API runtime errors in15m. Original checkout’s three dirty memory files untouched.
