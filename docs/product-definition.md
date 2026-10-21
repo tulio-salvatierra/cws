@@ -129,14 +129,14 @@ Avoid:
 
 ## 6. Retired layer
 
-The v1 Content Operations layer and the pre-OS n8n tables are **approved for retirement** (DEC-037). RETIRE-001 code removal is prepared for review; deployment and live checks remain pending. Then export and verify all 20 tables before applying RETIRE-002. No export or database drop is claimed here.
+The v1 Content Operations layer and the pre-OS n8n tables are **approved for retirement** (DEC-037). RETIRE-001 was merged, deployed, and production-verified through PRs #29–30. RETIRE-002 has a committed local export at `docs/archive/v1-dormant-export-2026-10-17.sql`, verified against all 20 production tables and restored successfully into a fresh local database. The export's approved backup destination is pending; the table-drop migration has not been applied. Actual capture time and hashes are recorded in the companion manifest.
 
 - **Tables to retire (RETIRE-002):**
   - goals, initiatives, projects, tasks, learnings
   - campaigns, content_variants, approvals, content_variant_exports, content_variant_revision_events
   - channel_brief, channel_topics, topic_proposals, topic_coverage
   - research_topics, keywords, content_drafts, platform_posts, media_assets, post_analytics
-- **Code to retire (RETIRE-001):** the v1 routes and redirects, and the `generate-draft` and `review-generated-draft` endpoints (`RETIRE-001`).
+- **Retired code (RETIRE-001):** the v1 routes and redirects, and the `generate-draft` and `review-generated-draft` endpoints (`RETIRE-001`).
 - **Kept from v1:**
   - `agent_runs` (live)
   - `channels` (live)
@@ -180,7 +180,9 @@ Laya is in-app code (§3a), not an integration.
 
 ## 9a. Gate for in-app AI
 
-No in-app LLM call (`LAYA-BRIEF-001` or anything like it) until both of these are true:
+The existing advisory Marketing draft assessment (`/api/laya-assess` and the Marketing assessment flow) is grandfathered; it remains advisory and cannot approve or publish. The gate below applies to new in-app AI features.
+
+No new in-app LLM call (`LAYA-BRIEF-001` or anything like it) until both of these are true:
 
 - At least 3 clients have moved through the Negocio Listo lifecycle.
 - Sales has run at the DEC-031 rate for 4 consecutive weeks.

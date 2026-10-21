@@ -3,10 +3,10 @@ begin;
 select plan(8);
 
 select has_table('public', 'marketing_publish_attempts', 'marketing publish attempts table exists');
-select hasnt_policy('public', 'marketing_publish_attempts', 'authenticated_can_read_marketing_publish_attempts', 'browser users have no direct marketing-attempt policy');
-select table_privs_are('anon', 'public', 'marketing_publish_attempts', array[]::text[], 'anon has no marketing-attempt table grant');
-select table_privs_are('authenticated', 'public', 'marketing_publish_attempts', array[]::text[], 'authenticated has no direct marketing-attempt table grant');
-select table_privs_are('service_role', 'public', 'marketing_publish_attempts', array['SELECT', 'INSERT', 'UPDATE', 'DELETE'], 'only the server service role can manage attempts');
+select policies_are('public', 'marketing_publish_attempts', array[]::text[], 'browser users have no direct marketing-attempt policy');
+select table_privs_are('public', 'marketing_publish_attempts', 'anon', array[]::text[], 'anon has no marketing-attempt table grant');
+select table_privs_are('public', 'marketing_publish_attempts', 'authenticated', array[]::text[], 'authenticated has no direct marketing-attempt table grant');
+select table_privs_are('public', 'marketing_publish_attempts', 'service_role', array['SELECT', 'INSERT', 'UPDATE', 'DELETE'], 'only the server service role can manage attempts');
 
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password,

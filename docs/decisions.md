@@ -33,6 +33,8 @@ Numbers DEC-001–003 and DEC-014–024 were never recorded in this file; do not
 | 037 | Retire the dormant v1 and n8n layers | Approved; implementation pending where applicable |
 | 038 | Owner-entered whole project hours | Approved; implementation pending where applicable |
 
+| 039 | Grandfather the existing advisory Marketing assessment | Approved |
+
 ---
 
 ## DEC-004 — Existing social publishing pipeline remains separate during MVP
@@ -571,3 +573,10 @@ Status: Approved (supplied product definition v3)
 ### Decision
 
 Track whole hours per project, entered by the owner. Implement integer `hours` in `project_time_entries` under the separately scoped LIFECYCLE-001 ticket.
+
+## DEC-039 — Grandfather the existing advisory Marketing assessment
+
+Date recorded: 2026-10-21
+Status: Approved (Tulio, direct instruction)
+
+The existing Marketing draft assessment, including `/api/laya-assess` and the Marketing assessment flow, may remain advisory. It cannot approve, publish, send, or change CEO Today ordering. Product definition §9a gates new in-app AI features; this exception does not authorize expanding the existing assessment. DEC-034 otherwise remains in force.

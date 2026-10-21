@@ -51,3 +51,6 @@ skills-lock.json
 .venv-laya/
 .laya-cache/
 .env*.local
+
+# Exact retirement backups must remain private (owner instruction).
+docs/archive/v1-dormant-export-*

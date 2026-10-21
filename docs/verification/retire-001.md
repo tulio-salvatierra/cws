@@ -32,7 +32,7 @@ Literal word matches remain in public marketing prose, SEO keywords, ordinary pr
 - Vercel CWS production deployment `dpl_9DSAm9GvXzXrgTGqJno7tur3grhw` is READY for `23b5aea70f2fc062829059eeba24a54c9863946f`, with the cicerowebstudio.xyz and www aliases assigned.
 - Authenticated Chrome verification on www.cicerowebstudio.xyz: CEO Today priorities/history loaded; Sales queue/prospect review loaded; Operations readiness projects loaded; Accounting summary/registers loaded; Compliance requirements/history loaded; Marketing slots, destination verification, assessment history and channel context loaded.
 - Marketing overview showed image/caption preview; LinkedIn tab showed both slot image/caption previews and existing delivery results. All four destinations were verified. Both current slots were already Posted with Slot locked controls. No new action was confirmed; no caption, asset, business record, or owner review was changed.
-- Found and corrected one residual Sales back link to the removed Workspace route; it now returns to CEO Today.
+- Found and corrected one residual Sales back link to the removed Workspace route via #30. Follow-up production commit `8af573974ce717affaa3d91ebe941bbf2784f58d` is READY; authenticated Sales loaded and clicking the corrected link reached `/admin`.
 - No provider publish/send, export, SQL execution, migration, or table drop was performed.
 - Separate cws-laya-release project lacks its public Supabase client variables; no configuration or credentials changed.
 

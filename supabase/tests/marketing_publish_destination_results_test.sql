@@ -3,10 +3,10 @@ begin;
 select plan(8);
 
 select has_table('public', 'marketing_publish_destination_results', 'destination results table exists');
-select hasnt_policy('public', 'marketing_publish_destination_results', 'authenticated_can_read_marketing_destination_results', 'browser users have no destination-result policy');
-select table_privs_are('anon', 'public', 'marketing_publish_destination_results', array[]::text[], 'anon has no destination-result table grant');
-select table_privs_are('authenticated', 'public', 'marketing_publish_destination_results', array[]::text[], 'authenticated has no destination-result table grant');
-select table_privs_are('service_role', 'public', 'marketing_publish_destination_results', array['SELECT', 'INSERT', 'UPDATE', 'DELETE'], 'only the server service role can manage destination results');
+select policies_are('public', 'marketing_publish_destination_results', array[]::text[], 'browser users have no destination-result policy');
+select table_privs_are('public', 'marketing_publish_destination_results', 'anon', array[]::text[], 'anon has no destination-result table grant');
+select table_privs_are('public', 'marketing_publish_destination_results', 'authenticated', array[]::text[], 'authenticated has no destination-result table grant');
+select table_privs_are('public', 'marketing_publish_destination_results', 'service_role', array['SELECT', 'INSERT', 'UPDATE', 'DELETE'], 'only the server service role can manage destination results');
 
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password,

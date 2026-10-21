@@ -6,10 +6,10 @@ select has_table('public', 'marketing_slot_resolutions', 'M6 missed-slot resolut
 select has_column('public', 'marketing_slot_resolutions', 'occurrence_slot_key', 'original occurrence is durable');
 select has_column('public', 'marketing_slot_resolutions', 'target_slot_key', 'move target is durable');
 select has_column('public', 'marketing_slot_resolutions', 'caption', 'edited caption is durable');
-select hasnt_policy('public', 'marketing_slot_resolutions', 'authenticated_can_read_marketing_slot_resolutions', 'browser users have no direct missed-slot policy');
-select table_privs_are('anon', 'public', 'marketing_slot_resolutions', array[]::text[], 'anon has no missed-slot decision grant');
-select table_privs_are('authenticated', 'public', 'marketing_slot_resolutions', array[]::text[], 'authenticated has no missed-slot decision grant');
-select table_privs_are('service_role', 'public', 'marketing_slot_resolutions', array['SELECT', 'INSERT'], 'only the server service role can read or record decisions');
+select policies_are('public', 'marketing_slot_resolutions', array[]::text[], 'browser users have no direct missed-slot policy');
+select table_privs_are('public', 'marketing_slot_resolutions', 'anon', array[]::text[], 'anon has no missed-slot decision grant');
+select table_privs_are('public', 'marketing_slot_resolutions', 'authenticated', array[]::text[], 'authenticated has no missed-slot decision grant');
+select table_privs_are('public', 'marketing_slot_resolutions', 'service_role', array['SELECT', 'INSERT'], 'only the server service role can read or record decisions');
 
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password,
