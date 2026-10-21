@@ -107,4 +107,4 @@
 
 | GOAL-PACE | Codex | Done — #36 merged 7bb9826; production verified | Pinned approved Negocio Listo targets with Chicago deadline distances, recorded agreement sources and explicit unknown signed/active/pace evidence gaps; no activation or external actions | 514 tests, lint/build and CI passed; production targets/evidence verified; no migration or business writes |
 
-| GOAL-EVIDENCE | Codex | Implemented — release pending | Owner-JWT signature/status/core inclusion history, database-generated current-day completeness snapshot and verified goal counts; migrations20261021192155/20261021192448, 71/71 exact parity; 531 app tests,27 evidence+18 activation pgTAP,lint/build passed | Owner entry required; no inferred facts, activation, LLM, publish or send |
+| GOAL-EVIDENCE | Codex | Done — #37 merged b37309b; production verified | Owner-JWT signature/status/core inclusion history, database-generated current-day completeness snapshot and verified goal counts; migrations20261021192155/20261021192448, 71/71 exact parity; 531 app tests,27 evidence+18 activation pgTAP,lint/build passed | Owner entry required; no inferred facts, activation, LLM, publish or send |
