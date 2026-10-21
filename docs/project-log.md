@@ -2190,3 +2190,7 @@ Added combined Act/Dismiss and inclusive Chicago saved-response date filters to 
 ## 2026-10-21 — LAYA-HISTORY-SEARCH
 
 Added bounded80-character literal saved-text search to existing owner-only CEO history GET. Searches reasons, subject IDs/types and saved decision/lead/agreement descriptions before pagination; no live-source joins. JSON-quoted PostgREST imatch with PostgreSQL literal mode prevents wildcard/regex interpretation and grammar injection; cursor binds search with all criteria. UI explicit Search history/blank clear/all clear, saved subject display and exact retry/pagination retained. 663 tests,lint/build passed; production SQL literal matching verified read-only; baseline unchanged. Release pending.
+
+## 2026-10-21 — Saved-history search released
+
+#45 merged `0c0e969`; CI39680222130 passed; READY production verified. Owner browser applied literal punctuation-heavy search including quotes/backslash/wildcard characters; retained search with Deal fit and restored blank search/all criteria/page1 using Clear filters. No runtime error or response/business writes. Final responses0/active decisions0/posts43/sends17/migrations74 and decision fingerprint unchanged. Populated historical matches/pages verified by synthetic fixtures only.
