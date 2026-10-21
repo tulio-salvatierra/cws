@@ -21,7 +21,7 @@ export default function GoalEvidence({pace,onReload}) {
     {error && <p role="alert" className="mt-3 text-rose-200">{error}</p>}
     {pace.register.map(row=><EvidenceForm key={`${row.id}:${row.evidence?.revision || 'new'}`} row={row} today={pace.business_date} busy={busy} onSave={payload=>save('negocio_listo_evidence',payload)} />)}
     {!pace.register.length && <p className="mt-3 text-gray-400">No Negocio Listo agreements are recorded. Confirm zero only after checking that no signed or active subscriptions are missing.</p>}
-    <form className="mt-4 space-y-3 border-t border-gray-700 pt-4" onSubmit={e=>{e.preventDefault();if(confirmed)void save('negocio_listo_completeness',{source_note:note})}}>
+    <form className="mt-4 space-y-3 border-t border-gray-700 pt-4" onSubmit={e=>{e.preventDefault();if(confirmed)void save('negocio_listo_completeness',{source_note:note,snapshot:pace.register_snapshot,confirmed_on:pace.business_date})}}>
       <label className="block"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)} required /> I checked the full Negocio Listo register: all agreements and signed/active subscriptions are recorded, each core subscription is counted once, and all current statuses and exclusions are correct for {pace.business_date}.</label>
       <label className="block">Completeness check source / reason<textarea required maxLength={2000} value={note} onChange={e=>setNote(e.target.value)} className="mt-2 block w-full rounded bg-gray-800 p-2" /></label>
       <p className="text-xs text-gray-400">Valid for today’s Chicago date and this exact register. New agreements or evidence corrections require another check. Tomorrow, refresh statuses and confirm again.</p>

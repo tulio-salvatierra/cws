@@ -28,8 +28,8 @@ describe('owner goal evidence',()=>{
   expect(from).toHaveBeenCalledExactlyOnceWith('negocio_listo_evidence')
   expect(insert).toHaveBeenCalledWith(expect.objectContaining({workspace_id:'w',agreement_id:'a',client_id:'client',signature_status:'signed',signed_on:'2026-10-20',subscription_status:'active',status_on:'2026-10-21'}))
  })
- it('requires explicit completeness declaration and source then saves no browser snapshot',async()=>{
-  const reload=vi.fn();show(<GoalEvidence pace={{...pace,register:[]}} onReload={reload} />)
+ it('requires explicit completeness declaration and source then saves the exact displayed snapshot and date',async()=>{
+  const reload=vi.fn();show(<GoalEvidence pace={{...pace,register:[],register_snapshot:[]}} onReload={reload} />)
   fireEvent.click(screen.getByText('Owner · Review signature and subscription evidence'))
   const button=screen.getByRole('button',{name:'Confirm complete register for today'})
   expect(button).toBeDisabled()
@@ -39,11 +39,11 @@ describe('owner goal evidence',()=>{
   fireEvent.click(button)
   await waitFor(()=>expect(reload).toHaveBeenCalledTimes(1))
   expect(from).toHaveBeenCalledWith('negocio_listo_completeness')
-  expect(insert).toHaveBeenCalledWith({workspace_id:'w',source_note:'Checked all contracts and subscription records; none exist'})
+  expect(insert).toHaveBeenCalledWith({workspace_id:'w',source_note:'Checked all contracts and subscription records; none exist',snapshot:[],confirmed_on:'2026-10-21'})
  })
  it('shows database rejection without changing counts',async()=>{
   single.mockResolvedValue({error:{message:'Review every agreement first'}})
-  show(<GoalEvidence pace={{...pace,register:[]}} onReload={vi.fn()} />)
+  show(<GoalEvidence pace={{...pace,register:[],register_snapshot:[]}} onReload={vi.fn()} />)
   fireEvent.click(screen.getByText('Owner · Review signature and subscription evidence'))
   fireEvent.click(screen.getByRole('checkbox',{name:/I checked the full/}))
   fireEvent.change(screen.getByLabelText('Completeness check source / reason'),{target:{value:'Reviewed'}})

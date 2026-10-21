@@ -202,6 +202,16 @@ describe('CEO Today endpoint', () => {
     expect(res.json.mock.calls[0][0].goal_pace).toMatchObject({verdict:"needs_data",recorded_agreements:null,goal:{recorded:null},checkpoint:{recorded:null}})
   })
 
+  it('keeps lifecycle and department priorities when goal evidence is unavailable',async()=>{
+    const client={from:vi.fn(table=>query({data:[],error:table==='negocio_listo_evidence'?{message:'unavailable'}:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a'})
+    const res=response();await handler({method:'GET'},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json.mock.calls[0][0].negocio_listo.available).toBe(true)
+    expect(res.json.mock.calls[0][0].goal_pace).toMatchObject({verdict:'needs_data',goal:{recorded:null},checkpoint:{recorded:null}})
+    expect(res.json.mock.calls[0][0].actions.length).toBeGreaterThan(0)
+  })
+
   it.each(['act','dismiss'])('persists only owner %s response evidence through POST', async choice => {
     const source={id:'decision-a',workspace_id:'workspace-a',status:'proposed',decision:'Reviewed terms'}
     const evaluation={evaluator:'decision_review',policy_version:'decision-review-v1',subject:{id:'decision-a',workspace_id:'workspace-a'},evaluated_at:'2026-09-11T15:00:00Z',business_date:'2026-09-11',time_zone:'America/Chicago'}

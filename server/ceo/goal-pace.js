@@ -41,6 +41,6 @@ export function buildGoalPace({workspaceId,agreements=[],evidence=[],completenes
     why,target_source:{document:'docs/product-definition.md',section:'1a',version:3},assumptions:[],missing_data:missing,
     forecast_note:'No on-track forecast or required weekly rate is inferred without a pace baseline.',money_at_stake:null,related_decisions:[],
     register:available?rows.map(row=>({...row,evidence:latest.find(e=>e.agreement_id===row.id) || null})):[],
-    workspace_id:workspaceId,
+    workspace_id:workspaceId,register_snapshot:snapshot,
   }
 }
