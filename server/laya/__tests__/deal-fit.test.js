@@ -6,7 +6,7 @@ const evaluate=(a=agreement,projects=[])=>evaluateDealFit({workspaceId:'w',agree
 describe('deterministic deal fit',()=>{
  it('uses source-backed gross ceilings, never a projected hourly pass',()=>{
   const result=evaluate()
-  expect(result).toMatchObject({evaluator:'deal_fit',policy_version:'deal-fit-v1',verdict:'needs_data',business_date:'2026-10-21',money_at_stake:null,related_decisions:[]})
+  expect(result).toMatchObject({evaluator:'deal_fit',policy_version:'deal-fit-v2',verdict:'needs_data',business_date:'2026-10-21',money_at_stake:null,related_decisions:[]})
   expect(result.checks[0].status).toBe('meets')
   expect(result.checks[1]).toMatchObject({status:'needs_data',gross_term_cents:208800,gross_hour_ceiling:41.76,floor_cents:5000})
   expect(result.checks[2].status).toBe('needs_data')

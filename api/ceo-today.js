@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 }
 
 export async function loadCeoToday(context, now = new Date()) {
-  const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue, complianceRequirements, complianceCompletions, goalEvidence, goalCompleteness, agreements, installments] = await Promise.all([
+  const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue, complianceRequirements, complianceCompletions, goalEvidence, goalCompleteness, agreements, installments, dealBudgets, dealCosts] = await Promise.all([
     context.client.from('leads').select('id, workspace_id, source, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('sales_promised_actions').select('id, lead_id, action_text, due_on, completed_at, created_at').eq('workspace_id', context.workspaceId).is('completed_at', null).order('due_on', { ascending: true }).order('created_at', { ascending: true }),
     context.client.from('outreach_sends').select('id, lead_id, send_type, status, sent_at, created_at').eq('workspace_id', context.workspaceId).not('lead_id', 'is', null).order('created_at', { ascending: true }),
@@ -78,6 +78,8 @@ export async function loadCeoToday(context, now = new Date()) {
     context.client.from('negocio_listo_completeness').select('*').eq('workspace_id',context.workspaceId).order('created_at',{ascending:false}).limit(10),
     context.client.from('client_service_agreements').select('id,workspace_id,client_id,product_name,setup_cents,monthly_cents,term_months,launch_date,created_at').eq('workspace_id',context.workspaceId),
     context.client.from('agreement_installments').select('id,workspace_id,agreement_id,installment,financial_obligation_id').eq('workspace_id',context.workspaceId),
+    context.client.from('negocio_listo_deal_budgets').select('*').eq('workspace_id',context.workspaceId).order('revision',{ascending:false}).limit(1000),
+    context.client.from('project_costs').select('id,workspace_id,operations_project_id,amount_cents,incurred_on,updated_at').eq('workspace_id',context.workspaceId).limit(1000),
   ])
   const failed = [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue, complianceRequirements, complianceCompletions].find((result) => result.error)
   if (failed) return { data: null, error: 'CEO Today could not load the current workspace state.' }
@@ -127,7 +129,7 @@ export async function loadCeoToday(context, now = new Date()) {
     : buildNegocioListoLifecycle({workspaceId:context.workspaceId,leads:leads.data || [],agreements:agreements.data || [],installments:installments.data || [],obligations:obligations.data || [],receipts:receipts.data || [],projects:operationsProjects.data || [],requirements:operationsRequirements.data || [],clients:operationsClients.data || [],now})
   return {
     data: buildCeoToday({
-      dealFits: buildDealFits({workspaceId:context.workspaceId,agreements:agreements.data || [],leads:leads.data || [],projects:operationsProjects.data || [],available:!agreements.error && [agreements,leads,operationsProjects].every(result=>(result.data || []).length<1000),now}),
+      dealFits: buildDealFits({workspaceId:context.workspaceId,agreements:agreements.data || [],leads:leads.data || [],projects:operationsProjects.data || [],budgets:dealBudgets.data || [],costs:dealCosts.data || [],available:!agreements.error && !dealBudgets.error && !dealCosts.error && [agreements,leads,operationsProjects,dealBudgets,dealCosts].every(result=>(result.data || []).length<1000),now}),
       goalPace: buildGoalPace({workspaceId:context.workspaceId,agreements:agreements.data || [],evidence:goalEvidence.data || [],completeness:goalCompleteness.data || [],available:!agreements.error && !goalEvidence.error && !goalCompleteness.error && (agreements.data || []).length<1000 && (goalEvidence.data || []).length<1000,now}),
       lifecycle,
       leads: leads.data || [],

@@ -110,3 +110,5 @@
 | GOAL-EVIDENCE | Codex | Done — #37 merged b37309b; production verified | Owner-JWT signature/status/core inclusion history, database-generated current-day completeness snapshot and verified goal counts; migrations20261021192155/20261021192448, 71/71 exact parity; 531 app tests,27 evidence+18 activation pgTAP,lint/build passed | Owner entry required; no inferred facts, activation, LLM, publish or send |
 
 | DEAL-FIT-001 | Codex | Done — #38 merged42f2d0f; production verified | Pure source-backed NL setup/floor/capacity advisory in CEO Today; exact setup baseline, gross labor ceiling only; missing labor/cost/capacity evidence explicit; no new query/schema/order/write | 558 tests,CI,lint/build passed; live source/missing-data checks verified; no LLM/publish/send/activation |
+
+| DEAL-FIT-EVIDENCE | Codex | Implemented — release pending | Owner-only full-term labor/direct-cost and dated capacity budgets with exact snapshot/day completeness; v2 verified do/revise/hold/needs_data; migration20261021201429,72/72 parity;26 evidence+18 activation DB checks | 582 app tests,lint/build pass; release verification pending; no real evidence prefilled or external action |

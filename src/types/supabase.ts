@@ -1319,6 +1319,90 @@ export type Database = {
           },
         ]
       }
+      negocio_listo_deal_budgets: {
+        Row: {
+          agreement_id: string
+          available_hours: number
+          capacity_complete: boolean
+          client_id: string
+          committed_hours: number
+          created_at: string
+          created_by: string
+          deal_window_hours: number
+          labor_cost_complete: boolean
+          monthly_cost_cents: number
+          monthly_hours: number
+          revision: number
+          setup_cost_cents: number
+          setup_hours: number
+          snapshot: Json
+          source_note: string
+          verified_on: string
+          window_end: string
+          window_start: string
+          workspace_id: string
+        }
+        Insert: {
+          agreement_id: string
+          available_hours: number
+          capacity_complete: boolean
+          client_id: string
+          committed_hours: number
+          created_at?: string
+          created_by?: string
+          deal_window_hours: number
+          labor_cost_complete: boolean
+          monthly_cost_cents: number
+          monthly_hours: number
+          revision?: never
+          setup_cost_cents: number
+          setup_hours: number
+          snapshot: Json
+          source_note: string
+          verified_on: string
+          window_end: string
+          window_start: string
+          workspace_id: string
+        }
+        Update: {
+          agreement_id?: string
+          available_hours?: number
+          capacity_complete?: boolean
+          client_id?: string
+          committed_hours?: number
+          created_at?: string
+          created_by?: string
+          deal_window_hours?: number
+          labor_cost_complete?: boolean
+          monthly_cost_cents?: number
+          monthly_hours?: number
+          revision?: never
+          setup_cost_cents?: number
+          setup_hours?: number
+          snapshot?: Json
+          source_note?: string
+          verified_on?: string
+          window_end?: string
+          window_start?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negocio_listo_deal_budgets_agreement_id_workspace_id_clien_fkey"
+            columns: ["agreement_id", "workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "client_service_agreements"
+            referencedColumns: ["id", "workspace_id", "client_id"]
+          },
+          {
+            foreignKeyName: "negocio_listo_deal_budgets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       negocio_listo_evidence: {
         Row: {
           agreement_id: string

@@ -148,6 +148,8 @@ describe('CEO Today endpoint', () => {
       'negocio_listo_completeness',
       'client_service_agreements',
       'agreement_installments',
+      'negocio_listo_deal_budgets',
+      'project_costs',
       'marketing_publish_destination_results',
       'agent_runs',
       'business_decisions',
@@ -222,6 +224,15 @@ describe('CEO Today endpoint', () => {
     const item=res.json.mock.calls[0][0].deal_fit.items[0]
     expect(item.evaluation).toMatchObject({evaluator:'deal_fit',verdict:'needs_data',subject:{id:'lead-a',workspace_id:'workspace-a'}})
     expect(item.evaluation.checks.map(c=>c.status)).toEqual(['needs_data','needs_data','needs_data'])
+  })
+
+  it('withholds deal fit when owner budgets cannot load without hiding lifecycle',async()=>{
+    const client={from:vi.fn(table=>query({data:[],error:table==='negocio_listo_deal_budgets'?{message:'unavailable'}:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a'})
+    const res=response();await handler({method:'GET'},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json.mock.calls[0][0].deal_fit).toEqual({available:false,items:[]})
+    expect(res.json.mock.calls[0][0].negocio_listo.available).toBe(true)
   })
 
   it.each(['act','dismiss'])('persists only owner %s response evidence through POST', async choice => {

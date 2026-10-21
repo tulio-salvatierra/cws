@@ -1,19 +1,19 @@
-Task ID: DEAL-FIT-001
+Task ID: DEAL-FIT-EVIDENCE
 Agent: Codex
-Objective: Deterministic source-backed NL $50/hour, setup and capacity checks with missing data explicit.
-Files inspected: Product/role/conventions/decisions/learnings/memory; CEO/lifecycle/goal/API/UI/tests; project financial SQL/live view columns and aggregate safety baseline; Supabase skill/docs.
-Files changed: Pure deal-fit evaluator/fixtures, CEO projection/API integration and tests, DealFits read-only component/tests, product/conventions/ledger/log/handoff.
-Database or API changes: Existing GET reuses agreement/lead/project reads. No new query, route, migration, grant or write.
-Security decisions: AUTO advice only; activation remains separate owner-JWT. No new LLM/provider calls, response persistence, acceptance, publishing or sending.
-Decisions made: Implement approved §3a/direct task. No permanent decision added.
-Assumptions: Setup >=$300 meets approved baseline, not payment proof. Gross term value/$50 only bounds labor before costs. Actual hours are spent hours, not full-term budget or available capacity. No full planned labor/direct-cost or dated availability/committed-work record exists, so no overall pass is asserted.
-Tests added: Setup exact/below/above/zero/invalid cases; safe integer/bigint/overflow/term checks; source/workspace/linkage/inquiry/closed/failed reads; no controls; CEO unchanged priority ordering.
-Tests run: 558 tests/67 files, lint/build passed, including final API projection and unchanged ordering checks. PR #38 merged42f2d0f; GitHub Tests run39663515062 and preview passed. Production dpl_FhEkGnfzAM3edhYrnF76VBJ4PiYk READY with www alias verified at merged SHA. Signed-in CEO shows the existing NL inquiry with setup/floor/capacity all needs_data; expanded policy sections, missing labor/cost/capacity facts and exact lead source verified. No conversion or acceptance inferred. Agreement fee/budget cases verified by synthetic app fixtures because no NL agreement is recorded in production. Final active decisions0,unchanged decision fingerprint,responses0,evidence0,completeness0,posts43/sends17,migrations71. CEO runtime errors absent in final15-minute window. No new LLM/publish/send or business writes.
-Known issues: Needs_data until separately recorded complete labor/cost/capacity facts exist; no new owner-entry workflow invented. Existing build/advisor warnings.
-Recommended next task: Define/record owner labor/direct-cost budgets and dated capacity evidence before asserting full deal fit.
+Objective: Owner-entered complete labor/cost budgets and dated capacity evidence for verified deal fit.
+Files inspected: Product/role/conventions/decisions/learnings/memory; CEO/goal/deal-fit/Accounting/time/schema/tests; Supabase skills/docs, live advisors/schema/safety baseline.
+Files changed: Migration20261021201429,26-assertion pgTAP/types; canonical budget snapshot/evaluator/fixtures; CEO reads and UI budget form/tests; product/conventions/memory.
+Database or API changes: Owner-JWT append-only negocio_listo_deal_budgets, exact client/workspace agreement FK, private invoker snapshot/guard. Existing CEO GET reads budgets and project costs.72/72 exact migration version parity and SQL equality. App/database snapshot equality verified against live read data.
+Security decisions: No agent/service/anonymous/member writes, history edits or deletes. Exact displayed snapshot/day, explicit completeness/source and owner provenance enforced. Budget >= actual hours/costs; physical calendar bound. No decision/response write, LLM, publish/send, acceptance or reservation.
+Decisions made: Direct user scope implemented; no permanent architecture decision added.
+Assumptions: Budgets are owner forecasts across setup plus every term month; actual ledger remains separate. Capacity window is current/future and covers only those dates; other committed work excludes this deal and includes off-system work. Owner attests completeness. Same-content other-plan rechecks do not create circular invalidation.
+Tests added: Verified threshold/exact capacity/do/revise/hold/missing/stale/changed prices/plans/projects/hours/costs; explicit complete UI/zero/fractions/nonowner/failures;26 DB assertions.
+Tests run:582 app tests/69 files,lint/build passed including final API failure assertion;26 pgTAP rehearsal+postapply and18 activation checks rolled back,72/72 parity,advisors unchanged. Release pending.
+Known issues: Real budget table intentionally empty. Owner first records an agreement and exact project link, then complete budget/capacity. No forecast guarantee or capacity reservation. Existing build/advisor warnings; 1,000-row read caps fail closed.
+Recommended next task: Owner records/reconciles real agreement/project budgets and capacity when ready.
 Questions requiring Tulio: None.
 Project-memory files updated: Product, conventions, ledger/log/handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No estimates, availability, profit, receipts, strategy activation or capacity thresholds invented.
-Git diff summary: Isolated codex/deal-fit-001; original checkout's three memory edits and private archive untouched. Merged #38 and production verified; documentation receipt follows on main.
+Memory updates withheld: No production budgets, availability, costs, completeness or decision activation invented.
+Git diff summary: Isolated codex/deal-fit-evidence; original checkout's three dirty memory files and private archive untouched. Public code/schema/synthetic fixtures only; release pending.
