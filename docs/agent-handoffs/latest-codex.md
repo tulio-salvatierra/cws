@@ -1,19 +1,19 @@
-Task ID: LAYA-RESPONSES-001
+Task ID: LIFECYCLE-001
 Agent: Codex
-Objective: Owner-only Act/Dismiss with exact reviewed snapshot/evaluation, response, reason and immutable provenance, separate from activation.
-Files inspected: Canonical product scope, role instructions, conventions/decisions/learnings, ledger/log/handoff, Laya evaluator/projection/API/UI/tests, auth helpers, prior migration/pgTAP patterns, Supabase/Vercel skills/docs.
-Files changed: Migration 20261021180810 and types; signed review/response helper and tests; CEO Today handler/tests; BusinessDecisions controls/history/tests; new pgTAP file; product/conventions/verification/ledger/log and this handoff.
-Database or API changes: New append-only laya_evaluations with required reason, owner/source integrity, RLS owner reads, server append/read only. Existing CEO route accepts only owner laya_response POST; GET issues signed reviews and reads history without writes. 68/68 version parity; exact migration SQL match.
-Security decisions: Current owner membership and signed owner/workspace/purpose/expiration-bound review required. Server ignores body-supplied evidence/actor. No browser INSERT, UPDATE, DELETE or anonymous access. Actor checked in DB; trusted server insert path follows owner auth. Original snapshot persists even if decision changes later. Idempotent identical retries; conflicting replay fails. Existing activation guard untouched; no external action or LLM.
-Decisions made: Implement existing DEC-035 and direct owner request; no new permanent business/architecture decision.
-Assumptions: Act records owner intent, not execution or completion. Dismiss records feedback, not deletion/suppression/status change. Latest30 history is bounded; future history paging separately scoped. Do not fabricate a response on the real production proposal during verification.
-Tests added: 10 token/persistence, five API cases, five UI response cases; 17 pgTAP assertions.
-Tests run: 483 tests/61 files, lint/build/prerenders; 17 new DB assertions rehearsal/after apply plus 18 activation assertions after apply, all rolled back; 68/68 exact parity; unchanged advisor. GitHub Actions Tests run39651224644 and preview passed; #34 merged at54d9d82. Production dpl_B8nNJEacxmqJ8JSuoNmqy2XZqdtR READY on verified public aliases. Owner Act/Dismiss forms, explanation/reason, cancel and reload verified. Final response rows0, proposal1/active0, unchanged full decision hash, posts43/sends17, migrations68. No CEO API runtime errors in final15-minute scan.
-Known issues: Existing build/advisor warnings. Prior MCP migration apply errors avoided via proven CLI Management API with transactional history entry. No new response evaluator, autoexecution or provider behavior.
-Recommended next task: Owner records real responses when ready; separately scope additional evaluators.
+Objective: Negocio Listo lifecycle items in CEO Today and owner-entered whole project hours, preserving decision activation and external-action boundaries.
+Files inspected: Canonical product, role guidance, conventions/decisions/learnings/handoff/ledger/log, historical supplied ticket for context, current CEO/Sales intake/Operations/Accounting schema/code/tests, production schema/counts, Supabase/Vercel skills.
+Files changed: Lifecycle projection/fixtures; CEO read/order/UI/tests; Operations read/link route/readmodel/UI/tests; ProjectTime component/tests; migration20261021182855, pgTAP/types; product/conventions/DEC038 implementation note, verification/ledger/log/handoff.
+Database or API changes: Explicit same-client/workspace project-agreement FK. Owner-JWT integer project_time_entries; server SELECT only. Non-exposed owner-checked sync trigger maintains guarded actual_hours cache for financial views, with per-project locking. Existing decimal-total route rejects; owner agreement link uses existing Operations route. Existing CEO read derives lifecycle without writes. 69/69 exact migration parity/SQL equality.
+Security decisions: No service/AI time insertion, inferred hours, fuzzy name linkage, signature/provider-state inference, LLM/external calls or decision activation. Identity/provenance protected; owner corrections/removal recalculate cache. Migration guards all prior NULL-hours precondition; no backfill. Existing owner activation guards untouched and retested.
+Decisions made: Implement approved DEC038 and current lifecycle scope. No additional permanent decision; recorded implementation under DEC038.
+Assumptions: Lifecycle uses actual intake source/product snapshot prefixes and explicit agreement links; a recorded agreement is not a signed contract. No NL agreement currently exists; one existing NL inquiry should appear. Remaining Laya evaluators/goal pace are separately scoped. Work dates/notes are owner-entered; positive whole entries only, no fractional rounding.
+Tests added: 15 lifecycle scenarios/ordering checks, eight time UI cases, owner link and legacy-total API checks, optional lifecycle-read failure; 19 pgTAP assertions.
+Tests run: 509 app tests/63 files, lint/build/prerenders; 19 new DB assertions rehearsal/after apply plus18 activation after apply, rolled back; 69/69 exact parity; advisors unchanged. CI/live verification pending.
+Known issues: Existing build/advisor warnings. No signed_at source exists, so no signed-count claim. Private cache trigger is SECURITY DEFINER only to update the derived financial field; no direct execution grants and repeated authenticated owner check. Existing project actual_hours API now fails with guidance to the ledger.
+Recommended next task: Owner records actual hours and links a real NL agreement/project when available; separately scope goal pace/remaining evaluators.
 Questions requiring Tulio: None.
-Project-memory files updated: Product, conventions, ledger/log, verification and handoff.
+Project-memory files updated: Product, conventions, DEC038 implementation note, ledger/log, verification, handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No inferred real owner response, strategy activation, publish/send or condition observation.
-Git diff summary: Isolated codex/laya-owner-responses; original checkout and private archive untouched. No real record contents/secrets committed. Merged and production forms verified; final documentation receipt follows on main. Three unrelated pre-existing memory edits in original checkout remain untouched.
+Memory updates withheld: No invented signature, client conversion, historical hours, subscription/provider activity or strategy activation.
+Git diff summary: Isolated codex/lifecycle-001; original checkout and private archive untouched. No production-record contents/secrets in branch. Release pending.

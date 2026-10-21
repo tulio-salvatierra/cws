@@ -108,6 +108,15 @@ Laya is the advisory evaluator. It is not the name of the assistant or of the OS
 - AI may PREPARE `proposed` candidates from a conversation. Nothing is auto-saved from chat.
 - Architecture decisions stay in `docs/decisions.md` (DEC-012).
 
+## 3c. Negocio Listo lifecycle and project hours (LIFECYCLE-001)
+
+- CEO Today derives lifecycle items from explicit `negocio-listo|…` inquiry tags and `Negocio Listo` agreement product snapshots. Agreement creation is not evidence of signature; client names are never used to infer conversion or project linkage.
+- Stages cover prospect, setup payment pending/overdue, missing linkage/data, delivery/waiting/paused, launch-record pending, recorded launch, installment due/overdue, and term completed. Dates use Chicago time. A provider reference is not proof of payment or live subscription state. Stages are never saved automatically.
+- The owner explicitly links an Operations project to an agreement belonging to the same workspace and client. Missing or multiple project links require review. Launch and payments continue through existing owner-controlled Accounting records; lifecycle GET never creates bills, launches, charges or messages.
+- Lifecycle evidence appears in CEO Today and is included in existing deterministic priority tiers. Inquiry cards enrich the Sales queue without duplication, preserving Sales ordering. A linked delivery/payment item replaces its matching generic card. No new scoring or LLM evaluator is introduced in this milestone; the remaining Laya evaluators/goal pace remain separately scoped.
+- `project_time_entries.hours` is an owner-entered positive integer, with work date and optional notes. Fractions are rejected rather than rounded. Only an authenticated owner can add/correct/remove entries; the service role can read but cannot invent time. Corrections preserve entry identity/provenance; removal requires an explicit UI action.
+- Project `actual_hours` is a guarded cache of the entry sum for existing financial views and hourly rates. It cannot be written directly. A private owner-checked trigger synchronizes totals; per-project writes are serialized. Removing the last entry restores unknown hours, not an invented zero. Existing production totals were unset; no history was backfilled.
+
 ## 4. Product principles
 
 Favor:

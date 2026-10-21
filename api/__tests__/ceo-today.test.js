@@ -144,6 +144,8 @@ describe('CEO Today endpoint', () => {
       'recurring_revenue',
       'compliance_requirements',
       'compliance_completions',
+      'client_service_agreements',
+      'agreement_installments',
       'marketing_publish_destination_results',
       'agent_runs',
       'business_decisions',
@@ -187,6 +189,14 @@ describe('CEO Today endpoint', () => {
     await handler({ method: 'GET' }, res)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json.mock.calls[0][0]).toMatchObject({ ok: true, business_decisions: { available: false, items: [] } })
+  })
+
+  it('keeps other priorities when lifecycle agreement reads fail',async()=>{
+    const client={from:vi.fn(table=>query({data:[],error:table==='client_service_agreements'?{message:'unavailable'}:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a'})
+    const res=response();await handler({method:'GET'},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json.mock.calls[0][0].negocio_listo).toMatchObject({available:false,items:[]})
   })
 
   it.each(['act','dismiss'])('persists only owner %s response evidence through POST', async choice => {

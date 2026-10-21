@@ -33,6 +33,7 @@ const COMPLIANCE_STATE_ORDER = {
 // CEO Today deliberately owns only this pure, read-side projection. The
 // underlying Sales and Marketing records remain the systems of record.
 export function buildCeoToday({
+  lifecycle = {available:true,items:[]},
   leads = [],
   promisedActions = [],
   outreachSends = [],
@@ -51,11 +52,13 @@ export function buildCeoToday({
     now,
   })
 
+  const lifecycleItems=lifecycle.items || []
   const actions = [
-    ...salesActions(salesQueue.items, today),
+    ...salesActions(salesQueue.items, today).map(item=>{const match=lifecycleItems.find(row=>row.lead_id===item.lead_id);return match?{...item,lifecycle_stage:match.stage,lifecycle_sources:match.sources}:item}),
     ...marketingActions(marketingPlan, now),
-    ...operationsActions(operationsProjects),
-    ...accountingActions(accountingProjection),
+    ...operationsActions(operationsProjects).filter(item=>!lifecycleItems.some(row=>row.project_id===item.project_id && row.department==='OPERATIONS')),
+    ...accountingActions(accountingProjection).filter(item=>!lifecycleItems.some(row=>row.obligation_id && item.id===`accounting:financial_obligation:${row.obligation_id}`)),
+    ...lifecycleItems.filter(item=>!item.lead_id),
     ...complianceActions(complianceProjection),
   ].sort(compareActions)
 
@@ -64,6 +67,7 @@ export function buildCeoToday({
     actions: visibleActions.length ? visibleActions : [fallbackAction()],
     all_actions: actions,
     sales_summary: salesQueue.summary,
+    negocio_listo: lifecycle,
   }
 }
 
@@ -187,6 +191,7 @@ function salesActions(items, today) {
       sourceType: 'sales_command',
       salesOrder,
     })
+    candidate.lead_id=leadId
     const current = byLeadId.get(leadId)
     if (!current || compareSalesLeadActions(candidate, current) < 0) byLeadId.set(leadId, candidate)
   }
@@ -286,6 +291,7 @@ function operationsActions(projects) {
       operationsOrder: OPERATIONS_STATE_ORDER[project.delivery_state],
     })
 
+    candidate.project_id=project.project_id
     const current = byProjectId.get(project.project_id)
     if (!current || compareOperationsActions(candidate, current) < 0) byProjectId.set(project.project_id, candidate)
   }
@@ -375,8 +381,10 @@ function compareActions(left, right) {
 
   // Tier-two Sales cards retain the frozen S1 order exactly, even when their
   // actionable dates differ across categories.
-  if (left.priority_tier === TIER.sales && left.sales_order !== null && right.sales_order !== null) {
-    return left.sales_order - right.sales_order || left.id.localeCompare(right.id)
+  if (left.priority_tier === TIER.sales) {
+    if (left.sales_order !== null && right.sales_order !== null) return left.sales_order - right.sales_order || left.id.localeCompare(right.id)
+    if (left.sales_order !== null) return -1
+    if (right.sales_order !== null) return 1
   }
 
   if (left.priority_tier === TIER.deliver && left.operations_order !== null && right.operations_order !== null) {

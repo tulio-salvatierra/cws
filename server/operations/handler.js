@@ -31,11 +31,11 @@ async function loadOperations(req, res) {
 
   const projectsQuery = context.client
     .from('operations_projects')
-    .select('id, workspace_id, client_id, name, project_type, status, actual_hours, created_at, updated_at')
+    .select('id, workspace_id, client_id, name, project_type, status, actual_hours, service_agreement_id, created_at, updated_at')
     .eq('workspace_id', context.workspaceId)
     .order('created_at', { ascending: true })
   if (projectId) projectsQuery.eq('id', projectId)
-  const [projects, requirements, clients, financialSummaries, projectCosts] = await Promise.all([
+  const [projects, requirements, clients, financialSummaries, projectCosts, timeEntries, agreements, membership] = await Promise.all([
     projectsQuery,
     context.client.from('project_requirements')
       .select('id, workspace_id, project_id, requirement_key, label, category, status, timing, responsible_party, notes, requested_at, received_at, created_at, updated_at')
@@ -53,8 +53,11 @@ async function loadOperations(req, res) {
       .select('id, workspace_id, operations_project_id, description, amount_cents, currency, incurred_on, recovery, reimbursed_by_obligation_id, created_at')
       .eq('workspace_id', context.workspaceId)
       .order('incurred_on', { ascending: false }),
+    context.client.from('project_time_entries').select('id,workspace_id,project_id,hours,worked_on,notes,created_by,created_at,updated_at').eq('workspace_id',context.workspaceId).order('worked_on',{ascending:false}),
+    context.client.from('client_service_agreements').select('id,workspace_id,client_id,product_name,launch_date').eq('workspace_id',context.workspaceId),
+    context.user ? context.client.from('workspace_members').select('role').eq('workspace_id',context.workspaceId).eq('user_id',context.user.id).eq('status','active').maybeSingle() : Promise.resolve({data:null}),
   ])
-  const failed = [projects, requirements, clients, financialSummaries, projectCosts].find((result) => result.error)
+  const failed = [projects, requirements, clients, financialSummaries, projectCosts, timeEntries, agreements].find((result) => result.error)
   if (failed) return res.status(502).json({ ok: false, error: failed.error.message })
 
   return res.status(200).json({
@@ -66,6 +69,9 @@ async function loadOperations(req, res) {
       requirements: requirements.data || [],
       clients: clients.data || [],
       }),
+      can_record_time: !membership.error && membership.data?.role === 'owner',
+      time_entries: timeEntries.data || [],
+      agreements: agreements.data || [],
       financial_summaries: financialSummaries.data || [],
       project_costs: projectCosts.data || [],
     },
@@ -78,25 +84,19 @@ async function runOwnerAction(req, res) {
   const body = parseBody(req.body)
   if (body.action === 'create_operations_project') return createOperationsProject(context, body, res)
   if (body.action === 'update_operations_project') return updateOperationsProject(context, body, res)
-  if (body.action === 'update_project_financial_hours') return updateProjectFinancialHours(context, body, res)
+  if (body.action === 'update_project_financial_hours') return res.status(409).json({ok:false,error:'Record whole-hour entries in the project time log instead.'})
+  if (body.action === 'link_project_agreement') return linkProjectAgreement(context,body,res)
   if (body.action === 'create_project_cost') return createProjectCost(context, body, res)
   if (body.action === 'update_project_requirement') return updateProjectRequirement(context, body, res)
   return res.status(400).json({ ok: false, error: 'Unknown Operations action.' })
 }
 
-async function updateProjectFinancialHours(context, body, res) {
-  const projectId = cleanText(body.project_id, 50)
-  const actualHours = body.actual_hours === '' || body.actual_hours === null ? null : Number(body.actual_hours)
-  if (!UUID.test(projectId) || (actualHours !== null && (!Number.isFinite(actualHours) || actualHours < 0 || actualHours > 9999.9))) {
-    return res.status(400).json({ ok: false, error: 'A project and non-negative actual hours are required.' })
-  }
-  const result = await context.client.from('operations_projects')
-    .update({ actual_hours: actualHours })
-    .eq('id', projectId).eq('workspace_id', context.workspaceId)
-    .select('id, actual_hours, updated_at').maybeSingle()
-  if (result.error) return res.status(502).json({ ok: false, error: 'Actual hours could not be saved.' })
-  if (!result.data) return res.status(404).json({ ok: false, error: 'Operations project not found.' })
-  return res.status(200).json({ ok: true, project: result.data })
+async function linkProjectAgreement(context,body,res) {
+  if (!UUID.test(body.project_id || '') || (body.agreement_id && !UUID.test(body.agreement_id))) return res.status(400).json({ok:false,error:'Choose a project and its client agreement.'})
+  const result=await context.client.from('operations_projects').update({service_agreement_id:body.agreement_id || null}).eq('id',body.project_id).eq('workspace_id',context.workspaceId).select('id,service_agreement_id').maybeSingle()
+  if (result.error) return res.status(409).json({ok:false,error:'Agreement must belong to the same workspace and client as this project.'})
+  if (!result.data) return res.status(404).json({ok:false,error:'Project not found.'})
+  return res.status(200).json({ok:true,project:result.data})
 }
 
 async function createProjectCost(context, body, res) {
