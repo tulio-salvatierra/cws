@@ -1,3 +1,4 @@
+import { loadResponseHistory, parseHistoryPosition } from '../server/laya/history.js'
 import { buildDealFits } from '../server/laya/deal-fit.js'
 import { buildGoalPace } from '../server/ceo/goal-pace.js'
 import { authenticateWorkspace, missingOutreachEnv, parseBody } from '../server/outreach/shared.js'
@@ -34,6 +35,22 @@ export default async function handler(req, res) {
     return res.status(saved.status).json(saved.error ? { ok: false, error: saved.error } : { ok: true, response_id: saved.id })
   }
 
+  const params = new URL(req.url || '/api/ceo-today', 'http://localhost').searchParams
+  const query = { ...Object.fromEntries(params), ...req.query }
+  if (query.view === 'laya_history') {
+    const owner = await context.client.from('workspace_members').select('role').eq('workspace_id', context.workspaceId)
+      .eq('user_id', context.user.id).eq('status', 'active').maybeSingle()
+    if (owner.error) return res.status(502).json({ ok: false, error: 'Ownership could not be verified.' })
+    if (owner.data?.role !== 'owner') return res.status(403).json({ ok: false, error: 'Only the workspace owner can read Laya history.' })
+    let position
+    try { position = parseHistoryPosition(query.type, query.cursor, context.workspaceId) }
+    catch (error) { return res.status(400).json({ ok: false, error: error.message }) }
+    const history = await loadResponseHistory(context, position)
+    return res.status(history.available ? 200 : 502).json(history.available
+      ? { ok: true, laya_response_history: history }
+      : { ok: false, error: 'Response history is unavailable. Try again.' })
+  }
+
   const loaded = await loadCeoToday(context)
   if (loaded.error) return res.status(502).json({ ok: false, error: loaded.error })
   const [layaReviews, decisionRows, membership] = await Promise.all([
@@ -45,9 +62,8 @@ export default async function handler(req, res) {
     ? { available: false, items: [], due_count: 0 }
     : buildDecisionReviews({ decisions: decisionRows.data || [], workspaceId: context.workspaceId })
   decisions.can_manage = !membership.error && membership.data?.role === 'owner'
-  const history=decisions.can_manage ? await context.client.from('laya_evaluations')
-    .select('id,decision_id,evaluator,subject_type,subject_id,response,reason,created_at,input_snapshot,evaluation')
-    .eq('workspace_id',context.workspaceId).order('created_at',{ascending:false}).limit(30) : {data:[],error:null}
+  const historyPage = decisions.can_manage ? await loadResponseHistory(context) : { can_view: false }
+  const history = { data: historyPage.items || [], error: historyPage.available === false }
   if(decisions.can_manage && decisions.available) {
     decisions.response_history_available=!history.error
     for(const row of decisions.items) {
@@ -68,9 +84,7 @@ export default async function handler(req, res) {
     item.owner_response=attachResponse(item.evaluation,item.response_input)
     delete item.response_input
   }
-  return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions, laya_response_history: decisions.can_manage
-    ? { can_view: true, available: !history.error, items: history.error ? [] : history.data || [], limit: 30 }
-    : { can_view: false } })
+  return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions, laya_response_history: historyPage })
 }
 
 export async function loadCeoToday(context, now = new Date()) {

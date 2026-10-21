@@ -2170,3 +2170,7 @@ Added a unified owner-only history panel in CEO Today with Decision/Goal pace/De
 ## 2026-10-21 — Unified history released
 
 #42 merged `ee3cc74`; CI passed and READY production verified. Owner view shows unified empty history and explicit latest30 window; Decision, Goal pace, Deal fit and All types filters selected successfully. No production responses fabricated. Final responses0/active decisions0/posts43/sends17/migrations74 and decision fingerprint unchanged; no CEO API runtime errors in15m. Original checkout’s three dirty memory files untouched.
+
+## 2026-10-21 — LAYA-HISTORY-PAGINATION
+
+Implemented owner-only history pages through existing CEO GET with server type filters, 30-row pages/31-row lookahead and timestamp+ID keyset cursors preserving microseconds. Every page rechecks ownership/workspace; malformed/mismatched cursors rejected. UI supports older/newer, filter reset, exact saved evidence and retry retaining the displayed page; refresh ignores stale results. 631 tests,lint/build passed; release pending. No schema or business writes.
