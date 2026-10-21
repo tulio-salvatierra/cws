@@ -199,6 +199,7 @@ describe('CEO Today endpoint', () => {
     const res=response();await handler({method:'GET'},res)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json.mock.calls[0][0].negocio_listo).toMatchObject({available:false,items:[]})
+    expect(res.json.mock.calls[0][0].deal_fit).toEqual({available:false,items:[]})
     expect(res.json.mock.calls[0][0].goal_pace).toMatchObject({verdict:"needs_data",recorded_agreements:null,goal:{recorded:null},checkpoint:{recorded:null}})
   })
 
@@ -210,6 +211,17 @@ describe('CEO Today endpoint', () => {
     expect(res.json.mock.calls[0][0].negocio_listo.available).toBe(true)
     expect(res.json.mock.calls[0][0].goal_pace).toMatchObject({verdict:'needs_data',goal:{recorded:null},checkpoint:{recorded:null}})
     expect(res.json.mock.calls[0][0].actions.length).toBeGreaterThan(0)
+  })
+
+  it('projects scoped inquiry deal-fit checks without extra queries, writes or provider calls',async()=>{
+    const rows=[{...activeLead(),workspace_id:'workspace-a',source:'negocio-listo|plan=basico'}]
+    const client={from:vi.fn(table=>query({data:table==='leads'?rows:[],error:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a'})
+    const res=response();await handler({method:'GET'},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    const item=res.json.mock.calls[0][0].deal_fit.items[0]
+    expect(item.evaluation).toMatchObject({evaluator:'deal_fit',verdict:'needs_data',subject:{id:'lead-a',workspace_id:'workspace-a'}})
+    expect(item.evaluation.checks.map(c=>c.status)).toEqual(['needs_data','needs_data','needs_data'])
   })
 
   it.each(['act','dismiss'])('persists only owner %s response evidence through POST', async choice => {
