@@ -2182,3 +2182,7 @@ Implemented owner-only history pages through existing CEO GET with server type f
 ## 2026-10-21 — LAYA-HISTORY-FILTERS
 
 Added combined Act/Dismiss and inclusive Chicago saved-response date filters to the existing owner history GET. Strict date/response validation precedes SELECT; UTC bounds respect DST and use exclusive next-day midnight. Cursors bind all applied criteria; older unfiltered cursors remain compatible. UI separates date drafts from applied criteria, offers Apply dates/Clear filters, resets pages on successful criteria changes and preserves exact retry context. 643 tests,lint/build passed; release pending. No schema/business writes.
+
+## 2026-10-21 — History response/date filters released
+
+#44 merged `c9cddae`;643 tests,lint/build and CI passed (existing Operations race cleared on retry). READY production verified Act/Dismiss, native Chicago date entry2026-11-01 through2026-11-21, combined Goal pace filter and Clear filters. Automation fill alone did not update React date state; native key input did and applied summary confirmed exact criteria. No real responses fabricated; final responses0/active decisions0/posts43/sends17/migrations74 and decision fingerprint unchanged; CEO API runtime errors none in15m.

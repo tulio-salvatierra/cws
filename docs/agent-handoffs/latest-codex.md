@@ -8,7 +8,7 @@ Security decisions: Active ownership/workspace checks unchanged before history r
 Decisions made: User-requested scope; no permanent decision.
 Assumptions: Date range refers to saved-response created_at on inclusive Chicago calendar days, not evaluation date. Next-day exclusive bound preserves microseconds and DST23/25-hour days. Date drafts apply explicitly; header reflects applied criteria. Successful filter changes reset page1; failure/retry preserves exact attempted criteria and displayed page. Refresh resets.
 Tests added: Combined filters through older pages, cursor mismatch, impossible/leap/reversed/array/injected dates, open bounds, DST/year/leap-day boundaries, owner API validation/filter forwarding; UI apply/clear/Act/Dismiss/paging/retry/reversed range and existing exact evidence/stale refresh.
-Tests run:643 app tests/72files,lint/build passed. Production precheck0responses/0active decisions/43posts/17sends/74migrations,decision fingerprint unchanged. Release pending.
+Tests run:643 app tests/72files,lint/build passed. Production precheck0responses/0active decisions/43posts/17sends/74migrations,decision fingerprint unchanged. CI39677203595 passed on retry after the existing Operations test race (642 other tests passed on first attempt). #44 merged c9cddae; READY production dpl_8BVDMBUXkBZh5ARhbN7bwHAyte3Q assigned www alias. Owner browser verified Act/Dismiss, native dates2026-11-01 through2026-11-21 and combined Goal pace filter, then Clear filters. Final counts/fingerprint unchanged; no CEO API runtime errors in15m.
 Known issues: Production has no saved responses; populated filtering verified with synthetic fixtures only.
 Recommended next task: Owner may review actual responses when recorded.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product/conventions,ledger/log/latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No fabricated owner responses or activation.
-Git diff summary: Isolated codex/laya-history-filters; original three dirty memory files/private backup untouched. Release pending.
+Git diff summary: Isolated codex/laya-history-filters; original three dirty memory files/private backup untouched. CI39677203595 passed on retry after the existing Operations test race (642 other tests passed on first attempt). #44 merged c9cddae; READY production dpl_8BVDMBUXkBZh5ARhbN7bwHAyte3Q assigned www alias. Owner browser verified Act/Dismiss, native dates2026-11-01 through2026-11-21 and combined Goal pace filter, then Clear filters. Final counts/fingerprint unchanged; no CEO API runtime errors in15m.

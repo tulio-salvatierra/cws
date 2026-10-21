@@ -119,4 +119,4 @@
 
 | LAYA-HISTORY-PAGINATION | Codex | Done — #43 merged b2ef703; production verified | Owner-checked cursor pages in existing CEO GET; server type filters across full history; exact snapshots/reasons, Newer/Older and retry/stale-result handling | 631 tests,lint/build and CI passed; production filters/empty-page controls verified; no migration, activation, LLM, publish or send |
 
-| LAYA-HISTORY-FILTERS | Codex | Implemented — release pending | Combined server Act/Dismiss and inclusive Chicago saved-date ranges, open bounds, all-criteria cursor binding, Apply dates/Clear filters with page reset and exact retry | 643 tests,lint/build passed; no migration, activation, LLM, publish or send |
+| LAYA-HISTORY-FILTERS | Codex | Done — #44 merged c9cddae; production verified | Combined server Act/Dismiss and inclusive Chicago saved-date ranges, open bounds, all-criteria cursor binding, Apply dates/Clear filters with page reset and exact retry | 643 tests,lint/build and CI passed; live Act/Dismiss/combined Chicago dates/type/clear verified; no migration, activation, LLM, publish or send |

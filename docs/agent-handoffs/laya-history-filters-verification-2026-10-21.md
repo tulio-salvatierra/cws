@@ -1,0 +1,9 @@
+# Laya history response/date filter verification — 2026-10-21
+
+PR #44 merged as `c9cddaed3ad1a6e964677f83b6aff42965250897`. CI39677203595 passed on retry: first run hit the existing Operations requirement test race;642 other tests passed, including all filter fixtures. Production `dpl_8BVDMBUXkBZh5ARhbN7bwHAyte3Q` READY and assigned www alias.
+
+643 tests/72files, lint and production build passed locally. Fixtures combine type/Act/Dismiss/date filters through older pages; reject impossible/reversed/injected/array dates and mismatched cursors before SELECT; cover open bounds, leap/year boundaries and Chicago DST23/25-hour days. UI fixtures preserve applied criteria across pagination/retry, reset to page1, clear all criteria, and retain exact snapshots/reasons and stale-response protection. No schema change or new endpoint.
+
+Owner production browser verified Act and Dismiss server reads; inclusive native dates2026-11-01 through2026-11-21; combined Goal pace+Dismiss+range retained in applied summary; and Clear filters. Both paging controls disabled appropriately for empty results. Automation fill alone changed DOM date values without updating React state; native ArrowUp date input updated state and exact applied summary was confirmed. Production history has zero saved responses; populated filtering/paging verified by synthetic fixtures only, with no fabricated owner records.
+
+Final read-only checks match baseline: responses0,active decisions0,posts43,sends17,migrations74,decision fingerprint unchanged. CEO API runtime errors none in last15m. Owner access and activation remain separate; no LLM calls, publishing, sending, response persistence or business mutations triggered. Original checkout’s three dirty memory files/private backup untouched. No permanent decision or reusable learning added.
