@@ -1,20 +1,19 @@
-Task ID: RETIRE-001
+Task ID: COMPLIANCE-SEED-001
 Agent: Codex
-Objective: Remove dormant v1 application dependencies without changing production tables.
-Files inspected: Supplied retirement ticket/audit/SQL; canonical product definition; conventions, decisions, learnings, ledger, project log, relevant handoffs; admin routes/pages; APIs; Laya helpers/transport; local service; Vite/Vercel config; database and application tests.
-Files changed: Dormant UI/endpoints/tests removed; live assessment queries use retained channels; publication webhook drops obsolete relation fields; Vite/Vercel routes cleaned; back links fixed; mixed pgTAP test retains live publication/decision checks; product scope, ledger, project log, verification record, this handoff updated.
-Database or API changes: No migration or database change. Removed generate-draft and review-generated-draft APIs. Existing assessment response shape retained; context IDs now identify workspace channels and new snapshots cite channels. History/review receipts are unchanged.
-Security decisions: Exact-resource owner confirmation unchanged; no posts, emails, or provider actions. Original homepage changes untouched in the primary checkout. No secrets committed.
-Decisions made: Follow DOCS-V3 (#28), with RETIRE-001 as a separate stacked PR. Keep existing Laya wire field for service compatibility; it is not a database reference.
-Assumptions: This is code retirement only, not DECISIONS-001 or LAYA-001. Missing channel guidance remains unspecified; it is not translated or invented.
-Tests added: Retired relationship fields cannot become publication columns; pasted-draft API uses workspace channel context; assessment GET only loads channel context/history. Updated snapshot and UI tests.
-Tests run: Full Vitest 406 tests in 53 files passed. ESLint passed. Import casing, test-mode Vite build, production build with existing public client configuration, and git diff --check passed. Production build has existing chunk-size/lottie warnings. Database tests were edited but not executed.
-Production verification: #28 merged, #29 retargeted/merged; 23b5aea deployed READY with custom domains. All six authenticated surfaces and Marketing overview/LinkedIn previews loaded. Four destinations verified; both current slots already Posted/locked. No publishing, sending, record edits, SQL, or table drops. Found and corrected a residual Sales Workspace backlink.
-Known issues: Sales backlink correction prepared for release. Literal protocol field channel_brief remains in transport/local service/tests; zero retired database queries remain. The app still uses pre-existing advisory behavior; v3 evaluator implementation is separately scoped.
-Recommended next task: Release the small Sales backlink correction and retain the production verification record. Do not execute RETIRE-002.
-Questions requiring Tulio: None for these two PRs; production table retirement is explicitly deferred by the user.
-Project-memory files updated: Product definition, task ledger, project log, this handoff; docs/verification/retire-001.md records audit and release checks.
-Permanent decisions added: None in this code PR.
-Reusable learnings added: None.
-Memory updates withheld: No export, SQL execution, or table drops.
-Git diff summary: Separate code PR based on docs PR; approximately 4,000 lines of dormant code/tests removed. No migration files changed.
+Objective: Apply the owner-approved Illinois compliance checklist data seed.
+Files inspected: Product definition, Codex instructions, technical conventions, decisions, learnings, ledger, project log, latest handoff, supplied ticket, migration history, package.json.
+Files changed: supabase/migrations/20261021151033_compliance_seed_illinois_checklist.sql; this handoff; project log; task ledger.
+Database or API changes: Production migration 20261021151033 applied with the exact supplied SQL; no schema or application changes. All live preconditions matched. Referenced claude/compliance-review-2026-10-20.md was absent.
+Security decisions: No applicability changes or external sends/publishing. Security advisor unchanged: seven RLS/no-policy INFO findings, existing create_workspace SECURITY DEFINER warning and leaked-password-protection warning.
+Decisions made: Renamed CLI-generated migration to exact remotely assigned version; 64/64 local/remote migration versions match.
+Assumptions: Supplied ticket is the approved seed content; no independent legal-content revision.
+Tests added: None (data-only).
+Tests run: ESLint and git diff --check passed. SQL exactly matches ticket. Acceptance 1: active 11, retired 1. Acceptance 2: annual report applies, annual, due 2026-11-30; verified_by_owner_at unchanged at 2026-09-15T02:09:41.821+00:00. Acceptance 3: all ten new rows needs_verification and null verification. Acceptance 4: zero completions. Acceptance 5: reran exact SQL successfully, still 12 rows and last updated_at remains original migration time 2026-10-21T15:10:33.730985+00:00; already-applied guard present (connector does not surface NOTICE text). Acceptance 6: no new security findings. Acceptance 7: authenticated production Compliance loaded with Verified 1, Needs verification 10, annual report due 2026-11-30 and retired history. Vitest: 354 passed across 41 files; 14 suites could not load due to missing local @testing-library/dom. Attempted local-only peer restoration failed with npm edgesOut error; no manifest or lockfile edit requested.
+Known issues: Full test suite blocked by existing local dependency installation. No live precondition differences.
+Recommended next task: CANSPAM-AUDIT (read-only), separately scoped; owner verifies ten new checklist items.
+Questions requiring Tulio: None.
+Project-memory files updated: This handoff, docs/project-log.md, docs/task-ledger.md.
+Permanent decisions added: None.
+Reusable learnings added: None; migration parity convention already documented.
+Memory updates withheld: No legal-content changes or owner applicability determinations.
+Git diff summary: One data migration and three required memory files; no pre-existing changes.

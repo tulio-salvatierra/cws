@@ -2076,3 +2076,7 @@ Merged #28, retargeted #29 to main, then merged #29. Confirmed CWS production de
 
 Added the Negocio Listo landing pages in Spanish (`/negocio-listo`) and English (`/en/negocio-listo`) with the owner's EN/ES reels in a phone-frame player, plan copy taken from `public/images/negocio-listo`, a lead popup and an inline form. Leads post to a new public route on the existing outreach function (no new Vercel function) and land as `inbound` rows in `leads` with a compact `source` tag; no email or other external action. A build step writes prerendered HTML for both routes so link previews and crawlers get the page's own metadata. The intro loader is skipped on these routes. No migration or database change.
 
+
+## 2026-10-21 — COMPLIANCE-SEED-001
+
+Applied exact approved data seed as production migration `20261021151033`; 64/64 migration parity. All live preconditions matched. Verified 11 active/1 retired, annual report due 2026-11-30 with original owner verification intact, ten new unverified items, zero completions, successful no-op rerun, unchanged security advisor, and authenticated production Compliance display. No schema or app changes. Vitest: 354 passing tests, 14 suites blocked by missing local @testing-library/dom; local peer-install attempt failed with npm edgesOut error. Referenced review file was absent. See latest Codex handoff.
