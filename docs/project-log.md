@@ -2087,4 +2087,4 @@ Implemented the approved P1 fixes: full commercial footer before exact owner con
 
 ## 2026-10-21 — CWS-NL-FIX-001
 
-Fixed landing-page footer Contact navigation and stale form-error language. Error text derives from status and current copy, preserving entered values and in-flight state. 430 tests, lint, production build/prerender and diff checks passed. No data or API changes. Production verification pending.
+Fixed landing-page footer Contact navigation and stale form-error language. Error text derives from status and current copy, preserving entered values and in-flight state. 430 tests, lint, production build/prerender and diff checks passed. No data or API changes. Production a31b744 deployed to cws as dpl_E99LWLkvAQkTuApQcDXYFLMko5k4 (READY, custom domains assigned). Live browser verified both footer targets and ES→EN→ES validation language updates; no leads submitted.

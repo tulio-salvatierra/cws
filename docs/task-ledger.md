@@ -92,4 +92,4 @@
 
 | CANSPAM-FIX-001 | Codex | Pushed to main; production verified | Full pre-confirmation footer, persistent shared email opt-outs, restored public/legacy unsubscribe flow, owner reply-opt-out action, safe mailing-list confirmation; migration `20261021152507`; 430 tests, lint/build pass | Runtime ff32084 READY; synthetic opt-outs/legacy links/owner action verified and cleaned; sends unchanged at 17; freeze fix |
 
-| CWS-NL-FIX-001 | Codex | Implemented; production verification pending | Footer Contact targets formulario on both landing routes; validation and request errors derive from current language without resetting form state; 430 tests, lint, build pass | Verify production release |
+| CWS-NL-FIX-001 | Codex | Completed — production verified | Footer Contact targets formulario on both landing routes; validation and request errors derive from current language without resetting form state; 430 tests, lint, build pass; production a31b744 READY and live browser verified both fixes | No further action |

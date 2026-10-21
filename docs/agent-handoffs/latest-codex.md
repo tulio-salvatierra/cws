@@ -8,9 +8,9 @@ Security decisions: No production lead submissions or provider actions.
 Decisions made: Route-specific footer destination; derive localized errors from existing status rather than storing translated text.
 Assumptions: Preserve entered fields, selected plan and submission state when changing language.
 Tests added: None; small reversible change checked with existing suite and planned live browser verification.
-Tests run: 430 tests in 57 files, lint, production build/prerender, git diff --check passed.
-Known issues: Existing build chunk-size warnings. Production verification pending.
-Recommended next task: Verify production deployment and both language flows.
+Tests run: 430 tests in 57 files, lint, production build/prerender, git diff --check passed; live browser confirmed footer targets on both routes and validation text updates in both directions.
+Known issues: Existing build chunk-size warnings. Production a31b744 verified READY (dpl_E99LWLkvAQkTuApQcDXYFLMko5k4), custom domains assigned; live footer targets and ES→EN→ES validation language verified without submitting leads.
+Recommended next task: No further landing-page work required.
 Questions requiring Tulio: None.
 Project-memory files updated: This handoff, project log, task ledger.
 Permanent decisions added: None.
