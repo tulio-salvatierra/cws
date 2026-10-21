@@ -1,0 +1,5 @@
+# GOAL-PACE verification — 2026-10-21
+
+PR #36 merged at 7bb9826; GitHub Tests run39659230487 and preview succeeded. Production dpl_5aWePFch5kKnT7VkMUdj5apeL2yK READY; www alias verified at merged SHA. Signed-in CEO shows pinned 10 active / 4 signed targets, unknown counts/needs-data pace, 71/25 Chicago days remaining and zero recorded agreements explicitly distinguished from conversions. Expanded provenance and four missing-evidence explanations verified; reload performs no writes. Active decisions0, response rows0, decision fingerprint unchanged, posts43/sends17, migrations69. No CEO runtime errors in final15-minute window. No LLM, publish or send.
+
+No migration or pgTAP change: this feature is a pure read projection using the existing authenticated workspace-scoped query. Full app suite includes owner activation guards. Production verification read only; no real response, activation, publishing or sending controls were invoked. Original checkout’s three existing memory edits remain untouched.

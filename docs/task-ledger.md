@@ -105,4 +105,4 @@
 
 | LIFECYCLE-001 | Codex | Completed — merged #35 and production verified | Source-derived NL lifecycle in CEO Today, explicit same-client project/agreement links, owner-JWT integer time ledger and financial total; migration20261021182855, 69/69 parity; 509 tests,CI and37 pgTAP pass; READY9b45ac5 CEO/Operations reads verified | Owner records actual hours/links; no LLM/external action/activation |
 
-| GOAL-PACE | Codex | Implemented; release verification pending | Pinned approved Negocio Listo targets with Chicago deadline distances, recorded agreement sources and explicit unknown signed/active/pace evidence gaps; no activation or external actions | 514 tests, lint/build passed; no migration |
+| GOAL-PACE | Codex | Done — #36 merged 7bb9826; production verified | Pinned approved Negocio Listo targets with Chicago deadline distances, recorded agreement sources and explicit unknown signed/active/pace evidence gaps; no activation or external actions | 514 tests, lint/build and CI passed; production targets/evidence verified; no migration or business writes |

@@ -8,7 +8,7 @@ Security decisions: AUTO read only; no decision/response writes, external action
 Decisions made: Implement approved product §1a targets; no permanent decision added.
 Assumptions: Agreement creation, launch, payment or provider reference cannot prove signature/current subscription. Unknown totals and remaining conversions remain null; no census completeness or pace baseline inferred.
 Tests added: Empty/failed evidence, workspace scoping, launch/provider/signature inference exclusion, Chicago date/deadline boundary, pinned persistence after Not now and no writes; API failure assertion.
-Tests run: 514 tests/64 files, lint/build passed before final API assertion. Release verification pending.
+Tests run: 514 tests/64 files, lint/build passed; final API assertion included in rerun. PR #36 merged at 7bb9826; GitHub Tests run39659230487 and preview succeeded. Production dpl_5aWePFch5kKnT7VkMUdj5apeL2yK READY; www alias verified at merged SHA. Signed-in CEO shows pinned 10 active / 4 signed targets, unknown counts/needs-data pace, 71/25 Chicago days remaining and zero recorded agreements explicitly distinguished from conversions. Expanded provenance and four missing-evidence explanations verified; reload performs no writes. Active decisions0, response rows0, decision fingerprint unchanged, posts43/sends17, migrations69. No CEO runtime errors in final15-minute window. No LLM, publish or send.
 Known issues: Signature dates/product-linked subscription state/completeness/baseline are absent; pace intentionally needs_data. Existing build warnings.
 Recommended next task: Separately define owner-recorded signature/subscription evidence and completeness before numeric progress/forecast.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product, conventions, ledger, log, latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No invented counts, active decision or forecast.
-Git diff summary: Isolated codex/goal-pace, original checkout's three dirty memory files untouched. Release pending; no private production records or archive in Git.
+Git diff summary: Isolated codex/goal-pace, original checkout's three dirty memory files untouched. Merged #36 and production verified; docs receipt on main. No private production records or archive in Git.
