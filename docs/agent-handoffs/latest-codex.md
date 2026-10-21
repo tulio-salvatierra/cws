@@ -8,12 +8,12 @@ Security decisions: Only owner-JWT writes can activate; service role cannot upda
 Decisions made: Implement approved DEC-036; no additional permanent architecture/business decision. Existing legacy row stays proposed with all prior values intact.
 Assumptions: Free-text conditions are owner-observed rather than guessed. Due dates derive in Chicago time; reviews sit outside unchanged department ordering. Strategy activation remains an owner task; no strategy row invented. Candidate creation screen and Laya evaluator are outside this ticket.
 Tests added: Five projection fixtures, five UI authority/staleness tests, two API scope/degradation tests, 18 pgTAP assertions.
-Tests run: 18 pgTAP before/after, 46 existing database assertions, full app suite plus new API cases, lint, placeholder-env build/prerenders, row hash preservation and exact migration SQL/version parity, security advisors unchanged.
-Known issues: MCP migration tool twice returned expired requestState; CLI Management API applied schema and history atomically. Existing build warnings remain. Live release verification pending.
+Tests run: 18 pgTAP before/after, 46 existing database assertions, 442 app tests in 59 files, lint, placeholder-env build/prerenders, row hash preservation and exact migration SQL/version parity, security advisors unchanged.
+Known issues: MCP migration tool twice returned expired requestState; CLI Management API applied schema and history atomically. Existing build warnings remain. PR #32 merged at 1c1e9c5; production dpl_AyqjJ1BQb7c5Rats2Rb9xz6ijkFX READY and verified through public alias. Authenticated CEO Today, read-only activation preview/cancel/reload and unchanged production row hash/counts verified.
 Recommended next task: Owner reviews existing proposal/strategy before any activation. Separate lifecycle/Laya work remains separately scoped.
 Questions requiring Tulio: None.
 Project-memory files updated: Product definition, ledger, log, verification, this handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No automatic strategy activation or arbitrary free-text condition evaluator inferred.
-Git diff summary: Isolated codex/decisions-001 from main; original user checkout untouched. No private archive, production record contents or secrets included. Merge/deployment pending.
+Git diff summary: Isolated codex/decisions-001 from main; original user checkout untouched. No private archive, production record contents or secrets included. Merged #32; final documentation receipt follows on main. Original checkout has three unrelated pre-existing memory edits; none modified here.

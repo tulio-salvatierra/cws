@@ -18,8 +18,10 @@
 - Reviews appear in a separate CEO Today section, without changing department ordering. Dates use Chicago time, inclusive on the review date. Free-text conditions are assessed by the owner; only an explicit recorded observation creates a condition-based review. No free-text/AI inference is performed.
 - Owner UI reviews the exact decision and terms before the separate “I activate this decision” action. It writes with the owner's Supabase JWT and an optimistic timestamp check. Opening/reloading/canceling never writes. No agent activated a production record.
 - Review dates and observations can be updated by the owner; active terms require a replacement decision. Proposed candidates can be prepared explicitly through authorized database access; chat is never auto-saved. No separate candidate-creation screen or new Laya evaluator is included.
-- App suite, lint and placeholder-env build/prerenders pass. Local build without client env correctly fails the existing production-environment guard.
-- Release/live verification: pending.
+- All 442 app tests in 59 files, lint and placeholder-env build/prerenders pass. Local build without client env correctly fails the existing production-environment guard.
+- Merged PR #32 at `1c1e9c5291d75682eb3729e5e71c901de8206ed4`. Production deployment `dpl_AyqjJ1BQb7c5Rats2Rb9xz6ijkFX` is READY, serving `www.cicerowebstudio.xyz` and the root domain.
+- Authenticated production CEO Today loads its existing priorities, the preserved proposed decision, zero due reviews, and owner review controls. Opening activation preview displays the missing date/condition prerequisites and offers no activation action; cancel/reload keep the row unchanged. No save, reject, supersede, condition observation or activation action was performed.
+- Final database check: one decision, zero active, zero activation/condition evidence, same legacy hash, zero synthetic users; posts43/sends17.
 
 ## External actions
 
