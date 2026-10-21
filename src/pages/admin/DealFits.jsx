@@ -1,3 +1,4 @@
+import LayaOwnerResponse from './LayaOwnerResponse'
 import DealBudget from './DealBudget'
 import { Link } from 'react-router-dom'
 
@@ -19,6 +20,7 @@ export default function DealFits({summary,canManage,onReload}) {
         <ul className="mt-2 list-disc pl-5">{item.evaluation.missing_data.map(text=><li key={text}>{text}</li>)}</ul>
         {item.evaluation.why.map((item,index)=><p key={index} className="mt-2 break-words">{item.claim} {item.source.table} · {item.source.id} · {Object.entries(item.source.fields).map(([key,value])=>`${key}: ${value ?? 'not recorded'}`).join(' · ')}</p>)}
       </details>
+      <LayaOwnerResponse key={item.owner_response?.review_token || item.id} review={item.owner_response} label="Deal fit" onReload={onReload} />
       {canManage && item.agreement && <DealBudget key={`${item.id}:${item.budget?.revision || 'new'}:${summary.today}:${JSON.stringify(item.budget_snapshot)}`} item={item} workspaceId={summary.workspace_id} today={summary.today} onReload={onReload} />}
     </article>)}
   </section>

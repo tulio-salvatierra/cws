@@ -68,9 +68,16 @@ export function evaluateDealFit({workspaceId,agreement=null,lead=null,projects=[
 export function buildDealFits({workspaceId,agreements=[],leads=[],projects=[],budgets=[],costs=[],available=true,now=new Date()}) {
   if(!available)return {available:false,items:[]}
   const latest=latestBudgets(budgets,workspaceId)
-  const items=[
-    ...agreements.filter(a=>a.workspace_id===workspaceId && isNegocioListo(a)).map(agreement=>({id:`agreement:${agreement.id}`,title:agreement.product_name,href:`/admin/accounting?client=${encodeURIComponent(agreement.client_id)}#client-agreements`,agreement,budget:latest.find(b=>b.agreement_id===agreement.id) || null,budget_snapshot:dealSnapshot({workspaceId,agreementId:agreement.id,agreements,projects,budgets,costs}),evaluation:evaluateDealFit({workspaceId,agreement,projects,costs,budget:latest.find(b=>b.agreement_id===agreement.id),snapshot:dealSnapshot({workspaceId,agreementId:agreement.id,agreements,projects,budgets,costs}),now})})),
-    ...leads.filter(l=>l.workspace_id===workspaceId && String(l.source || '').split('|')[0]==='negocio-listo' && !['won','lost','unresponsive'].includes(l.status)).map(lead=>({id:`lead:${lead.id}`,title:lead.company || lead.name || 'Negocio Listo inquiry',href:'/admin/sales',evaluation:evaluateDealFit({workspaceId,lead,now})})),
-  ].sort((a,b)=>a.id.localeCompare(b.id))
+  const items=agreements.filter(a=>a.workspace_id===workspaceId && isNegocioListo(a)).map(agreement=>{
+    const budget=latest.find(b=>b.agreement_id===agreement.id) || null
+    const snapshot=dealSnapshot({workspaceId,agreementId:agreement.id,agreements,projects,budgets,costs})
+    const inputs={workspaceId,agreement,lead:null,projects,costs,budget,snapshot,now}
+    return {id:`agreement:${agreement.id}`,title:agreement.product_name,href:`/admin/accounting?client=${encodeURIComponent(agreement.client_id)}#client-agreements`,agreement,budget,budget_snapshot:snapshot,evaluation:evaluateDealFit(inputs),response_input:inputs}
+  })
+  for(const lead of leads.filter(l=>l.workspace_id===workspaceId && String(l.source || '').split('|')[0]==='negocio-listo' && !['won','lost','unresponsive'].includes(l.status))) {
+    const inputs={workspaceId,agreement:null,lead,projects:[],costs:[],budget:null,snapshot:null,now}
+    items.push({id:`lead:${lead.id}`,title:lead.company || lead.name || 'Negocio Listo inquiry',href:'/admin/sales',evaluation:evaluateDealFit(inputs),response_input:inputs})
+  }
+  items.sort((a,b)=>a.id.localeCompare(b.id))
   return {available:true,items,workspace_id:workspaceId,today:chicagoDate(now)}
 }

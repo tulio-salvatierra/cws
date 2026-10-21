@@ -1,7 +1,7 @@
 import { buildDealFits } from '../server/laya/deal-fit.js'
 import { buildGoalPace } from '../server/ceo/goal-pace.js'
 import { authenticateWorkspace, missingOutreachEnv, parseBody } from '../server/outreach/shared.js'
-import { createResponseToken, saveOwnerResponse } from '../server/laya/responses.js'
+import { createResponseToken, createEvaluationResponseToken, saveOwnerResponse } from '../server/laya/responses.js'
 import { buildDecisionReviews } from '../server/decisions/reviews.js'
 import { buildNegocioListoLifecycle } from '../server/lifecycle/negocio-listo.js'
 import { buildCeoToday } from '../server/ceo/today.js'
@@ -45,16 +45,28 @@ export default async function handler(req, res) {
     ? { available: false, items: [], due_count: 0 }
     : buildDecisionReviews({ decisions: decisionRows.data || [], workspaceId: context.workspaceId })
   decisions.can_manage = !membership.error && membership.data?.role === 'owner'
-  if (decisions.can_manage && decisions.available) {
-    const history = await context.client.from('laya_evaluations')
-      .select('id,decision_id,response,reason,created_at,input_snapshot,evaluation')
-      .eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }).limit(30)
-    decisions.response_history_available = !history.error
-    for (const row of decisions.items) {
-      const source = decisionRows.data.find(item => item.id === row.id)
-      row.review_token = createResponseToken(context, source, row.evaluation)
-      row.responses = (history.data || []).filter(item => item.decision_id === row.id)
+  const history=decisions.can_manage ? await context.client.from('laya_evaluations')
+    .select('id,decision_id,evaluator,subject_type,subject_id,response,reason,created_at,input_snapshot,evaluation')
+    .eq('workspace_id',context.workspaceId).order('created_at',{ascending:false}).limit(30) : {data:[],error:null}
+  if(decisions.can_manage && decisions.available) {
+    decisions.response_history_available=!history.error
+    for(const row of decisions.items) {
+      const source=decisionRows.data.find(item=>item.id===row.id)
+      row.review_token=createResponseToken(context,source,row.evaluation)
+      row.responses=(history.data || []).filter(item=>item.decision_id===row.id)
     }
+  }
+  const attachResponse=(evaluation,inputs)=>{
+    if(!decisions.can_manage)return {can_respond:false}
+    const token=createEvaluationResponseToken(context,inputs,evaluation)
+    return {can_respond:Boolean(token),review_token:token,history_available:!history.error,
+      unavailable_reason:token?null:'The exact evidence is too large to sign safely; no response can be saved for this view.',
+      responses:(history.data || []).filter(item=>item.evaluator===evaluation.evaluator && item.subject_type===evaluation.subject.type && item.subject_id===evaluation.subject.id)}
+  }
+  loaded.data.goal_pace.owner_response=attachResponse(loaded.data.goal_pace,loaded.review_inputs.goal)
+  for(const item of loaded.data.deal_fit?.items || []) {
+    item.owner_response=attachResponse(item.evaluation,item.response_input)
+    delete item.response_input
   }
   return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions })
 }
@@ -127,10 +139,14 @@ export async function loadCeoToday(context, now = new Date()) {
   const lifecycle = agreements.error || installments.error
     ? {available:false,items:[]}
     : buildNegocioListoLifecycle({workspaceId:context.workspaceId,leads:leads.data || [],agreements:agreements.data || [],installments:installments.data || [],obligations:obligations.data || [],receipts:receipts.data || [],projects:operationsProjects.data || [],requirements:operationsRequirements.data || [],clients:operationsClients.data || [],now})
+  const goalInput={workspaceId:context.workspaceId,agreements:agreements.data || [],evidence:goalEvidence.data || [],completeness:goalCompleteness.data || [],available:!agreements.error && !goalEvidence.error && !goalCompleteness.error && (agreements.data || []).length<1000 && (goalEvidence.data || []).length<1000,now}
+  const dealInput={workspaceId:context.workspaceId,agreements:agreements.data || [],leads:leads.data || [],projects:operationsProjects.data || [],budgets:dealBudgets.data || [],costs:dealCosts.data || [],available:!agreements.error && !dealBudgets.error && !dealCosts.error && [agreements,leads,operationsProjects,dealBudgets,dealCosts].every(result=>(result.data || []).length<1000),now}
+  const goalPace=buildGoalPace(goalInput)
   return {
+    review_inputs:{goal:goalInput},
     data: buildCeoToday({
-      dealFits: buildDealFits({workspaceId:context.workspaceId,agreements:agreements.data || [],leads:leads.data || [],projects:operationsProjects.data || [],budgets:dealBudgets.data || [],costs:dealCosts.data || [],available:!agreements.error && !dealBudgets.error && !dealCosts.error && [agreements,leads,operationsProjects,dealBudgets,dealCosts].every(result=>(result.data || []).length<1000),now}),
-      goalPace: buildGoalPace({workspaceId:context.workspaceId,agreements:agreements.data || [],evidence:goalEvidence.data || [],completeness:goalCompleteness.data || [],available:!agreements.error && !goalEvidence.error && !goalCompleteness.error && (agreements.data || []).length<1000 && (goalEvidence.data || []).length<1000,now}),
+      dealFits: buildDealFits(dealInput),
+      goalPace,
       lifecycle,
       leads: leads.data || [],
       promisedActions: promisedActions.data || [],
