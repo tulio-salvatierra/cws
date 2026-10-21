@@ -47,7 +47,7 @@ Other rates:
 Fee rules:
 
 - The sign-up fee is **never waived** by default. It pays for the one-time build and setup hours and is non-refundable once work starts.
-- **Early termination:** the client pays a fee that covers the website build: 3 months of the plan for a one-page site, 6 months for a multi-page site (or the remaining months, if fewer).
+- **Early termination:** the client pays 6 months of the plan's fee on every plan (or the remaining months, if fewer). It covers the website build.
 - **Website buyout** after leaving: 6 months of the plan's fee.
 - Price is locked for the first 12 months, then month to month with 30 days' notice for changes.
 - **Existing-client exception:** a client whose site is already paid for may get Crecer at **$200/month** with no sign-up fee and a shorter minimum. Any other exception needs Tulio's decision.
