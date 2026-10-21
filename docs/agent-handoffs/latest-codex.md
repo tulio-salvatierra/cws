@@ -8,7 +8,7 @@ Security decisions: Authenticate workspace and active owner before each history 
 Decisions made: Direct requested scope; no permanent decision.
 Assumptions: Newer pages retained during browsing; refresh resets. New rows do not shift older boundaries. Type changes restart at page1 and apply server-wide. No total count inferred.
 Tests added:65 tied-time rows across3pages, insert during paging, filtered older rows, exact end/empty/error, malformed/cross-scope cursors; API owner/member/failed ownership and bad query/read failures; UI older/newer/filter reset/retry/stale refresh and exact saved JSON/reasons.
-Tests run:631 app tests/72files,lint/build passed after final retry-button cleanup. Production baseline responses0/active decisions0/posts43/sends17/migrations74,decision fingerprint unchanged. Release pending.
+Tests run:631 app tests/72files,lint/build passed after final retry-button cleanup. Production baseline responses0/active decisions0/posts43/sends17/migrations74,decision fingerprint unchanged. CI39675880904 passed; #43 merged b2ef703. READY production dpl_8vKqzH1yqewtUevDqeScYpa5wbcF assigned www alias. Owner browser verified page1/empty state/disabled Newer+Older and all three server-filtered types, restored All types; no CEO API runtime errors in15m. Final counts/fingerprint unchanged.
 Known issues: Production has no saved responses; populated paging verified using synthetic fixtures, never fabricated owner records. Existing Operations test race cleared on full rerun.
 Recommended next task: Owner may review actual responses when recorded.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product/conventions,ledger/log/latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No invented production responses or activation.
-Git diff summary: Isolated codex/laya-history-pagination; original dirty memory/private archive untouched. Release pending.
+Git diff summary: Isolated codex/laya-history-pagination; original dirty memory/private archive untouched. CI39675880904 passed; #43 merged b2ef703. READY production dpl_8vKqzH1yqewtUevDqeScYpa5wbcF assigned www alias. Owner browser verified page1/empty state/disabled Newer+Older and all three server-filtered types, restored All types; no CEO API runtime errors in15m. Final counts/fingerprint unchanged.

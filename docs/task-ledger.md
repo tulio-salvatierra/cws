@@ -117,4 +117,4 @@
 
 | LAYA-UNIFIED-HISTORY | Codex | Done — #42 merged ee3cc74; production verified | Unified owner-only CEO Today history for Decision/Goal pace/Deal fit; saved snapshots/evaluations/reasons independent of live subject cards; existing scoped latest30 read, no schema change | 616 tests,lint/build and CI passed; live empty-state/all three filters verified; activation separate; no writes, LLM, publish or send |
 
-| LAYA-HISTORY-PAGINATION | Codex | Implemented — release pending | Owner-checked cursor pages in existing CEO GET; server type filters across full history; exact snapshots/reasons, Newer/Older and retry/stale-result handling | 631 tests,lint/build passed; no migration, activation, LLM, publish or send |
+| LAYA-HISTORY-PAGINATION | Codex | Done — #43 merged b2ef703; production verified | Owner-checked cursor pages in existing CEO GET; server type filters across full history; exact snapshots/reasons, Newer/Older and retry/stale-result handling | 631 tests,lint/build and CI passed; production filters/empty-page controls verified; no migration, activation, LLM, publish or send |

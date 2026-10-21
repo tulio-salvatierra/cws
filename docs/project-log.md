@@ -2174,3 +2174,7 @@ Added a unified owner-only history panel in CEO Today with Decision/Goal pace/De
 ## 2026-10-21 — LAYA-HISTORY-PAGINATION
 
 Implemented owner-only history pages through existing CEO GET with server type filters, 30-row pages/31-row lookahead and timestamp+ID keyset cursors preserving microseconds. Every page rechecks ownership/workspace; malformed/mismatched cursors rejected. UI supports older/newer, filter reset, exact saved evidence and retry retaining the displayed page; refresh ignores stale results. 631 tests,lint/build passed; release pending. No schema or business writes.
+
+## 2026-10-21 — History pagination released
+
+#43 merged `b2ef703`; CI39675880904 passed and READY production verified. Owner browser checked page1/empty state/disabled paging controls, Decision/Goal pace/Deal fit server reads and All types restoration. Populated65-row pagination, tied timestamps, concurrent insert, filtered older records and retries verified by synthetic fixtures. No real responses fabricated; final response/activation/publish/send counts and decision fingerprint unchanged,74 migrations,CEO API runtime errors none in15m.
