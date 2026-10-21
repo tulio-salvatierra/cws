@@ -103,4 +103,4 @@
 
 | LAYA-RESPONSES-001 | Codex | Completed — merged #34 and production verified | Owner-only signed Act/Dismiss with reason, exact snapshot/output, immutable history and idempotent retry; migration20261021180810, 68/68 parity; 483 tests, CI and 35 pgTAP pass; READY54d9d82 forms/cancel/reload verified | Owner may save real responses; activation remains separate; no LLM/publish/send |
 
-| LIFECYCLE-001 | Codex | Implemented; migration verified; release pending | Source-derived NL lifecycle in CEO Today, explicit same-client project/agreement links, owner-JWT integer time ledger and financial total; migration20261021182855, 69/69 parity; 509 tests and37 pgTAP pass | CI/release, read-only CEO/Operations verification; no LLM/external action/activation |
+| LIFECYCLE-001 | Codex | Completed — merged #35 and production verified | Source-derived NL lifecycle in CEO Today, explicit same-client project/agreement links, owner-JWT integer time ledger and financial total; migration20261021182855, 69/69 parity; 509 tests,CI and37 pgTAP pass; READY9b45ac5 CEO/Operations reads verified | Owner records actual hours/links; no LLM/external action/activation |

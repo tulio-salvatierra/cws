@@ -8,7 +8,7 @@ Security decisions: No service/AI time insertion, inferred hours, fuzzy name lin
 Decisions made: Implement approved DEC038 and current lifecycle scope. No additional permanent decision; recorded implementation under DEC038.
 Assumptions: Lifecycle uses actual intake source/product snapshot prefixes and explicit agreement links; a recorded agreement is not a signed contract. No NL agreement currently exists; one existing NL inquiry should appear. Remaining Laya evaluators/goal pace are separately scoped. Work dates/notes are owner-entered; positive whole entries only, no fractional rounding.
 Tests added: 15 lifecycle scenarios/ordering checks, eight time UI cases, owner link and legacy-total API checks, optional lifecycle-read failure; 19 pgTAP assertions.
-Tests run: 509 app tests/63 files, lint/build/prerenders; 19 new DB assertions rehearsal/after apply plus18 activation after apply, rolled back; 69/69 exact parity; advisors unchanged. CI/live verification pending.
+Tests run: 509 app tests/63 files, lint/build/prerenders; 19 new DB assertions rehearsal/after apply plus18 activation after apply, rolled back; 69/69 exact parity; advisors unchanged. Tests run39654874692 and preview passed; #35 merged9b45ac5, production dpl_3qDmUaeDhuCceRUkdF3tkMLvJZfk READY on verified aliases. CEO NL prospect/card enrichment/date/source expansion and Operations owner whole-hour/agreement controls/financial-rate read verified without saving. Final projects4,time0,totals0,links0,active decisions0,unchanged decision hash,posts43/sends17,migrations69. CEO/Operations runtime scans clean.
 Known issues: Existing build/advisor warnings. No signed_at source exists, so no signed-count claim. Private cache trigger is SECURITY DEFINER only to update the derived financial field; no direct execution grants and repeated authenticated owner check. Existing project actual_hours API now fails with guidance to the ledger.
 Recommended next task: Owner records actual hours and links a real NL agreement/project when available; separately scope goal pace/remaining evaluators.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product, conventions, DEC038 implementation note, 
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No invented signature, client conversion, historical hours, subscription/provider activity or strategy activation.
-Git diff summary: Isolated codex/lifecycle-001; original checkout and private archive untouched. No production-record contents/secrets in branch. Release pending.
+Git diff summary: Isolated codex/lifecycle-001; original checkout and private archive untouched. No production-record contents/secrets in branch. Merged #35 and production verified; final documentation receipt follows on main. Three pre-existing unrelated memory edits in original checkout remain untouched.
