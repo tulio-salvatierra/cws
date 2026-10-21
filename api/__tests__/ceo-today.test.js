@@ -144,6 +144,8 @@ describe('CEO Today endpoint', () => {
       'recurring_revenue',
       'compliance_requirements',
       'compliance_completions',
+      'negocio_listo_evidence',
+      'negocio_listo_completeness',
       'client_service_agreements',
       'agreement_installments',
       'marketing_publish_destination_results',
@@ -198,6 +200,16 @@ describe('CEO Today endpoint', () => {
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json.mock.calls[0][0].negocio_listo).toMatchObject({available:false,items:[]})
     expect(res.json.mock.calls[0][0].goal_pace).toMatchObject({verdict:"needs_data",recorded_agreements:null,goal:{recorded:null},checkpoint:{recorded:null}})
+  })
+
+  it('keeps lifecycle and department priorities when goal evidence is unavailable',async()=>{
+    const client={from:vi.fn(table=>query({data:[],error:table==='negocio_listo_evidence'?{message:'unavailable'}:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a'})
+    const res=response();await handler({method:'GET'},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json.mock.calls[0][0].negocio_listo.available).toBe(true)
+    expect(res.json.mock.calls[0][0].goal_pace).toMatchObject({verdict:'needs_data',goal:{recorded:null},checkpoint:{recorded:null}})
+    expect(res.json.mock.calls[0][0].actions.length).toBeGreaterThan(0)
   })
 
   it.each(['act','dismiss'])('persists only owner %s response evidence through POST', async choice => {
