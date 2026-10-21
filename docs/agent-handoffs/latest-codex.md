@@ -8,7 +8,7 @@ Security decisions: No agent/service/anonymous/member writes, history edits or d
 Decisions made: Direct user scope implemented; no permanent architecture decision added.
 Assumptions: Budgets are owner forecasts across setup plus every term month; actual ledger remains separate. Capacity window is current/future and covers only those dates; other committed work excludes this deal and includes off-system work. Owner attests completeness. Same-content other-plan rechecks do not create circular invalidation.
 Tests added: Verified threshold/exact capacity/do/revise/hold/missing/stale/changed prices/plans/projects/hours/costs; explicit complete UI/zero/fractions/nonowner/failures;26 DB assertions.
-Tests run:584 app tests/69 files,lint/build passed including final API failure assertion;26 pgTAP rehearsal+postapply and18 activation checks rolled back,73/73 parity,advisors unchanged. PR39 merged9e0fba7; focused capacity snapshot hardening release pending.
+Tests run:586 app tests/69 files,lint/build passed including final API failure assertion;26 pgTAP rehearsal+postapply and18 activation checks rolled back,73/73 parity,advisors unchanged. PR39 merged9e0fba7; focused capacity snapshot hardening release pending.
 Known issues: Real budget table intentionally empty. Owner first records an agreement and exact project link, then complete budget/capacity. No forecast guarantee or capacity reservation. Existing build/advisor warnings; 1,000-row read caps fail closed.
 Recommended next task: Owner records/reconciles real agreement/project budgets and capacity when ready.
 Questions requiring Tulio: None.
