@@ -1,4 +1,5 @@
-import { authenticateWorkspace, missingOutreachEnv } from '../server/outreach/shared.js'
+import { authenticateWorkspace, missingOutreachEnv, parseBody } from '../server/outreach/shared.js'
+import { createResponseToken, saveOwnerResponse } from '../server/laya/responses.js'
 import { buildDecisionReviews } from '../server/decisions/reviews.js'
 import { buildCeoToday } from '../server/ceo/today.js'
 import { loadReviewSummary } from '../server/laya/marketing.js'
@@ -10,13 +11,25 @@ const complianceRequirementFields = 'id, workspace_id, title, category, authorit
 const complianceCompletionFields = 'id, workspace_id, compliance_requirement_id, completed_at, notes, created_at'
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'Method not allowed.' })
+  res.setHeader?.('Cache-Control', 'no-store')
+  if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ ok: false, error: 'Method not allowed.' })
 
   const missing = missingOutreachEnv()
   if (missing.length) return res.status(500).json({ ok: false, error: `Missing CEO Today environment variables: ${missing.join(', ')}` })
 
   const context = await authenticateWorkspace(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
+
+  if (req.method === 'POST') {
+    const owner = await context.client.from('workspace_members').select('role').eq('workspace_id', context.workspaceId)
+      .eq('user_id', context.user.id).eq('status', 'active').maybeSingle()
+    if (owner.error) return res.status(502).json({ ok: false, error: 'Ownership could not be verified.' })
+    if (owner.data?.role !== 'owner') return res.status(403).json({ ok: false, error: 'Only the workspace owner can respond to Laya.' })
+    const body = parseBody(req.body)
+    if (body.action !== 'laya_response') return res.status(400).json({ ok: false, error: 'Unknown CEO Today action.' })
+    const saved = await saveOwnerResponse(context, body)
+    return res.status(saved.status).json(saved.error ? { ok: false, error: saved.error } : { ok: true, response_id: saved.id })
+  }
 
   const loaded = await loadCeoToday(context)
   if (loaded.error) return res.status(502).json({ ok: false, error: loaded.error })
@@ -29,6 +42,17 @@ export default async function handler(req, res) {
     ? { available: false, items: [], due_count: 0 }
     : buildDecisionReviews({ decisions: decisionRows.data || [], workspaceId: context.workspaceId })
   decisions.can_manage = !membership.error && membership.data?.role === 'owner'
+  if (decisions.can_manage && decisions.available) {
+    const history = await context.client.from('laya_evaluations')
+      .select('id,decision_id,response,reason,created_at,input_snapshot,evaluation')
+      .eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }).limit(30)
+    decisions.response_history_available = !history.error
+    for (const row of decisions.items) {
+      const source = decisionRows.data.find(item => item.id === row.id)
+      row.review_token = createResponseToken(context, source, row.evaluation)
+      row.responses = (history.data || []).filter(item => item.decision_id === row.id)
+    }
+  }
   return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions })
 }
 
