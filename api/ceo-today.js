@@ -1,6 +1,7 @@
 import { authenticateWorkspace, missingOutreachEnv, parseBody } from '../server/outreach/shared.js'
 import { createResponseToken, saveOwnerResponse } from '../server/laya/responses.js'
 import { buildDecisionReviews } from '../server/decisions/reviews.js'
+import { buildNegocioListoLifecycle } from '../server/lifecycle/negocio-listo.js'
 import { buildCeoToday } from '../server/ceo/today.js'
 import { loadReviewSummary } from '../server/laya/marketing.js'
 import { buildOperationsReadModel } from '../server/operations/readiness.js'
@@ -57,13 +58,13 @@ export default async function handler(req, res) {
 }
 
 export async function loadCeoToday(context, now = new Date()) {
-  const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue, complianceRequirements, complianceCompletions] = await Promise.all([
-    context.client.from('leads').select('id, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+  const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue, complianceRequirements, complianceCompletions, agreements, installments] = await Promise.all([
+    context.client.from('leads').select('id, workspace_id, source, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('sales_promised_actions').select('id, lead_id, action_text, due_on, completed_at, created_at').eq('workspace_id', context.workspaceId).is('completed_at', null).order('due_on', { ascending: true }).order('created_at', { ascending: true }),
     context.client.from('outreach_sends').select('id, lead_id, send_type, status, sent_at, created_at').eq('workspace_id', context.workspaceId).not('lead_id', 'is', null).order('created_at', { ascending: true }),
     context.client.from('marketing_publish_attempts').select('id, marketing_slot_key, asset_id, asset_path, destination, required_platforms, provider_status, provider_error, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }).limit(50),
     context.client.from('marketing_slot_resolutions').select('occurrence_slot_key, origin_slot_key, target_slot_key, action, asset_id, asset_path, caption, created_at, decided_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }),
-    context.client.from('operations_projects').select('id, workspace_id, client_id, name, project_type, status, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+    context.client.from('operations_projects').select('id, workspace_id, client_id, name, project_type, status, service_agreement_id, actual_hours, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('project_requirements').select('id, workspace_id, project_id, requirement_key, label, category, status, timing, responsible_party, notes, requested_at, received_at, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('clients').select('id, workspace_id, name, contact_email, contact_phone, status, created_at').eq('workspace_id', context.workspaceId).eq('status', 'active').order('name', { ascending: true }),
     context.client.from('financial_obligations').select('id, workspace_id, client_id, operations_project_id, description, amount_cents, currency, obligation_type, due_date, status, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
@@ -71,6 +72,8 @@ export async function loadCeoToday(context, now = new Date()) {
     context.client.from('recurring_revenue').select('id, workspace_id, client_id, description, amount_cents, currency, cadence, status, provider, provider_reference, started_at, next_expected_at, ended_at, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('compliance_requirements').select(complianceRequirementFields).eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('compliance_completions').select(complianceCompletionFields).eq('workspace_id', context.workspaceId).order('completed_at', { ascending: false }),
+    context.client.from('client_service_agreements').select('id,workspace_id,client_id,product_name,setup_cents,monthly_cents,term_months,launch_date,created_at').eq('workspace_id',context.workspaceId),
+    context.client.from('agreement_installments').select('id,workspace_id,agreement_id,installment,financial_obligation_id').eq('workspace_id',context.workspaceId),
   ])
   const failed = [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue, complianceRequirements, complianceCompletions].find((result) => result.error)
   if (failed) return { data: null, error: 'CEO Today could not load the current workspace state.' }
@@ -115,8 +118,12 @@ export async function loadCeoToday(context, now = new Date()) {
     now,
   })
 
+  const lifecycle = agreements.error || installments.error
+    ? {available:false,items:[]}
+    : buildNegocioListoLifecycle({workspaceId:context.workspaceId,leads:leads.data || [],agreements:agreements.data || [],installments:installments.data || [],obligations:obligations.data || [],receipts:receipts.data || [],projects:operationsProjects.data || [],requirements:operationsRequirements.data || [],clients:operationsClients.data || [],now})
   return {
     data: buildCeoToday({
+      lifecycle,
       leads: leads.data || [],
       promisedActions: promisedActions.data || [],
       outreachSends: outreachSends.data || [],

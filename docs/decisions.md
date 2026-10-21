@@ -576,6 +576,8 @@ Status: Approved (supplied product definition v3)
 
 Track whole hours per project, entered by the owner. Implement integer `hours` in `project_time_entries` under the separately scoped LIFECYCLE-001 ticket.
 
+Implementation, 2026-10-21: LIFECYCLE-001 migration `20261021182855` adds the owner-JWT-only integer ledger and guarded derived financial total. No historical hours inferred or rounded.
+
 ## DEC-039 — Grandfather the existing advisory Marketing assessment
 
 Date recorded: 2026-10-21

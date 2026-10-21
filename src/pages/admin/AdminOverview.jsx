@@ -61,6 +61,13 @@ export default function AdminOverview() {
         {!actions.length && <p className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5 text-sm text-gray-400">No further action is shown in this view. Reload to recalculate from current department state.</p>}
       </section>}
 
+      {ceo?.negocio_listo && <section aria-label="Negocio Listo lifecycle" className="mt-7 rounded-2xl border border-emerald-400/30 p-5">
+        <h2 className="text-lg font-semibold text-white">Negocio Listo lifecycle</h2><p className="mt-2 text-xs text-gray-400">Derived for {ceo.negocio_listo.today} · Chicago time. No stages are saved automatically.</p>
+        {ceo.negocio_listo.available===false && <p className="mt-2 text-amber-200">Lifecycle records are unavailable. Other priorities are unaffected.</p>}
+        {ceo.negocio_listo.available && !ceo.negocio_listo.items.length && <p className="mt-2 text-sm text-gray-400">No Negocio Listo inquiries or recorded agreements in this workspace.</p>}
+        {ceo.negocio_listo.items.map(item=><article key={item.id} className="mt-4 border-t border-gray-800 pt-3"><p className="text-xs text-emerald-200">{item.stage.replaceAll('_',' ')}</p><h3 className="mt-1 font-semibold text-white">{item.title}</h3><p className="mt-2 text-sm text-gray-300">{item.why_now}</p><Link to={item.href} className="mt-2 inline-block text-sm text-emerald-200">{item.cta_label}</Link><details className="mt-2 text-xs text-gray-400"><summary>Lifecycle source evidence</summary>{item.sources.map((source,index)=><p key={index} className="mt-1 break-words">{source.table} · {source.id} · {Object.entries(source.fields).map(([field,value])=>`${field}: ${value ?? 'not recorded'}`).join(' · ')}</p>)}</details></article>)}
+      </section>}
+
       <BusinessDecisions summary={ceo?.business_decisions} onReload={async () => setCeo(await loadCeoToday())} />
 
       <section className="mt-7 rounded-2xl border border-indigo-400/30 bg-gray-900/60 p-5" aria-label="Marketing content reviews">
@@ -94,6 +101,7 @@ function CeoActionCard({ item, onNotNow }) {
       </div>
       <button type="button" onClick={onNotNow} className="text-sm text-gray-400 transition hover:text-white">Not now</button>
     </div>
+    {item.lifecycle_stage && <p className="mt-2 text-xs text-emerald-200">Negocio Listo · {item.lifecycle_stage.replaceAll('_',' ')}</p>}
     <p className="mt-4 text-sm leading-6 text-gray-300"><span className="font-medium text-white">Why now:</span> {item.why_now}</p>
     <Link to={item.href} className="mt-5 inline-flex rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400">{item.cta_label}</Link>
   </article>

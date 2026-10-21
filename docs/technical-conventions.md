@@ -46,6 +46,11 @@ serverless functions under `/api`.
   files must have zero differences.
 - Never use `supabase migration repair` or a broad `db push` to paper over drift.
 
+## Lifecycle and project time
+
+- `server/lifecycle/negocio-listo.js` is a pure source-based projection. Explicit intake/product identifiers and project/agreement foreign keys govern membership; never match names or infer signatures/provider status.
+- Time is entered with the authenticated owner JWT into `project_time_entries`. Server/agent writes are denied. `actual_hours` is a guarded derived cache used by existing financial views, synchronized by a non-exposed owner-checked trigger with per-project transaction locking. Direct total/decimal writes are rejected.
+
 ## Definition of done
 
 See `docs/product-definition.md` §10.

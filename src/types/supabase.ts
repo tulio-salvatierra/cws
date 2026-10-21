@@ -1459,6 +1459,7 @@ export type Database = {
           id: string
           name: string
           project_type: string
+          service_agreement_id: string | null
           status: string
           updated_at: string
           workspace_id: string
@@ -1471,6 +1472,7 @@ export type Database = {
           id?: string
           name: string
           project_type: string
+          service_agreement_id?: string | null
           status?: string
           updated_at?: string
           workspace_id: string
@@ -1483,11 +1485,19 @@ export type Database = {
           id?: string
           name?: string
           project_type?: string
+          service_agreement_id?: string | null
           status?: string
           updated_at?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "operations_agreement_same_client"
+            columns: ["service_agreement_id", "workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "client_service_agreements"
+            referencedColumns: ["id", "workspace_id", "client_id"]
+          },
           {
             foreignKeyName: "operations_projects_client_id_workspace_id_fkey"
             columns: ["client_id", "workspace_id"]
@@ -1828,6 +1838,64 @@ export type Database = {
           },
           {
             foreignKeyName: "project_requirements_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_time_entries: {
+        Row: {
+          created_at: string
+          created_by: string
+          hours: number
+          id: string
+          notes: string
+          project_id: string
+          updated_at: string
+          worked_on: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          hours: number
+          id: string
+          notes?: string
+          project_id: string
+          updated_at?: string
+          worked_on: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          hours?: number
+          id?: string
+          notes?: string
+          project_id?: string
+          updated_at?: string
+          worked_on?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_time_entries_project_id_workspace_id_fkey"
+            columns: ["project_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "operations_projects"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "project_time_entries_project_id_workspace_id_fkey"
+            columns: ["project_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "project_financial_summary"
+            referencedColumns: ["operations_project_id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "project_time_entries_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -2530,6 +2598,7 @@ export type Database = {
           id: string
           name: string
           project_type: string
+          service_agreement_id: string | null
           status: string
           updated_at: string
           workspace_id: string

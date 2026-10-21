@@ -53,7 +53,7 @@ describe('Operations endpoint', () => {
     const clients = query({ data: [{ id: 'client-a', workspace_id: 'workspace-a', name: 'Northside', contact_email: null, contact_phone: null }, { id: 'client-b', workspace_id: 'workspace-b', name: 'Other', contact_email: null, contact_phone: null }], error: null })
     const financialSummaries = query({ data: [{ operations_project_id: project.id, workspace_id: 'workspace-a', contracted_cents: 95000, received_cents: 0, outstanding_cents: 95000, direct_cost_cents: 0, margin_cents: 95000, cash_margin_cents: 0, actual_hours: null, effective_hourly_rate_cents: null, undecided_cost_count: 0 }], error: null })
     const costs = query({ data: [], error: null })
-    const client = { from: vi.fn().mockReturnValueOnce(projects).mockReturnValueOnce(requirements).mockReturnValueOnce(clients).mockReturnValueOnce(financialSummaries).mockReturnValueOnce(costs) }
+    const client = { from: vi.fn().mockReturnValueOnce(projects).mockReturnValueOnce(requirements).mockReturnValueOnce(clients).mockReturnValueOnce(financialSummaries).mockReturnValueOnce(costs).mockReturnValueOnce(query({data:[]})).mockReturnValueOnce(query({data:[]})) }
     mocks.authenticateOperationsWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a' })
     const res = response()
 
@@ -67,6 +67,24 @@ describe('Operations endpoint', () => {
     expect(payload.operations.projects).toHaveLength(1)
     expect(payload.operations.projects[0].requirements).toHaveLength(1)
     expect(payload.operations.financial_summaries).toHaveLength(1)
+  })
+
+  it('rejects the obsolete decimal-total mutation without writing',async()=>{
+    const client={from:vi.fn()}
+    mocks.authenticateOperationsOwner.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'owner-a'}})
+    const res=response()
+    await handler({method:'POST',body:{action:'update_project_financial_hours',project_id:project.id,actual_hours:1.5}},res)
+    expect(res.status).toHaveBeenCalledWith(409)
+    expect(client.from).not.toHaveBeenCalled()
+  })
+  it('links an agreement only through a workspace-scoped owner action',async()=>{
+    const chain=query({data:{id:project.id}});const client={from:vi.fn(()=>chain)}
+    mocks.authenticateOperationsOwner.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'owner-a'}})
+    const res=response()
+    await handler({method:'POST',body:{action:'link_project_agreement',project_id:project.id,agreement_id:'55555555-5555-4555-8555-555555555555'}},res)
+    expect(chain.update).toHaveBeenCalledWith({service_agreement_id:'55555555-5555-4555-8555-555555555555'})
+    expect(chain.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
+    expect(res.status).toHaveBeenCalledWith(200)
   })
 
   it('creates a billed project cost and reimbursement in one transactional RPC', async () => {
