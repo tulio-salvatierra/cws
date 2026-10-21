@@ -8,7 +8,7 @@ Security decisions: AUTO advice only; activation remains separate owner-JWT. No 
 Decisions made: Implement approved §3a/direct task. No permanent decision added.
 Assumptions: Setup >=$300 meets approved baseline, not payment proof. Gross term value/$50 only bounds labor before costs. Actual hours are spent hours, not full-term budget or available capacity. No full planned labor/direct-cost or dated availability/committed-work record exists, so no overall pass is asserted.
 Tests added: Setup exact/below/above/zero/invalid cases; safe integer/bigint/overflow/term checks; source/workspace/linkage/inquiry/closed/failed reads; no controls; CEO unchanged priority ordering.
-Tests run: 558 tests/67 files, lint/build passed, including final API projection and unchanged ordering checks.
+Tests run: 558 tests/67 files, lint/build passed, including final API projection and unchanged ordering checks. PR #38 merged42f2d0f; GitHub Tests run39663515062 and preview passed. Production dpl_FhEkGnfzAM3edhYrnF76VBJ4PiYk READY with www alias verified at merged SHA. Signed-in CEO shows the existing NL inquiry with setup/floor/capacity all needs_data; expanded policy sections, missing labor/cost/capacity facts and exact lead source verified. No conversion or acceptance inferred. Agreement fee/budget cases verified by synthetic app fixtures because no NL agreement is recorded in production. Final active decisions0,unchanged decision fingerprint,responses0,evidence0,completeness0,posts43/sends17,migrations71. CEO runtime errors absent in final15-minute window. No new LLM/publish/send or business writes.
 Known issues: Needs_data until separately recorded complete labor/cost/capacity facts exist; no new owner-entry workflow invented. Existing build/advisor warnings.
 Recommended next task: Define/record owner labor/direct-cost budgets and dated capacity evidence before asserting full deal fit.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product, conventions, ledger/log/handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No estimates, availability, profit, receipts, strategy activation or capacity thresholds invented.
-Git diff summary: Isolated codex/deal-fit-001; original checkout's three memory edits and private archive untouched. Release pending.
+Git diff summary: Isolated codex/deal-fit-001; original checkout's three memory edits and private archive untouched. Merged #38 and production verified; documentation receipt follows on main.
