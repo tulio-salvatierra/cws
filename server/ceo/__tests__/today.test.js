@@ -561,3 +561,12 @@ describe('CEO Today prioritizer', () => {
     expect(complianceActions(result)).toEqual([expect.objectContaining({ id: 'compliance:same', priority_tier: 6 })])
   })
 })
+
+it('keeps deal-fit advice outside priority ordering and action limits',()=>{
+ const base=buildCeoToday({now:friday})
+ const advice={available:true,items:[{id:'example',evaluation:{verdict:'needs_data'}}]}
+ const result=buildCeoToday({now:friday,dealFits:advice})
+ expect(result.actions).toEqual(base.actions)
+ expect(result.all_actions).toEqual(base.all_actions)
+ expect(result.deal_fit).toBe(advice)
+})

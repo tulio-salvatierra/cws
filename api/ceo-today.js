@@ -1,3 +1,4 @@
+import { buildDealFits } from '../server/laya/deal-fit.js'
 import { buildGoalPace } from '../server/ceo/goal-pace.js'
 import { authenticateWorkspace, missingOutreachEnv, parseBody } from '../server/outreach/shared.js'
 import { createResponseToken, saveOwnerResponse } from '../server/laya/responses.js'
@@ -126,6 +127,7 @@ export async function loadCeoToday(context, now = new Date()) {
     : buildNegocioListoLifecycle({workspaceId:context.workspaceId,leads:leads.data || [],agreements:agreements.data || [],installments:installments.data || [],obligations:obligations.data || [],receipts:receipts.data || [],projects:operationsProjects.data || [],requirements:operationsRequirements.data || [],clients:operationsClients.data || [],now})
   return {
     data: buildCeoToday({
+      dealFits: buildDealFits({workspaceId:context.workspaceId,agreements:agreements.data || [],leads:leads.data || [],projects:operationsProjects.data || [],available:!agreements.error && [agreements,leads,operationsProjects].every(result=>(result.data || []).length<1000),now}),
       goalPace: buildGoalPace({workspaceId:context.workspaceId,agreements:agreements.data || [],evidence:goalEvidence.data || [],completeness:goalCompleteness.data || [],available:!agreements.error && !goalEvidence.error && !goalCompleteness.error && (agreements.data || []).length<1000 && (goalEvidence.data || []).length<1000,now}),
       lifecycle,
       leads: leads.data || [],

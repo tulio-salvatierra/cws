@@ -34,6 +34,7 @@ const COMPLIANCE_STATE_ORDER = {
 // underlying Sales and Marketing records remain the systems of record.
 export function buildCeoToday({
   goalPace = null,
+  dealFits = null,
   lifecycle = {available:true,items:[]},
   leads = [],
   promisedActions = [],
@@ -70,6 +71,7 @@ export function buildCeoToday({
     sales_summary: salesQueue.summary,
     negocio_listo: lifecycle,
     goal_pace: goalPace,
+    deal_fit: dealFits,
   }
 }
 
