@@ -91,6 +91,7 @@ Laya is the advisory evaluator. It is not the name of the assistant or of the OS
   - `deal_fit` ($50/h floor, setup fee, capacity)
   - `goal_pace`
   - `decision_review`
+- LAYA-001 implements read-only `decision_review` evaluations in CEO Today through its existing GET: rules return the shared contract, cite the decision row and exact field values, and expose the Chicago evaluation date. Missing/invalid review data returns `needs_data`; due active reviews return `do`; future reviews and complete proposals return `hold`; closed decisions return `skip`. Free-text conditions still require owner observation. It adds no LLM call, decision mutation, new endpoint, Act/Dismiss control, or evaluation persistence. Owner-response storage remains required before introducing those response controls.
 - After the gate (§9a), an LLM may only write the `why` text and drafts, using the same snapshot. It never sets or changes a verdict.
 - A claim without a source is a bug. Missing data produces `needs_data`, never a guess.
 - Evaluations are computed live (AUTO). A row is written to `laya_evaluations` only when the owner clicks Act or Dismiss. That row records the input snapshot, output, response, and reason.
