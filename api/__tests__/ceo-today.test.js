@@ -265,7 +265,7 @@ describe('CEO Today endpoint', () => {
     expect(payload.deal_fit.items[0].owner_response.can_respond).toBe(true)
     if(failed==='history') {
       expect(payload.goal_pace.owner_response.history_available).toBe(false)
-      expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30})
+      expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30,type:'all',next_cursor:null})
     } else expect(payload.laya_response_history.available).toBe(true)
   })
 
@@ -277,14 +277,37 @@ describe('CEO Today endpoint', () => {
     const res=response(); await handler({method:'GET'},res)
     const payload=res.json.mock.calls[0][0]
     if(role==='owner') {
-      expect(payload.laya_response_history).toEqual({can_view:true,available:true,items:saved,limit:30})
+      expect(payload.laya_response_history).toEqual({can_view:true,available:true,items:saved,limit:30,type:'all',next_cursor:null})
       expect(historyQuery.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
       expect(historyQuery.order).toHaveBeenCalledWith('created_at',{ascending:false})
-      expect(historyQuery.limit).toHaveBeenCalledWith(30)
+      expect(historyQuery.limit).toHaveBeenCalledWith(31)
     } else {
       expect(payload.laya_response_history).toEqual({can_view:false})
       expect(client.from).not.toHaveBeenCalledWith('laya_evaluations')
     }
+  })
+
+  it.each(['owner','member',null,'failed'])('gates standalone history pages before any history query: %s',async role=>{
+    const historyQuery=query({data:[],error:null})
+    const client={from:vi.fn(table=>table==='laya_evaluations'?historyQuery:query({data:role?{role}:null,error:role==='failed'?{message:'failed'}:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'actor'}})
+    const res=response();await handler({method:'GET',url:'/api/ceo-today?view=laya_history&type=deal_fit'},res)
+    expect(res.status).toHaveBeenCalledWith(role==='owner'?200:role==='failed'?502:403)
+    if(role==='owner') {
+      expect(historyQuery.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
+      expect(historyQuery.eq).toHaveBeenCalledWith('evaluator','deal_fit')
+      expect(client.from.mock.calls).toEqual([['workspace_members'],['laya_evaluations']])
+    } else expect(client.from.mock.calls).toEqual([['workspace_members']])
+  })
+
+  it.each(['invalid-type','invalid-cursor','failed-read'])('fails history pagination explicitly: %s',async failure=>{
+    const client={from:vi.fn(table=>query({data:table==='workspace_members'?{role:'owner'}:[],error:table==='laya_evaluations'?{message:'private database detail'}:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'actor'}})
+    const res=response();await handler({method:'GET',query:{view:'laya_history',type:failure==='invalid-type'?'injected':'all',...(failure==='invalid-cursor'?{cursor:'unsafe()'}:{})}},res)
+    expect(res.status).toHaveBeenCalledWith(failure==='failed-read'?502:400)
+    expect(res.json.mock.calls[0][0].laya_response_history).toBeUndefined()
+    expect(JSON.stringify(res.json.mock.calls)).not.toContain('private database detail')
+    if(failure!=='failed-read')expect(client.from.mock.calls).toEqual([['workspace_members']])
   })
 
   it.each(['goal_pace','deal_fit'])('persists owner %s response without activating or recomputing',async evaluator=>{
