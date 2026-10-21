@@ -144,6 +144,8 @@ describe('CEO Today endpoint', () => {
       'recurring_revenue',
       'compliance_requirements',
       'compliance_completions',
+      'negocio_listo_evidence',
+      'negocio_listo_completeness',
       'client_service_agreements',
       'agreement_installments',
       'marketing_publish_destination_results',

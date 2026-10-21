@@ -1,19 +1,19 @@
-Task ID: GOAL-PACE
+Task ID: GOAL-EVIDENCE
 Agent: Codex
-Objective: Pin approved Negocio Listo goal/checkpoint with recorded evidence and explicit missing data.
-Files inspected: Product, role instructions, conventions, decisions, learnings, memory; CEO/lifecycle/API/UI/tests; live agreement schema and aggregate safety baseline.
-Files changed: Pure goal-pace projection and tests; CEO GET/read projection/UI/tests; product/conventions/ledger/log/handoff.
-Database or API changes: Existing GET adds goal_pace from its existing workspace-scoped agreement read; no DB/schema/query/route changes.
-Security decisions: AUTO read only; no decision/response writes, external actions, LLM calls or activation controls. Existing owner activation separate and untouched.
-Decisions made: Implement approved product §1a targets; no permanent decision added.
-Assumptions: Agreement creation, launch, payment or provider reference cannot prove signature/current subscription. Unknown totals and remaining conversions remain null; no census completeness or pace baseline inferred.
-Tests added: Empty/failed evidence, workspace scoping, launch/provider/signature inference exclusion, Chicago date/deadline boundary, pinned persistence after Not now and no writes; API failure assertion.
-Tests run: 514 tests/64 files, lint/build passed; final API assertion included in rerun. PR #36 merged at 7bb9826; GitHub Tests run39659230487 and preview succeeded. Production dpl_5aWePFch5kKnT7VkMUdj5apeL2yK READY; www alias verified at merged SHA. Signed-in CEO shows pinned 10 active / 4 signed targets, unknown counts/needs-data pace, 71/25 Chicago days remaining and zero recorded agreements explicitly distinguished from conversions. Expanded provenance and four missing-evidence explanations verified; reload performs no writes. Active decisions0, response rows0, decision fingerprint unchanged, posts43/sends17, migrations69. No CEO runtime errors in final15-minute window. No LLM, publish or send.
-Known issues: Signature dates/product-linked subscription state/completeness/baseline are absent; pace intentionally needs_data. Existing build warnings.
-Recommended next task: Separately define owner-recorded signature/subscription evidence and completeness before numeric progress/forecast.
+Objective: Owner-entered NL signature dates/subscription statuses and completeness for verified goal counts.
+Files inspected: Canonical product, role instructions, conventions, decisions/learnings and memory; CEO/Accounting/goal/time code/schema/tests; Supabase skills/docs/changelog and live schema/advisors.
+Files changed: Additive migration20261021192155, pgTAP/generated types; goal projection/fixtures, CEO reads/tests, goal/evidence UI/tests; product/conventions/memory.
+Database or API changes: Two append-only owner-JWT evidence tables; exact same-client/workspace agreement FK; private invoker guard/snapshot helpers. CEO GET reads evidence/completeness; no new endpoint. 70/70 exact migration parity and SQL md5 equality.
+Security decisions: Authenticated owner writes only, service/anonymous read/write grants restricted, immutable history and owner provenance, DB-generated completeness snapshot/date. No inferred signatures, subscription provider mutations, auto completeness, activation, LLM or external actions.
+Decisions made: Implement direct owner request; no permanent architecture decision added.
+Assumptions: One core subscription per client; owner explicitly excludes add-ons/replaced agreements. Owner attests all real contracts/subscriptions are recorded; software cannot prove off-system completeness. Current active count requires status verification and completeness on current Chicago date. No on-track forecast baseline inferred.
+Tests added: Verified/zero/unknown/changed/stale/workspace/duplicate/excluded/checkpoint fixtures, owner forms/explicit confirmation/failure/no writes/nonowner controls,24 pgTAP assertions.
+Tests run: 530 tests/65 files, lint/build.24 evidence assertions rehearsal and after migration,18 owner activation after apply (all rolled back).70/70 version parity and exact new SQL; security advisors unchanged. Release pending.
+Known issues: Real evidence/completeness tables intentionally empty; counts unknown until owner records facts and checks full register. No forecast. Read cap1000 fails closed; history retained. Existing advisor/build warnings.
+Recommended next task: Owner records/reconciles real NL agreements and evidence, then confirms complete register for today.
 Questions requiring Tulio: None.
-Project-memory files updated: Product, conventions, ledger, log, latest handoff.
+Project-memory files updated: Product, conventions, ledger/log/handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No invented counts, active decision or forecast.
-Git diff summary: Isolated codex/goal-pace, original checkout's three dirty memory files untouched. Merged #36 and production verified; docs receipt on main. No private production records or archive in Git.
+Memory updates withheld: No production facts or completeness fabricated; no strategy activation.
+Git diff summary: Isolated codex/goal-evidence; original three dirty memory files untouched. Public schema/code and synthetic fixtures only; private archive untouched. Release pending.

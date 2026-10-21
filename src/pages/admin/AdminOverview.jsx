@@ -57,7 +57,7 @@ export default function AdminOverview() {
       {error && <p role="alert" className="mt-6 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">{error}</p>}
       {!error && !ceo && <p className="mt-6 text-sm text-gray-400">Loading today’s priorities…</p>}
 
-      {ceo?.goal_pace && <GoalPace pace={ceo.goal_pace} />}
+      {ceo?.goal_pace && <GoalPace pace={ceo.goal_pace} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
 
       {ceo && <section className="mt-7 space-y-3" aria-label="CEO Today actions">
         {actions.map((item) => <CeoActionCard key={item.id} item={item} onNotNow={() => setNotNow((current) => new Set(current).add(item.id))} />)}

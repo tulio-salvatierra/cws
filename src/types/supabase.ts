@@ -1281,6 +1281,104 @@ export type Database = {
           },
         ]
       }
+      negocio_listo_completeness: {
+        Row: {
+          confirmed_on: string
+          created_at: string
+          created_by: string
+          id: string
+          snapshot: Json
+          source_note: string
+          workspace_id: string
+        }
+        Insert: {
+          confirmed_on: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          snapshot: Json
+          source_note: string
+          workspace_id: string
+        }
+        Update: {
+          confirmed_on?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          snapshot?: Json
+          source_note?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negocio_listo_completeness_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      negocio_listo_evidence: {
+        Row: {
+          agreement_id: string
+          client_id: string
+          counts_toward_goal: boolean
+          created_at: string
+          created_by: string
+          revision: number
+          signature_status: string
+          signed_on: string | null
+          source_note: string
+          status_on: string
+          subscription_status: string
+          workspace_id: string
+        }
+        Insert: {
+          agreement_id: string
+          client_id: string
+          counts_toward_goal: boolean
+          created_at?: string
+          created_by?: string
+          revision?: never
+          signature_status: string
+          signed_on?: string | null
+          source_note: string
+          status_on: string
+          subscription_status: string
+          workspace_id: string
+        }
+        Update: {
+          agreement_id?: string
+          client_id?: string
+          counts_toward_goal?: boolean
+          created_at?: string
+          created_by?: string
+          revision?: never
+          signature_status?: string
+          signed_on?: string | null
+          source_note?: string
+          status_on?: string
+          subscription_status?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "negocio_listo_evidence_agreement_id_workspace_id_client_id_fkey"
+            columns: ["agreement_id", "workspace_id", "client_id"]
+            isOneToOne: false
+            referencedRelation: "client_service_agreements"
+            referencedColumns: ["id", "workspace_id", "client_id"]
+          },
+          {
+            foreignKeyName: "negocio_listo_evidence_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offer_captions: {
         Row: {
           body: string

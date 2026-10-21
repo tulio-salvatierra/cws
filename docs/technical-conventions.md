@@ -22,7 +22,7 @@ Note: this is not Next.js. There is no app router, no server components, and no
 Next.js API routes in this repository — server-side logic lives in Vercel
 serverless functions under `/api`.
 
-Goal pace is a pure read projection in `server/ceo/goal-pace.js`, returned by the existing CEO Today GET using its workspace-scoped agreement read. Target provenance is product definition §1a v3, separate from active business decisions. Unknown signed/active counts remain `null`, including empty or failed reads; recorded agreement counts are never conversion counts. No persistence, provider calls or response/activation controls.
+Goal pace remains a pure read projection in `server/ceo/goal-pace.js`, returned by the existing CEO Today GET. Owner-JWT-only append-only `negocio_listo_evidence` links to exact same-workspace/client agreements. `negocio_listo_completeness` uses a trigger-computed register snapshot (agreement identity/client/product + latest evidence revision), current Chicago date, source note and owner provenance. No service-role writes; no UPDATE/DELETE grants. Completeness requires every NL agreement to be reviewed, known included signature/status evidence, today’s status verification, and at most one included core agreement per client. Unknown/excluded add-ons are explicit owner choices, not guesses. The evaluator compares the snapshot and date, preserves unknown counts on failed/truncated reads (1,000-row cap), and counts signed dates only through the checkpoint. Full evidence history is retained; no provider calls or decision activation. Product §1a remains target provenance.
 
 ## Row-Level Security
 
