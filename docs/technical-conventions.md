@@ -22,6 +22,8 @@ Note: this is not Next.js. There is no app router, no server components, and no
 Next.js API routes in this repository — server-side logic lives in Vercel
 serverless functions under `/api`.
 
+Goal pace is a pure read projection in `server/ceo/goal-pace.js`, returned by the existing CEO Today GET using its workspace-scoped agreement read. Target provenance is product definition §1a v3, separate from active business decisions. Unknown signed/active counts remain `null`, including empty or failed reads; recorded agreement counts are never conversion counts. No persistence, provider calls or response/activation controls.
+
 ## Row-Level Security
 
 - The dormant v1/n8n tables were dropped by migration `20261021155615`. Their historical blanket authenticated RLS pattern must not be reused (DEC-007).

@@ -36,6 +36,8 @@ It is not a generic project-management tool, CRM, or AI chat.
 
 The strategy is approved product context. Recording it as an active business decision (§3b) requires a separate owner activation; DECISIONS-001 preserves the existing legacy proposal without activating it.
 
+Goal pace implementation: CEO Today pins these approved targets above the action list. It derives Chicago calendar days to each deadline and shows workspace-scoped recorded agreements as supporting evidence only. Signed and active counts, remaining conversions and pace stay unknown until verified signature dates, product-linked current subscription status and record completeness are available. Agreement creation, launch dates, payments and provider references are not substitutes. No forecast or weekly rate is inferred without a baseline; viewing this line never activates a decision.
+
 ## 2. What is live
 
 The admin app (`/admin`) has six surfaces. These are the product.

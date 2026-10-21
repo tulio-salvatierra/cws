@@ -1,19 +1,19 @@
-Task ID: LIFECYCLE-001
+Task ID: GOAL-PACE
 Agent: Codex
-Objective: Negocio Listo lifecycle items in CEO Today and owner-entered whole project hours, preserving decision activation and external-action boundaries.
-Files inspected: Canonical product, role guidance, conventions/decisions/learnings/handoff/ledger/log, historical supplied ticket for context, current CEO/Sales intake/Operations/Accounting schema/code/tests, production schema/counts, Supabase/Vercel skills.
-Files changed: Lifecycle projection/fixtures; CEO read/order/UI/tests; Operations read/link route/readmodel/UI/tests; ProjectTime component/tests; migration20261021182855, pgTAP/types; product/conventions/DEC038 implementation note, verification/ledger/log/handoff.
-Database or API changes: Explicit same-client/workspace project-agreement FK. Owner-JWT integer project_time_entries; server SELECT only. Non-exposed owner-checked sync trigger maintains guarded actual_hours cache for financial views, with per-project locking. Existing decimal-total route rejects; owner agreement link uses existing Operations route. Existing CEO read derives lifecycle without writes. 69/69 exact migration parity/SQL equality.
-Security decisions: No service/AI time insertion, inferred hours, fuzzy name linkage, signature/provider-state inference, LLM/external calls or decision activation. Identity/provenance protected; owner corrections/removal recalculate cache. Migration guards all prior NULL-hours precondition; no backfill. Existing owner activation guards untouched and retested.
-Decisions made: Implement approved DEC038 and current lifecycle scope. No additional permanent decision; recorded implementation under DEC038.
-Assumptions: Lifecycle uses actual intake source/product snapshot prefixes and explicit agreement links; a recorded agreement is not a signed contract. No NL agreement currently exists; one existing NL inquiry should appear. Remaining Laya evaluators/goal pace are separately scoped. Work dates/notes are owner-entered; positive whole entries only, no fractional rounding.
-Tests added: 15 lifecycle scenarios/ordering checks, eight time UI cases, owner link and legacy-total API checks, optional lifecycle-read failure; 19 pgTAP assertions.
-Tests run: 509 app tests/63 files, lint/build/prerenders; 19 new DB assertions rehearsal/after apply plus18 activation after apply, rolled back; 69/69 exact parity; advisors unchanged. Tests run39654874692 and preview passed; #35 merged9b45ac5, production dpl_3qDmUaeDhuCceRUkdF3tkMLvJZfk READY on verified aliases. CEO NL prospect/card enrichment/date/source expansion and Operations owner whole-hour/agreement controls/financial-rate read verified without saving. Final projects4,time0,totals0,links0,active decisions0,unchanged decision hash,posts43/sends17,migrations69. CEO/Operations runtime scans clean.
-Known issues: Existing build/advisor warnings. No signed_at source exists, so no signed-count claim. Private cache trigger is SECURITY DEFINER only to update the derived financial field; no direct execution grants and repeated authenticated owner check. Existing project actual_hours API now fails with guidance to the ledger.
-Recommended next task: Owner records actual hours and links a real NL agreement/project when available; separately scope goal pace/remaining evaluators.
+Objective: Pin approved Negocio Listo goal/checkpoint with recorded evidence and explicit missing data.
+Files inspected: Product, role instructions, conventions, decisions, learnings, memory; CEO/lifecycle/API/UI/tests; live agreement schema and aggregate safety baseline.
+Files changed: Pure goal-pace projection and tests; CEO GET/read projection/UI/tests; product/conventions/ledger/log/handoff.
+Database or API changes: Existing GET adds goal_pace from its existing workspace-scoped agreement read; no DB/schema/query/route changes.
+Security decisions: AUTO read only; no decision/response writes, external actions, LLM calls or activation controls. Existing owner activation separate and untouched.
+Decisions made: Implement approved product §1a targets; no permanent decision added.
+Assumptions: Agreement creation, launch, payment or provider reference cannot prove signature/current subscription. Unknown totals and remaining conversions remain null; no census completeness or pace baseline inferred.
+Tests added: Empty/failed evidence, workspace scoping, launch/provider/signature inference exclusion, Chicago date/deadline boundary, pinned persistence after Not now and no writes; API failure assertion.
+Tests run: 514 tests/64 files, lint/build passed before final API assertion. Release verification pending.
+Known issues: Signature dates/product-linked subscription state/completeness/baseline are absent; pace intentionally needs_data. Existing build warnings.
+Recommended next task: Separately define owner-recorded signature/subscription evidence and completeness before numeric progress/forecast.
 Questions requiring Tulio: None.
-Project-memory files updated: Product, conventions, DEC038 implementation note, ledger/log, verification, handoff.
+Project-memory files updated: Product, conventions, ledger, log, latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No invented signature, client conversion, historical hours, subscription/provider activity or strategy activation.
-Git diff summary: Isolated codex/lifecycle-001; original checkout and private archive untouched. No production-record contents/secrets in branch. Merged #35 and production verified; final documentation receipt follows on main. Three pre-existing unrelated memory edits in original checkout remain untouched.
+Memory updates withheld: No invented counts, active decision or forecast.
+Git diff summary: Isolated codex/goal-pace, original checkout's three dirty memory files untouched. Release pending; no private production records or archive in Git.

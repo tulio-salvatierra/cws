@@ -1,3 +1,4 @@
+import { buildGoalPace } from '../server/ceo/goal-pace.js'
 import { authenticateWorkspace, missingOutreachEnv, parseBody } from '../server/outreach/shared.js'
 import { createResponseToken, saveOwnerResponse } from '../server/laya/responses.js'
 import { buildDecisionReviews } from '../server/decisions/reviews.js'
@@ -123,6 +124,7 @@ export async function loadCeoToday(context, now = new Date()) {
     : buildNegocioListoLifecycle({workspaceId:context.workspaceId,leads:leads.data || [],agreements:agreements.data || [],installments:installments.data || [],obligations:obligations.data || [],receipts:receipts.data || [],projects:operationsProjects.data || [],requirements:operationsRequirements.data || [],clients:operationsClients.data || [],now})
   return {
     data: buildCeoToday({
+      goalPace: buildGoalPace({workspaceId:context.workspaceId,agreements:agreements.data || [],available:!agreements.error,now}),
       lifecycle,
       leads: leads.data || [],
       promisedActions: promisedActions.data || [],
