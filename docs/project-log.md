@@ -2178,3 +2178,7 @@ Implemented owner-only history pages through existing CEO GET with server type f
 ## 2026-10-21 — History pagination released
 
 #43 merged `b2ef703`; CI39675880904 passed and READY production verified. Owner browser checked page1/empty state/disabled paging controls, Decision/Goal pace/Deal fit server reads and All types restoration. Populated65-row pagination, tied timestamps, concurrent insert, filtered older records and retries verified by synthetic fixtures. No real responses fabricated; final response/activation/publish/send counts and decision fingerprint unchanged,74 migrations,CEO API runtime errors none in15m.
+
+## 2026-10-21 — LAYA-HISTORY-FILTERS
+
+Added combined Act/Dismiss and inclusive Chicago saved-response date filters to the existing owner history GET. Strict date/response validation precedes SELECT; UTC bounds respect DST and use exclusive next-day midnight. Cursors bind all applied criteria; older unfiltered cursors remain compatible. UI separates date drafts from applied criteria, offers Apply dates/Clear filters, resets pages on successful criteria changes and preserves exact retry context. 643 tests,lint/build passed; release pending. No schema/business writes.

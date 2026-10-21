@@ -26,6 +26,8 @@ function query(result) {
     is: vi.fn(() => chain),
     not: vi.fn(() => chain),
     in: vi.fn(() => chain),
+    gte: vi.fn(() => chain),
+    lt: vi.fn(() => chain),
     limit: vi.fn(() => chain),
     maybeSingle: vi.fn(() => chain),
     order: vi.fn(() => chain),
@@ -265,7 +267,7 @@ describe('CEO Today endpoint', () => {
     expect(payload.deal_fit.items[0].owner_response.can_respond).toBe(true)
     if(failed==='history') {
       expect(payload.goal_pace.owner_response.history_available).toBe(false)
-      expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30,type:'all',next_cursor:null})
+      expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30,type:'all',response:'all',from:'',to:'',next_cursor:null})
     } else expect(payload.laya_response_history.available).toBe(true)
   })
 
@@ -277,7 +279,7 @@ describe('CEO Today endpoint', () => {
     const res=response(); await handler({method:'GET'},res)
     const payload=res.json.mock.calls[0][0]
     if(role==='owner') {
-      expect(payload.laya_response_history).toEqual({can_view:true,available:true,items:saved,limit:30,type:'all',next_cursor:null})
+      expect(payload.laya_response_history).toEqual({can_view:true,available:true,items:saved,limit:30,type:'all',response:'all',from:'',to:'',next_cursor:null})
       expect(historyQuery.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
       expect(historyQuery.order).toHaveBeenCalledWith('created_at',{ascending:false})
       expect(historyQuery.limit).toHaveBeenCalledWith(31)
@@ -308,6 +310,25 @@ describe('CEO Today endpoint', () => {
     expect(res.json.mock.calls[0][0].laya_response_history).toBeUndefined()
     expect(JSON.stringify(res.json.mock.calls)).not.toContain('private database detail')
     if(failure!=='failed-read')expect(client.from.mock.calls).toEqual([['workspace_members']])
+  })
+
+  it('applies validated response and Chicago saved-date filters through the owner-only history route',async()=>{
+    const historyQuery=query({data:[],error:null})
+    const client={from:vi.fn(table=>table==='laya_evaluations'?historyQuery:query({data:{role:'owner'}}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'owner'}})
+    const res=response();await handler({method:'GET',query:{view:'laya_history',type:'deal_fit',response:'dismiss',from:'2026-11-01',to:'2026-11-01'}},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(historyQuery.eq).toHaveBeenCalledWith('response','dismiss')
+    expect(historyQuery.gte).toHaveBeenCalledWith('created_at','2026-11-01T05:00:00.000Z')
+    expect(historyQuery.lt).toHaveBeenCalledWith('created_at','2026-11-02T06:00:00.000Z')
+    expect(client.from.mock.calls).toEqual([['workspace_members'],['laya_evaluations']])
+  })
+  it.each([{response:'execute'},{from:'2026-02-30'},{from:'2026-10-22',to:'2026-10-21'}])('rejects invalid history filters before SELECT: %j',async filters=>{
+    const client={from:vi.fn(()=>query({data:{role:'owner'}}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'owner'}})
+    const res=response();await handler({method:'GET',query:{view:'laya_history',...filters}},res)
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(client.from.mock.calls).toEqual([['workspace_members']])
   })
 
   it.each(['goal_pace','deal_fit'])('persists owner %s response without activating or recomputing',async evaluator=>{
