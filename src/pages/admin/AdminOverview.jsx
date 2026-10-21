@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import GoalPace from './GoalPace'
 import DealFits from './DealFits'
 import BusinessDecisions from './BusinessDecisions'
+import LayaResponseHistory from './LayaResponseHistory'
 import { supabase } from '../../lib/supabase'
 
 const departmentNavigation = [
@@ -73,6 +74,8 @@ export default function AdminOverview() {
       </section>}
 
       {ceo?.deal_fit && <DealFits summary={ceo.deal_fit} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
+
+      <LayaResponseHistory history={ceo?.laya_response_history} />
 
       <BusinessDecisions summary={ceo?.business_decisions} onReload={async () => setCeo(await loadCeoToday())} />
 

@@ -263,7 +263,28 @@ describe('CEO Today endpoint', () => {
     const payload=res.json.mock.calls[0][0]
     expect(payload.goal_pace.owner_response.can_respond).toBe(true)
     expect(payload.deal_fit.items[0].owner_response.can_respond).toBe(true)
-    if(failed==='history')expect(payload.goal_pace.owner_response.history_available).toBe(false)
+    if(failed==='history') {
+      expect(payload.goal_pace.owner_response.history_available).toBe(false)
+      expect(payload.laya_response_history).toEqual({can_view:true,available:false,items:[],limit:30})
+    } else expect(payload.laya_response_history.available).toBe(true)
+  })
+
+  it.each(['owner', 'member', null, 'failed'])('exposes unified saved history only to a verified active owner: %s', async role => {
+    const saved = [{id:'old-source', evaluator:'decision_review', decision_id:'removed-decision', reason:'Original reason', input_snapshot:{decision:{decision:'Historical terms'}}, evaluation:{verdict:'hold'}}]
+    const historyQuery = query({data:saved,error:null})
+    const client = {from:vi.fn(table => table==='laya_evaluations' ? historyQuery : query({data:table==='workspace_members'?{role}:[],error:table==='workspace_members' && role==='failed'?{message:'failed'}:null}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'workspace-a',user:{id:'actor'}})
+    const res=response(); await handler({method:'GET'},res)
+    const payload=res.json.mock.calls[0][0]
+    if(role==='owner') {
+      expect(payload.laya_response_history).toEqual({can_view:true,available:true,items:saved,limit:30})
+      expect(historyQuery.eq).toHaveBeenCalledWith('workspace_id','workspace-a')
+      expect(historyQuery.order).toHaveBeenCalledWith('created_at',{ascending:false})
+      expect(historyQuery.limit).toHaveBeenCalledWith(30)
+    } else {
+      expect(payload.laya_response_history).toEqual({can_view:false})
+      expect(client.from).not.toHaveBeenCalledWith('laya_evaluations')
+    }
   })
 
   it.each(['goal_pace','deal_fit'])('persists owner %s response without activating or recomputing',async evaluator=>{

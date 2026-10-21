@@ -68,7 +68,9 @@ export default async function handler(req, res) {
     item.owner_response=attachResponse(item.evaluation,item.response_input)
     delete item.response_input
   }
-  return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions })
+  return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions, laya_response_history: decisions.can_manage
+    ? { can_view: true, available: !history.error, items: history.error ? [] : history.data || [], limit: 30 }
+    : { can_view: false } })
 }
 
 export async function loadCeoToday(context, now = new Date()) {
