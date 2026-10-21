@@ -166,13 +166,13 @@ describe('CEO Today endpoint', () => {
     const queries = []
     const client = { from: vi.fn(table => {
       const data = table === 'workspace_members' ? { role: 'owner' }
-        : table === 'business_decisions' ? [{ id: 'decision-a', workspace_id: 'workspace-a', status: 'active', review_by: '2026-09-11' }, { id: 'other', workspace_id: 'workspace-b', status: 'active', review_by: '2026-09-11' }] : []
+        : table === 'business_decisions' ? [{ id: 'decision-a', workspace_id: 'workspace-a', title: 'Synthetic', decision: 'Terms', status: 'active', review_by: '2026-09-11', revisit_condition: 'Owner observation', activated_by: 'owner-a', activated_at: '2026-09-01T12:00:00Z' }, { id: 'other', workspace_id: 'workspace-b', status: 'active', review_by: '2026-09-11' }] : []
       const current = query({ data, error: null }); queries.push({ table, current }); return current
     }) }
     mocks.authenticateWorkspace.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
     const res = response()
     await handler({ method: 'GET' }, res)
-    expect(res.json.mock.calls[0][0].business_decisions).toMatchObject({ can_manage: true, due_count: 1, items: [expect.objectContaining({ id: 'decision-a' })] })
+    expect(res.json.mock.calls[0][0].business_decisions).toMatchObject({ can_manage: true, due_count: 1, items: [expect.objectContaining({ id: 'decision-a', evaluation: expect.objectContaining({ evaluator: 'decision_review', verdict: 'do', money_at_stake: null, why: expect.arrayContaining([expect.objectContaining({ source: expect.objectContaining({ table: 'business_decisions', id: 'decision-a', workspace_id: 'workspace-a' }) })]) }) })] })
     expect(queries.find(q => q.table === 'workspace_members').current.eq).toHaveBeenCalledWith('user_id', 'owner-a')
   })
 

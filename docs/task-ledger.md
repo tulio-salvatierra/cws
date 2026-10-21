@@ -98,3 +98,5 @@
 | RETIRE-002 | Codex | Applied and production verified | Private-folder backup restored/verified (87 rows); migration 20261021155615 retires 20 tables; 66/66 version and exact SQL parity; retained counts 39/17/24/2/1; 46 pgTAP and 430 app tests pass; all six surfaces and Marketing previews load | Next work requires separately scoped DECISIONS-001; archive remains private; no publishing performed |
 
 | DECISIONS-001 | Codex | Completed — merged #32 and production verified | Renamed table in place; existing proposal/hash retained; owner-only activation with actor/time and required review terms; CEO Today review panel; migration 20261021161456, 67/67 parity; 18 new + 46 existing pgTAP and 442 app tests pass; READY production 1c1e9c5 verified | Owner alone activates; existing row remains proposed; no publish/send |
+
+| LAYA-001 | Codex | Implemented; release pending | Pure source-backed decision_review shared contract in CEO Today; deterministic verdict fixtures, evidence UI and CI; 463 tests, lint/build pass; no schema/activation/provider change | Merge, CI and read-only production verification; response persistence remains separately scoped |

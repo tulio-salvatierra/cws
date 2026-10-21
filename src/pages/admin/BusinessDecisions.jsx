@@ -29,13 +29,14 @@ export default function BusinessDecisions({ summary, onReload }) {
     <p className="mt-2 text-xs text-gray-400">Review dates use Chicago time. Read each revisit condition and record when it occurs.</p>
     {summary.available === false && <p className="mt-3 text-amber-200">Business decisions are unavailable. Reload to try again.</p>}
     {error && <p role="alert" className="mt-3 text-rose-200">{error}</p>}
-    {(summary.items || []).map(row => <article key={row.id} className="mt-4 rounded-xl border border-gray-700 p-4">
+    {(summary.items || []).map(row => <article id={`business-decision-${row.id}`} key={row.id} className="mt-4 rounded-xl border border-gray-700 p-4">
       <p className="text-xs uppercase text-indigo-200">{row.status}{row.review_due ? ' · Review due' : ''}</p>
       <h3 className="mt-2 font-semibold text-white">{row.title}</h3>
       <p className="mt-2 whitespace-pre-wrap text-sm text-gray-300">{row.decision}</p>
       {row.context && <p className="mt-2 whitespace-pre-wrap text-sm text-gray-400">Context: {row.context}</p>}
       <p className="mt-2 text-sm text-gray-400">Review by: {row.review_by || 'Not set'} · Revisit: {row.revisit_condition || 'Not set'}</p>
-      {row.review_reasons?.map(reason => <p key={reason} className="mt-2 text-sm text-amber-200">{reason}</p>)}
+      {row.evaluation && <DecisionEvaluation evaluation={row.evaluation} />}
+      {!row.evaluation && row.review_reasons?.map(reason => <p key={reason} className="mt-2 text-sm text-amber-200">{reason}</p>)}
       {summary.can_manage && ['proposed', 'active'].includes(row.status) && <div className="mt-3 flex flex-wrap gap-4 text-sm text-indigo-200">
         <button disabled={busy} onClick={() => { setEditing({ ...row }); setConfirmation(null); setError('') }}>Edit review details</button>
         {row.status === 'proposed' && <button disabled={busy} onClick={() => { setConfirmation(row); setEditing(null); setError('') }}>Review activation</button>}
@@ -56,4 +57,23 @@ export default function BusinessDecisions({ summary, onReload }) {
     </article>)}
     {summary.available && !summary.items?.length && <p className="mt-3 text-sm text-gray-400">No business decisions recorded.</p>}
   </section>
+}
+
+function DecisionEvaluation({ evaluation }) {
+  return <div className="mt-4 rounded-xl border border-sky-300/20 bg-sky-300/5 p-3 text-sm">
+    <p className="font-semibold text-sky-200">Laya · {evaluation.verdict.replaceAll('_', ' ')}</p>
+    <p className="mt-2 text-gray-200">{evaluation.next_action}</p>
+    {!!evaluation.missing_data.length && <p className="mt-2 text-amber-200">Missing or invalid data: {evaluation.missing_data.join(', ')}</p>}
+    <details className="mt-3 text-gray-300">
+      <summary className="cursor-pointer">Why · Source evidence</summary>
+      <p className="mt-2 text-xs text-gray-400">{evaluation.policy_version} · {evaluation.business_date} · {evaluation.time_zone}</p>
+      {evaluation.why.map((item, index) => <div key={index} className="mt-3">
+        <p>{item.claim}</p>
+        <a className="text-xs text-sky-200 underline" href={`#business-decision-${item.source.id}`}>Source: {item.source.table} · {item.source.id}</a>
+        <dl className="mt-1 break-words text-xs text-gray-400">{Object.entries(item.source.fields).map(([field, value]) => <div key={field}><dt className="inline">{field}: </dt><dd className="inline">{value == null ? 'not recorded' : String(value)}</dd></div>)}</dl>
+      </div>)}
+      {evaluation.assumptions.map(item => <p key={item} className="mt-3 text-xs text-gray-400">{item}</p>)}
+    </details>
+    <p className="mt-3 text-xs text-gray-400">Advisory only. A review recommendation never activates or changes a decision.</p>
+  </div>
 }

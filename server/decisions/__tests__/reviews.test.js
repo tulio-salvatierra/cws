@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildDecisionReviews } from '../reviews.js'
-const base = { id: 'a', workspace_id: 'w', status: 'active', review_by: '2026-10-21', revisit_condition: 'Owner-observed change' }
+const base = { title: 'Synthetic decision', decision: 'Synthetic terms', activated_by: 'owner', activated_at: '2026-10-01T12:00:00Z', id: 'a', workspace_id: 'w', status: 'active', review_by: '2026-10-21', revisit_condition: 'Owner-observed change' }
 const build = (decisions, now = '2026-10-21T05:00:00Z') => buildDecisionReviews({ decisions, workspaceId: 'w', now: new Date(now) })
 describe('business decision reviews', () => {
   it('uses the Chicago date boundary inclusively without mutating state', () => {
@@ -10,7 +10,7 @@ describe('business decision reviews', () => {
     expect(row.status).toBe('active')
   })
   it('shows owner-observed conditions before the review date', () => {
-    expect(build([{ ...base, review_by: '2026-12-31', condition_observed_at: '2026-10-20T12:00:00Z' }]).items[0].review_reasons).toEqual(['You recorded that the revisit condition occurred.'])
+    expect(build([{ ...base, review_by: '2026-12-31', condition_observed_at: '2026-10-20T12:00:00Z', condition_observed_by: 'owner' }]).items[0].review_reasons).toEqual(['You recorded that the revisit condition occurred.'])
   })
   it('never treats proposals or closed decisions as binding and excludes other workspaces', () => {
     expect(build(['proposed', 'rejected', 'superseded'].map(status => ({ ...base, status }))).due_count).toBe(0)

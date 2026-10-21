@@ -13,6 +13,20 @@ beforeEach(() => {
   mocks.from.mockReturnValue({ update: mocks.update })
 })
 describe('Business decisions owner controls', () => {
+  it('shows a source-backed advisory without adding mutation authority', () => {
+    const evaluation = { verdict: 'needs_data', policy_version: 'decision-review-v1', business_date: '2026-10-21', time_zone: 'America/Chicago', next_action: 'Complete review details.', missing_data: ['review_by'], assumptions: ['Owner-observed conditions only.'], why: [{ claim: 'Review date is not recorded.', source: { table: 'business_decisions', id: row.id, fields: { review_by: null } } }] }
+    show({ can_manage: false, items: [{ ...row, evaluation }] })
+    expect(screen.getByText('Laya · needs data')).toBeInTheDocument()
+    expect(screen.getByText('Complete review details.')).toBeInTheDocument()
+    expect(screen.getByText(/Missing or invalid data: review_by/)).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Why · Source evidence'))
+    expect(screen.getByText('Review date is not recorded.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Source: business_decisions/ })).toHaveAttribute('href', '#business-decision-a')
+    expect(screen.getByText(/never activates or changes a decision/)).toBeInTheDocument()
+    expect(screen.queryByText('Review activation')).not.toBeInTheDocument()
+    expect(mocks.update).not.toHaveBeenCalled()
+  })
+
   it('does not write on rendering, reload, or reviewing activation', () => {
     show()
     fireEvent.click(screen.getByText('Review activation'))
