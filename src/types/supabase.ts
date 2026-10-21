@@ -109,6 +109,91 @@ export type Database = {
           },
         ]
       }
+      business_decisions: {
+        Row: {
+          activated_at: string | null
+          activated_by: string | null
+          condition_observed_at: string | null
+          condition_observed_by: string | null
+          context: string | null
+          created_at: string
+          created_by: string
+          decision: string
+          id: string
+          observed_outcome: string | null
+          review_by: string | null
+          revisit_condition: string | null
+          source_agent_run_id: string | null
+          status: string
+          superseded_by: string | null
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activated_by?: string | null
+          condition_observed_at?: string | null
+          condition_observed_by?: string | null
+          context?: string | null
+          created_at?: string
+          created_by: string
+          decision: string
+          id?: string
+          observed_outcome?: string | null
+          review_by?: string | null
+          revisit_condition?: string | null
+          source_agent_run_id?: string | null
+          status?: string
+          superseded_by?: string | null
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          activated_at?: string | null
+          activated_by?: string | null
+          condition_observed_at?: string | null
+          condition_observed_by?: string | null
+          context?: string | null
+          created_at?: string
+          created_by?: string
+          decision?: string
+          id?: string
+          observed_outcome?: string | null
+          review_by?: string | null
+          revisit_condition?: string | null
+          source_agent_run_id?: string | null
+          status?: string
+          superseded_by?: string | null
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decisions_source_agent_run_id_fkey"
+            columns: ["source_agent_run_id"]
+            isOneToOne: false
+            referencedRelation: "agent_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decisions_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "business_decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decisions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_expenses: {
         Row: {
           amount_cents: number
@@ -535,73 +620,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "compliance_requirements_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      decisions: {
-        Row: {
-          context: string | null
-          created_at: string
-          created_by: string
-          decision: string
-          id: string
-          observed_outcome: string | null
-          source_agent_run_id: string | null
-          status: string
-          superseded_by: string | null
-          title: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          context?: string | null
-          created_at?: string
-          created_by: string
-          decision: string
-          id?: string
-          observed_outcome?: string | null
-          source_agent_run_id?: string | null
-          status?: string
-          superseded_by?: string | null
-          title: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          context?: string | null
-          created_at?: string
-          created_by?: string
-          decision?: string
-          id?: string
-          observed_outcome?: string | null
-          source_agent_run_id?: string | null
-          status?: string
-          superseded_by?: string | null
-          title?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "decisions_source_agent_run_id_fkey"
-            columns: ["source_agent_run_id"]
-            isOneToOne: false
-            referencedRelation: "agent_runs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "decisions_superseded_by_fkey"
-            columns: ["superseded_by"]
-            isOneToOne: false
-            referencedRelation: "decisions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "decisions_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"

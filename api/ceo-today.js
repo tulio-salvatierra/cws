@@ -1,4 +1,5 @@
 import { authenticateWorkspace, missingOutreachEnv } from '../server/outreach/shared.js'
+import { buildDecisionReviews } from '../server/decisions/reviews.js'
 import { buildCeoToday } from '../server/ceo/today.js'
 import { loadReviewSummary } from '../server/laya/marketing.js'
 import { buildOperationsReadModel } from '../server/operations/readiness.js'
@@ -19,8 +20,16 @@ export default async function handler(req, res) {
 
   const loaded = await loadCeoToday(context)
   if (loaded.error) return res.status(502).json({ ok: false, error: loaded.error })
-  const layaReviews = await loadReviewSummary(context.client, context.workspaceId)
-  return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews })
+  const [layaReviews, decisionRows, membership] = await Promise.all([
+    loadReviewSummary(context.client, context.workspaceId),
+    context.client.from('business_decisions').select('*').eq('workspace_id', context.workspaceId),
+    context.user ? context.client.from('workspace_members').select('role').eq('workspace_id', context.workspaceId).eq('user_id', context.user.id).eq('status', 'active').maybeSingle() : Promise.resolve({ data: null }),
+  ])
+  const decisions = decisionRows.error
+    ? { available: false, items: [], due_count: 0 }
+    : buildDecisionReviews({ decisions: decisionRows.data || [], workspaceId: context.workspaceId })
+  decisions.can_manage = !membership.error && membership.data?.role === 'owner'
+  return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions })
 }
 
 export async function loadCeoToday(context, now = new Date()) {

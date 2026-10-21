@@ -34,7 +34,7 @@ It is not a generic project-management tool, CRM, or AI chat.
 - **Goal:** 10 active subscriptions by 2026-12-31.
 - **Checkpoint:** at least 4 signed by 2026-11-15.
 
-The strategy is recorded as an active business decision (§3b). It is reopened only when its revisit condition is met.
+The strategy is approved product context. Recording it as an active business decision (§3b) requires a separate owner activation; DECISIONS-001 preserves the existing legacy proposal without activating it.
 
 ## 2. What is live
 
@@ -101,6 +101,8 @@ Laya is the advisory evaluator. It is not the name of the assistant or of the OS
 - Business decisions live in `business_decisions`, reshaped from the v1 `decisions` table.
 - Statuses: `proposed`, `active`, `superseded`, `rejected`. **A decision binds only when it is `active`, and only the owner sets `active`.**
 - Every active decision has a `review_by` date and a `revisit_condition`. When either one fires, CEO Today shows a review item (derived).
+- DECISIONS-001 derives date reviews in Chicago time and displays them separately from the unchanged department priority order. Free-text revisit conditions are owner-assessed: the owner records or clears an observation that the condition occurred; the app derives a review from that evidence. It does not guess whether arbitrary conditions are true.
+- Activation is an explicit owner action after reviewing the exact decision, date, and condition. The database records the authenticated actor and timestamp; PREPARE/service-role writes cannot activate or update decisions. Active terms are immutable; the owner may reschedule reviews or supersede the decision.
 - AI may PREPARE `proposed` candidates from a conversation. Nothing is auto-saved from chat.
 - Architecture decisions stay in `docs/decisions.md` (DEC-012).
 
@@ -140,7 +142,7 @@ The v1 Content Operations layer and the pre-OS n8n tables are **retired** (DEC-0
 - **Kept from v1:**
   - `agent_runs` (live)
   - `channels` (live)
-  - `decisions`, which becomes `business_decisions`
+  - `business_decisions`, reshaped from `decisions` by DECISIONS-001
 - **Still to clean up:** the unused NULL columns `published_posts.campaign_id`, `published_posts.content_variant_id`, `outreach_sends.campaign_id`, and `outreach_sends.approval_id`. They are removed in a later cleanup.
 
 Rebuilding anything from the retired layer needs a decision that names the surface it serves.

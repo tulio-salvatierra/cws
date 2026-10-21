@@ -1,19 +1,19 @@
-Task ID: RETIRE-002
+Task ID: DECISIONS-001
 Agent: Codex
-Objective: Complete owner-authorized retirement with a private verified archive and existing Marketing-assessment exception.
-Files inspected: Canonical product scope, AGENTS and role guidance, conventions/decisions/learnings, supplied SQL/audit, newer main and compliance/email migrations, private archive/manifest, current schema/history, live department pages.
-Files changed: Guarded migration renamed to 20261021155615; regenerated src/types/supabase.ts; corrected three pgTAP files; product §6/§9a, DEC-039, AGENTS, conventions, ledger/log/verification, this handoff; gitignore prevents accidental archive inclusion. Retained prior RETIRE-001 final verification updates.
-Database or API changes: Applied retire_v1_dormant_layer on production ddbhxqkckzpwzwvnoxqt. Dropped exactly 20 dormant tables, topic_performance and 15 dedicated functions; detached four live-parent FKs. Kept live columns (all NULL), agent_runs, channels, decisions, update_updated_at(), and newer compliance/email objects. No application endpoint change in this ticket.
-Security decisions: Exact data archive kept only in owner-approved Documents/CWS-backups, outside GitHub. A clean branch excludes the rejected archive-bearing history. Directory/file modes 0700/0600. No publish, send, owner-review action, credential exposure or Auth/permission change. Marketing GET reconciliation wrote four existing-attempt platform results, increasing posts from 39 immediately after the drop to 43 after preview; the attempt was created before this work and no new Marketing attempt was created.
-Decisions made: Existing Marketing advisory assessment grandfathered under §9a/DEC-039; new in-app AI features remain gated. Private backup destination overrides the original public archive instruction.
-Assumptions: Preserve current main and both newer compliance/email migrations. Export filenames retain the original 2026-10-17 ticket identifier; capture timestamp is disclosed in the private manifest.
-Tests added: None. Corrected unsupported pgTAP policy assertion and reversed privilege arguments; no runtime grants changed.
-Tests run: Fresh private-folder restore and checksum; all 20 production row hashes/counts match (87 rows). 46 pgTAP assertions before/after drop with fixture/extension rollback. 430 Vitest tests in 57 files, ESLint, production build, both landing prerenders, diff checks. 66/66 migration versions match; remote history SQL equals the local migration byte-for-byte. Advisors unchanged. All six authenticated production surfaces plus Marketing overview/LinkedIn image-caption previews load.
-Known issues: Existing build chunk/lottie warnings and existing security advisor baseline remain. Export method is exact typed MCP snapshot -> native pg_dump from verified local replica, because direct IPv6 access timed out and pooler rejected CLI credentials; not a full schema backup. Historical migrations and private inspection schema support recovery. No archive content is included in the public branch.
-Recommended next task: Separately scope DECISIONS-001; no additional lifecycle or Laya work is authorized by this retirement.
+Objective: Reshape decisions into business_decisions, preserve the existing proposal, and surface owner-controlled reviews in CEO Today.
+Files inspected: Product scope, AGENTS/role instructions, conventions/decisions/learnings, ledger/log/handoff, live decision schema/row/policies, CEO API/readmodel/UI/tests, workspace auth/helpers, historical migrations, Supabase and Vercel skills/docs.
+Files changed: Migration 20261021161456, generated types, decision review projection/fixtures, CEO API and tests, embedded BusinessDecisions UI and tests, legacy pgTAP test, product definition, ledger/log/verification and this handoff.
+Database or API changes: Production table renamed in place; review fields, activation evidence, strict lifecycle trigger and RLS/grants added. 67/67 exact migration parity. CEO GET adds workspace-scoped decisions and verified owner controls; no new route.
+Security decisions: Only owner-JWT writes can activate; service role cannot update or insert active. Actual actor/time stamped by database. Active terms, activation evidence and identity/provenance protected. No delete grant. Optimistic writes require the exact reviewed updated_at. No production decision activated, publishing or sending.
+Decisions made: Implement approved DEC-036; no additional permanent architecture/business decision. Existing legacy row stays proposed with all prior values intact.
+Assumptions: Free-text conditions are owner-observed rather than guessed. Due dates derive in Chicago time; reviews sit outside unchanged department ordering. Strategy activation remains an owner task; no strategy row invented. Candidate creation screen and Laya evaluator are outside this ticket.
+Tests added: Five projection fixtures, five UI authority/staleness tests, two API scope/degradation tests, 18 pgTAP assertions.
+Tests run: 18 pgTAP before/after, 46 existing database assertions, full app suite plus new API cases, lint, placeholder-env build/prerenders, row hash preservation and exact migration SQL/version parity, security advisors unchanged.
+Known issues: MCP migration tool twice returned expired requestState; CLI Management API applied schema and history atomically. Existing build warnings remain. Live release verification pending.
+Recommended next task: Owner reviews existing proposal/strategy before any activation. Separate lifecycle/Laya work remains separately scoped.
 Questions requiring Tulio: None.
-Project-memory files updated: Product definition, decisions, technical conventions, AGENTS, ledger, log, RETIRE-001/002 verification and this handoff.
-Permanent decisions added: DEC-039 from direct owner instruction.
+Project-memory files updated: Product definition, ledger, log, verification, this handoff.
+Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No inference of a social publish or email delivery test; none was performed.
-Git diff summary: Archive-free branch based on current main. Only migration/types/tests/docs/ignore changes; original user checkout untouched. PR records release merge/deployment disposition.
+Memory updates withheld: No automatic strategy activation or arbitrary free-text condition evaluator inferred.
+Git diff summary: Isolated codex/decisions-001 from main; original user checkout untouched. No private archive, production record contents or secrets included. Merge/deployment pending.
