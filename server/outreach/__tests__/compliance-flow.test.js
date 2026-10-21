@@ -66,6 +66,7 @@ describe('commercial email opt-out and exact-draft flow (no real emails)', () =>
   it('renders the full footer before signing, sends exactly reviewed text, and deduplicates retries', async () => {
     const draft = (await prepare()).body
     expect(draft.body).toContain('Commercial email from Cicero Web Studio.')
+    expect(draft.body).toContain('Advertisement for our services.')
     expect(draft.body).toContain('123 Test Street')
     expect(draft.body).toContain(`?token=${preferenceId}`)
     expect((await send(draft)).status).toHaveBeenCalledWith(201)

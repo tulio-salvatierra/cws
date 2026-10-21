@@ -40,7 +40,7 @@ export function unsubscribeUrl(preference) {
 export function commercialBody(body, preference) {
   const address = postalAddress()
   const content = String(body || '').split(FOOTER_MARKER)[0].replace(/\n*Unsubscribe: \{\{unsubscribe_url\}\}/g, '').trim()
-  const message = `${content}${FOOTER_MARKER}\n${address}\nUnsubscribe from all marketing emails: ${unsubscribeUrl(preference)}`
+  const message = `${content}${FOOTER_MARKER}\nAdvertisement for our services.\n${address}\nUnsubscribe from all marketing emails: ${unsubscribeUrl(preference)}`
   if (!content || message.length > 20000 || /{{[^}]+}}/.test(message)) throw new Error('Review the email: content is missing, too long, or contains unresolved template fields.')
   return message
 }
@@ -48,4 +48,3 @@ export function commercialBody(body, preference) {
 export function validCommercialBody(body, preference) {
   return typeof body === 'string' && body === commercialBody(body, preference)
 }
-
