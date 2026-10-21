@@ -101,4 +101,4 @@
 
 | LAYA-001 | Codex | Completed — merged #33 and production verified | Pure source-backed decision_review shared contract in CEO Today; deterministic verdict fixtures, evidence UI and CI; 463 tests, CI, lint/build pass; READY production 7adc611 source evidence verified; unchanged decision hash/counts | Owner-only activation unchanged; no LLM/publish/send; response persistence remains separately scoped |
 
-| LAYA-RESPONSES-001 | Codex | Implemented; migration verified; release pending | Owner-only signed Act/Dismiss with reason, exact snapshot/output, immutable history and idempotent retry; migration20261021180810, 68/68 parity; 483 tests and 35 pgTAP pass | CI/release and read-only live form verification; activation remains separate |
+| LAYA-RESPONSES-001 | Codex | Completed — merged #34 and production verified | Owner-only signed Act/Dismiss with reason, exact snapshot/output, immutable history and idempotent retry; migration20261021180810, 68/68 parity; 483 tests, CI and 35 pgTAP pass; READY54d9d82 forms/cancel/reload verified | Owner may save real responses; activation remains separate; no LLM/publish/send |

@@ -8,7 +8,7 @@ Security decisions: Current owner membership and signed owner/workspace/purpose/
 Decisions made: Implement existing DEC-035 and direct owner request; no new permanent business/architecture decision.
 Assumptions: Act records owner intent, not execution or completion. Dismiss records feedback, not deletion/suppression/status change. Latest30 history is bounded; future history paging separately scoped. Do not fabricate a response on the real production proposal during verification.
 Tests added: 10 token/persistence, five API cases, five UI response cases; 17 pgTAP assertions.
-Tests run: 483 tests/61 files, lint/build/prerenders; 17 new DB assertions rehearsal/after apply plus 18 activation assertions after apply, all rolled back; 68/68 exact parity; unchanged advisor. CI/deployment/form verification pending.
+Tests run: 483 tests/61 files, lint/build/prerenders; 17 new DB assertions rehearsal/after apply plus 18 activation assertions after apply, all rolled back; 68/68 exact parity; unchanged advisor. GitHub Actions Tests run39651224644 and preview passed; #34 merged at54d9d82. Production dpl_B8nNJEacxmqJ8JSuoNmqy2XZqdtR READY on verified public aliases. Owner Act/Dismiss forms, explanation/reason, cancel and reload verified. Final response rows0, proposal1/active0, unchanged full decision hash, posts43/sends17, migrations68. No CEO API runtime errors in final15-minute scan.
 Known issues: Existing build/advisor warnings. Prior MCP migration apply errors avoided via proven CLI Management API with transactional history entry. No new response evaluator, autoexecution or provider behavior.
 Recommended next task: Owner records real responses when ready; separately scope additional evaluators.
 Questions requiring Tulio: None.
@@ -16,4 +16,4 @@ Project-memory files updated: Product, conventions, ledger/log, verification and
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No inferred real owner response, strategy activation, publish/send or condition observation.
-Git diff summary: Isolated codex/laya-owner-responses; original checkout and private archive untouched. No real record contents/secrets committed. Release pending.
+Git diff summary: Isolated codex/laya-owner-responses; original checkout and private archive untouched. No real record contents/secrets committed. Merged and production forms verified; final documentation receipt follows on main. Three unrelated pre-existing memory edits in original checkout remain untouched.
