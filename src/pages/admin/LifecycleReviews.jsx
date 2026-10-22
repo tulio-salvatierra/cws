@@ -6,7 +6,7 @@ export default function LifecycleReviews({ summary, onReload }) {
     <h2 className="text-lg font-semibold text-white">Negocio Listo lifecycle</h2>
     <p className="mt-2 text-xs text-gray-400">Derived for {summary.today} · Chicago time. Laya is advisory; no stages, payments or launches are changed automatically.</p>
     {summary.available === false && <p className="mt-2 text-amber-200">Lifecycle records are unavailable. Other priorities are unaffected.</p>}
-    {summary.available && !summary.items.length && <p className="mt-2 text-sm text-gray-400">No Negocio Listo inquiries or recorded agreements in this workspace.</p>}
+    {summary.available && !summary.items.length && <p className="mt-2 text-sm text-gray-400">No live Negocio Listo inquiries or recorded agreements in this view. Test leads are excluded; their records and saved history are preserved.</p>}
     {summary.items.map(item => <article key={item.id} className="mt-4 border-t border-gray-800 pt-3">
       <p className="text-xs text-emerald-200">{item.stage.replaceAll('_', ' ')}</p>
       <h3 className="mt-1 font-semibold text-white">{item.title}</h3>

@@ -20,6 +20,6 @@ describe('Deal fit evidence UI',()=>{
   const {rerender}=render(<MemoryRouter><DealFits summary={{available:false,items:[]}}/></MemoryRouter>)
   expect(screen.getByText(/Deal records are unavailable/)).toBeInTheDocument()
   rerender(<MemoryRouter><DealFits summary={{available:true,items:[]}}/></MemoryRouter>)
-  expect(screen.getByText(/No recorded Negocio Listo inquiries/)).toBeInTheDocument()
+  expect(screen.getByText(/No live Negocio Listo inquiries/)).toHaveTextContent('their records and saved history are preserved')
  })
 })

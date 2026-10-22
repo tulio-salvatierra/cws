@@ -8,7 +8,7 @@ export default function DealFits({summary,canManage,onReload}) {
     <p className="mt-2 text-sm text-gray-400">Laya checks recorded terms against the $50/hour floor, $300 setup baseline and capacity evidence. Advisory only; this never accepts a deal or activates a decision.</p>
     {canManage && summary.available && !summary.items.some(item=>item.agreement) && <p className="mt-3 text-sm text-gray-300">To record owner budgets, first record a Negocio Listo client agreement in <Link className="text-indigo-300" to="/admin/accounting#client-agreements">Accounting</Link> and link its Operations project. Then open the agreement’s owner budget form here. Inquiries alone cannot establish agreed prices or delivery scope.</p>}
     {!summary.available && <p className="mt-3 text-amber-200">Deal records are unavailable or incomplete. Other priorities are unaffected.</p>}
-    {summary.available && !summary.items.length && <p className="mt-3 text-gray-400">No recorded Negocio Listo inquiries or agreements to evaluate.</p>}
+    {summary.available && !summary.items.length && <p className="mt-3 text-gray-400">No live Negocio Listo inquiries or agreements to evaluate. Test leads are excluded; their records and saved history are preserved.</p>}
     {summary.items.map(item=><article key={item.id} className="mt-4 border-t border-gray-800 pt-4">
       <h3 className="font-semibold text-white">{item.title}</h3>
       <p className="mt-1 text-sm text-amber-200">Laya · {item.evaluation.verdict.replaceAll('_',' ')} · {item.evaluation.business_date} (Chicago)</p>
