@@ -162,7 +162,7 @@ The v1 Content Operations layer and the pre-OS n8n tables are **retired** (DEC-0
   - `agent_runs` (live)
   - `channels` (live)
   - `business_decisions`, reshaped from `decisions` by DECISIONS-001
-- **Still to clean up:** the unused NULL columns `published_posts.campaign_id`, `published_posts.content_variant_id`, `outreach_sends.campaign_id`, and `outreach_sends.approval_id`. They are removed in a later cleanup.
+- **Retirement cleanup complete:** migration `20261022152513` removed the four verified-empty linkage columns, obsolete indexes and retired trigger references. Retained publication/outreach records and active identity protections are preserved.
 
 Rebuilding anything from the retired layer needs a decision that names the surface it serves.
 

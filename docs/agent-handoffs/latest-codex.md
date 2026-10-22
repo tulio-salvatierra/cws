@@ -1,19 +1,9 @@
-Task ID: LAYA-LIFECYCLE-001
+Task ID: RETIRE-COLUMNS
 Agent: Codex
-Objective: Deterministic source-backed lifecycle advice and exact owner Act/Dismiss responses in CEO Today.
-Files inspected: Product/role/conventions/decisions/learnings/memory; lifecycle projection/CEO ordering/API; signed response/history/UI/schema/tests; Supabase skill/docs/live constraints/advisors/baseline.
-Files changed: Lifecycle evaluator+fixtures, CEO input capture/owner metadata+fixtures, signed token support+fixtures, lifecycle panel/owner response/history filter+UI tests, migration/pgTAP, product/conventions/memory.
-Database or API changes: Existing laya_evaluations evaluator/subject constraints and private invoker append guard extended to lifecycle lead/agreement; migration20261021215655,75/75 versions and SQL MD5 match. No new endpoint/grant/table/type shape.
-Security decisions: Existing active-owner API/DB actor gates; signed15-minute owner/workspace snapshot, exact historical inputs/output, body overrides ignored, retry/expiry/size guards retained. Lifecycle source must identify NL and match same-workspace principal; no decision FK. Browser inserts/rewrites/deletes denied, saved history owner-only. Activation remains separate.
-Decisions made: Direct requested scope; no permanent decision.
-Assumptions: Verdict mapping documented in product. Dates/receipts use exact Chicago evaluation clock; future receipts retained but not counted. Reads hitting1000 rows produce needs_data, critical failures retain CEO error behavior. Only explicit links, no customer-name matching. No live provider status, signature or payment inference. Inputs scoped per item and stripped before priority projection. Existing stages/order untouched.
-Tests added: Lifecycle stage/verdict/source fixtures, missing/truncated/invalid/duplicate/non-USD/unsafe totals/future receipts, source scoping and ordering; owner/nonowner API and exact snapshot/private-field absence, signed historical persistence/replay/tamper/expiry/offer validation; UI source evidence/Act/Dismiss/reason/cancel/nonowner/history filter;25 DB response assertions.
-Tests run:703 app tests/74files,lint/build passed.25 lifecycle rehearsal+postapply assertions,36 legacy response and18 activation assertions all rolled back.75/75 parity,SQL MD5 97abc31cd9a54fc06d17ad1ff295af58,security advisors unchanged (7server-only no-policy INFO,existing create_workspace/password warnings). Baseline responses0/posts43/sends17/active decisions0,fingerprint unchanged. CI39683143336 passed; #46 merged b6570d8. READY production dpl_GpLfFf44Q2bWB9Uksf8zDSs3ciLp assigned www alias. Owner browser verified prospect do/source evidence, Act+Dismiss required-reason forms opened/canceled, Lifecycle history filter and restored defaults. No real response saved; final responses0/posts43/sends17/active decisions0/fingerprint unchanged,75 migrations. CEO API runtime errors none in15m.
-Known issues: Production currently has no NL agreements; existing inquiry can verify lifecycle advice/form/cancel. No real response saved; agreement persistence exercised with synthetic fixtures and rolled-back DB tests. Existing build/advisor warnings. Snapshot limit100000 chars withholds oversized saving; per-card latest30 plus unified paginated history.
-Recommended next task: Owner may record actual responses and business evidence when ready.
-Questions requiring Tulio: None.
-Project-memory files updated: Product/conventions,ledger/log/latest handoff.
-Permanent decisions added: None.
-Reusable learnings added: None.
-Memory updates withheld: No fabricated production evidence, responses or activation.
-Git diff summary: Isolated codex/laya-lifecycle; original three dirty memory files/private backup untouched. CI39683143336 passed; #46 merged b6570d8. READY production dpl_GpLfFf44Q2bWB9Uksf8zDSs3ciLp assigned www alias. Owner browser verified prospect do/source evidence, Act+Dismiss required-reason forms opened/canceled, Lifecycle history filter and restored defaults. No real response saved; final responses0/posts43/sends17/active decisions0/fingerprint unchanged,75 migrations. CEO API runtime errors none in15m.
+Objective: Remove four empty retirement columns, verify parity and production; activation separate.
+Changes: Migration20261022152513; regenerated matching type shape; §6 cleanup complete;18 publication/write-back pgTAP assertions including absent columns, valid outcome update and immutable retained identity.
+Database: Guarded ACCESS EXCLUSIVE locks with5s timeout, abort on any non-NULL retiring value, no CASCADE. Retired two indexes removed with columns. Trigger retains all remaining protections.76/76 version parity; SQL MD5 bbe6a7f21744dfb88787651f375792e2.43 posts/17 sends identical retained JSON hashes before/after; decisions unchanged.
+Validation:703 tests/74files,lint/build pass.18 publication +18 owner-activation pgTAP checks pass and roll back fixtures. Initial rehearsal requests expired and CLI temporary credentials lacked lock permission; production migration applied through migration tool; postapply checks passed. No successful preapply rehearsal claimed.
+Security: No grant, RLS, Laya response or activation changes. Existing security advisories unchanged. No LLM calls/publish/send. Production contains an existing owner response recorded independently since prior release; do not erase or fabricate history.
+Release: PR/CI/deployment/browser verification pending.
+Memory: Product/ledger/log/handoff updated. No permanent decision. Original dirty checkout and private backup untouched.

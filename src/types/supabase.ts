@@ -1742,8 +1742,6 @@ export type Database = {
       }
       outreach_sends: {
         Row: {
-          approval_id: string | null
-          campaign_id: string | null
           created_at: string
           created_by: string
           draft_hash: string | null
@@ -1762,8 +1760,6 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
-          approval_id?: string | null
-          campaign_id?: string | null
           created_at?: string
           created_by: string
           draft_hash?: string | null
@@ -1782,8 +1778,6 @@ export type Database = {
           workspace_id: string
         }
         Update: {
-          approval_id?: string | null
-          campaign_id?: string | null
           created_at?: string
           created_by?: string
           draft_hash?: string | null
@@ -2095,9 +2089,7 @@ export type Database = {
         Row: {
           agent_run_id: string | null
           brief_version: number | null
-          campaign_id: string | null
           channel_id: string | null
-          content_variant_id: string | null
           created_at: string
           created_by: string | null
           external_post_id: string | null
@@ -2117,9 +2109,7 @@ export type Database = {
         Insert: {
           agent_run_id?: string | null
           brief_version?: number | null
-          campaign_id?: string | null
           channel_id?: string | null
-          content_variant_id?: string | null
           created_at?: string
           created_by?: string | null
           external_post_id?: string | null
@@ -2139,9 +2129,7 @@ export type Database = {
         Update: {
           agent_run_id?: string | null
           brief_version?: number | null
-          campaign_id?: string | null
           channel_id?: string | null
-          content_variant_id?: string | null
           created_at?: string
           created_by?: string | null
           external_post_id?: string | null

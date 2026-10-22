@@ -1,6 +1,6 @@
 begin;
 
-select plan(12);
+select plan(18);
 
 select has_column('public', 'business_decisions', 'observed_outcome', 'decisions retain their observed outcome');
 
@@ -35,6 +35,12 @@ select lives_ok(
   $$update public.marketing_publish_attempts set provider_status = 'posted', provider_post_id = 'legacy-linkedin-post', provider_permalink = 'https://www.linkedin.com/posts/legacy-linkedin-post' where id = 'abababab-0000-0000-0000-000000000003'$$,
   'a posted legacy LinkedIn attempt writes back a published post'
 );
+select hasnt_column('public','published_posts','campaign_id','retired post campaign column is absent');
+select hasnt_column('public','published_posts','content_variant_id','retired post variant column is absent');
+select hasnt_column('public','outreach_sends','campaign_id','retired outreach campaign column is absent');
+select hasnt_column('public','outreach_sends','approval_id','retired outreach approval column is absent');
+select lives_ok($$update public.published_posts set outcome_score = 'worked' where external_post_id = 'legacy-linkedin-post' and workspace_id = 'abababab-0000-0000-0000-000000000001'$$,'outcome update works after column removal');
+select throws_ok($$update public.published_posts set external_post_id = 'changed' where external_post_id = 'legacy-linkedin-post' and workspace_id = 'abababab-0000-0000-0000-000000000001'$$,'P0001','published post identity fields are immutable','remaining identity protection is preserved');
 select results_eq(
   $$select platform::text, external_post_id, external_url, source, channel_id from public.published_posts where workspace_id = 'abababab-0000-0000-0000-000000000001' order by external_post_id$$,
   $$values ('linkedin', 'legacy-linkedin-post', 'https://www.linkedin.com/posts/legacy-linkedin-post', 'cws-os', 'abababab-0000-0000-0000-000000000002'::uuid)$$,
