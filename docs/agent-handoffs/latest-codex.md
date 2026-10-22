@@ -1,19 +1,19 @@
-Task ID: TEST-LEADS-001
+Task ID: LAYA-PRIORITIES-001
 Agent: Codex
-Objective: Explicit owner-controlled test lead exclusion from Sales/CEO/Laya without deleting history.
-Files inspected: Canonical product, role/conventions/memory, Sales queue/API/UI, CEO loader, lifecycle/deal evaluators, lead RLS/schema, owner evidence patterns; Supabase skill/docs.
-Files changed: Owner flag migration/types; Sales/CEO read fields; queue/lifecycle/deal lead filtering; owner Sales TestLeadControls; UI/API/pure/DB tests; product and memory. Prior local acceptance report/memory included as verified background.
-Database or API changes: leads.is_test default false + last classification reason/actor/time; private invoker trigger requires active owner JWT, derives provenance, blocks flagged insert and metadata-only rewrites. Exact migration20261022163524,77/77 parity, SQL MD5 48a71b096235a5c6e44f29b75fb36e65. Existing routes only.
-Security decisions: Browser owner JWT writes with workspace/id/current-flag predicates; nonowner controls hidden and DB enforces. Service role denied even with spoofed owner sub. No new grants, RLS changes or activation path. No name-based inference.
-Decisions made: Requested lead exclusion; agreement identity/finances unaffected. This is priority/advice exclusion, not a universal send block.
-Assumptions: Preserve existing sends/promises/Laya response snapshots; current classification metadata reflects last transition. No historical business data edited by migration. Migration left existing leads live; live owner verification subsequently classified only the known QA intake.
-Tests added: Queue classifications/promises/progress/immutability; lifecycle/CEO/deal filtering and restoration; API owner/member controls and historical responses; UI reason/owner gate/scoping/stale-write;14 DB ownership/provenance/restore assertions.
-Tests run:716 tests/75 files,lint/build pass; both PR CI runs passed.14 rehearsal+14 postapply pgTAP and18 separate activation assertions passed, all synthetic fixtures rolled back. Security advisories unchanged.
-Known issues: Separate audit's universal Laya coverage and missing real NL evidence remain; unrelated.
-Recommended next task: Owner reconciles real agreement evidence. QA exclusion verified; owner may restore explicitly when warranted.
-Questions requiring Tulio: None for implementation.
-Project-memory files updated: Product,ledger,log,handoff; previous acceptance report retained.
+Objective: Deterministic source-backed Laya reviews/responses on all remaining CEO Today priorities, preserving order/activation.
+Files inspected: Canonical product/role/conventions/decisions/learnings/memory; CEO projection/API/read models, lifecycle/deal/signing/history/UI, live source schemas/response guard; Supabase skill/docs.
+Files changed: Pure priority evaluator+fixtures; CEO post-projection decoration/scoped read fields/visible owner capabilities; signing/history extensions; priority source UI + existing owner responses; Priority saved-text history; constraint/guard migration/pgTAP; product/conventions/memory.
+Database or API changes: Existing CEO GET/POST only. Migration20261022171613 adds priority_review + ceo_priority shape and validates clock/subject/principal whitelist/existence/workspace/action/source parent. No table/column/grant/activation change; generated types unchanged.78/78 parity and SQL MD5 d52d5d4b8b9e0a9591e23ae17cb2ada4.
+Security decisions: Existing active-owner POST, signed15-minute exact input/output, owner/workspace binding, replay/expiry/tamper/100k-size guard and immutable owner history retained. Body overrides ignored. Primary-source-unavailable or oversized reviews withhold saving. Sign visible cards only. Generic subjects have no decision FK. Browser arbitrary inserts remain denied.
+Decisions made: Direct requested coverage; no engine, endpoint, LLM, external action or activation.
+Assumptions: Frozen projection/order/limit remain untouched; negative/calendar claims use exact register inputs/completeness + fixed policy references, no invented rows. Calendar readiness does not establish exact publish preview readiness. Future/invalid/non-USD/unsafe Accounting data needs_data; possible Compliance requirements require owner verification. NL cards reuse lifecycle evaluation/input, not a duplicate generic evaluator. Fallback needs_data, never invented prospect.
+Tests added: Sales category/promise/follow-up/test exclusion; delivery blockers/readiness; exact valid payment/recurring evidence and unsafe/future/missing data; Compliance status/authority; Marketing occurrence/failure/calendar-only cases; missing/capped/scoped evidence; frozen order/limit/input immutability; lifecycle reuse; exact signed body-override/expiry/tamper/size controls; API and UI owner/cancel/reason/source checks; Priority search/filter/paging;22 DB actor/shape/scope/clock/immutability assertions.
+Tests run:748 tests/77files,lint/build pass.22 priority rehearsal+22 postapply,25 lifecycle+36 goal/deal+18 activation postapply checks all pass and roll back synthetic fixtures.78/78 parity/types unchanged/security baseline unchanged.
+Known issues: Existing real NL evidence gaps remain. Priority source caps withhold confident verdicts; primary-source-absent/oversized snapshots cannot save. Existing build/advisor warnings unchanged.
+Recommended next task: Complete production source/owner form/cancel/history verification after release; then owner records actual business evidence.
+Questions requiring Tulio: None.
+Project-memory files updated: Product/conventions/ledger/log/handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No inferred business identity, activation or new strategy.
-Git diff summary: Isolated codex/test-lead-exclusion; original dirty memory files/private backups untouched. PR #48 merged4599fbb; CI39815544303 passed; READY dpl_BJfhxfNHVbujeiwbkcrab6UjApbk assigned www domain. Owner explicitly excluded known QA intake;8 leads retained/1 test. Sales/CEO/lifecycle/deal exclusion verified and response/decision/send/post/agreement/run hashes unchanged. Empty-state follow-up #49 merged1c15553; CI39817157687 passed; READY dpl_jenyPWYfPxjuHRaLDXTq1aCK1YZk assigned www. Fresh CEO empty states distinguish excluded records from absent ones. See test-leads-verification-2026-10-22.md.
+Memory updates withheld: No business facts, owner responses or activation fabricated.
+Git diff summary: Isolated codex/laya-priority-reviews; original dirty memory/private backup untouched. Release pending.

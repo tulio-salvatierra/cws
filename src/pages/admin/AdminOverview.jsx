@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import PriorityEvaluation from './PriorityEvaluation'
 import GoalPace from './GoalPace'
 import LifecycleReviews from './LifecycleReviews'
 import DealFits from './DealFits'
@@ -63,7 +64,7 @@ export default function AdminOverview() {
       {ceo?.goal_pace && <GoalPace pace={ceo.goal_pace} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
 
       {ceo && <section className="mt-7 space-y-3" aria-label="CEO Today actions">
-        {actions.map((item) => <CeoActionCard key={item.id} item={item} onNotNow={() => setNotNow((current) => new Set(current).add(item.id))} />)}
+        {actions.map((item) => <CeoActionCard key={item.id} item={item} onReload={async () => setCeo(await loadCeoToday())} onNotNow={() => setNotNow((current) => new Set(current).add(item.id))} />)}
         {!actions.length && <p className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5 text-sm text-gray-400">No further action is shown in this view. Reload to recalculate from current department state.</p>}
       </section>}
 
@@ -97,7 +98,7 @@ export default function AdminOverview() {
   </div>
 }
 
-function CeoActionCard({ item, onNotNow }) {
+function CeoActionCard({ item, onNotNow, onReload }) {
   return <article className="rounded-2xl border border-gray-800 bg-gray-900/70 p-5 shadow-2xl shadow-black/10">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
@@ -108,6 +109,7 @@ function CeoActionCard({ item, onNotNow }) {
     </div>
     {item.lifecycle_stage && <p className="mt-2 text-xs text-emerald-200">Negocio Listo · {item.lifecycle_stage.replaceAll('_',' ')}</p>}
     <p className="mt-4 text-sm leading-6 text-gray-300"><span className="font-medium text-white">Why now:</span> {item.why_now}</p>
+    <PriorityEvaluation item={item} onReload={onReload} />
     <Link to={item.href} className="mt-5 inline-flex rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400">{item.cta_label}</Link>
   </article>
 }

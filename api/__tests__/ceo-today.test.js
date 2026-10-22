@@ -454,3 +454,20 @@ it('excludes flagged intake from CEO and live advice, while retaining saved hist
  expect(result.laya_response_history.items).toContainEqual(saved)
  vi.unstubAllEnvs()
 })
+
+it('decorates ordered priorities with owner-only exact capabilities and strips internal review inputs',async()=>{
+ vi.stubEnv('GENERATION_SUPABASE_SERVICE_ROLE_KEY','fixture-secret')
+ const lead={...activeLead(),workspace_id:'workspace-a',id:'priority-lead',sales_classification:'inbound',status:'new'}
+ const from=vi.fn(table=>query({data:table==='leads'?[lead]:table==='workspace_members'?{role:'owner'}:[],error:null}))
+ mocks.authenticateWorkspace.mockResolvedValue({client:{from},workspaceId:'workspace-a',user:{id:'owner'}})
+ const res=response();await handler({method:'GET'},res)
+ const payload=res.json.mock.calls[0][0]
+ expect(payload.actions.every(card=>card.evaluation && card.owner_response)).toBe(true)
+ const card=payload.all_actions.find(card=>card.lead_id==='priority-lead')
+ expect(card.evaluation).toMatchObject({evaluator:'priority_review',verdict:'do'})
+ expect(JSON.stringify(payload)).not.toContain('review_inputs')
+ expect(JSON.stringify(payload)).not.toContain('response_input')
+ const visible=payload.actions[0],review=readResponseToken(visible.owner_response.review_token,{workspaceId:'workspace-a',user:{id:'owner'}})
+ expect(review.input_snapshot.inputs.action.id).toBe(visible.id)
+ vi.unstubAllEnvs()
+})

@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer'
 
 const fields = 'id,decision_id,evaluator,subject_type,subject_id,response,reason,created_at,input_snapshot,evaluation'
 const pageSize = 30
-const types = ['all', 'decision_review', 'goal_pace', 'deal_fit', 'lifecycle']
+const types = ['all', 'decision_review', 'goal_pace', 'deal_fit', 'lifecycle', 'priority_review']
 const timestamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -56,7 +56,7 @@ export async function loadResponseHistory(context, position = { type: 'all', cur
     // JSON string quoting protects PostgREST's OR grammar, including quotes,
     // backslashes and commas. No user pattern or live source join is accepted.
     const literal = JSON.stringify(`(?q)${selected.search}`)
-    const columns = ['reason', 'subject_id', 'subject_type', 'input_snapshot->decision->>title', 'input_snapshot->decision->>decision', 'input_snapshot->inputs->lead->>name', 'input_snapshot->inputs->lead->>company', 'input_snapshot->inputs->agreement->>product_name']
+    const columns = ['reason', 'subject_id', 'subject_type', 'input_snapshot->decision->>title', 'input_snapshot->decision->>decision', 'input_snapshot->inputs->lead->>name', 'input_snapshot->inputs->lead->>company', 'input_snapshot->inputs->agreement->>product_name', 'input_snapshot->inputs->action->>human_action']
     query = query.or(columns.map(column => `${column}.imatch.${literal}`).join(','))
   }
   if (selected.response !== 'all') query = query.eq('response', selected.response)

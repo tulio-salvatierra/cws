@@ -14,6 +14,7 @@ export function createResponseToken(context, decision, evaluation, now = Date.no
 }
 
 export function createEvaluationResponseToken(context, inputs, evaluation, now = Date.now()) {
+  if(evaluation.evaluator==='priority_review' && !['fallback','marketing_ready','marketing_missed','marketing_delivery_failure'].includes(inputs?.action?.source_type) && !inputs?.principal)return null
   const input_snapshot = { subject: evaluation.subject, inputs, evaluated_at: evaluation.evaluated_at, business_date: evaluation.business_date, time_zone: evaluation.time_zone }
   const payload = { v: 2, purpose: 'laya_owner_response', id: randomUUID(), workspace_id: context.workspaceId,
     user_id: context.user.id, expires_at: now + lifetime, input_snapshot, evaluation }
@@ -41,7 +42,10 @@ export function readResponseToken(token, context, now = Date.now()) {
       if(!snapshot?.inputs || snapshot.inputs.workspaceId!==context.workspaceId || JSON.stringify(snapshot.subject)!==JSON.stringify(subject)
         || snapshot.evaluated_at!==evaluation.evaluated_at || snapshot.business_date!==evaluation.business_date || snapshot.time_zone!==evaluation.time_zone
         || snapshot.inputs.now!==evaluation.evaluated_at) return null
-      if(evaluation.evaluator==='goal_pace') {
+      if(evaluation.evaluator==='priority_review') {
+        if(subject.type!=='ceo_priority' || subject.id!==snapshot.inputs.action?.id || !Array.isArray(snapshot.inputs.sources))return null
+        if(snapshot.inputs.sources.some(s=>s.table==='marketing_publish_destination_results' ? !snapshot.inputs.sources.some(a=>a.table==='marketing_publish_attempts' && a.row.id===s.row.attempt_id && a.row.workspace_id===context.workspaceId) : s.row?.workspace_id!==context.workspaceId))return null
+      } else if(evaluation.evaluator==='goal_pace') {
         if(subject.type!=='negocio_listo_goal' || subject.id!=='negocio-listo-2026-12-31')return null
       } else if(['deal_fit','lifecycle'].includes(evaluation.evaluator)) {
         const row=subject.type==='lead'?snapshot.inputs.lead:subject.type==='client_service_agreement'?snapshot.inputs.agreement:null
