@@ -55,6 +55,8 @@ The admin app (`/admin`) has six surfaces. These are the product.
 
 Also live: the public marketing site (`cicerowebstudio.xyz`). The public client portal is **disabled**; intake runs through Vercel and Google Apps Script. The Negocio Listo landing pages (`/negocio-listo`, `/en/negocio-listo`) capture leads through `POST /api/outreach/public-lead`, which inserts or merges one `inbound` `leads` row owned by the workspace owner and triggers no external action.
 
+Owner-controlled test leads: an authenticated active workspace owner may toggle `leads.is_test` with a required classification reason. The database records the actor/time and rejects member/service-role classification or forged provenance. Default is live; names/source text never auto-classify existing rows. Sales provides a separate owner control listing excluded leads and restoring them. Test leads do not contribute Sales priorities (including promises), progress or unclassified counts, CEO Today priorities, or live Negocio Listo lifecycle/deal-fit advice. This is a lead-only classification: it does not infer or alter any agreement's identity, finances, provider state, decision activation or existing sends/promises/saved Laya history. It is not a global send prohibition; existing exact-draft confirmation remains required elsewhere.
+
 ## 3. Authority model
 
 | Tier | Meaning | Examples |

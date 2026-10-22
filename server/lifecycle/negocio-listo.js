@@ -11,7 +11,7 @@ export function buildNegocioListoLifecycle({workspaceId,leads=[],agreements=[],i
   const today=chicagoDate(now)
   const ownProjects=scoped(projects,workspaceId), ownClients=scoped(clients,workspaceId)
   const ownObligations=scoped(obligations,workspaceId), ownReceipts=scoped(receipts,workspaceId)
-  const items=scoped(leads,workspaceId).filter(lead=>String(lead.source || '').split('|')[0]==='negocio-listo' && !['won','lost','unresponsive'].includes(lead.status)).map(lead=>({
+  const items=scoped(leads,workspaceId).filter(lead=>lead.is_test !== true && String(lead.source || '').split('|')[0]==='negocio-listo' && !['won','lost','unresponsive'].includes(lead.status)).map(lead=>({
     id:`lifecycle:lead:${lead.id}`,lead_id:lead.id,stage:'prospect',title:lead.company || lead.name || 'Negocio Listo prospect',
     human_action:`Review Negocio Listo inquiry: ${lead.company || lead.name || 'prospect'}`,why_now:'A Negocio Listo intake inquiry is in Sales; no conversion or signature is inferred.',
     department:'SALES',business_priority:'GET MONEY',priority_tier:2,href:'/admin/sales',cta_label:'Review in Sales',

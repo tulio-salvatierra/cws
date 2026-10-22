@@ -891,6 +891,7 @@ export type Database = {
           created_by: string
           email: string | null
           id: string
+          is_test: boolean
           last_contacted_at: string | null
           locality: string | null
           name: string | null
@@ -899,6 +900,9 @@ export type Database = {
           sales_classification: string | null
           source: string | null
           status: string
+          test_record_at: string | null
+          test_record_by: string | null
+          test_record_reason: string | null
           updated_at: string
           workspace_id: string
         }
@@ -908,6 +912,7 @@ export type Database = {
           created_by: string
           email?: string | null
           id?: string
+          is_test?: boolean
           last_contacted_at?: string | null
           locality?: string | null
           name?: string | null
@@ -916,6 +921,9 @@ export type Database = {
           sales_classification?: string | null
           source?: string | null
           status?: string
+          test_record_at?: string | null
+          test_record_by?: string | null
+          test_record_reason?: string | null
           updated_at?: string
           workspace_id: string
         }
@@ -925,6 +933,7 @@ export type Database = {
           created_by?: string
           email?: string | null
           id?: string
+          is_test?: boolean
           last_contacted_at?: string | null
           locality?: string | null
           name?: string | null
@@ -933,6 +942,9 @@ export type Database = {
           sales_classification?: string | null
           source?: string | null
           status?: string
+          test_record_at?: string | null
+          test_record_by?: string | null
+          test_record_reason?: string | null
           updated_at?: string
           workspace_id?: string
         }

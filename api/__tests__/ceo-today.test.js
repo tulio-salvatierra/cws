@@ -440,3 +440,17 @@ describe('CEO Today endpoint', () => {
     expect(mocks.authenticateWorkspace).not.toHaveBeenCalled()
   })
 })
+
+it('excludes flagged intake from CEO and live advice, while retaining saved history',async()=>{
+ vi.stubEnv('GENERATION_SUPABASE_SERVICE_ROLE_KEY','fixture-secret')
+ const lead={...activeLead(),id:'test-lead',workspace_id:'workspace-a',source:'negocio-listo|inline|en',is_test:true,sales_classification:'inbound'}
+ const saved={id:'saved',evaluator:'lifecycle',subject_id:'test-lead',subject_type:'lead',response:'dismiss',reason:'Historic QA review',created_at:'2026-09-10T10:00:00Z',input_snapshot:{lead},evaluation:{}}
+ const from=vi.fn(table=>query({data:table==='leads'?[lead]:table==='workspace_members'?{role:'owner'}:table==='laya_evaluations'?[saved]:[],error:null}))
+ mocks.authenticateWorkspace.mockResolvedValue({client:{from},workspaceId:'workspace-a',user:{id:'owner'}})
+ const res=response();await handler({method:'GET'},res)
+ const result=res.json.mock.calls[0][0]
+ expect(result.negocio_listo.items).toEqual([]);expect(result.deal_fit.items).toEqual([])
+ expect(result.actions.some(item=>item.lead_id==='test-lead')).toBe(false)
+ expect(result.laya_response_history.items).toContainEqual(saved)
+ vi.unstubAllEnvs()
+})

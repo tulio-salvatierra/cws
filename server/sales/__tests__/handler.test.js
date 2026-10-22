@@ -721,3 +721,14 @@ describe('Sales command endpoint', () => {
     expect(mocks.sendResendEmail).not.toHaveBeenCalled()
   })
 })
+
+describe('Owner test classification projection',()=>{
+ it.each([['owner',true],['member',false],[null,false]])('exposes controls only for active owner: %s',async(role,canManage)=>{
+  const from=vi.fn(table=>query({data:table==='leads'?[{...queueLead,is_test:true}]:table==='workspace_members'?(role?{role}:null):[],error:null}))
+  mocks.authenticateWorkspace.mockResolvedValue({client:{from},workspaceId:'workspace-a',user:{id:'owner'}})
+  const res=response();await handler({method:'GET'},res)
+  expect(res.status).toHaveBeenCalledWith(200)
+  expect(res.json.mock.calls[0][0]).toMatchObject({can_manage_tests:canManage,workspace_id:'workspace-a',items:[],summary:{excludedTestLeads:1}})
+  expect(res.json.mock.calls[0][0].leads[0].id).toBe('lead-a')
+ })
+})

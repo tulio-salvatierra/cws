@@ -74,7 +74,7 @@ export function buildDealFits({workspaceId,agreements=[],leads=[],projects=[],bu
     const inputs={workspaceId,agreement,lead:null,projects,costs,budget,snapshot,now}
     return {id:`agreement:${agreement.id}`,title:agreement.product_name,href:`/admin/accounting?client=${encodeURIComponent(agreement.client_id)}#client-agreements`,agreement,budget,budget_snapshot:snapshot,evaluation:evaluateDealFit(inputs),response_input:inputs}
   })
-  for(const lead of leads.filter(l=>l.workspace_id===workspaceId && String(l.source || '').split('|')[0]==='negocio-listo' && !['won','lost','unresponsive'].includes(l.status))) {
+  for(const lead of leads.filter(l=>l.workspace_id===workspaceId && l.is_test !== true && String(l.source || '').split('|')[0]==='negocio-listo' && !['won','lost','unresponsive'].includes(l.status))) {
     const inputs={workspaceId,agreement:null,lead,projects:[],costs:[],budget:null,snapshot:null,now}
     items.push({id:`lead:${lead.id}`,title:lead.company || lead.name || 'Negocio Listo inquiry',href:'/admin/sales',evaluation:evaluateDealFit(inputs),response_input:inputs})
   }

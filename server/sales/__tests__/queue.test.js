@@ -157,3 +157,18 @@ describe('Sales command queue', () => {
     expect(result.summary.newOutreachToday).toBe(0)
   })
 })
+
+describe('Explicit test lead exclusion', () => {
+  it.each(['inbound','prospect',null])('excludes %s leads, promises and daily progress without altering source history', classification => {
+    const test = lead({is_test:true,sales_classification:classification,response_state:'warm'})
+    const leads=[test,lead({id:'real',name:'TEST ONLY ordinary text',sales_classification:'inbound'})]
+    const sends=[send({sent_at:now.toISOString()})]
+    const promises=[{id:'promise',lead_id:test.id,action_text:'Call',due_on:'2026-09-09'}]
+    const before=JSON.stringify({leads,sends,promises})
+    const result=buildSalesCommandQueue({leads,outreachSends:sends,promisedActions:promises,now})
+    expect(result.items.map(row=>row.lead.id)).toEqual(['real'])
+    expect(result.summary).toMatchObject({excludedTestLeads:1,newOutreachToday:0,promisedActionsDue:0,unclassifiedLeads:0})
+    expect(JSON.stringify({leads,sends,promises})).toBe(before)
+    expect(buildSalesCommandQueue({leads:[{...test,is_test:false}],now}).items).toHaveLength(classification?1:0)
+  })
+})

@@ -46,3 +46,11 @@ describe('deterministic deal fit',()=>{
   expect(buildDealFits({workspaceId:'w',available:false})).toEqual({available:false,items:[]})
  })
 })
+
+it('excludes test leads from live deal-fit without changing historical evidence or agreement membership',()=>{
+ const lead={id:'l',workspace_id:'w',source:'negocio-listo|inline|en',status:'new',is_test:true}
+ const before=JSON.stringify(lead)
+ expect(buildDealFits({workspaceId:'w',leads:[lead],agreements:[],now}).items).toEqual([])
+ expect(buildDealFits({workspaceId:'w',leads:[{...lead,is_test:false}],agreements:[agreement],now}).items).toHaveLength(2)
+ expect(JSON.stringify(lead)).toBe(before)
+})
