@@ -138,3 +138,13 @@ describe('Laya cursor history',()=>{
     expect(()=>parseHistoryPosition('all',first.next_cursor,'other')).toThrow('cursor')
   })
 })
+
+it('filters and pages saved priority responses with literal saved action text, preserving other history',async()=>{
+ const rows=Array.from({length:35},(_,i)=>({...source[0],id:id(i+100),evaluator:'priority_review',subject_type:'ceo_priority',subject_id:`operations:${i}`,response:'act',input_snapshot:{inputs:{action:{human_action:'Review Client [A]'}}}}))
+ const ctx=context([...source,...rows]);const position=parseHistoryPosition('priority_review',null,'w',{response:'act',search:'Client [A]'})
+ const first=await loadResponseHistory(ctx,position)
+ expect(first.items).toHaveLength(30);expect(first.items.every(row=>row.evaluator==='priority_review')).toBe(true)
+ const next=parseHistoryPosition('priority_review',first.next_cursor,'w',{response:'act',search:'Client [A]'})
+ expect((await loadResponseHistory(context([...source,...rows]),next)).items).toHaveLength(5)
+ expect(ctx.query.or.mock.calls[0][0]).toContain('input_snapshot->inputs->action->>human_action.imatch.')
+})

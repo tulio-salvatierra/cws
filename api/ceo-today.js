@@ -1,3 +1,4 @@
+import { decoratePriorities } from '../server/laya/priority-review.js'
 import { evaluateLifecycleItems } from '../server/laya/lifecycle.js'
 import { loadResponseHistory, parseHistoryPosition } from '../server/laya/history.js'
 import { buildDealFits } from '../server/laya/deal-fit.js'
@@ -77,8 +78,11 @@ export default async function handler(req, res) {
     if(!decisions.can_manage)return {can_respond:false}
     const token=createEvaluationResponseToken(context,inputs,evaluation)
     return {can_respond:Boolean(token),review_token:token,history_available:!history.error,
-      unavailable_reason:token?null:'The exact evidence is too large to sign safely; no response can be saved for this view.',
+      unavailable_reason:token?null:'The exact evidence is unavailable or too large to sign safely; no response can be saved for this view.',
       responses:(history.data || []).filter(item=>item.evaluator===evaluation.evaluator && item.subject_type===evaluation.subject.type && item.subject_id===evaluation.subject.id)}
+  }
+  for (const item of loaded.data.actions) {
+    item.owner_response = attachResponse(item.evaluation, loaded.review_inputs.priorities[item.id])
   }
   for (const item of loaded.data.negocio_listo?.items || []) {
     item.owner_response = attachResponse(item.evaluation, loaded.review_inputs.lifecycle[item.id])
@@ -93,11 +97,11 @@ export default async function handler(req, res) {
 
 export async function loadCeoToday(context, now = new Date()) {
   const [leads, promisedActions, outreachSends, attempts, resolutions, operationsProjects, operationsRequirements, operationsClients, obligations, receipts, recurringRevenue, complianceRequirements, complianceCompletions, goalEvidence, goalCompleteness, agreements, installments, dealBudgets, dealCosts] = await Promise.all([
-    context.client.from('leads').select('id, workspace_id, source, name, email, company, status, is_test, test_record_reason, test_record_by, test_record_at, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
-    context.client.from('sales_promised_actions').select('id, lead_id, action_text, due_on, completed_at, created_at').eq('workspace_id', context.workspaceId).is('completed_at', null).order('due_on', { ascending: true }).order('created_at', { ascending: true }),
-    context.client.from('outreach_sends').select('id, lead_id, send_type, status, sent_at, created_at').eq('workspace_id', context.workspaceId).not('lead_id', 'is', null).order('created_at', { ascending: true }),
-    context.client.from('marketing_publish_attempts').select('id, marketing_slot_key, asset_id, asset_path, destination, required_platforms, provider_status, provider_error, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }).limit(50),
-    context.client.from('marketing_slot_resolutions').select('occurrence_slot_key, origin_slot_key, target_slot_key, action, asset_id, asset_path, caption, created_at, decided_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }),
+    context.client.from('leads').select('id, workspace_id, source, name, email, company, status, is_test, test_record_reason, test_record_by, test_record_at, sales_classification, response_state, phone, locality, last_contacted_at, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+    context.client.from('sales_promised_actions').select('id, workspace_id, lead_id, action_text, due_on, completed_at, created_at').eq('workspace_id', context.workspaceId).is('completed_at', null).order('due_on', { ascending: true }).order('created_at', { ascending: true }),
+    context.client.from('outreach_sends').select('id, workspace_id, lead_id, send_type, status, sent_at, created_at').eq('workspace_id', context.workspaceId).not('lead_id', 'is', null).order('created_at', { ascending: true }),
+    context.client.from('marketing_publish_attempts').select('id, workspace_id, marketing_slot_key, asset_id, asset_path, destination, required_platforms, provider_status, provider_error, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }).limit(50),
+    context.client.from('marketing_slot_resolutions').select('id, workspace_id, occurrence_slot_key, origin_slot_key, target_slot_key, action, asset_id, asset_path, caption, created_at, decided_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false }),
     context.client.from('operations_projects').select('id, workspace_id, client_id, name, project_type, status, service_agreement_id, actual_hours, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('project_requirements').select('id, workspace_id, project_id, requirement_key, label, category, status, timing, responsible_party, notes, requested_at, received_at, created_at, updated_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('clients').select('id, workspace_id, name, contact_email, contact_phone, status, created_at').eq('workspace_id', context.workspaceId).eq('status', 'active').order('name', { ascending: true }),
@@ -119,12 +123,14 @@ export async function loadCeoToday(context, now = new Date()) {
   const attemptRows = attempts.data || []
   const attemptIds = attemptRows.map((attempt) => attempt.id).filter(Boolean)
   let destinationResults = []
+  let destinationsComplete = true
   if (attemptIds.length) {
     const results = await context.client.from('marketing_publish_destination_results')
-      .select('attempt_id, provider_status, provider_error')
+      .select('id, attempt_id, platform, provider_status, provider_error, created_at, updated_at')
       .in('attempt_id', attemptIds)
     if (results.error) return { data: null, error: 'CEO Today could not load Marketing delivery state.' }
     destinationResults = results.data || []
+    destinationsComplete = destinationResults.length < 1000
   }
 
   const resultsByAttempt = new Map()
@@ -166,9 +172,7 @@ export async function loadCeoToday(context, now = new Date()) {
   const goalInput={workspaceId:context.workspaceId,agreements:agreements.data || [],evidence:goalEvidence.data || [],completeness:goalCompleteness.data || [],available:!agreements.error && !goalEvidence.error && !goalCompleteness.error && (agreements.data || []).length<1000 && (goalEvidence.data || []).length<1000,now}
   const dealInput={workspaceId:context.workspaceId,agreements:agreements.data || [],leads:leads.data || [],projects:operationsProjects.data || [],budgets:dealBudgets.data || [],costs:dealCosts.data || [],available:!agreements.error && !dealBudgets.error && !dealCosts.error && [agreements,leads,operationsProjects,dealBudgets,dealCosts].every(result=>(result.data || []).length<1000),now}
   const goalPace=buildGoalPace(goalInput)
-  return {
-    review_inputs:{goal:goalInput,lifecycle:lifecycleReviewInputs},
-    data: buildCeoToday({
+  const data = buildCeoToday({
       dealFits: buildDealFits(dealInput),
       goalPace,
       lifecycle,
@@ -184,7 +188,11 @@ export async function loadCeoToday(context, now = new Date()) {
       accountingProjection: accounting.ceo_projection,
       complianceProjection: compliance.ceo_projection,
       now,
-    }),
-    error: null,
-  }
+    })
+  const querySources={leads,promises:promisedActions,sends:outreachSends,attempts,resolutions,projects:operationsProjects,requirements:operationsRequirements,clients:operationsClients,obligations,receipts,recurring:recurringRevenue,compliance:complianceRequirements,completions:complianceCompletions}
+  const priorityContext={workspaceId:context.workspaceId,now,destinations:destinationResults,
+    ...Object.fromEntries(Object.entries(querySources).map(([key,result])=>[key,result.data || []])),
+    availability:{...Object.fromEntries(Object.entries(querySources).map(([key,result])=>[key,!result.error && (result.data || []).length<(key==='attempts'?50:1000)])),destinations:destinationsComplete}}
+  const priorities=decoratePriorities(data,priorityContext,lifecycleReviewInputs)
+  return {review_inputs:{goal:goalInput,lifecycle:lifecycleReviewInputs,priorities},data,error:null}
 }

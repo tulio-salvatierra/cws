@@ -118,3 +118,29 @@ describe('signed lifecycle response compatibility',()=>{
   expect(readResponseToken(createEvaluationResponseToken(ctx,inputs,evaluation),ctx)).toBeNull()
  })
 })
+
+describe('Exact signed remaining-priority responses',()=>{
+ const input=()=>({workspaceId:'workspace-a',now:'2026-10-21T18:00:00Z',action:{id:'sales:inbound:lead-a',source_type:'sales_command',lead_id:'lead-a',human_action:'Review synthetic lead'},principal:{table:'leads',row:{id:'lead-a',workspace_id:'workspace-a',status:'new'}},sources:[{table:'leads',row:{id:'lead-a',workspace_id:'workspace-a',status:'new'}}],availability:{leads:true}})
+ const output=()=>({...evaluation,evaluator:'priority_review',policy_version:'priority-review-v1',subject:{type:'ceo_priority',id:'sales:inbound:lead-a',workspace_id:'workspace-a'}})
+ it('binds owner/workspace/clock/subject and exact inputs without mutable substitutions',async()=>{
+  const ctx=context(),inputs=input(),out=output(),token=createEvaluationResponseToken(ctx,inputs,out)
+  expect(readResponseToken(token,ctx).input_snapshot.inputs).toEqual(inputs)
+  expect(readResponseToken(token,{...ctx,user:{id:'other'}})).toBeNull()
+  expect(readResponseToken(token,{...ctx,workspaceId:'other'})).toBeNull()
+  expect(readResponseToken(token+'x',ctx)).toBeNull()
+  const insert=vi.fn(()=>({select:()=>({single:async()=>({data:{id:'saved'}})})}));ctx.client={from:vi.fn(()=>({insert}))}
+  inputs.principal.row.status='changed later'
+  expect((await saveOwnerResponse(ctx,{review_token:token,response:'dismiss',reason:' Source reviewed ',evaluation:{verdict:'do'},input_snapshot:{forged:true}})).status).toBe(200)
+  expect(insert.mock.calls[0][0]).toMatchObject({decision_id:null,evaluator:'priority_review',reason:'Source reviewed',input_snapshot:{inputs:{principal:{row:{status:'new'}}}},evaluation:out})
+  expect(ctx.client.from.mock.calls).toEqual([['laya_evaluations']])
+ })
+ it('rejects clock/subject/foreign-source mismatch and expiry; withholds missing/oversized evidence',()=>{
+  const ctx=context()
+  expect(readResponseToken(createEvaluationResponseToken(ctx,{...input(),now:'wrong'},output()),ctx)).toBeNull()
+  expect(readResponseToken(createEvaluationResponseToken(ctx,input(),{...output(),subject:{...output().subject,id:'wrong'}}),ctx)).toBeNull()
+  expect(readResponseToken(createEvaluationResponseToken(ctx,{...input(),sources:[{table:'leads',row:{workspace_id:'foreign'}}]},output()),ctx)).toBeNull()
+  expect(createEvaluationResponseToken(ctx,{...input(),principal:null},output())).toBeNull()
+  expect(createEvaluationResponseToken(ctx,{...input(),huge:'x'.repeat(100000)},output())).toBeNull()
+  const token=createEvaluationResponseToken(ctx,input(),output());vi.advanceTimersByTime(15*60*1000);expect(readResponseToken(token,ctx)).toBeNull()
+ })
+})

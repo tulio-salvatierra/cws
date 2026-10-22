@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
-const types = { decision_review: 'Decision', goal_pace: 'Goal pace', deal_fit: 'Deal fit', lifecycle: 'Lifecycle' }
+const types = { decision_review: 'Decision', goal_pace: 'Goal pace', deal_fit: 'Deal fit', lifecycle: 'Lifecycle', priority_review: 'Priority' }
 
 export default function LayaResponseHistory({ history }) {
   const [state, setState] = useState({ pages: [history], index: 0, filter: 'all', response: 'all', from: '', to: '', search: '' })
@@ -63,7 +63,7 @@ export default function LayaResponseHistory({ history }) {
         <label>Search saved reason or subject<input type="search" maxLength={80} disabled={busy} value={search} onChange={event => setSearch(event.target.value)} className="mt-1 block rounded bg-gray-800 p-2" /></label>
         <button disabled={busy} className="p-2 text-sky-200">Search history</button>
       </form>
-      <p className="mt-2 text-xs text-gray-400">Case-insensitive literal text, up to 80 characters. Searches saved reasons, subject IDs/types, decision titles/text, lead names/companies, and agreement product names. Select Search history to apply.</p>
+      <p className="mt-2 text-xs text-gray-400">Case-insensitive literal text, up to 80 characters. Searches saved reasons, subject IDs/types, decision titles/text, lead names/companies, agreement product names, and saved priority text. Select Search history to apply.</p>
       <form className="mt-3 flex flex-wrap items-end gap-3 text-sm" onSubmit={event => {
         event.preventDefault()
         if (dates.from && dates.to && dates.from > dates.to) { setValidation('Start date must be on or before end date.'); return }
@@ -81,7 +81,7 @@ export default function LayaResponseHistory({ history }) {
       {items.map(row => <article key={row.id} className="mt-4 border-t border-gray-700 pt-4">
         <h3 className="font-semibold">{types[row.evaluator] || row.evaluator} · {row.response === 'act' ? 'Act' : 'Dismiss'}</h3>
         <p className="mt-1 text-xs text-gray-400">{row.created_at} · {row.subject_type || 'business_decision'} · {row.subject_id || row.decision_id}</p>
-        <p className="mt-2 text-sm whitespace-pre-wrap">Saved subject: {[row.input_snapshot?.decision?.title, row.input_snapshot?.decision?.decision, row.input_snapshot?.inputs?.lead?.name, row.input_snapshot?.inputs?.lead?.company, row.input_snapshot?.inputs?.agreement?.product_name].filter(Boolean).join(' · ') || row.subject_id || row.decision_id}</p>
+        <p className="mt-2 text-sm whitespace-pre-wrap">Saved subject: {[row.input_snapshot?.inputs?.action?.human_action, row.input_snapshot?.decision?.title, row.input_snapshot?.decision?.decision, row.input_snapshot?.inputs?.lead?.name, row.input_snapshot?.inputs?.lead?.company, row.input_snapshot?.inputs?.agreement?.product_name].filter(Boolean).join(' · ') || row.subject_id || row.decision_id}</p>
         <p className="mt-2 whitespace-pre-wrap">Reason: {row.reason}</p>
         <p className="mt-2 text-sm">Reviewed {row.evaluation?.policy_version} · {row.evaluation?.business_date} · {row.evaluation?.verdict?.replaceAll('_', ' ')}</p>
         <details className="mt-3 text-sm"><summary>Saved input snapshot and evaluation</summary><pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all text-xs">{JSON.stringify({ input_snapshot: row.input_snapshot, evaluation: row.evaluation }, null, 2)}</pre></details>
