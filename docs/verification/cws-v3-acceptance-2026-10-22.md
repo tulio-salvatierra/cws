@@ -38,3 +38,6 @@ Result: PARTIAL / OPEN GAPS. The pass completed read-only; real Negocio Listo en
 First fix explicit test-record exclusion so production advice cannot suggest contacting QA records. In parallel, the owner reconciles the existing custom agreement against actual signed scope and records only verified identity/signature/status/project/time/budget evidence. Re-run acceptance as real milestones occur; a launch/payment/renewal test must wait for recorded reality. Separately resolve per-priority Laya scope. Keep decision activation an independent owner action throughout.
 
 Report contains aggregate evidence only; no customer names, contacts, saved reasons, row exports or secrets. No report publication or Git push performed by this pass.
+
+## Follow-up: test-lead priority exclusion
+TEST-LEADS-001 (#48) resolves the lead-priority contamination finding with an explicit owner-controlled flag/reason/provenance and restoration control. The owner UI classified only the known QA lead; its record and all prior history remain. This does not resolve missing real-client evidence or universal per-priority Laya coverage. See docs/agent-handoffs/test-leads-verification-2026-10-22.md.

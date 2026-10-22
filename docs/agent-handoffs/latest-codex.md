@@ -6,14 +6,14 @@ Files changed: Owner flag migration/types; Sales/CEO read fields; queue/lifecycl
 Database or API changes: leads.is_test default false + last classification reason/actor/time; private invoker trigger requires active owner JWT, derives provenance, blocks flagged insert and metadata-only rewrites. Exact migration20261022163524,77/77 parity, SQL MD5 48a71b096235a5c6e44f29b75fb36e65. Existing routes only.
 Security decisions: Browser owner JWT writes with workspace/id/current-flag predicates; nonowner controls hidden and DB enforces. Service role denied even with spoofed owner sub. No new grants, RLS changes or activation path. No name-based inference.
 Decisions made: Requested lead exclusion; agreement identity/finances unaffected. This is priority/advice exclusion, not a universal send block.
-Assumptions: Preserve existing sends/promises/Laya response snapshots; current classification metadata reflects last transition. No historical business data edited by migration. Existing leads all remain live pending explicit classification.
+Assumptions: Preserve existing sends/promises/Laya response snapshots; current classification metadata reflects last transition. No historical business data edited by migration. Migration left existing leads live; live owner verification subsequently classified only the known QA intake.
 Tests added: Queue classifications/promises/progress/immutability; lifecycle/CEO/deal filtering and restoration; API owner/member controls and historical responses; UI reason/owner gate/scoping/stale-write;14 DB ownership/provenance/restore assertions.
-Tests run:716 tests/75 files,lint/build pass.14 rehearsal+14 postapply pgTAP and18 separate activation assertions passed, all synthetic fixtures rolled back. Security advisories unchanged.
+Tests run:716 tests/75 files,lint/build pass; both PR CI runs passed.14 rehearsal+14 postapply pgTAP and18 separate activation assertions passed, all synthetic fixtures rolled back. Security advisories unchanged.
 Known issues: Separate audit's universal Laya coverage and missing real NL evidence remain; unrelated.
-Recommended next task: Verify live owner controls/mark known QA record and exclusion paths without external actions; then owner reconciles real agreement evidence.
+Recommended next task: Owner reconciles real agreement evidence. QA exclusion verified; owner may restore explicitly when warranted.
 Questions requiring Tulio: None for implementation.
 Project-memory files updated: Product,ledger,log,handoff; previous acceptance report retained.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No inferred business identity, activation or new strategy.
-Git diff summary: Isolated codex/test-lead-exclusion; original dirty memory files/private backups untouched. Release pending.
+Git diff summary: Isolated codex/test-lead-exclusion; original dirty memory files/private backups untouched. PR #48 merged4599fbb; CI39815544303 passed; READY dpl_BJfhxfNHVbujeiwbkcrab6UjApbk assigned www domain. Owner explicitly excluded known QA intake;8 leads retained/1 test. Sales/CEO/lifecycle/deal exclusion verified and response/decision/send/post/agreement/run hashes unchanged. Empty-state follow-up #49 merged1c15553; CI39817157687 passed; READY dpl_jenyPWYfPxjuHRaLDXTq1aCK1YZk assigned www. Fresh CEO empty states distinguish excluded records from absent ones. See test-leads-verification-2026-10-22.md.
