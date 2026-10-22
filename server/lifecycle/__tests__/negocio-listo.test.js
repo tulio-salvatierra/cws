@@ -56,3 +56,11 @@ describe('Negocio Listo lifecycle evidence',()=>{
   expect(result.all_actions.find(row=>row.project_id==='p').priority_tier).toBe(4)
  })
 })
+
+it('excludes explicit test inquiries from lifecycle and CEO, but not names alone',()=>{
+ const lead={id:'test',workspace_id:'w',is_test:true,source:'negocio-listo|inline|en',status:'new',sales_classification:'inbound',name:'QA',created_at:'2026-10-21T12:00:00Z'}
+ const lifecycle=build({agreements:[],leads:[lead]})
+ expect(lifecycle.items).toEqual([])
+ expect(buildCeoToday({leads:[lead],lifecycle,now:base.now}).actions.some(row=>row.lead_id==='test')).toBe(false)
+ expect(build({agreements:[],leads:[{...lead,is_test:false,name:'TEST ONLY'}]}).items).toHaveLength(1)
+})

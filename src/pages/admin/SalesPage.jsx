@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import TestLeadControls from './TestLeadControls'
 import { supabase } from '../../lib/supabase'
 
 const CATEGORY = {
@@ -46,7 +47,7 @@ export default function SalesPage() {
   useEffect(() => { load() }, [])
 
   const items = useMemo(() => sales?.items.filter((item) => !notNow.has(item.id)) || [], [sales, notNow])
-  const uniqueLeads = useMemo(() => sales?.leads || [], [sales])
+  const uniqueLeads = useMemo(() => sales?.leads.filter(lead => lead.is_test !== true) || [], [sales])
 
   async function ownerAction(payload) {
     try { await request(SALES_API_PATH, { method: 'POST', body: JSON.stringify(payload) }); await load(); return true } catch (actionError) { setError(actionError.message); return false }
@@ -141,6 +142,8 @@ export default function SalesPage() {
     </section>
 
     <section className="mt-10 rounded-3xl border border-white/10 bg-white/[0.04] p-5"><h2 className="text-lg font-semibold">Record a promised action</h2><p className="mt-1 text-sm text-slate-400">Sales-only: one lead, one action, one due date.</p><form onSubmit={addPromise} className="mt-4 grid gap-3 md:grid-cols-4"><select required value={promise.lead_id} onChange={(event) => setPromise({ ...promise, lead_id: event.target.value })} className="rounded-xl bg-slate-900 p-3"><option value="">Choose lead</option>{uniqueLeads.map((lead) => <option key={lead.id} value={lead.id}>{lead.company || lead.name || lead.email}</option>)}</select><input required value={promise.action_text} onChange={(event) => setPromise({ ...promise, action_text: event.target.value })} placeholder="e.g. Send recommendations" className="rounded-xl bg-slate-900 p-3 md:col-span-2" /><input required type="date" value={promise.due_on} onChange={(event) => setPromise({ ...promise, due_on: event.target.value })} className="rounded-xl bg-slate-900 p-3" /><button className="rounded-xl bg-orange-300 px-4 py-3 font-semibold text-slate-950 md:col-span-4">Save promised action</button></form></section>
+
+    <TestLeadControls leads={sales.leads || []} workspaceId={sales.workspace_id} canManage={sales.can_manage_tests} onReload={load} />
 
     {editingLead && <LeadEditor lead={editingLead} onCancel={() => setEditingLead(null)} onSave={async (changes) => { if (await ownerAction({ action: 'update_lead_sales_state', lead_id: editingLead.id, ...changes })) setEditingLead(null) }} />}
   </div></main>

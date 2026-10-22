@@ -63,6 +63,8 @@ export function deriveFollowUpState(sends, today) {
 }
 
 export function buildSalesCommandQueue({ leads = [], promisedActions = [], outreachSends = [], now = new Date() }) {
+  const excludedTestLeads = leads.filter(lead => lead.is_test === true).length
+  leads = leads.filter(lead => lead.is_test !== true)
   const today = chicagoDate(now)
   const sendsByLead = new Map()
   outreachSends.forEach((send) => {
@@ -144,6 +146,7 @@ export function buildSalesCommandQueue({ leads = [], promisedActions = [], outre
     warmResponses: sortedItems.filter((item) => item.category === 'warm').length,
     promisedActionsDue: sortedItems.filter((item) => item.category === 'promised').length,
     unclassifiedLeads: leads.length - classifiedLeadIds.size,
+    excludedTestLeads,
   }
   return { items: sortedItems, summary }
 }

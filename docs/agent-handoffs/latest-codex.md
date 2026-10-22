@@ -1,9 +1,19 @@
-Task ID: RETIRE-COLUMNS
+Task ID: TEST-LEADS-001
 Agent: Codex
-Objective: Remove four empty retirement columns, verify parity and production; activation separate.
-Changes: Migration20261022152513; regenerated matching type shape; §6 cleanup complete;18 publication/write-back pgTAP assertions including absent columns, valid outcome update and immutable retained identity.
-Database: Guarded ACCESS EXCLUSIVE locks with5s timeout, abort on any non-NULL retiring value, no CASCADE. Retired two indexes removed with columns. Trigger retains all remaining protections.76/76 version parity; SQL MD5 bbe6a7f21744dfb88787651f375792e2.43 posts/17 sends identical retained JSON hashes before/after; decisions unchanged.
-Validation:703 tests/74files,lint/build pass.18 publication +18 owner-activation pgTAP checks pass and roll back fixtures. Initial rehearsal requests expired and CLI temporary credentials lacked lock permission; production migration applied through migration tool; postapply checks passed. No successful preapply rehearsal claimed.
-Security: No grant, RLS, Laya response or activation changes. Existing security advisories unchanged. No LLM calls/publish/send. Production contains an existing owner response recorded independently since prior release; do not erase or fabricate history.
-Release: #47 merged b1b441d; CI39805133276 passed. READY dpl_3KHmQqK9q12nW4FXdN9DmfFok4kY assigned www alias. Six surfaces and Marketing live preview verified read-only; fresh preview reload after release. No runtime errors in15m. See retire-columns-verification-2026-10-22.md.
-Memory: Product/ledger/log/handoff updated. No permanent decision. Original dirty checkout and private backup untouched.
+Objective: Explicit owner-controlled test lead exclusion from Sales/CEO/Laya without deleting history.
+Files inspected: Canonical product, role/conventions/memory, Sales queue/API/UI, CEO loader, lifecycle/deal evaluators, lead RLS/schema, owner evidence patterns; Supabase skill/docs.
+Files changed: Owner flag migration/types; Sales/CEO read fields; queue/lifecycle/deal lead filtering; owner Sales TestLeadControls; UI/API/pure/DB tests; product and memory. Prior local acceptance report/memory included as verified background.
+Database or API changes: leads.is_test default false + last classification reason/actor/time; private invoker trigger requires active owner JWT, derives provenance, blocks flagged insert and metadata-only rewrites. Exact migration20261022163524,77/77 parity, SQL MD5 48a71b096235a5c6e44f29b75fb36e65. Existing routes only.
+Security decisions: Browser owner JWT writes with workspace/id/current-flag predicates; nonowner controls hidden and DB enforces. Service role denied even with spoofed owner sub. No new grants, RLS changes or activation path. No name-based inference.
+Decisions made: Requested lead exclusion; agreement identity/finances unaffected. This is priority/advice exclusion, not a universal send block.
+Assumptions: Preserve existing sends/promises/Laya response snapshots; current classification metadata reflects last transition. No historical business data edited by migration. Existing leads all remain live pending explicit classification.
+Tests added: Queue classifications/promises/progress/immutability; lifecycle/CEO/deal filtering and restoration; API owner/member controls and historical responses; UI reason/owner gate/scoping/stale-write;14 DB ownership/provenance/restore assertions.
+Tests run:716 tests/75 files,lint/build pass.14 rehearsal+14 postapply pgTAP and18 separate activation assertions passed, all synthetic fixtures rolled back. Security advisories unchanged.
+Known issues: Separate audit's universal Laya coverage and missing real NL evidence remain; unrelated.
+Recommended next task: Verify live owner controls/mark known QA record and exclusion paths without external actions; then owner reconciles real agreement evidence.
+Questions requiring Tulio: None for implementation.
+Project-memory files updated: Product,ledger,log,handoff; previous acceptance report retained.
+Permanent decisions added: None.
+Reusable learnings added: None.
+Memory updates withheld: No inferred business identity, activation or new strategy.
+Git diff summary: Isolated codex/test-lead-exclusion; original dirty memory files/private backups untouched. Release pending.
