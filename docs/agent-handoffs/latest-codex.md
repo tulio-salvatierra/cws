@@ -10,10 +10,10 @@ Assumptions: Frozen projection/order/limit remain untouched; negative/calendar c
 Tests added: Sales category/promise/follow-up/test exclusion; delivery blockers/readiness; exact valid payment/recurring evidence and unsafe/future/missing data; Compliance status/authority; Marketing occurrence/failure/calendar-only cases; missing/capped/scoped evidence; frozen order/limit/input immutability; lifecycle reuse; exact signed body-override/expiry/tamper/size controls; API and UI owner/cancel/reason/source checks; Priority search/filter/paging;22 DB actor/shape/scope/clock/immutability assertions.
 Tests run:748 tests/77files,lint/build pass.22 priority rehearsal+22 postapply,25 lifecycle+36 goal/deal+18 activation postapply checks all pass and roll back synthetic fixtures.78/78 parity/types unchanged/security baseline unchanged.
 Known issues: Existing real NL evidence gaps remain. Priority source caps withhold confident verdicts; primary-source-absent/oversized snapshots cannot save. Existing build/advisor warnings unchanged.
-Recommended next task: Complete production source/owner form/cancel/history verification after release; then owner records actual business evidence.
+Recommended next task: Owner records actual business evidence and reviews source-backed advice; activation remains an independent owner action.
 Questions requiring Tulio: None.
 Project-memory files updated: Product/conventions/ledger/log/handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No business facts, owner responses or activation fabricated.
-Git diff summary: Isolated codex/laya-priority-reviews; original dirty memory/private backup untouched. Release pending.
+Git diff summary: Isolated codex/laya-priority-reviews; original dirty memory/private backup untouched. PR #50 merged50515ad; CI39821665435 passed. READY dpl_BCTnVeC4eHBHBkJWZgTujAaufLk6 assigned www domain. Five visible headings/order unchanged; source/version evidence, Act+Dismiss open/cancel and Priority history filter verified. Responses1/posts43/sends17/runs24/active decisions0 and hashes unchanged; no CEO API runtime errors15m. See laya-priorities-verification-2026-10-22.md.

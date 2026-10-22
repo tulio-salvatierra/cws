@@ -41,3 +41,6 @@ Report contains aggregate evidence only; no customer names, contacts, saved reas
 
 ## Follow-up: test-lead priority exclusion
 TEST-LEADS-001 (#48) resolves the lead-priority contamination finding with an explicit owner-controlled flag/reason/provenance and restoration control. The owner UI classified only the known QA lead; its record and all prior history remain. This does not resolve missing real-client evidence or universal per-priority Laya coverage. See docs/agent-handoffs/test-leads-verification-2026-10-22.md.
+
+## Follow-up: remaining priority Laya coverage
+LAYA-PRIORITIES-001 (#50) resolves the universal priority-card evaluation gap: post-projection deterministic advice with source evidence and exact signed owner response snapshots now decorates the remaining department/fallback cards; NL priorities reuse lifecycle. Live five-card order was unchanged; owner forms/cancel and Priority history verified. Missing real-client evidence remains unresolved. See docs/agent-handoffs/laya-priorities-verification-2026-10-22.md.
