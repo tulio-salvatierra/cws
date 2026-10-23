@@ -29,7 +29,7 @@ describe('deterministic Laya lifecycle verdict fixtures',()=>{
   ['payment_due','do',{...launched,obligations:[bill,{...monthlyBills[0],due_date:'2026-10-21'},monthlyBills[1]]}],
  ])('derives %s → %s with exact source claims',(stage,verdict,changes)=>{
   const row=build(changes).items[0]
-  expect(row.stage).toBe(stage);expect(row.evaluation).toMatchObject({evaluator:'lifecycle',policy_version:'lifecycle-v1',subject:{type:'client_service_agreement',id:'a',workspace_id:'w'},stage,verdict,time_zone:'America/Chicago',business_date:'2026-10-21',related_decisions:[]})
+  expect(row.stage).toBe(stage);expect(row.evaluation).toMatchObject({evaluator:'lifecycle',policy_version:'lifecycle-v2',subject:{type:'client_service_agreement',id:'a',workspace_id:'w'},stage,verdict,time_zone:'America/Chicago',business_date:'2026-10-21',related_decisions:[]})
   expect(row.evaluation.why.length).toBeGreaterThan(0)
   for(const claim of row.evaluation.why){expect(claim.source.workspace_id).toBe('w');expect(claim.source.fields.id).toBe(claim.source.id)}
   expect(row.response_input.agreement).toEqual({...agreement,...changes.agreements?.[0]})
@@ -71,5 +71,43 @@ describe('deterministic Laya lifecycle verdict fixtures',()=>{
   expect(evaluated.items.map(row=>[row.id,row.stage,row.priority_tier])).toEqual(plain.items.map(row=>[row.id,row.stage,row.priority_tier]))
   expect(buildCeoToday({lifecycle:evaluated,now:base.now}).all_actions.map(row=>row.id)).toEqual(buildCeoToday({lifecycle:plain,now:base.now}).all_actions.map(row=>row.id))
   expect(JSON.stringify(base)).toBe(before)
+ })
+})
+
+describe('paid setup due-date policy',()=>{
+ it('allows fully paid setup without a due date and preserves exact evidence',()=>{
+  const changes={obligations:[{...bill,due_date:null}]}
+  const before=JSON.stringify(changes)
+  const row=build(changes).items[0]
+  expect(row.evaluation).toMatchObject({policy_version:'lifecycle-v2',stage:'in_delivery',verdict:'do',missing_data:[]})
+  expect(row.response_input.obligations[0].due_date).toBeNull()
+  expect(row.response_input.receipts).toEqual([receipt])
+  expect(JSON.stringify(changes)).toBe(before)
+ })
+ it('uses multiple current receipts and permits overpayment without inferring new cash',()=>{
+  expect(build({obligations:[{...bill,due_date:null}],receipts:[{...receipt,amount_cents:10000},{...receipt,id:'r2',amount_cents:20001}]}).items[0].evaluation.verdict).toBe('do')
+ })
+ it.each([
+  {receipts:[]},
+  {receipts:[{...receipt,amount_cents:29999}]},
+  {receipts:[{...receipt,received_at:'2026-10-22T12:00:00Z'}]},
+  {receipts:[{...receipt,financial_obligation_id:'unrelated'}]},
+  {receipts:[{...receipt,workspace_id:'other'}]},
+  {receipts:[{...receipt,amount_cents:-30000}]},
+  {receipts:[{...receipt,received_at:'invalid'}]},
+  {receipts:[{...receipt,amount_cents:Number.MAX_SAFE_INTEGER},{...receipt,id:'r2'}]},
+ ])('keeps missing-date checks when valid current setup coverage is absent: %j',changes=>{
+  expect(build({obligations:[{...bill,due_date:null}],...changes}).items[0].evaluation.verdict).toBe('needs_data')
+ })
+ it.each(['2026-02-30','invalid'])('rejects a malformed supplied setup date even when paid: %s',due_date=>{
+  expect(build({obligations:[{...bill,due_date}]}).items[0].evaluation.verdict).toBe('needs_data')
+ })
+ it('keeps monthly due dates mandatory even if a monthly bill is paid',()=>{
+  const row=build({...launched,obligations:[bill,{...monthlyBills[0],due_date:null},monthlyBills[1]],receipts:[receipt,{...receipt,id:'monthly-receipt',financial_obligation_id:'b1',amount_cents:14900}]}).items[0]
+  expect(row.evaluation.verdict).toBe('needs_data')
+ })
+ it('retains unpaid due and overdue advice for valid dates',()=>{
+  expect(build({receipts:[]}).items[0].evaluation.verdict).toBe('do')
+  expect(build({receipts:[],obligations:[{...bill,due_date:'2026-10-20'}]}).items[0].evaluation).toMatchObject({stage:'payment_overdue',verdict:'do'})
  })
 })
