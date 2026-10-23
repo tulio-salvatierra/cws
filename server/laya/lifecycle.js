@@ -39,7 +39,12 @@ export function evaluateLifecycle(inputs) {
     if (agreement.launch_date && (indexes.filter(n => n > 0).length !== agreement.term_months || (agreement.setup_cents > 0 && !indexes.includes(0)))) missing.push('The launched agreement does not have a complete recorded installment schedule.')
     for (const installment of inputs.installments) {
       const bill = inputs.obligations.find(row => row.id === installment.financial_obligation_id)
-      if (!bill || bill.status !== 'expected' || !cents(bill.amount_cents) || bill.currency !== 'USD' || !realDate(bill.due_date) || bill.amount_cents !== (installment.installment === 0 ? agreement.setup_cents : agreement.monthly_cents)) missing.push('A linked billing obligation is missing, void, non-USD or inconsistent with the agreement.')
+      const currentReceipts = inputs.receipts.filter(row => row.financial_obligation_id === bill?.id && cents(row.amount_cents) && Number.isFinite(Date.parse(row.received_at)) && Date.parse(row.received_at) <= Date.parse(now))
+      const paid = currentReceipts.reduce((sum, row) => sum + row.amount_cents, 0)
+      // A missing setup due date is irrelevant once valid recorded cash covers it.
+      // Supplied dates and every monthly/unpaid obligation still require validation.
+      const paidSetupWithoutDate = installment.installment === 0 && bill?.due_date == null && cents(bill?.amount_cents) && Number.isSafeInteger(paid) && paid >= bill.amount_cents
+      if (!bill || bill.status !== 'expected' || !cents(bill.amount_cents) || bill.currency !== 'USD' || (!realDate(bill.due_date) && !paidSetupWithoutDate) || bill.amount_cents !== (installment.installment === 0 ? agreement.setup_cents : agreement.monthly_cents)) missing.push('A linked billing obligation is missing, void, non-USD or inconsistent with the agreement.')
     }
     if (inputs.receipts.some(row => !cents(row.amount_cents) || !Number.isFinite(Date.parse(row.received_at))) || !Number.isSafeInteger(inputs.receipts.reduce((sum, row) => sum + row.amount_cents, 0))) missing.push('A linked payment receipt has invalid amount or date evidence.')
     if (inputs.projects.some(row => row.actual_hours != null && (!Number.isSafeInteger(row.actual_hours) || row.actual_hours < 0))) missing.push('Recorded project hours must be whole nonnegative hours.')
@@ -51,7 +56,7 @@ export function evaluateLifecycle(inputs) {
   const bill = inputs.obligations.find(row => row.id === projected?.obligation_id)
   const paid = bill ? inputs.receipts.filter(row => row.financial_obligation_id === bill.id && Date.parse(row.received_at) <= Date.parse(now)).reduce((sum, row) => sum + row.amount_cents, 0) : 0
   const amount = bill ? Math.max(0, bill.amount_cents - paid) : null
-  return { evaluator: 'lifecycle', policy_version: 'lifecycle-v1', subject, stage, verdict,
+  return { evaluator: 'lifecycle', policy_version: 'lifecycle-v2', subject, stage, verdict,
     next_action: verdict === 'needs_data' ? 'Review and complete the recorded lifecycle evidence before deciding the next move.' : verdict === 'hold' ? `Review the recorded ${stage.replaceAll('_', ' ')} state; no automatic follow-up or state change is authorized.` : projected.human_action,
     why, assumptions: ['Recorded launch and payment evidence do not prove signature or live provider subscription status.', 'Future-dated receipts are retained in the snapshot but excluded from current payment totals.', 'Act/Dismiss records advice review only; it performs no delivery, charge, send, publish, renewal or activation.'],
     missing_data: [...new Set(missing)], money_at_stake: verdict !== 'needs_data' && Number.isSafeInteger(amount) ? { amount_cents: amount, currency: 'USD' } : null,

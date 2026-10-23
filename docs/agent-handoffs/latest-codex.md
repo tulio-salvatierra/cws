@@ -1,19 +1,19 @@
-Task ID: AGREEMENT-CLASSIFICATION-001
+Task ID: LAYA-PAID-SETUP-001
 Agent: Codex
-Objective: Owner-only audited classification of existing custom agreement as NL; preserve financial/custom scope/history.
-Files inspected: Canonical/role/conventions/memory; agreement/lifecycle/Accounting/auth/UI; production schema/guards and Supabase skill.
-Files changed: Classification migration/pgTAP/types; Accounting owner read/UI/direct owner-JWT RPC; membership role propagation; UI/API tests; product/conventions/memory.
-Database or API changes: Migration20261023011926 applied. New constrained owner RPC plus append-only owner-read audit. Existing Accounting GET returns history/owner capability; no new route.
-Security decisions: Authenticated role+UID+active-owner enforcement, expected label,row lock,exact old snapshot audit;service RPC and direct classification bypass denied. Only label changes; all other agreement fields frozen in correction. Intentional SECURITY DEFINER generic advisor warning documented.
-Decisions made: Retain custom label after NL prefix; no catalog substitution/economic amendment,signature/status/completeness/activation inference.
-Assumptions: Owner explicitly confirmed NL with custom terms. Actual payment discrepancies and scope evidence are unchanged.
-Tests added:13 pgTAP actor/history/staleness/nonclassification preservation checks;UI owner visibility/reason/cancel/payload/history;API owner-history disclosure.
-Tests run:13 rehearsal+13 postapply pgTAP pass/rollback;lint/build;751 initial suite pass,additional API test pending current run.
-Known issues: Automatic approval review rejected public GitHub commit/push because explicit public-egress authorization was absent. Release and real owner correction await approval; no push/commit occurred. New advisor warning intentional constrained RPC.
-Recommended next task: After owner approves public code PR release,finish release and authorized classification;verify hashes and CEO needs_data behavior.
-Questions requiring Tulio: Approval to push the source/migration/docs publicly and release the PR.
-Project-memory files updated: Product/conventions/ledger/log/latest handoff.
+Objective: Remove missing-due-date requirement only forfully paid setup,retain unpaid checks.
+Files inspected: Canonical/role instructions,lifecycle projection/evaluator/tests,policy history references,memory.
+Files changed: Pure evaluator,regression fixtures,product/log/ledger/handoff.
+Database or API changes: None. New output policy lifecycle-v2;historical v1 snapshots unchanged.
+Security decisions: Receipt scope stays explicit;onlyvalid nonfuture same-obligation receipts withsafe integer sum establish coverage. Unpaid/monthly andmalformed supplied dates still fail validation. No activation/LLM/publish/send/payment/history writes.
+Decisions made: Allow absent setup due_date only aftervalid coverage;no dates fabricated. Existing priority projection/order unchanged.
+Assumptions: Existing statuses/currency/amount/term/source guards remain authoritative.
+Tests added:14 regressions including paid/overpaid/multiple receipts,partial/future/unrelated/cross-workspace/invalid/overflow,malformed supplied dates,monthly dates andvalid unpaid advice;exact inputs retained.
+Tests run:766 tests/77 files pass;lint pass;build pass (existing dependency/chunk warnings only).
+Known issues: Public release/deployment pending;no production data orschema changes required.
+Recommended next task: Release narrow change andread-only verify real paid-setup lifecycle becomes source-backed hold/do asappropriate;preserve financial/history hashes.
+Questions requiring Tulio: Approval to push/merge/deploy this specific narrow fix;role instructions require explicit commit/push authorization.
+Project-memory files updated: Product,log,ledger,latest handoff.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No fabricated signature,launch,budget/status facts or activation.
-Git diff summary: Isolated codex/agreement-classification;prior audit notes/original dirty checkout untouched. No private client records in public changes.
+Memory updates withheld: No fabricated dates/business facts;no historical snapshots modified.
+Git diff summary: Isolated codex/laya-paid-setup-date;prior local audit notes/original dirty checkout preserved. Public payload contains policy/code/synthetic fixtures only.

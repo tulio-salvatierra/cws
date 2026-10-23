@@ -124,6 +124,8 @@ Laya is the advisory evaluator. It is not the name of the assistant or of the OS
 
 Owner classification correction: Accounting lets only an authenticated active owner explicitly classify an existing custom agreement as Negocio Listo, requiring the exact current label and a reason. The label receives a `Negocio Listo — ` prefix while retaining its custom description. An append-only owner-readable audit stores the original complete agreement snapshot, old/new labels, actor, time and reason. No catalog offer is substituted, and commercial terms, payments, installments, launch and custom scope stay intact. Classification is not signature/status evidence, goal completeness or business-decision activation.
 
+Lifecycle date validation (`lifecycle-v2`): an absent setup due date is allowed only when valid same-obligation receipts dated no later than the evaluation cover the setup amount with a safe integer total. Unpaid setup and all monthly obligations still require valid dates; malformed supplied dates remain invalid. This changes advice only, never receipts, obligations, history, activation or priority ordering.
+
 ## 3c. Negocio Listo lifecycle and project hours (LIFECYCLE-001)
 
 - CEO Today derives lifecycle items from explicit `negocio-listo|…` inquiry tags and `Negocio Listo` agreement product snapshots. Agreement creation is not evidence of signature; client names are never used to infer conversion or project linkage.
