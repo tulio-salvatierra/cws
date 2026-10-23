@@ -31,7 +31,7 @@ async function loadAccounting(req, res) {
   const context = await authenticateWorkspace(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
-  const [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers, agreements, installments] = await Promise.all([
+  const [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers, agreements, installments, corrections] = await Promise.all([
     loadExpenseRows(context, 'financial_obligations'),
     loadExpenseRows(context, 'payment_receipts'),
     context.client.from('recurring_revenue')
@@ -47,8 +47,9 @@ async function loadAccounting(req, res) {
     loadExpenseRows(context, 'offers'),
     loadExpenseRows(context, 'client_service_agreements'),
     loadExpenseRows(context, 'agreement_installments'),
+    context.membershipRole === 'owner' ? loadExpenseRows(context, 'agreement_classification_corrections') : Promise.resolve({data: []}),
   ])
-  const failed = [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers, agreements, installments].find((result) => result.error)
+  const failed = [obligations, receipts, recurringRevenue, clients, projects, subscriptions, expenses, projectCosts, offers, agreements, installments, corrections].find((result) => result.error)
   if (failed) return res.status(502).json({ ok: false, error: failed.error.message })
 
   const accounting = buildAccountingReadModel({
@@ -62,6 +63,8 @@ async function loadAccounting(req, res) {
   accounting.summary.monthly_recurring_revenue_cents += (agreements.data || []).reduce((sum, a) => sum + agreementSummary(a).activeMonthly, 0)
   return res.status(200).json({
     ok: true, accounting,
+    can_classify_agreements: context.membershipRole === 'owner',
+    agreement_classification_corrections: corrections.data || [],
     client_agreements: agreements.data || [],
     agreement_installments: installments.data || [],
     financial_obligations: obligations.data || [],

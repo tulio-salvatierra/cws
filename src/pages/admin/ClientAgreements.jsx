@@ -6,14 +6,14 @@ const money = n => new Intl.NumberFormat('en-US', { style: 'currency', currency:
 const button = 'rounded-xl border border-white/20 px-4 py-2 text-sm disabled:opacity-50'
 const input = 'mt-1 w-full rounded-xl bg-slate-900 p-3 text-white'
 
-export default function ClientAgreements({ agreements = [], installments = [], obligations = [], receipts = [], clients = [], offers = [], busy, onAction, initialClientId = '' }) {
+export default function ClientAgreements({ agreements = [], installments = [], obligations = [], receipts = [], clients = [], offers = [], busy, onAction, initialClientId = '', canClassify = false, corrections = [] }) {
   const [adding, setAdding] = useState(Boolean(initialClientId))
   const [notice, setNotice] = useState('')
   return <section id="client-agreements" aria-label="Client agreements" className="mt-10 scroll-mt-8">
     <div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-2xl font-semibold">Client products & agreements</h2><p className="mt-2 text-sm text-slate-400">Agreed customer prices, setup payments, and monthly balances. Billing begins when you confirm the website is live.</p></div><button className={button} onClick={() => setAdding(!adding)}>Assign product to client</button></div>
     {notice && <p role="status" className="mt-3 text-emerald-200">{notice}</p>}
     {adding && <AgreementForm clients={clients} offers={offers} obligations={obligations} installments={installments} initialClientId={initialClientId} busy={busy} onCancel={() => setAdding(false)} onSubmit={async body => { const result = await onAction(body); if (result) { setAdding(false); setNotice('Agreement saved. Monthly billing is waiting for website launch.') } return result }} />}
-    <div className="mt-4 space-y-4">{agreements.map(a => <AgreementCard key={a.id} agreement={a} client={clients.find(c => c.id === a.client_id)} summary={agreementSummary(a, installments, obligations, receipts)} busy={busy} onAction={onAction} />)}</div>
+    <div className="mt-4 space-y-4">{agreements.map(a => <AgreementCard canClassify={canClassify} corrections={corrections.filter(row => row.agreement_id === a.id)} key={a.id} agreement={a} client={clients.find(c => c.id === a.client_id)} summary={agreementSummary(a, installments, obligations, receipts)} busy={busy} onAction={onAction} />)}</div>
     {!agreements.length && <p className="mt-3 text-slate-400">No client agreements yet.</p>}
   </section>
 }
@@ -43,7 +43,9 @@ function AgreementForm({ clients, offers, obligations, installments, initialClie
     <div className="flex gap-3 md:col-span-2"><button disabled={busy} className={button}>Save client agreement</button><button type="button" disabled={busy} className={button} onClick={onCancel}>Close</button></div>
   </form>
 }
-function AgreementCard({ agreement: a, client, summary: s, busy, onAction }) {
+function AgreementCard({ agreement: a, client, summary: s, busy, onAction, canClassify, corrections }) {
+  const [classifying, setClassifying] = useState(false)
+  const [reason, setReason] = useState('')
   const [launch, setLaunch] = useState(false)
   const [date, setDate] = useState(businessToday)
   const [paying, setPaying] = useState(null)
@@ -52,6 +54,19 @@ function AgreementCard({ agreement: a, client, summary: s, busy, onAction }) {
     <h3 className="text-xl font-semibold">{client?.name || 'Client'} · {a.product_name}</h3>
     <p className="mt-2 text-orange-200">{s.status} · {a.term_months} months · {money(a.monthly_cents)}/month</p>
     <p className="mt-1 text-sm text-slate-400">Setup: {money(a.setup_cents)} · {a.launch_date ? `Term: ${a.launch_date} to ${s.end} (end exclusive). Renewal requires review.` : 'Term starts on the website launch date.'}</p>
+    {canClassify && !/^negocio listo(?:\s|$|[—-])/i.test(a.product_name.trim()) && <button type="button" className={`${button} mt-4`} disabled={busy} onClick={() => setClassifying(!classifying)}>Correct classification to Negocio Listo</button>}
+    {classifying && canClassify && <form aria-label="Agreement classification correction" className="mt-4 space-y-3" onSubmit={async e => {
+      e.preventDefault(); if (!reason.trim()) return
+      const result = await onAction({action: 'classify_agreement_negocio_listo', id: a.id, expected_name: a.product_name, reason: reason.trim()})
+      if (result) { setClassifying(false); setReason(''); setMessage('Classification corrected. Custom terms and payment history preserved. No signature, activation or launch inferred.') }
+    }}>
+      <p>Classify as: Negocio Listo — {a.product_name}</p>
+      <p className="text-sm text-slate-400">Owner confirms product identity only. Existing custom scope, prices, term, payments and history stay intact. This does not confirm signature, subscription status, launch, goal completeness or decision activation.</p>
+      <Field label="Classification correction reason" required maxLength={2000} value={reason} onChange={setReason} />
+      <button className={button} disabled={busy || !reason.trim()}>Save classification correction</button>
+      <button type="button" className={button} disabled={busy} onClick={() => {setClassifying(false);setReason('')}}>Cancel classification correction</button>
+    </form>}
+    {canClassify && corrections?.length > 0 && <details className="mt-4"><summary>Classification correction history</summary>{corrections.map(row => <p key={row.id} className="mt-2 text-sm">{row.previous_name} → {row.corrected_name} · {row.created_at} · Owner {row.recorded_by} · Reason: {row.reason}</p>)}</details>}
     <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{[['Contract value',s.total],['Received',s.received],['Due now',s.due],['Future payments',s.future],['Overdue',s.overdue]].map(([label,n]) => <div key={label}><dt className="text-sm text-slate-400">{label}</dt><dd className="mt-1 text-xl">{money(n)}</dd></div>)}</dl>
     <p className="mt-4 text-sm text-slate-300">Square: setup pending. Automatic collection and payment sync are not connected. Record confirmed payments below until connected.</p>
     {!a.launch_date && <button disabled={busy} className={`${button} mt-4`} onClick={() => setLaunch(!launch)}>Website is live — start monthly billing</button>}

@@ -47,6 +47,17 @@ describe('Accounting endpoint', () => {
     expect(fetchSpy).not.toHaveBeenCalled(); vi.unstubAllGlobals()
   })
 
+  it('exposes classification history only to the owner', async () => {
+    for (const role of ['member', 'owner']) {
+      const client = {from: vi.fn(() => query({data: [],error: null}))}
+      mocks.authenticateWorkspace.mockResolvedValue({...context,client,membershipRole:role})
+      const res=response(); await handler({method:'GET'},res)
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({can_classify_agreements:role==='owner',agreement_classification_corrections:[]}))
+      if (role==='owner') expect(client.from).toHaveBeenCalledWith('agreement_classification_corrections')
+      else expect(client.from).not.toHaveBeenCalledWith('agreement_classification_corrections')
+    }
+  })
+
   it('requires an owner for every financial mutation', async () => {
     mocks.authenticateAccountingOwner.mockResolvedValue({ error: 'An active workspace owner is required for Accounting changes.', status: 403 })
     const res = response(); await handler({ method: 'POST', body: validObligation }, res)
