@@ -35,6 +35,8 @@ const today = () => new Date().toISOString().slice(0, 10)
 export default function AccountingPage() {
   const [month, setMonth] = useState(() => businessToday().slice(0, 7))
   const [agreements, setAgreements] = useState([])
+  const [canClassify, setCanClassify] = useState(false)
+  const [corrections, setCorrections] = useState([])
   const [installments, setInstallments] = useState([])
   const [obligations, setObligations] = useState([])
   const [receipts, setReceipts] = useState([])
@@ -66,6 +68,8 @@ export default function AccountingPage() {
     }
     setAccounting(payload.accounting)
     setAgreements(payload.client_agreements || [])
+    setCanClassify(payload.can_classify_agreements === true)
+    setCorrections(payload.agreement_classification_corrections || [])
     setInstallments(payload.agreement_installments || [])
     setObligations(payload.financial_obligations || [])
     setReceipts(payload.payment_receipts || [])
@@ -86,6 +90,12 @@ export default function AccountingPage() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) throw new Error('Sign in to make Accounting changes.')
+      if (body.action === 'classify_agreement_negocio_listo') {
+        const result = await supabase.rpc('classify_agreement_negocio_listo', {p_agreement_id: body.id, p_expected_name: body.expected_name, p_reason: body.reason})
+        if (result.error) throw result.error
+        await load()
+        return {ok: true}
+      }
       const response = await fetch('/api/accounting', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
@@ -120,7 +130,7 @@ export default function AccountingPage() {
 
     <Profitability receipts={receipts} expenses={expenses} projectCosts={projectCosts} subscriptions={subscriptions} month={month} onMonthChange={setMonth} loaded={Boolean(accounting)} busy={busy} onAction={ownerAction} />
 
-    <ClientAgreements agreements={agreements} installments={installments} obligations={obligations} receipts={receipts} clients={clients} offers={offers} busy={busy} onAction={ownerAction} initialClientId={new URLSearchParams(window.location.search).get('client') || ''} />
+    <ClientAgreements canClassify={canClassify} corrections={corrections} agreements={agreements} installments={installments} obligations={obligations} receipts={receipts} clients={clients} offers={offers} busy={busy} onAction={ownerAction} initialClientId={new URLSearchParams(window.location.search).get('client') || ''} />
 
     <BusinessExpenses selectedMonth={month} onMonthChange={setMonth} subscriptions={subscriptions} expenses={expenses} projects={projects} busy={busy} onAction={ownerAction} />
 

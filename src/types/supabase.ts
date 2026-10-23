@@ -70,6 +70,57 @@ export type Database = {
           },
         ]
       }
+      agreement_classification_corrections: {
+        Row: {
+          agreement_id: string
+          agreement_snapshot: Json
+          corrected_name: string
+          created_at: string
+          id: string
+          previous_name: string
+          reason: string
+          recorded_by: string
+          workspace_id: string
+        }
+        Insert: {
+          agreement_id: string
+          agreement_snapshot: Json
+          corrected_name: string
+          created_at?: string
+          id?: string
+          previous_name: string
+          reason: string
+          recorded_by: string
+          workspace_id: string
+        }
+        Update: {
+          agreement_id?: string
+          agreement_snapshot?: Json
+          corrected_name?: string
+          created_at?: string
+          id?: string
+          previous_name?: string
+          reason?: string
+          recorded_by?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_classification_correct_agreement_id_workspace_id_fkey"
+            columns: ["agreement_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "client_service_agreements"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "agreement_classification_corrections_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agreement_installments: {
         Row: {
           agreement_id: string
@@ -2753,6 +2804,14 @@ export type Database = {
       }
     }
     Functions: {
+      classify_agreement_negocio_listo: {
+        Args: {
+          p_agreement_id: string
+          p_expected_name: string
+          p_reason: string
+        }
+        Returns: string
+      }
       create_client_service_agreement: {
         Args: {
           p_client_id: string

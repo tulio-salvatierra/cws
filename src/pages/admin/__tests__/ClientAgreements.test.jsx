@@ -26,3 +26,29 @@ describe('client product agreements',()=>{
   await waitFor(()=>expect(onAction).toHaveBeenCalledWith({action:'launch_client_agreement',id:'a',launch_date:'2026-01-31'}))
  })
 })
+
+describe('owner agreement classification', () => {
+ it('hides correction and history without owner access', () => {
+  render(<ClientAgreements agreements={[agreement]} corrections={[{id:'x',agreement_id:'a',reason:'private'}]} onAction={vi.fn()} />)
+  expect(screen.queryByRole('button',{name:'Correct classification to Negocio Listo'})).not.toBeInTheDocument()
+  expect(screen.queryByText('private')).not.toBeInTheDocument()
+ })
+ it('requires a reason, cancels without writes, and sends only classification fields',async()=>{
+  const onAction=vi.fn().mockResolvedValue({ok:true})
+  render(<ClientAgreements agreements={[agreement]} canClassify onAction={onAction} />)
+  fireEvent.click(screen.getByRole('button',{name:'Correct classification to Negocio Listo'}))
+  expect(screen.getByRole('button',{name:'Save classification correction'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'Cancel classification correction'}))
+  expect(onAction).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button',{name:'Correct classification to Negocio Listo'}))
+  fireEvent.change(screen.getByLabelText('Classification correction reason'),{target:{value:'Owner confirmed NL with custom terms'}})
+  fireEvent.click(screen.getByRole('button',{name:'Save classification correction'}))
+  await waitFor(()=>expect(onAction).toHaveBeenCalledWith({action:'classify_agreement_negocio_listo',id:'a',expected_name:'Website',reason:'Owner confirmed NL with custom terms'}))
+  expect(onAction).toHaveBeenCalledTimes(1)
+ })
+ it('shows owner history but does not offer duplicate classification',()=>{
+  render(<ClientAgreements agreements={[{...agreement,product_name:'Negocio Listo — Website'}]} canClassify corrections={[{id:'x',agreement_id:'a',previous_name:'Website',corrected_name:'Negocio Listo — Website',reason:'Confirmed custom terms',recorded_by:'owner',created_at:'2026-10-22'}]} />)
+  expect(screen.queryByRole('button',{name:'Correct classification to Negocio Listo'})).not.toBeInTheDocument()
+  expect(screen.getByText(/Confirmed custom terms/)).toBeInTheDocument()
+ })
+})

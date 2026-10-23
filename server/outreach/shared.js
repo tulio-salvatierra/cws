@@ -51,7 +51,7 @@ export async function authenticateWorkspace(req) {
 
   const membership = await client
     .from('workspace_members')
-    .select('workspace_id')
+    .select('workspace_id, role')
     .eq('user_id', user.id)
     .eq('status', 'active')
     .order('created_at', { ascending: true })
@@ -60,7 +60,7 @@ export async function authenticateWorkspace(req) {
 
   if (membership.error) return { error: membership.error.message, status: 502 }
   if (!membership.data) return { error: 'No active workspace membership was found.', status: 403 }
-  return { client, user, workspaceId: membership.data.workspace_id }
+  return { client, user, workspaceId: membership.data.workspace_id, membershipRole: membership.data.role }
 }
 
 export async function authenticateOwner(req) {

@@ -122,6 +122,8 @@ Laya is the advisory evaluator. It is not the name of the assistant or of the OS
 - AI may PREPARE `proposed` candidates from a conversation. Nothing is auto-saved from chat.
 - Architecture decisions stay in `docs/decisions.md` (DEC-012).
 
+Owner classification correction: Accounting lets only an authenticated active owner explicitly classify an existing custom agreement as Negocio Listo, requiring the exact current label and a reason. The label receives a `Negocio Listo — ` prefix while retaining its custom description. An append-only owner-readable audit stores the original complete agreement snapshot, old/new labels, actor, time and reason. No catalog offer is substituted, and commercial terms, payments, installments, launch and custom scope stay intact. Classification is not signature/status evidence, goal completeness or business-decision activation.
+
 ## 3c. Negocio Listo lifecycle and project hours (LIFECYCLE-001)
 
 - CEO Today derives lifecycle items from explicit `negocio-listo|…` inquiry tags and `Negocio Listo` agreement product snapshots. Agreement creation is not evidence of signature; client names are never used to infer conversion or project linkage.
