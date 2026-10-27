@@ -2,7 +2,7 @@ Task ID: CWS-LAYA-RESPONSE-FEEDBACK-20261027
 Agent: Codex
 Objective: Optional reason category and preferred alternative on every Laya Act/Dismiss form; retain original evidence and old responses.
 Files inspected: Product/convention/decision/learning context; response API/history/components/tests/types/migrations and current memory.
-Files changed: shared/laya-feedback.js; response save/history modules; shared feedback input/display components; LayaOwnerResponse, BusinessDecisions, LayaResponseHistory; Supabase types; four test files; additive migration20261027173144; required memory.
+Files changed: shared/laya-feedback.js; response save/history modules; shared feedback input/display components; LayaOwnerResponse, BusinessDecisions, LayaResponseHistory; Supabase types; four test files; additive migration20261027173612; required memory.
 Database or API changes: Prepared nullable reason_category and alternative_action with category whitelist and trimmed1–2000 character alternative checks. API normalizes blanks/nulls, validates types/limits and compares both fields during idempotent retry. No production migration/data writes.
 Security decisions: Original signed review tokens and owner/service/append-only boundaries unchanged. No evidence backfill/rewrite, automatic learning, external calls, task creation or publishing.
 Decisions made: Eight optional categories shared between UI/server; optional alternative up to2000characters. Required reason retained. Feedback displays in item and global history. Blank fields omitted by UI for old request compatibility and stored asnull by updatedAPI.
