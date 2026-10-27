@@ -1,19 +1,19 @@
-Task ID: LAYA-PAID-SETUP-001
+Task ID: CWS-MARKETING-CAPTION-EDITOR-20261026
 Agent: Codex
-Objective: Remove missing-due-date requirement only forfully paid setup,retain unpaid checks.
-Files inspected: Canonical/role instructions,lifecycle projection/evaluator/tests,policy history references,memory.
-Files changed: Pure evaluator,regression fixtures,product/log/ledger/handoff.
-Database or API changes: None. New output policy lifecycle-v2;historical v1 snapshots unchanged.
-Security decisions: Receipt scope stays explicit;onlyvalid nonfuture same-obligation receipts withsafe integer sum establish coverage. Unpaid/monthly andmalformed supplied dates still fail validation. No activation/LLM/publish/send/payment/history writes.
-Decisions made: Allow absent setup due_date only aftervalid coverage;no dates fabricated. Existing priority projection/order unchanged.
-Assumptions: Existing statuses/currency/amount/term/source guards remain authoritative.
-Tests added:14 regressions including paid/overpaid/multiple receipts,partial/future/unrelated/cross-workspace/invalid/overflow,malformed supplied dates,monthly dates andvalid unpaid advice;exact inputs retained.
-Tests run:766 tests/77 files pass;lint pass;build pass (existing dependency/chunk warnings only).
-Known issues: Public release/deployment pending;no production data orschema changes required.
-Recommended next task: Release narrow change andread-only verify real paid-setup lifecycle becomes source-backed hold/do asappropriate;preserve financial/history hashes.
-Questions requiring Tulio: Approval to push/merge/deploy this specific narrow fix;role instructions require explicit commit/push authorization.
-Project-memory files updated: Product,log,ledger,latest handoff.
-Permanent decisions added: None.
+Objective: Make saved Marketing captions visible/editable and fix Básico Spanish caption mislabeled English.
+Files inspected: Canonical/role instructions, technical conventions, decisions, learnings, existing memory, MarketingPage/tests, caption endpoint, offer-catalog selector and platform limits.
+Files changed: MarketingPage.jsx, new SavedOfferCaptions.jsx, MarketingPage.test.jsx, required memory files.
+Database or API changes: Existing owner-only save_marketing_offer_caption API reused; no new route/schema. Owner-requested guarded production DML changed only the identified Básico caption locale en to es; exact old updated_at guard and read-back verified. Body/status retained; no client seed data in code.
+Security decisions: No publication/provider request; exact caption ID and parent offer retained in edits; existing workspace/owner guards preserved. Spanish remains outside English evergreen rotation.
+Decisions made: Inline edit under each saved caption; language/channel/status visible before editing. Cancel preserves saved value; failed save retains draft; channel overflow blocks save. Readiness UI matches server shared-English rule.
+Assumptions: Current English-only publishing rotation stays unchanged. Básico needs a separate English shared caption to enter that rotation after corrected tagging.
+Tests added: Four UI regressions covering exact-row update without duplication/publishing, failure/cancel preservation, changed-channel limits, Spanish visibility/readiness.
+Tests run: 770 tests across 77 files pass; lint pass; import-casing pass; production build with placeholder public settings pass. Local synthetic browser preview verified edit and save; production caption tag read-back verified. No production editor verification until deployment.
+Known issues: New editor is local, not released. Build emits existing lottie eval/chunk-size warnings. Dependencies installed from lockfile with no package changes. No migration required.
+Recommended next task: After explicit authorization, commit/push this narrow branch, open/merge PR, deploy from main and verify live editor without publishing.
+Questions requiring Tulio: Approve commit/push/deploy; role instructions explicitly forbid commit/push without direct task instruction.
+Project-memory files updated: Latest Codex handoff, project log, task ledger in isolated checkout.
+Permanent decisions added: None; existing language/publishing scope retained.
 Reusable learnings added: None.
-Memory updates withheld: No fabricated dates/business facts;no historical snapshots modified.
-Git diff summary: Isolated codex/laya-paid-setup-date;prior local audit notes/original dirty checkout preserved. Public payload contains policy/code/synthetic fixtures only.
+Memory updates withheld: No secrets, real client records or backup rows committed. No commit/push performed.
+Git diff summary: Isolated checkout based on origin/main cde65ee; source checkout's pre-existing migration memory changes untouched. Three runtime/test files plus three required memory files changed. No package/config changes.

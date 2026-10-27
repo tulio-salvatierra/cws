@@ -2230,3 +2230,8 @@ Classification release blocked: automatic approval review rejected public GitHub
 
 ## 2026-10-23 — Paid setup date policy
 LAYA-PAID-SETUP-001: lifecycle-v2 allows absent setup due_date only when valid current scoped receipts fully cover its amount;partial/future/unrelated/invalid/unsafe payment evidence cannot waive date checks. Supplied malformed dates,unpaid setup andall monthly dates stay validated.14 regression cases added;766 tests andlint pass. No schema/payment/history changes. Build/release status inlatest handoff.
+
+
+## 2026-10-26 — CWS-MARKETING-CAPTION-EDITOR-20261026
+
+Added saved-caption text/language/channel/status display and inline editing to each offer using the existing owner-only catalog endpoint. Editing submits the original caption ID, retains edits on failure, supports cancel, enforces channel limits, and performs no provider/publish action. Rotation-readiness display now requires a shared English caption, matching server selection. Direct owner-requested production correction changed only Básico caption locale from en to es, retaining text/status; verified by read-back. No translation or Spanish publishing expansion. 770 tests/77 files, lint, import-case check and production build pass (placeholder public build settings); local browser preview save verified with synthetic state. No schema changes or actual publication. Source original dirty checkout preserved; implementation isolated in work/cws-offer-library on codex/marketing-caption-editor. Commit/push/deploy pending explicit owner approval under role instructions.

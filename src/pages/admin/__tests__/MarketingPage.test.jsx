@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { useAuthMock } = vi.hoisted(() => ({ useAuthMock: vi.fn() }))
@@ -148,6 +148,77 @@ describe('MarketingPage M5', () => {
     })
     expect(JSON.parse(options.body).owner_confirmation_token).toBeUndefined()
     expect(screen.getByRole('heading', { name: 'Website Refresh' })).toBeInTheDocument()
+  })
+
+  it('shows saved captions and updates the selected record without publishing or duplicating it', async () => {
+    const offer = { ...catalogOffer(), captions: [
+      { id: 'caption-1', offer_id: catalogOffer().id, body: 'Find your business locally.', locale: 'en', platform: null, status: 'active' },
+      { id: 'caption-2', offer_id: catalogOffer().id, body: 'A separate LinkedIn caption.', locale: 'en', platform: 'linkedin', status: 'draft' },
+    ] }
+    const updated = { ...offer.captions[0], body: 'Que encuentren tu negocio.', locale: 'es', platform: 'meta', status: 'draft' }
+    globalThis.fetch = vi.fn().mockResolvedValueOnce(response(statusBody({ offer_catalog: [offer] })))
+      .mockResolvedValueOnce(response(creativeBody()))
+      .mockResolvedValueOnce(response({ ok: true, offer_catalog: [{ ...offer, captions: [updated, offer.captions[1]] }] }))
+    render(<MarketingPage />)
+    const library = await screen.findByRole('region', { name: 'Saved captions for Website Refresh' })
+    expect(within(library).getByText('Find your business locally.')).toBeInTheDocument()
+    expect(within(library).getByText('English · Shared (all channels) · active')).toBeInTheDocument()
+    fireEvent.click(within(library).getByRole('button', { name: 'Edit caption 1 for Website Refresh' }))
+    const editor = within(library).getByRole('form', { name: 'Edit saved caption for Website Refresh' })
+    fireEvent.change(within(editor).getByLabelText('Caption text'), { target: { value: updated.body } })
+    fireEvent.change(within(editor).getByLabelText('Language'), { target: { value: 'es' } })
+    fireEvent.change(within(editor).getByLabelText('Channel'), { target: { value: 'meta' } })
+    fireEvent.change(within(editor).getByLabelText('Status'), { target: { value: 'draft' } })
+    fireEvent.click(within(editor).getByRole('button', { name: 'Save caption changes' }))
+    await screen.findByText('Caption updated.')
+    expect(JSON.parse(globalThis.fetch.mock.calls[2][1].body)).toEqual({ action: 'save_marketing_offer_caption', caption: updated })
+    expect(within(library).getByText(updated.body)).toHaveAttribute('lang', 'es')
+    expect(within(library).getByText('Spanish · Meta (Facebook + Instagram) · draft')).toBeInTheDocument()
+    expect(within(library).getByText('A separate LinkedIn caption.')).toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(3)
+    expect(window.confirm).not.toHaveBeenCalled()
+  })
+
+  it('keeps edits after a failed save and lets the owner cancel without changing saved text', async () => {
+    const offer = { ...catalogOffer(), captions: [{ id: 'caption-1', body: 'Saved Spanish text.', locale: 'es', platform: null, status: 'active' }] }
+    globalThis.fetch = vi.fn().mockResolvedValueOnce(response(statusBody({ offer_catalog: [offer] })))
+      .mockResolvedValueOnce(response(creativeBody()))
+      .mockResolvedValueOnce({ ok: false, json: async () => ({ error: 'The database is unavailable.' }) })
+    render(<MarketingPage />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit caption 1 for Website Refresh' }))
+    const editor = screen.getByRole('form', { name: 'Edit saved caption for Website Refresh' })
+    fireEvent.change(within(editor).getByLabelText('Caption text'), { target: { value: 'Unsaved replacement.' } })
+    fireEvent.click(within(editor).getByRole('button', { name: 'Save caption changes' }))
+    await screen.findByText('Your changes were not saved. Your edits are still here; please try again.')
+    expect(within(editor).getByLabelText('Caption text')).toHaveValue('Unsaved replacement.')
+    fireEvent.click(within(editor).getByRole('button', { name: 'Cancel caption edit' }))
+    expect(screen.getByText('Saved Spanish text.')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('Unsaved replacement.')).not.toBeInTheDocument()
+    expect(globalThis.fetch).toHaveBeenCalledTimes(3)
+  })
+
+  it('prevents saving an existing caption that exceeds its newly selected channel limit', async () => {
+    const offer = { ...catalogOffer(), captions: [{ id: 'caption-1', body: 'x'.repeat(1501), locale: 'en', platform: null, status: 'active' }] }
+    globalThis.fetch = vi.fn().mockResolvedValue(response(statusBody({ offer_catalog: [offer] })))
+    render(<MarketingPage />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit caption 1 for Website Refresh' }))
+    const editor = screen.getByRole('form', { name: 'Edit saved caption for Website Refresh' })
+    fireEvent.change(within(editor).getByLabelText('Channel'), { target: { value: 'google_business' } })
+    expect(within(editor).getByRole('button', { name: 'Save caption changes' })).toBeDisabled()
+    expect(within(editor).getByRole('alert')).toHaveTextContent('Shorten this caption')
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps Spanish captions visible without counting them or channel-only English captions as rotation-ready', async () => {
+    const offer = { ...catalogOffer(), media: [{ status: 'active', linkedin_compatible: true, facebook_compatible: true, instagram_compatible: true }], captions: [
+      { id: 'spanish', body: 'Encuentra tu negocio.', locale: 'es', platform: null, status: 'active' },
+      { id: 'channel-only', body: 'LinkedIn only.', locale: 'en', platform: 'linkedin', status: 'active' },
+    ] }
+    globalThis.fetch = vi.fn().mockResolvedValue(response(statusBody({ offer_catalog: [offer] })))
+    render(<MarketingPage />)
+    expect(await screen.findByText('Encuentra tu negocio.')).toBeInTheDocument()
+    expect(screen.getByText('Stored in Spanish; not used in the current English rotation.')).toBeInTheDocument()
+    expect(screen.getByText(/No catalog offer is active and shared-channel ready yet/)).toBeInTheDocument()
   })
 
   it('fails closed for an unverified destination while retaining M2/M3/M4 history', async () => {

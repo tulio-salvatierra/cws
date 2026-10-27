@@ -136,3 +136,5 @@
 | AGREEMENT-CLASSIFICATION-001 | Codex | Tested — public code release blocked by automatic approval review | Owner-JWT audited Negocio Listo prefix correction; exact old-name guard,immutable audit,custom terms and financial identity preserved | Migration20261023011926;13 rehearsal/postapply pgTAP pass;lint/build;app tests;no activation,LLM,publish or send |
 
 | LAYA-PAID-SETUP-001 | Codex | Implemented — release pending | lifecycle-v2 permits missing fully paid setup date using safe current linked receipts;unpaid/monthly/supplied dates remain validated |766 tests,lint;14 regressions;no schema/payment/history mutation |
+
+| CWS-MARKETING-CAPTION-EDITOR-20261026 | Codex | Implemented and tested; release pending | Saved caption text and inline edits for body/language/channel/status; existing scoped endpoint; failure/cancel/limit safeguards; Básico locale corrected live to es with text/status retained; 770 tests, lint/build, local browser checks pass | Explicit approval to commit/push/deploy; no schema or publishing changes |
