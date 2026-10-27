@@ -1,3 +1,4 @@
+import { REASON_CATEGORIES } from '../../shared/laya-feedback.js'
 /* global process */
 import { createHmac, timingSafeEqual, randomUUID } from 'node:crypto'
 import { Buffer } from 'node:buffer'
@@ -63,17 +64,24 @@ export async function saveOwnerResponse(context, body) {
   if (!['act', 'dismiss'].includes(response) || !reason || reason.length > 2000) {
     return { status: 400, error: 'Choose Act or Dismiss and enter a reason (1–2,000 characters).' }
   }
+  const category = body.reason_category == null || body.reason_category === '' ? null : body.reason_category
+  const alternative = body.alternative_action == null ? null : typeof body.alternative_action === 'string' ? body.alternative_action.trim() || null : body.alternative_action
+  if ((category !== null && (typeof category !== 'string' || !Object.hasOwn(REASON_CATEGORIES, category)))
+    || (alternative !== null && (typeof alternative !== 'string' || alternative.length > 2000))) {
+    return { status: 400, error: 'Choose a valid reason category and keep the alternative action within 2,000 characters.' }
+  }
   const reviewed = readResponseToken(body.review_token, context)
   if (!reviewed) return { status: 409, error: 'This review expired or is invalid. Reload CEO Today and review it again.' }
   const values = { id: reviewed.id, workspace_id: context.workspaceId, decision_id: reviewed.evaluation.evaluator==='decision_review'?reviewed.input_snapshot.decision.id:null,
     evaluator: reviewed.evaluation.evaluator, policy_version: reviewed.evaluation.policy_version,
-    input_snapshot: reviewed.input_snapshot, evaluation: reviewed.evaluation, response, reason, created_by: context.user.id }
+    input_snapshot: reviewed.input_snapshot, evaluation: reviewed.evaluation, response, reason, reason_category: category, alternative_action: alternative, created_by: context.user.id }
   const saved = await context.client.from('laya_evaluations').insert(values).select('id').single()
   if (!saved.error) return { status: 200, id: saved.data.id }
   if (saved.error.code === '23505') {
-    const previous = await context.client.from('laya_evaluations').select('id,response,reason,created_by')
+    const previous = await context.client.from('laya_evaluations').select('id,response,reason,reason_category,alternative_action,created_by')
       .eq('id', reviewed.id).eq('workspace_id', context.workspaceId).maybeSingle()
-    if (!previous.error && previous.data?.created_by === context.user.id && previous.data.response === response && previous.data.reason === reason) {
+    if (!previous.error && previous.data?.created_by === context.user.id && previous.data.response === response && previous.data.reason === reason
+      && (previous.data.reason_category ?? null) === category && (previous.data.alternative_action ?? null) === alternative) {
       return { status: 200, id: previous.data.id }
     }
     return { status: 409, error: 'A different response was already saved for this review. Reload to see it.' }

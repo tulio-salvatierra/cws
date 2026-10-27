@@ -1,19 +1,19 @@
-Task ID: CWS-LAYA-READABILITY-20261027
+Task ID: CWS-LAYA-RESPONSE-FEEDBACK-20261027
 Agent: Codex
-Objective: Improve readability of Laya priority recommendations and owner response help.
-Files inspected: Project instructions, product definition, technical conventions, decisions, learnings, existing handoff/log/ledger, live CEO Today cards, relevant components and tests.
-Files changed: PriorityEvaluation.jsx, LayaOwnerResponse.jsx, AdminOverview.jsx, two component test files, three required memory files.
-Database or API changes: None. Backend recommendation text, ranking, response API and exact review-token behavior preserved.
-Security decisions: Local synthetic preview only; no production responses saved or posts published.
-Decisions made: Plain-language verdict labels, prominent next step, visible missing-data box, expandable reasoning and exact source records; concise response help with expandable full explanation. Scope limited to existing presentation.
-Assumptions: User requested readable presentation; no new evaluator or authority changes.
-Tests added: Four verdict label/next-step cases and expandable response-help test; evidence expansion test updated.
-Tests run: 775 tests across 77 files pass; production build passes with placeholder public settings; local actual-component browser preview verified evidence/source expansion and Act/Cancel without saving; git diff --check passes. Lint passes. Live three verdicts (Recommended/Needs more information/Wait for now), next steps, Marketing missing-data box, evidence/source expansion, help expansion and Act/Cancel verified. No response saved. Browser error log empty; deployment error/fatal scan returned no logs.
-Known issues: Production release verified. Existing build chunk-size/Lottie warnings remain. Scratch fixture is untracked and excluded from release.
-Recommended next task: No remaining release work. Collect real owner responses through normal use when ready.
-Questions requiring Tulio: None.
-Project-memory files updated: Latest Codex handoff replaced; log and ledger appended, preserving previous caption and Google corrections.
-Permanent decisions added: None.
-Reusable learnings added: None.
-Memory updates withheld: Owner explicitly approved release; implementation committed/pushed as 51855d34f753ecf02236484753fd872efa21851d. Production deployment dpl_FrvLYnDfGbzi1JNjXvVn7zcymWhV READY, main custom domains assigned, live authenticated verification passed.
-Git diff summary: Five runtime/test files and required project memory committed. Memory diff also retains prior completed Google/social caption updates. Untracked .artwork-preview harness excluded. Original checkout unrelated changes untouched.
+Objective: Optional reason category and preferred alternative on every Laya Act/Dismiss form; retain original evidence and old responses.
+Files inspected: Product/convention/decision/learning context; response API/history/components/tests/types/migrations and current memory.
+Files changed: shared/laya-feedback.js; response save/history modules; shared feedback input/display components; LayaOwnerResponse, BusinessDecisions, LayaResponseHistory; Supabase types; four test files; additive migration20261027173144; required memory.
+Database or API changes: Prepared nullable reason_category and alternative_action with category whitelist and trimmed1–2000 character alternative checks. API normalizes blanks/nulls, validates types/limits and compares both fields during idempotent retry. No production migration/data writes.
+Security decisions: Original signed review tokens and owner/service/append-only boundaries unchanged. No evidence backfill/rewrite, automatic learning, external calls, task creation or publishing.
+Decisions made: Eight optional categories shared between UI/server; optional alternative up to2000characters. Required reason retained. Feedback displays in item and global history. Blank fields omitted by UI for old request compatibility and stored asnull by updatedAPI.
+Assumptions: Release authorization from prior readability task does not extend to this new feature; prepare reviewable release first.
+Tests added:13 regression cases for normalization, validation, retry conflict, shared and business decision forms, failure retention/cancel reset and old/new history display.
+Tests run:788tests/77files pass; lint/build/import-case pass. Isolated local PostgreSQL17 rehearsal of exact migration preserves original row content and nullable fields, accepts old/new inserts and enforces category/blank/length limits. Actual-component local synthetic browser form/category/text/cancel preview verified; screenshot saved. git diff --check passes.
+Known issues: Not live yet. Production history/API must not deploy before additive migration. Existing build Lottie/chunk warnings unchanged. PostgreSQL rehearsal used isolated fixture; production guard/grants untouched, not replaced.
+Recommended next task: Owner-approved commit/push, apply exact migration with remote/local parity and original-row hash verification, deploy and verify live without saving fabricated responses. Stage schema before code switches; retain old columns/records on rollback.
+Questions requiring Tulio: Commit/push/deploy approval under project instructions.
+Project-memory files updated: Handoff replaced, log/ledger appended; prior audit entry preserved locally.
+Permanent decisions added:None.
+Reusable learnings added:None.
+Memory updates withheld: No release/production schema apply for this feature yet.
+Git diff summary: Feature runtime/tests/types/new shared files and one migration; three memory files include pre-existing read-only audit notes. Untracked .artwork-preview harness excluded. Original checkout unrelated changes untouched.

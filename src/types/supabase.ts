@@ -882,6 +882,8 @@ export type Database = {
           id: string
           input_snapshot: Json
           policy_version: string
+          reason_category: string | null
+          alternative_action: string | null
           reason: string
           response: string
           subject_id: string | null
@@ -897,6 +899,8 @@ export type Database = {
           id: string
           input_snapshot: Json
           policy_version: string
+          reason_category?: string | null
+          alternative_action?: string | null
           reason: string
           response: string
           subject_id?: string | null
@@ -912,6 +916,8 @@ export type Database = {
           id?: string
           input_snapshot?: Json
           policy_version?: string
+          reason_category?: string | null
+          alternative_action?: string | null
           reason?: string
           response?: string
           subject_id?: string | null

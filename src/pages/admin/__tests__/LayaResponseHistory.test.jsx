@@ -195,3 +195,11 @@ describe('paginated Laya history', () => {
     expect(await screen.findByText('No saved responses match these filters.')).toBeInTheDocument()
   })
 })
+
+it('displays new optional feedback beside unchanged historical responses',()=>{
+  render(<LayaResponseHistory history={page([items[0],{...items[1],reason_category:'different_priority',alternative_action:'Call the warm lead first'}])}/>)
+  expect(screen.getByText('Reason: Saved reason 0')).toBeVisible()
+  expect(screen.getByText('Reason category: Something else comes first')).toBeVisible()
+  expect(screen.getByText('What I would do instead: Call the warm lead first')).toBeVisible()
+  expect(fetch).not.toHaveBeenCalled()
+})

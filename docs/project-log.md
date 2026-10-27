@@ -2270,3 +2270,13 @@ CWS-LAYA-READABILITY-20261027: Updated existing CEO Today recommendation cards w
 Owner approved commit, push, deployment and live verification of Laya readability changes. No post publication authorized.
 
 Release verified: 51855d34f753ecf02236484753fd872efa21851d pushed to main; production dpl_FrvLYnDfGbzi1JNjXvVn7zcymWhV READY with main custom domains. Authenticated live CEO Today verifies Recommended/Needs more information/Wait for now, next steps, visible Marketing missing evidence, expandable source records/help and Act/Cancel. No saved response, post publication or data mutation. Browser error log empty; deployment error/fatal scan returned no logs. Live screenshot saved in task outputs.
+
+
+## 2026-10-27 — Laya feedback capture audit
+
+CWS-LAYA-FEEDBACK-AUDIT-20261027: Read-only production aggregate/schema and code inspection confirms one goal-pace Act response (October21 Chicago time), 214-character required reason and nonempty exact input/evaluation snapshots. Records also retain owner/workspace, subject, policy version and timestamp. Save is explicit and append-only; review token expires after15minutes, repeat retry is idempotent per token. Not now only hides locally. No outcome linkage, structured rationale/corrected recommendation, dataset curation/export or automatic learning consumer found. Recommend ordinary explicit feedback first, optional reason/alternative fields next, outcome linkage later. No production writes, source changes, model training, publication or release.
+
+
+## 2026-10-27 — Optional Laya response feedback prepared
+
+CWS-LAYA-RESPONSE-FEEDBACK-20261027: Added optional category/preferred alternative to shared and business-decision response forms, API persistence/validation/retry comparison, item/global history and types. Eight shared categories; blankfields remainnull; required reason/exact evidence/owner boundary unchanged. Additive migration20261027173144 prepared with no backfill/grant/trigger changes.788tests/77files, lint/build/import-case pass. Exact SQL rehearsed on isolated PostgreSQL17 fixture for preservation, compatibility and constraints; browser synthetic preview verified. No production writes, learning or publication. Release awaits explicit commit/push authorization; schema must precede code deployment.

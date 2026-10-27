@@ -1,3 +1,4 @@
+import LayaSavedFeedback from './LayaSavedFeedback'
 import { useEffect, useId, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
@@ -83,6 +84,7 @@ export default function LayaResponseHistory({ history }) {
         <p className="mt-1 text-xs text-gray-400">{row.created_at} · {row.subject_type || 'business_decision'} · {row.subject_id || row.decision_id}</p>
         <p className="mt-2 text-sm whitespace-pre-wrap">Saved subject: {[row.input_snapshot?.inputs?.action?.human_action, row.input_snapshot?.decision?.title, row.input_snapshot?.decision?.decision, row.input_snapshot?.inputs?.lead?.name, row.input_snapshot?.inputs?.lead?.company, row.input_snapshot?.inputs?.agreement?.product_name].filter(Boolean).join(' · ') || row.subject_id || row.decision_id}</p>
         <p className="mt-2 whitespace-pre-wrap">Reason: {row.reason}</p>
+        <LayaSavedFeedback response={row} />
         <p className="mt-2 text-sm">Reviewed {row.evaluation?.policy_version} · {row.evaluation?.business_date} · {row.evaluation?.verdict?.replaceAll('_', ' ')}</p>
         <details className="mt-3 text-sm"><summary>Saved input snapshot and evaluation</summary><pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all text-xs">{JSON.stringify({ input_snapshot: row.input_snapshot, evaluation: row.evaluation }, null, 2)}</pre></details>
       </article>)}

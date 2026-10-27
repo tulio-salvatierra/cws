@@ -144,3 +144,31 @@ describe('Exact signed remaining-priority responses',()=>{
   const token=createEvaluationResponseToken(ctx,input(),output());vi.advanceTimersByTime(15*60*1000);expect(readResponseToken(token,ctx)).toBeNull()
  })
 })
+
+
+describe('optional owner feedback', () => {
+  const body = ctx => ({review_token:createResponseToken(ctx,source,evaluation),response:'dismiss',reason:'Owner reason'})
+  it('stores optional feedback with the original reviewed evidence', async () => {
+    const ctx=context(), insert=vi.fn(()=>({select:()=>({single:async()=>({data:{id:'saved'}})})}))
+    ctx.client={from:()=>({insert})}
+    expect((await saveOwnerResponse(ctx,{...body(ctx),reason_category:'different_priority',alternative_action:'  Call the warm lead first.  '})).status).toBe(200)
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({reason_category:'different_priority',alternative_action:'Call the warm lead first.',evaluation}))
+  })
+  it('keeps omitted and blank optional feedback null for older clients', async () => {
+    const ctx=context(), insert=vi.fn(()=>({select:()=>({single:async()=>({data:{id:'saved'}})})}))
+    ctx.client={from:()=>({insert})}
+    await saveOwnerResponse(ctx,body(ctx))
+    await saveOwnerResponse(ctx,{...body(ctx),reason_category:'',alternative_action:'   '})
+    expect(insert.mock.calls.every(([values])=>values.reason_category===null && values.alternative_action===null)).toBe(true)
+  })
+  it.each([{reason_category:'invented'},{reason_category:[]},{reason_category:'toString'},{alternative_action:42},{alternative_action:'x'.repeat(2001)}])('rejects invalid feedback before writing %j', async extra => {
+    const ctx=context();ctx.client={from:vi.fn()}
+    expect((await saveOwnerResponse(ctx,{...body(ctx),...extra})).status).toBe(400)
+    expect(ctx.client.from).not.toHaveBeenCalled()
+  })
+  it.each([['different_priority','Call first',200],['not_now','Call first',409],['different_priority','Email instead',409]])('compares all feedback on a retry %s %s',async(category,alternative,status)=>{
+    const ctx=context(),chain={eq:()=>chain,maybeSingle:async()=>({data:{id:'saved',created_by:'owner-a',response:'dismiss',reason:'Owner reason',reason_category:'different_priority',alternative_action:'Call first'}})}
+    ctx.client={from:()=>({insert:()=>({select:()=>({single:async()=>({error:{code:'23505'}})})}),select:()=>chain})}
+    expect((await saveOwnerResponse(ctx,{...body(ctx),reason_category:category,alternative_action:alternative})).status).toBe(status)
+  })
+})

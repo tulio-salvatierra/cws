@@ -101,3 +101,15 @@ describe('Business decisions owner controls', () => {
     expect(reload).not.toHaveBeenCalled()
   })
 })
+
+it('records optional feedback on decision responses without editing the decision',async()=>{
+  show({items:[{...row,review_token:'signed-review'}]})
+  fireEvent.click(screen.getByRole('button',{name:'Dismiss',exact:true}))
+  fireEvent.change(screen.getByLabelText('Reason'),{target:{value:'Wrong timing'}})
+  fireEvent.change(screen.getByLabelText('Reason category (optional)'),{target:{value:'not_now'}})
+  fireEvent.change(screen.getByLabelText('What would you do instead? (optional)'),{target:{value:'Finish delivery first'}})
+  fireEvent.click(screen.getByRole('button',{name:'Save Dismiss response'}))
+  await screen.findByText('Response saved. The decision was not changed.')
+  expect(JSON.parse(fetch.mock.calls[0][1].body)).toMatchObject({reason_category:'not_now',alternative_action:'Finish delivery first',review_token:'signed-review'})
+  expect(mocks.update).not.toHaveBeenCalled()
+})

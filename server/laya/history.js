@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer'
 
-const fields = 'id,decision_id,evaluator,subject_type,subject_id,response,reason,created_at,input_snapshot,evaluation'
+const fields = 'id,decision_id,evaluator,subject_type,subject_id,response,reason,reason_category,alternative_action,created_at,input_snapshot,evaluation'
 const pageSize = 30
 const types = ['all', 'decision_review', 'goal_pace', 'deal_fit', 'lifecycle', 'priority_review']
 const timestamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/

@@ -71,3 +71,21 @@ describe('goal/deal owner responses',()=>{
   expect(screen.queryByRole('button')).not.toBeInTheDocument()
  })
 })
+
+
+it('sends optional feedback and keeps it after a failed save',async()=>{
+  fetch.mockResolvedValueOnce({ok:false,json:async()=>({error:'Try again'})})
+  render(<LayaOwnerResponse review={review} label="Priority" onReload={vi.fn()}/>)
+  fireEvent.click(screen.getByRole('button',{name:'Dismiss',exact:true}))
+  fireEvent.change(screen.getByLabelText('Reason'),{target:{value:'Client deadline comes first'}})
+  fireEvent.change(screen.getByLabelText('Reason category (optional)'),{target:{value:'different_priority'}})
+  fireEvent.change(screen.getByLabelText('What would you do instead? (optional)'),{target:{value:'Finish the client website'}})
+  fireEvent.click(screen.getByRole('button',{name:'Save Dismiss response'}))
+  await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Try again'))
+  expect(JSON.parse(fetch.mock.calls[0][1].body)).toMatchObject({reason_category:'different_priority',alternative_action:'Finish the client website',review_token:'exact-signed-review'})
+  expect(screen.getByLabelText('What would you do instead? (optional)')).toHaveValue('Finish the client website')
+  fireEvent.click(screen.getByRole('button',{name:'Cancel response'}))
+  fireEvent.click(screen.getByRole('button',{name:'Act',exact:true}))
+  expect(screen.getByLabelText('Reason category (optional)')).toHaveValue('')
+  expect(screen.getByLabelText('What would you do instead? (optional)')).toHaveValue('')
+})

@@ -1,3 +1,6 @@
+import LayaFeedbackFields from './LayaFeedbackFields'
+import LayaSavedFeedback from './LayaSavedFeedback'
+import { optionalFeedbackPayload } from '../../../shared/laya-feedback'
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
@@ -36,7 +39,7 @@ export default function BusinessDecisions({ summary, onReload }) {
       const result = await fetch('/api/ceo-today', {
         method: 'POST',
         headers: { Authorization: `Bearer ${data.session?.access_token || ''}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'laya_response', response: responding.response, reason: responding.reason, review_token: responding.token }),
+        body: JSON.stringify({ action: 'laya_response', response: responding.response, reason: responding.reason, review_token: responding.token, ...optionalFeedbackPayload(responding.category, responding.alternative) }),
       })
       const payload = await result.json()
       if (!result.ok) throw new Error(payload.error || 'Your response could not be saved.')
@@ -63,11 +66,12 @@ export default function BusinessDecisions({ summary, onReload }) {
       <p className="mt-2 text-sm text-gray-400">Review by: {row.review_by || 'Not set'} · Revisit: {row.revisit_condition || 'Not set'}</p>
       {row.evaluation && <DecisionEvaluation evaluation={row.evaluation} />}
       {summary.can_manage && row.review_token && <div className="mt-3 flex gap-4 text-sm text-sky-200">
-        {['act', 'dismiss'].map(response => <button key={response} disabled={busy} onClick={() => { setResponding({ id: row.id, response, reason: '', token: row.review_token }); setConfirmation(null); setEditing(null); setError(''); setResponseNotice('') }}>{response === 'act' ? 'Act' : 'Dismiss'}</button>)}
+        {['act', 'dismiss'].map(response => <button key={response} disabled={busy} onClick={() => { setResponding({ id: row.id, response, reason: '', category: '', alternative: '', token: row.review_token }); setConfirmation(null); setEditing(null); setError(''); setResponseNotice('') }}>{response === 'act' ? 'Act' : 'Dismiss'}</button>)}
       </div>}
       {responding?.id === row.id && <form aria-label="Laya owner response" className="mt-3 space-y-3 rounded-xl border border-sky-300/20 p-3" onSubmit={recordResponse}>
         <p className="text-sm text-gray-200">Record {responding.response === 'act' ? 'Act' : 'Dismiss'} for this evaluation. This saves your response and the reviewed evidence; it does not activate or edit the decision.</p>
         <label className="block text-sm text-gray-200">Reason<textarea required maxLength={2000} value={responding.reason} onChange={event => setResponding({ ...responding, reason: event.target.value })} className="mt-2 block w-full rounded bg-gray-800 p-2" /></label>
+        <LayaFeedbackFields category={responding.category} alternative={responding.alternative} onCategoryChange={category => setResponding({ ...responding, category })} onAlternativeChange={alternative => setResponding({ ...responding, alternative })} disabled={busy} />
         <button disabled={busy} className="mr-4 text-sm text-sky-200">Save {responding.response === 'act' ? 'Act' : 'Dismiss'} response</button>
         <button type="button" disabled={busy} onClick={() => setResponding(null)} className="text-sm text-gray-400">Cancel response</button>
       </form>}
@@ -76,6 +80,7 @@ export default function BusinessDecisions({ summary, onReload }) {
         {row.responses.map(item => <div key={item.id} className="mt-3 border-t border-gray-700 pt-3">
           <p>{item.response === 'act' ? 'Act' : 'Dismiss'} · {item.created_at}</p>
           <p className="mt-1 whitespace-pre-wrap">Reason: {item.reason}</p>
+          <LayaSavedFeedback response={item} />
           <details className="mt-2"><summary className="cursor-pointer">Reviewed snapshot and evaluation</summary>
             <p className="mt-2 whitespace-pre-wrap">{item.input_snapshot.decision.title}: {item.input_snapshot.decision.decision}</p>
             <p>Status at review: {item.input_snapshot.decision.status} · Review by: {item.input_snapshot.decision.review_by || 'Not set'} · Revisit: {item.input_snapshot.decision.revisit_condition || 'Not set'}</p>
@@ -93,6 +98,7 @@ export default function BusinessDecisions({ summary, onReload }) {
       {editing?.id === row.id && <form className="mt-4 space-y-3" onSubmit={event => { event.preventDefault(); void save(row, { review_by: editing.review_by || null, revisit_condition: editing.revisit_condition || null }) }}>
         <label className="block text-sm text-gray-200">Review by<input required type="date" value={editing.review_by || ''} onChange={e => setEditing({ ...editing, review_by: e.target.value })} className="ml-3 rounded bg-gray-800 p-2" /></label>
         {row.status === 'proposed' && <label className="block text-sm text-gray-200">Revisit condition<textarea required maxLength={2000} value={editing.revisit_condition || ''} onChange={e => setEditing({ ...editing, revisit_condition: e.target.value })} className="mt-2 block w-full rounded bg-gray-800 p-2" /></label>}
+        <LayaFeedbackFields category={responding.category} alternative={responding.alternative} onCategoryChange={category => setResponding({ ...responding, category })} onAlternativeChange={alternative => setResponding({ ...responding, alternative })} disabled={busy} />
         <button disabled={busy} className="mr-4 text-sm text-indigo-200">Save review details</button>
         <button type="button" disabled={busy} className="text-sm text-gray-400" onClick={() => setEditing(null)}>Cancel</button>
       </form>}
