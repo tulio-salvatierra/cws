@@ -2249,3 +2249,22 @@ Created a versioned English Básico image with $150/month, larger benefit text, 
 Owner explicitly approved committing, pushing, deploying and verifying the revised artwork across four live channels, retaining both captions and publishing nothing. Release baseline: 17 publish attempts, 43 published posts.
 
 Release verified: abeb491 pushed to main; production dpl_5hgG9vfdnHfWpnfRhwdGvLzwdoZm READY with custom domains. Deployed PNG SHA-256 matches local. Guarded update changed only the existing Básico local media path to en-02-basico-150-v2.png; original asset retained. All four authenticated live channel previews show the revised image and 315-character shared English caption, with no browser errors. Both caption IDs/statuses/body hashes unchanged. Publish attempts stayed 17: no new publishing request. A pre-existing October 26 delivery completed reconciliation during verification (published records 43→47), using the old artwork; those posts were untouched. Build/import casing pass; runtime source unchanged.
+
+
+## 2026-10-27 — Existing Google Básico post corrections
+
+Owner authorized editing only the two existing Google posts from October 21/26. Replaced old artwork with approved $150 PNG on both using native Google owner editor, preserving original post IDs and links. Corrected October 21 description to the saved 315-character English Básico caption; October 26 caption retained. Reopened each original post to verify persisted image/text. Google reports edits pending review. No post creation/deletion, no other-channel actions. CWS publication counters unchanged at 17 attempts/47 records; no database writes. Browser extension upload remained unavailable; native file picker succeeded. No code/schema changes, commits or deployments.
+
+Final fresh owner-list verification shows both corrected post cards as Publicada (original ages retained), with $150 artwork and Básico copy; neither is pending anymore.
+
+
+## 2026-10-27 — October 21 social caption corrections
+
+Owner authorized updating only existing Facebook, Instagram and LinkedIn October 21 captions. Saved the approved 315-character English Básico copy ($150/month, $300 setup, 12-month term) through native published-post editors. Verified original public links show corrected text; LinkedIn after reload and Instagram with Edited indicator. Same post identities, dates and images retained. No new posts/stories or deletions; Facebook story toggle stayed off. CWS counters remain 17 attempts/47 records. No code, database writes, commits or deployments.
+
+
+## 2026-10-27 — Laya recommendation readability prepared
+
+CWS-LAYA-READABILITY-20261027: Updated existing CEO Today recommendation cards with plain-language status labels, prominent next-step text, visible missing-data box, and expandable reasoning/source records. Shortened visible response help while retaining full explanation, exact review-token behavior and Act/Dismiss semantics. Scoped spacing overrides prevent public article styles from crowding admin cards. Backend text/ranking/API unchanged; no production writes. Added five regression cases; all 775 tests/77 files, lint and production build pass. Actual-component local synthetic browser preview verified evidence and Act/Cancel without saving. Release awaits explicit commit/push authorization; no posts published.
+
+Owner approved commit, push, deployment and live verification of Laya readability changes. No post publication authorized.

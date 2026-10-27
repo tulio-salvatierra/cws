@@ -103,7 +103,7 @@ function CeoActionCard({ item, onNotNow, onReload }) {
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">{item.department} · {item.business_priority}</p>
-        <h2 className="mt-2 text-xl font-semibold text-white">{item.human_action}</h2>
+        <h2 className="!mt-2 !border-0 !pt-0 text-xl font-semibold text-white">{item.human_action}</h2>
       </div>
       <button type="button" onClick={onNotNow} className="text-sm text-gray-400 transition hover:text-white">Not now</button>
     </div>

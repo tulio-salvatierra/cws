@@ -17,9 +17,11 @@ export default function LayaOwnerResponse({review,label,onReload}) {
    try{await onReload()}catch{setError('Response saved, but history could not reload. Reload CEO Today to see it.')}
   }catch(err){setError(err.message || 'Response could not be saved.')}finally{setBusy(false)}
  }
- return <div className="mt-4 border-t border-sky-300/20 pt-3 text-sm" aria-label={`${label} responses`}>
-  <p className="text-xs text-gray-400">Act/Dismiss records your response to this exact evaluation. It does not change goals, budgets, subscriptions or priorities, accept a deal, reserve capacity, change delivery/launch/payment records, or activate a decision.</p>
-  {review.can_respond && <div className="mt-3 flex gap-4 text-sky-200">{['act','dismiss'].map(value=><button key={value} disabled={busy} type="button" onClick={()=>{setChoice(value);setReviewToken(review.review_token);setReason('');setError('');setNotice('')}}>{value==='act'?'Act':'Dismiss'}</button>)}</div>}
+ return <div className="[&_p]:mb-0 mt-4 border-t border-sky-300/20 pt-3 text-sm" aria-label={`${label} responses`}>
+  <p className="font-medium text-gray-200">Your response</p>
+  <p className="mt-1 max-w-prose text-sm leading-6 text-gray-400">Act or Dismiss saves your choice and reason. You carry out the next step separately.</p>
+  <details className="mt-2 text-xs leading-5 text-gray-400"><summary className="cursor-pointer py-1 text-sky-200">What happens when I respond?</summary><p className="mt-2 max-w-prose">Act/Dismiss records your response to this exact evaluation. It does not change goals, budgets, subscriptions or priorities, accept a deal, reserve capacity, change delivery/launch/payment records, or activate a decision.</p></details>
+  {review.can_respond && <div className="mt-3 flex flex-wrap gap-3 text-sky-200">{['act','dismiss'].map(value=><button key={value} className="rounded-lg border border-sky-300/30 px-4 py-2.5 font-medium transition hover:bg-sky-300/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 disabled:opacity-50" disabled={busy} type="button" onClick={()=>{setChoice(value);setReviewToken(review.review_token);setReason('');setError('');setNotice('')}}>{value==='act'?'Act':'Dismiss'}</button>)}</div>}
   {review.unavailable_reason && <p className="mt-2 text-amber-200">{review.unavailable_reason}</p>}
   {review.history_available===false && <p className="mt-2 text-amber-200">Response history is unavailable. Reload to try again.</p>}
   {choice && <form aria-label={`${label} owner response`} className="mt-3 space-y-3 rounded border border-sky-300/20 p-3" onSubmit={save}>

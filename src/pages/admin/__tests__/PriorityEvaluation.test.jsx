@@ -6,10 +6,21 @@ const evaluation={evaluator:'priority_review',policy_version:'priority-review-v1
 const item={id:'sales:inbound:l',evaluation,owner_response:{can_respond:true,review_token:'exact-signed-review',responses:[]}}
 afterEach(()=>vi.unstubAllGlobals())
 describe('Laya on priority cards',()=>{
+ it.each([['do','Recommended'],['hold','Wait for now'],['needs_data','Needs more information'],['skip','Not recommended']])('presents %s plainly while retaining the exact next step and missing evidence', (verdict,label)=>{
+  const fetch=vi.fn();vi.stubGlobal('fetch',fetch)
+  render(<PriorityEvaluation item={{...item,evaluation:{...evaluation,verdict},owner_response:{can_respond:false}}}/>)
+  expect(screen.getByText(label)).toBeVisible()
+  expect(screen.getByText('Next step')).toBeVisible()
+  expect(screen.getByText(evaluation.next_action)).toBeVisible()
+  expect(screen.getByText('Before you act')).toBeVisible()
+  expect(screen.getByText('Owner evidence missing')).toBeVisible()
+  expect(fetch).not.toHaveBeenCalled()
+ })
+
  it('shows exact source fields/missing data without writing and hides responses for nonowners',()=>{
   const fetch=vi.fn();vi.stubGlobal('fetch',fetch);render(<PriorityEvaluation item={{...item,owner_response:{can_respond:false}}}/> )
   expect(screen.getByText('Owner evidence missing')).toBeInTheDocument()
-  fireEvent.click(screen.getByText('Priority source evidence'));expect(screen.getByText(/"name": "Synthetic"/)).toBeInTheDocument()
+  fireEvent.click(screen.getByText('Why Laya reached this recommendation'));fireEvent.click(screen.getByText('Exact source record 1'));expect(screen.getByText(/"name": "Synthetic"/)).toBeVisible()
   expect(screen.queryByRole('button',{name:'Act'})).not.toBeInTheDocument();expect(fetch).not.toHaveBeenCalled()
  })
  it('opens/cancels intent without a write, then posts the exact captured token and reason only',async()=>{

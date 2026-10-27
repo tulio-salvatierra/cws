@@ -7,6 +7,16 @@ const review={can_respond:true,review_token:'exact-signed-review',history_availa
 beforeEach(()=>{vi.clearAllMocks();getSession.mockResolvedValue({data:{session:{access_token:'owner-token'}}});vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>({ok:true,response_id:'saved'})}))})
 afterEach(()=>vi.unstubAllGlobals())
 describe('goal/deal owner responses',()=>{
+ it('keeps response behavior clear and the full limitations available on demand',()=>{
+  render(<LayaOwnerResponse review={review} label="Priority" onReload={vi.fn()}/>)
+  expect(screen.getByText('Act or Dismiss saves your choice and reason. You carry out the next step separately.')).toBeVisible()
+  const limitations=screen.getByText(/Act\/Dismiss records your response to this exact evaluation/)
+  expect(limitations).not.toBeVisible()
+  fireEvent.click(screen.getByText('What happens when I respond?'))
+  expect(limitations).toBeVisible()
+  expect(fetch).not.toHaveBeenCalled()
+ })
+
  it.each(['Goal pace','Deal fit','Lifecycle'])('opens and cancels %s without persistence',label=>{
   render(<LayaOwnerResponse review={review} label={label} onReload={vi.fn()}/>)
   fireEvent.click(screen.getByRole('button',{name:'Act',exact:true}))
