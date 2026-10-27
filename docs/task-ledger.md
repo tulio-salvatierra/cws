@@ -145,4 +145,4 @@
 
 | CWS-OCT21-SOCIAL-CAPTIONS-20261027 | Codex | Completed — three original public links verified | Facebook, Instagram, LinkedIn October 21 captions corrected to approved $150 Básico copy | Existing identities/links/images retained; no new posts or deletions; counters 17/47 unchanged |
 
-| CWS-LAYA-READABILITY-20261027 | Codex | Prepared — local preview; release pending | Clear verdict, next step, missing information, expandable evidence and concise response help | 775 tests/77 files and build pass; no backend/API/production writes |
+| CWS-LAYA-READABILITY-20261027 | Codex | Completed — production verified | Clear verdict, next step, missing information, expandable evidence and concise response help | 51855d3; 775 tests/77 files, lint/build; live evidence/help/Act-Cancel verified; no response saved or posts published |
