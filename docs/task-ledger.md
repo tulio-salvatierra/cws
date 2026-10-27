@@ -149,4 +149,4 @@
 
 | CWS-LAYA-FEEDBACK-AUDIT-20261027 | Codex | Completed — read-only audit | Existing exact-evidence capture verified; one Act/zero Dismiss; gaps identified for reasons, alternatives and outcomes | Production aggregate/schema and source inspection; no data writes or training |
 
-| CWS-LAYA-RESPONSE-FEEDBACK-20261027 | Codex | Prepared — release pending | Optional reason category/alternative in forms, API and history; additive nullable migration |788tests,lint/build; local SQL preservation/constraints rehearsal; no production writes/learning/publishing |
+| CWS-LAYA-RESPONSE-FEEDBACK-20261027 | Codex | Completed — production verified | Optional reason category/alternative in forms, API and history; additive nullable migration |5f365cb; migration20261027173612;788tests,lint/build; live form/history/cancel verified; old response hash intact; no learning/publishing |
