@@ -1,19 +1,19 @@
-Task ID: CWS-MARKETING-CAPTION-EDITOR-20261026
+Task ID: CWS-BASICO-ARTWORK-20261026
 Agent: Codex
-Objective: Make saved Marketing captions visible/editable and fix Básico Spanish caption mislabeled English.
-Files inspected: Canonical/role instructions, technical conventions, decisions, learnings, existing memory, MarketingPage/tests, caption endpoint, offer-catalog selector and platform limits.
-Files changed: MarketingPage.jsx, new SavedOfferCaptions.jsx, MarketingPage.test.jsx, required memory files.
-Database or API changes: Existing owner-only save_marketing_offer_caption API reused; no new route/schema. Owner-requested guarded production DML changed only the identified Básico caption locale en to es; exact old updated_at guard and read-back verified. Body/status retained; no client seed data in code.
-Security decisions: No publication/provider request; exact caption ID and parent offer retained in edits; existing workspace/owner guards preserved. Spanish remains outside English evergreen rotation.
-Decisions made: Inline edit under each saved caption; language/channel/status visible before editing. Cancel preserves saved value; failed save retains draft; channel overflow blocks save. Readiness UI matches server shared-English rule.
-Assumptions: Current English-only publishing rotation stays unchanged. Básico needs a separate English shared caption to enter that rotation after corrected tagging.
-Tests added: Four UI regressions covering exact-row update without duplication/publishing, failure/cancel preservation, changed-channel limits, Spanish visibility/readiness.
-Tests run: 770 tests across 77 files pass; lint pass; import-casing pass; production build with placeholder public settings pass. Local synthetic browser preview verified edit and save; production caption tag read-back verified. PR #54 merged as 110580c. Production deployment dpl_3iiePisW1gHEAmH5w3x5ngq6ZP2p READY with custom domains. Live caption display, Spanish metadata, Cancel, unchanged-text Save through owner endpoint, exact reload persistence and one-row identity verified. Body hash unchanged; publish attempts 16 and posts 43 unchanged. Production error/fatal runtime log scan returned no entries.
-Known issues: No release blocker. Build emits existing lottie eval/chunk-size warnings. Dependencies installed from lockfile with no package changes. No migration required.
-Recommended next task: None for the editor. Add a separate owner-written English shared caption if Básico should enter the English rotation.
-Questions requiring Tulio: None; explicit release authorization received and executed.
-Project-memory files updated: Latest Codex handoff, project log, task ledger in isolated checkout.
-Permanent decisions added: None; existing language/publishing scope retained.
+Objective: Correct Básico artwork price/readability and preview across all four Marketing channels without publishing.
+Files inspected: Product definition, role instructions, conventions, decisions, learnings, memory, MarketingPage ChannelPanel, offer selector, current media path, original PNG.
+Files changed: New public/images/negocio-listo/en-02-basico-150-v2.png and three memory files. Original image untouched.
+Database or API changes: None. Current local-source media still points to en-02-basico.png. Release needs switch to versioned path after deployed asset verification.
+Security decisions: Local fixture has no production connection or publishing handler. No posts, no data changes, no credentials used.
+Decisions made: Keep black/white/orange identity; larger benefits; remove tiny other-plan strip and carousel numbering; include approved setup/term; preserve originals and both captions.
+Assumptions: Existing $150/month approved offer terms remain canonical.
+Tests added: None; static artwork only.
+Tests run: Visual inspection in actual production ChannelPanel across LinkedIn/Facebook/Instagram/Google local fixture; full caption retained at 315 characters and within all limits. Google website CTA visible. PNG 1122×1402, approx4:5. No application tests rerun because runtime unchanged.
+Known issues: Owner explicitly approved commit/push/deploy and live selection; release in progress. Local preview harness is untracked scratch and must not be committed. Existing separate checkout work/cws-offer-library has file-read stalls; fresh clone used here.
+Recommended next task: On owner authorization commit only asset and memory, push/merge/deploy, verify asset URL, update existing media storage_path guarded by old path, reload and inspect four live previews. Do not publish posts.
+Questions requiring Tulio: None; explicit release authorization received.
+Project-memory files updated: latest-codex, project-log, task-ledger.
+Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No secrets, real client records or backup rows committed. Approved implementation committed/pushed and merged; no posts published.
-Git diff summary: Isolated checkout based on origin/main cde65ee; source checkout's pre-existing migration memory changes untouched. Three runtime/test files plus three required memory files changed. No package/config changes.
+Memory updates withheld: No production claims or release completion.
+Git diff summary: One new PNG plus three memory files. No runtime code/config/schema changes. Original dirty checkout untouched.

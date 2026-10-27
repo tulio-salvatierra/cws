@@ -2240,3 +2240,10 @@ Added saved-caption text/language/channel/status display and inline editing to e
 ## 2026-10-26 — Caption editor production release
 
 Owner authorized commit/push/deploy. PR #54 merged as 110580c; Vercel production dpl_3iiePisW1gHEAmH5w3x5ngq6ZP2p READY with custom domains assigned. Live authenticated offer library displays saved Spanish Básico text and metadata. Cancel discarded an unsaved test edit; Save through the live owner-only endpoint updated the existing record with identical text, es locale and active status. Reload retained the exact text; one caption remains (no duplicate). Database body hash unchanged; publish attempts stayed 16 and published posts stayed 43. No posts published. Production runtime error/fatal log scan returned no entries. All 770 app tests, lint/build and remote checks passed before release.
+
+
+## 2026-10-26 — Básico artwork revision prepared
+
+Created a versioned English Básico image with $150/month, larger benefit text, visible $300 setup and 12-month initial term, preserving the original asset. Inspected the revised image in all four channel layouts using the unmodified production ChannelPanel renderer in an isolated local fixture, with the saved 315-character English caption. No production writes or provider actions. Image is 1122×1402 pixels (approximately 4:5). Commit/push/deploy await explicit authorization under role instructions; after deployment switch the existing Básico media path to the versioned image and verify live. No runtime code/schema changes.
+
+Owner explicitly approved committing, pushing, deploying and verifying the revised artwork across four live channels, retaining both captions and publishing nothing. Release baseline: 17 publish attempts, 43 published posts.

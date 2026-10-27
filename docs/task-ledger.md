@@ -138,3 +138,5 @@
 | LAYA-PAID-SETUP-001 | Codex | Implemented — release pending | lifecycle-v2 permits missing fully paid setup date using safe current linked receipts;unpaid/monthly/supplied dates remain validated |766 tests,lint;14 regressions;no schema/payment/history mutation |
 
 | CWS-MARKETING-CAPTION-EDITOR-20261026 | Codex | Completed — PR #54 merged; production verified | Saved caption display/inline edit live at 110580c; Básico es label correct; Cancel, unchanged-text Save and reload verified; one retained caption; publish counters unchanged; 770 tests, lint/build and CI pass | No further editor work required; separate English shared caption needed for Básico English rotation |
+
+| CWS-BASICO-ARTWORK-20261026 | Codex | Approved — release in progress | New versioned $150/month image with larger supporting text and visible setup/term; original preserved | All four local channel previews visually checked with production renderer; no production mutation/publication |
