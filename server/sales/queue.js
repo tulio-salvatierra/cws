@@ -165,6 +165,7 @@ function commandItem(category, lead, details) {
     lead: {
       id: lead.id, name: lead.name, email: lead.email, company: lead.company,
       phone: lead.phone, locality: lead.locality, status: lead.status,
+      google_business_profile_url: lead.google_business_profile_url,
       sales_classification: lead.sales_classification, response_state: lead.response_state,
       last_contacted_at: lead.last_contacted_at, created_at: lead.created_at,
     },

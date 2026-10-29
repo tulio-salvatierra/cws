@@ -214,6 +214,72 @@ describe('Sales command endpoint', () => {
     expect(mocks.sendResendEmail).not.toHaveBeenCalled()
   })
 
+  it('updates an owner-entered Google Business Profile reference without provider work', async () => {
+    const leadQuery = query({ data: { id: 'lead-a', status: 'contacted' }, error: null })
+    const updated = query({ data: { id: 'lead-a', google_business_profile_url: 'https://www.google.com/maps?cid=123' }, error: null })
+    const client = { from: vi.fn().mockReturnValueOnce(leadQuery).mockReturnValueOnce(updated) }
+    mocks.authenticateOwner.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
+    const res = response()
+
+    await handler({ method: 'POST', body: {
+      action: 'update_lead_sales_state',
+      lead_id: 'lead-a',
+      sales_classification: 'prospect',
+      response_state: 'no_response',
+      status: 'contacted',
+      google_business_profile_url: 'https://www.google.com/maps?cid=123',
+    } }, res)
+
+    expect(updated.update).toHaveBeenCalledWith(expect.objectContaining({
+      google_business_profile_url: 'https://www.google.com/maps?cid=123',
+    }))
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(mocks.sendResendEmail).not.toHaveBeenCalled()
+    expect(mocks.discoverGooglePlaces).not.toHaveBeenCalled()
+    expect(mocks.inspectOfficialWebsite).not.toHaveBeenCalled()
+  })
+
+  it('rejects an unsafe Google Business Profile reference before updating the lead', async () => {
+    const leadQuery = query({ data: { id: 'lead-a', status: 'contacted' }, error: null })
+    const client = { from: vi.fn().mockReturnValueOnce(leadQuery) }
+    mocks.authenticateOwner.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
+    const res = response()
+
+    await handler({ method: 'POST', body: {
+      action: 'update_lead_sales_state',
+      lead_id: 'lead-a',
+      google_business_profile_url: 'https://example.com/not-google',
+    } }, res)
+
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      error: 'Google Business Profile URL must be an HTTPS Google Maps or Business Profile link.',
+    }))
+    expect(mocks.sendResendEmail).not.toHaveBeenCalled()
+    expect(mocks.discoverGooglePlaces).not.toHaveBeenCalled()
+  })
+
+  it('preserves an existing Google Business Profile reference when an older Sales edit omits it', async () => {
+    const leadQuery = query({ data: { id: 'lead-a', status: 'contacted' }, error: null })
+    const updated = query({ data: { id: 'lead-a' }, error: null })
+    const client = { from: vi.fn().mockReturnValueOnce(leadQuery).mockReturnValueOnce(updated) }
+    mocks.authenticateOwner.mockResolvedValue({ client, workspaceId: 'workspace-a', user: { id: 'owner-a' } })
+    const res = response()
+
+    await handler({ method: 'POST', body: {
+      action: 'update_lead_sales_state',
+      lead_id: 'lead-a',
+      sales_classification: 'prospect',
+      response_state: 'warm',
+      status: 'responded',
+    } }, res)
+
+    expect(updated.update).toHaveBeenCalledWith(expect.not.objectContaining({
+      google_business_profile_url: expect.anything(),
+    }))
+    expect(res.status).toHaveBeenCalledWith(200)
+  })
+
   it('records a promised action as a Sales-only row without creating an email', async () => {
     const leadQuery = query({ data: { id: 'lead-a', status: 'contacted' }, error: null })
     const inserted = query({ data: { id: 'promise-a', lead_id: 'lead-a', action_text: 'Call Thursday', due_on: '2026-09-10', completed_at: null, created_at: '2026-09-09T15:00:00.000Z' }, error: null })

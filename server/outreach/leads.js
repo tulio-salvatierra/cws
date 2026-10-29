@@ -4,6 +4,7 @@ import {
   missingOutreachEnv,
   parseBody,
 } from './shared.js'
+import { normalizeGoogleBusinessProfileUrl } from '../../src/lib/googleBusinessProfile.js'
 
 const CLASSIFICATIONS = new Set(['inbound', 'prospect'])
 const RESPONSE_STATES = new Set(['no_response', 'warm', 'neutral'])
@@ -18,7 +19,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     const status = cleanText(req.query?.status, 32)
-    let query = context.client.from('leads').select('id, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false })
+    let query = context.client.from('leads').select('id, name, email, company, status, sales_classification, response_state, phone, locality, google_business_profile_url, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: false })
     if (status) query = query.eq('status', status)
     const result = await query
     if (!result.error) {
@@ -36,6 +37,8 @@ export default async function handler(req, res) {
   const email = cleanText(body.email, 320)
   const phone = cleanText(body.phone, 50)
   if (!email && !phone) return res.status(400).json({ ok: false, error: 'A verified business email or phone is required.' })
+  const googleBusinessProfileUrl = normalizeGoogleBusinessProfileUrl(body.google_business_profile_url)
+  if (googleBusinessProfileUrl === false) return res.status(400).json({ ok: false, error: 'Google Business Profile URL must be an HTTPS Google Maps or Business Profile link.' })
   const salesClassification = cleanText(body.sales_classification, 32)
   const responseState = cleanText(body.response_state, 32)
   if (salesClassification && !CLASSIFICATIONS.has(salesClassification)) return res.status(400).json({ ok: false, error: 'Invalid Sales classification.' })
@@ -50,8 +53,9 @@ export default async function handler(req, res) {
     response_state: responseState || null,
     phone: phone || null,
     locality: cleanText(body.locality, 200) || null,
+    google_business_profile_url: googleBusinessProfileUrl,
     created_by: context.user.id,
-  }).select('id, name, email, company, status, sales_classification, response_state, phone, locality, last_contacted_at').single()
+  }).select('id, name, email, company, status, sales_classification, response_state, phone, locality, google_business_profile_url, last_contacted_at').single()
   return inserted.error
     ? res.status(400).json({ ok: false, error: inserted.error.message })
     : res.status(201).json({ ok: true, lead: inserted.data })

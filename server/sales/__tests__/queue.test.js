@@ -156,6 +156,19 @@ describe('Sales command queue', () => {
     expect(result.items[0]).toMatchObject({ category: 'new_prospect', recommendation: 'Call', sendType: null, phone_only: true })
     expect(result.summary.newOutreachToday).toBe(0)
   })
+
+  it('carries an optional Google Business Profile reference without changing queue order', () => {
+    const result = buildSalesCommandQueue({
+      leads: [
+        lead({ id: 'earlier', created_at: '2026-09-01T15:00:00.000Z', google_business_profile_url: 'https://www.google.com/maps?cid=123' }),
+        lead({ id: 'later', created_at: '2026-09-08T15:00:00.000Z' }),
+      ],
+      now,
+    })
+
+    expect(result.items.map((item) => item.lead.id)).toEqual(['earlier', 'later'])
+    expect(result.items[0].lead.google_business_profile_url).toBe('https://www.google.com/maps?cid=123')
+  })
 })
 
 describe('Explicit test lead exclusion', () => {

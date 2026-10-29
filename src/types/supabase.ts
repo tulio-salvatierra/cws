@@ -947,6 +947,7 @@ export type Database = {
           created_at: string
           created_by: string
           email: string | null
+          google_business_profile_url: string | null
           id: string
           is_test: boolean
           last_contacted_at: string | null
@@ -968,6 +969,7 @@ export type Database = {
           created_at?: string
           created_by: string
           email?: string | null
+          google_business_profile_url?: string | null
           id?: string
           is_test?: boolean
           last_contacted_at?: string | null
@@ -989,6 +991,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           email?: string | null
+          google_business_profile_url?: string | null
           id?: string
           is_test?: boolean
           last_contacted_at?: string | null

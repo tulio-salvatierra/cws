@@ -39,7 +39,7 @@ describe('SalesPage', () => {
   })
 
   it('shows completed Prospect Brief context on a phone-only Call command without creating an action', async () => {
-    const phoneLead = { ...salesState.leads[0], id: 'lead-phone', name: 'Logan', company: 'Logan Auto Fix', email: null, phone: '+13125550123' }
+    const phoneLead = { ...salesState.leads[0], id: 'lead-phone', name: 'Logan', company: 'Logan Auto Fix', email: null, phone: '+13125550123', google_business_profile_url: 'https://www.google.com/maps?cid=123' }
     globalThis.fetch = vi.fn().mockResolvedValue(response({
       ...salesState,
       leads: [phoneLead],
@@ -62,6 +62,7 @@ describe('SalesPage', () => {
     expect(screen.getByText('Suggested opener')).toBeInTheDocument()
     expect(screen.getByText('Customer-information cleanup + clearer service presentation')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Call' })).toHaveAttribute('href', 'tel:+13125550123')
+    expect(screen.getByRole('link', { name: 'Open Google profile' })).toHaveAttribute('href', 'https://www.google.com/maps?cid=123')
     expect(screen.getByRole('button', { name: 'Log call' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Edit lead' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Prepare email' })).not.toBeInTheDocument()

@@ -35,6 +35,39 @@ describe('Sales leads contact methods', () => {
     expect(res.status).toHaveBeenCalledWith(201)
   })
 
+  it('stores a normalized manual Google Business Profile reference without connecting to Google', async () => {
+    const inserted = query({ data: { id: 'lead-a', google_business_profile_url: 'https://www.google.com/maps?cid=123' }, error: null })
+    mocks.authenticateWorkspace.mockResolvedValue({ workspaceId: 'workspace-a', user: { id: 'owner-a' }, client: { from: vi.fn(() => inserted) } })
+    const res = response()
+
+    await handler({ method: 'POST', body: {
+      name: 'Chicago General Contractor',
+      phone: '+13125550123',
+      google_business_profile_url: ' https://www.google.com/maps?cid=123 ',
+      sales_classification: 'prospect',
+    } }, res)
+
+    expect(inserted.insert).toHaveBeenCalledWith(expect.objectContaining({
+      google_business_profile_url: 'https://www.google.com/maps?cid=123',
+    }))
+    expect(res.status).toHaveBeenCalledWith(201)
+  })
+
+  it('rejects an unsafe Google Business Profile reference before writing a lead', async () => {
+    const res = response()
+
+    await handler({ method: 'POST', body: {
+      name: 'Chicago General Contractor',
+      phone: '+13125550123',
+      google_business_profile_url: 'http://example.com/not-google',
+    } }, res)
+
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      error: 'Google Business Profile URL must be an HTTPS Google Maps or Business Profile link.',
+    }))
+  })
+
   it('requires at least one verified public contact method', async () => {
     const res = response()
     await handler({ method: 'POST', body: { name: 'No Contact', email: '', phone: '' } }, res)
