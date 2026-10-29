@@ -5,9 +5,10 @@ Files changed: `src/pages/admin/SalesPage.jsx`; `src/pages/admin/__tests__/Sales
 Database or API changes: None. The existing `/api/outreach/leads` authenticated lead-create path is reused unchanged.
 Security decisions: This is navigation only. The new link does not create a lead, inspect a website, call AI, send email, place a call, or invoke a provider. Saving a lead remains an explicit action in the existing form.
 Tests added: Sales UI regression verifies the named link targets `/admin/leads` and existing queue loading remains read-only.
-Tests run: 788 tests across 77 files pass; lint and production build pass; `git diff --check` passes.
+Tests run: 788 tests across 77 files pass; lint and production build pass; `git diff --check` passes. GitHub CI passed the same test, lint, and build checks.
 Known issues: The existing manual lead form still carries its legacy `/admin/leads` presentation. This ticket deliberately adds no new lead model, endpoint, schema, migration, or outreach behavior.
-Recommended next task: Merge to `main`, verify the link live without entering data, then the owner may manually save real business-card leads through the form.
+Release: PR #55 merged to `main` at `eca76f54664886c60c52e55678852d4873b4b864`; Vercel Production deployment `dpl_56EiMMXdUYiWGGnUpzK63Jb8AQxM` is READY. Authenticated live Sales displays one named link resolving to `/admin/leads`; no form was opened or saved.
+Recommended next task: The owner may manually save real business-card leads through the existing form when ready.
 Questions requiring Tulio: None.
 Project-memory files updated: Task ledger and handoff.
 Permanent decisions added: None.
