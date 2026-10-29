@@ -41,6 +41,10 @@
       "destination": "/en/negocio-listo.html"
     },
     {
+      "source": "/review/:path*",
+      "destination": "https://cws-review.vercel.app/:path*"
+    },
+    {
       "source": "/((?!api/|assets/|.*\\..*).*)",
       "destination": "/index.html"
     }
