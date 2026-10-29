@@ -31,6 +31,7 @@ describe('SalesPage', () => {
     render(<MemoryRouter><SalesPage /></MemoryRouter>)
 
     expect(await screen.findByRole('heading', { name: 'Today’s command queue' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Add business-card lead' })).toHaveAttribute('href', '/admin/leads')
     expect(screen.getByRole('heading', { name: 'Ada Plumbing', level: 2 })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Prepare email' })).toHaveAttribute('href', '/admin/leads?lead_id=lead-a&send_type=intro')
     expect(globalThis.fetch).toHaveBeenCalledWith('/api/command-queue', expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer access-token' }) }))
