@@ -2289,6 +2289,17 @@ Release verified: implementation2a70111 and migration alignment5f365cb pushed to
 
 Exposed the existing authenticated `/admin/leads` form from Sales with one **Add business-card lead** link beside prospect research. The change adds no API route, schema, migration, provider/AI call, ranking change, or outreach behavior. PR #55 merged to `main` at `eca76f54664886c60c52e55678852d4873b4b864`; Vercel Production deployment `dpl_56EiMMXdUYiWGGnUpzK63Jb8AQxM` is READY. Authenticated live Sales shows exactly one link resolving to `/admin/leads`. The form was not opened or saved; no lead record or external action occurred.
 
-## 2026-10-29 — Lead Google Business Profile reference prepared
+## 2026-10-29 — Lead Google Business Profile reference released
 
-Prepared an optional owner-entered `google_business_profile_url` on existing workspace-scoped Leads. The additive migration accepts only trimmed HTTPS Google Maps/Profile/share hosts; server-side creation and owner Sales edits independently normalize the same narrow set. The Leads table and Sales command card show a safe outbound reference link only when the stored value passes validation. An omitted field from an older Sales editor request cannot clear an existing reference. This is not a Google connection, ownership check, enrichment source, publishing target, provider call, queue-ranking input, or outreach trigger. The migration remains unapplied and no Production lead was created or modified. 798 tests, lint, import-case check, and production build pass. Commit, push, migration application, deployment, and live verification await separate owner authorization.
+Released an optional owner-entered `google_business_profile_url` on existing workspace-scoped Leads. The additive migration accepts only trimmed HTTPS Google Maps/Profile/share hosts; server-side creation and owner Sales edits independently normalize the same narrow set. The Leads table and Sales command card show a safe outbound reference link only when the stored value passes validation. An omitted field from an older Sales editor request cannot clear an existing reference. This is not a Google connection, ownership check, enrichment source, publishing target, provider call, queue-ranking input, or outreach trigger. Commit `6f4b72a92af6c4fd20bc56df0b8f05e9f2af62c1` merged to `main`; Supabase applied `20261029155243_lead_google_business_profile_reference`; Vercel Production deployment `dpl_4rUpGAjzGtyUboH4zsxxttuVxqhV` is READY. The live authenticated Leads form shows the optional URL field, explanatory reference-only copy, and Google-profile table column; Sales remains available and unchanged. There are currently zero populated profile references, and no Production Lead was created or modified during release verification. 798 tests, lint, import-case check, and production build pass.
+
+## 2026-10-29 — Lead Google Business Profile reference release receipt
+
+The optional Lead Google Business Profile reference shipped to Production from
+`6f4b72a92af6c4fd20bc56df0b8f05e9f2af62c1`. Migration
+`20261029155243_lead_google_business_profile_reference` is recorded in the
+Production history, and Git deployment `dpl_4rUpGAjzGtyUboH4zsxxttuVxqhV`
+is READY on the verified CWS aliases. A read-only authenticated check confirmed
+the Leads input, the reference-only explanation, the new table column, and the
+unchanged Sales queue. No stored reference existed yet, so no outbound profile
+link was opened; no Lead record or external provider action occurred.
