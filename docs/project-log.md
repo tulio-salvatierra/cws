@@ -2307,3 +2307,8 @@ link was opened; no Lead record or external provider action occurred.
 ## 2026-11-01 — Laya Decision Rules V1 release
 
 Owner authorized deployment and migration with company-context excluded. Isolated release adds Top 3, evidence-only recommendations, explicit owner choices/outcomes, scope checks and 30-day review in CEO Today. 822 tests/82 files, lint and build pass. Production migration 20261101181750 applied with owner-only reads/server-only append; zero choices and no company profiles. Application deployment and live verification pending.
+
+
+## 2026-11-01 — Company World Model database verification and release
+
+Resolved local Docker path/access blocker. Applied exact World Model and released Next Move migrations in a disposable PostgreSQL 17 database: 53 SQL assertions and real-loader smoke pass; combined 839 tests, lint and configured production build pass. Production World Model migration 20261101182102 applied; RLS/grants and unchanged security-advisor baseline verified. Application release/live verification blocked: automatic approval review rejected direct main push for lack of explicit authorization for this exact production release. No application push/deployment occurred; tested commit remains local. Builds on concurrent main commit 856c5dc without duplicating Next Move schema.

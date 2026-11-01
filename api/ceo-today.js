@@ -1,3 +1,4 @@
+import { loadWorldModel } from '../server/laya/world-model.js'
 import { loadMoves, moveToken, saveMove } from '../server/laya/move-responses.js'
 import { recommendation, scopeCheck, sourceVersion, visibleMoves } from '../server/laya/next-move.js'
 import { decoratePriorities } from '../server/laya/priority-review.js'
@@ -45,6 +46,18 @@ export default async function handler(req, res) {
 
   const params = new URL(req.url || '/api/ceo-today', 'http://localhost').searchParams
   const query = { ...Object.fromEntries(params), ...req.query }
+  if (query.view === 'world_model') {
+    if (!context.user?.id) return res.status(403).json({ ok: false, error: 'Active owner required.' })
+    const owner = await context.client.from('workspace_members').select('role').eq('workspace_id', context.workspaceId)
+      .eq('user_id', context.user.id).eq('status', 'active').maybeSingle()
+    if (owner.error) return res.status(502).json({ ok: false, error: 'Ownership could not be verified.' })
+    if (owner.data?.role !== 'owner') return res.status(403).json({ ok: false, error: 'Active owner required.' })
+    try {
+      return res.status(200).json({ ok: true, world_model: await loadWorldModel(context) })
+    } catch {
+      return res.status(502).json({ ok: false, error: 'Company context is unavailable.' })
+    }
+  }
   if (query.view === 'laya_history') {
     const owner = await context.client.from('workspace_members').select('role').eq('workspace_id', context.workspaceId)
       .eq('user_id', context.user.id).eq('status', 'active').maybeSingle()

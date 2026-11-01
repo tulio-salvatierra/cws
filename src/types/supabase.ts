@@ -14,6 +14,387 @@ export type Database = {
   }
   public: {
     Tables: {
+      company_profiles: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          updated_at: string
+          source_note: string
+          observed_at: string | null
+          valid_until: string | null
+          evidence: Json
+          mission: string | null
+          objective: string | null
+          legal_structure: string | null
+          operating_geography: string[] | null
+          jurisdictions: string[] | null
+          human_capabilities: string[] | null
+          company_capabilities: string[] | null
+          strategic_principles: string[] | null
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          mission?: string | null
+          objective?: string | null
+          legal_structure?: string | null
+          operating_geography?: string[] | null
+          jurisdictions?: string[] | null
+          human_capabilities?: string[] | null
+          company_capabilities?: string[] | null
+          strategic_principles?: string[] | null
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note?: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          mission?: string | null
+          objective?: string | null
+          legal_structure?: string | null
+          operating_geography?: string[] | null
+          jurisdictions?: string[] | null
+          human_capabilities?: string[] | null
+          company_capabilities?: string[] | null
+          strategic_principles?: string[] | null
+        }
+        Relationships: [
+          { foreignKeyName: "company_profiles_workspace_id_fkey"; columns: ["workspace_id"]; isOneToOne: true; referencedRelation: "workspaces"; referencedColumns: ["id"] },
+        ]
+      }
+      company_state_snapshots: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          updated_at: string
+          source_note: string
+          observed_at: string | null
+          valid_until: string | null
+          evidence: Json
+          financial: Json | null
+          sales_pipeline: Json | null
+          clients_projects: Json | null
+          marketing: Json | null
+          capacity: Json | null
+          blockers: string[] | null
+          unknowns: string[] | null
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          financial?: Json | null
+          sales_pipeline?: Json | null
+          clients_projects?: Json | null
+          marketing?: Json | null
+          capacity?: Json | null
+          blockers?: string[] | null
+          unknowns?: string[] | null
+        }
+        Update: never
+        Relationships: [
+          { foreignKeyName: "company_state_snapshots_workspace_id_fkey"; columns: ["workspace_id"]; isOneToOne: false; referencedRelation: "workspaces"; referencedColumns: ["id"] },
+        ]
+      }
+      company_units: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          updated_at: string
+          source_note: string
+          observed_at: string | null
+          valid_until: string | null
+          evidence: Json
+          unit_key: string
+          name: string
+          kind: string | null
+          status: string
+          performance: Json | null
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          unit_key: string
+          name: string
+          kind?: string | null
+          status?: string
+          performance?: Json | null
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note?: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          unit_key?: string
+          name?: string
+          kind?: string | null
+          status?: string
+          performance?: Json | null
+        }
+        Relationships: [
+          { foreignKeyName: "company_units_workspace_id_fkey"; columns: ["workspace_id"]; isOneToOne: false; referencedRelation: "workspaces"; referencedColumns: ["id"] },
+        ]
+      }
+      company_constraints: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          updated_at: string
+          source_note: string
+          observed_at: string | null
+          valid_until: string | null
+          evidence: Json
+          category: string
+          statement: string
+          jurisdiction: string | null
+          status: string
+          source_url: string | null
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          category: string
+          statement: string
+          jurisdiction?: string | null
+          status?: string
+          source_url?: string | null
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note?: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          category?: string
+          statement?: string
+          jurisdiction?: string | null
+          status?: string
+          source_url?: string | null
+        }
+        Relationships: [
+          { foreignKeyName: "company_constraints_workspace_id_fkey"; columns: ["workspace_id"]; isOneToOne: false; referencedRelation: "workspaces"; referencedColumns: ["id"] },
+        ]
+      }
+      company_opportunities: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          updated_at: string
+          source_note: string
+          observed_at: string | null
+          valid_until: string | null
+          evidence: Json
+          unit_id: string | null
+          title: string
+          hypothesis: string | null
+          expected_value_cents: number | null
+          cost_cents: number | null
+          currency: string | null
+          human_hours: number | null
+          scalability: string | null
+          strategic_value: string | null
+          risk: string | null
+          confidence: number | null
+          success_criteria: string | null
+          deadline: string | null
+          status: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          unit_id?: string | null
+          title: string
+          hypothesis?: string | null
+          expected_value_cents?: number | null
+          cost_cents?: number | null
+          currency?: string | null
+          human_hours?: number | null
+          scalability?: string | null
+          strategic_value?: string | null
+          risk?: string | null
+          confidence?: number | null
+          success_criteria?: string | null
+          deadline?: string | null
+          status?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note?: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          unit_id?: string | null
+          title?: string
+          hypothesis?: string | null
+          expected_value_cents?: number | null
+          cost_cents?: number | null
+          currency?: string | null
+          human_hours?: number | null
+          scalability?: string | null
+          strategic_value?: string | null
+          risk?: string | null
+          confidence?: number | null
+          success_criteria?: string | null
+          deadline?: string | null
+          status?: string
+        }
+        Relationships: [
+          { foreignKeyName: "company_opportunities_workspace_id_fkey"; columns: ["workspace_id"]; isOneToOne: false; referencedRelation: "workspaces"; referencedColumns: ["id"] },
+          { foreignKeyName: "company_opportunities_unit_id_workspace_id_fkey"; columns: ["unit_id", "workspace_id"]; isOneToOne: false; referencedRelation: "company_units"; referencedColumns: ["id", "workspace_id"] },
+        ]
+      }
+      company_decision_contexts: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          updated_at: string
+          source_note: string
+          observed_at: string | null
+          valid_until: string | null
+          evidence: Json
+          decision_id: string
+          state_snapshot_id: string | null
+          opportunity_id: string | null
+          alternatives: Json | null
+          rationale: string | null
+          expected_outcome: string | null
+          assumptions: string[] | null
+          confidence: number | null
+          decision_snapshot: Json
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          decision_id: string
+          state_snapshot_id?: string | null
+          opportunity_id?: string | null
+          alternatives?: Json | null
+          rationale?: string | null
+          expected_outcome?: string | null
+          assumptions?: string[] | null
+          confidence?: number | null
+          decision_snapshot?: Json
+        }
+        Update: never
+        Relationships: [
+          { foreignKeyName: "company_decision_contexts_workspace_id_fkey"; columns: ["workspace_id"]; isOneToOne: false; referencedRelation: "workspaces"; referencedColumns: ["id"] },
+          { foreignKeyName: "company_decision_contexts_decision_id_workspace_id_fkey"; columns: ["decision_id", "workspace_id"]; isOneToOne: false; referencedRelation: "business_decisions"; referencedColumns: ["id", "workspace_id"] },
+          { foreignKeyName: "company_decision_contexts_state_snapshot_id_workspace_id_fkey"; columns: ["state_snapshot_id", "workspace_id"]; isOneToOne: false; referencedRelation: "company_state_snapshots"; referencedColumns: ["id", "workspace_id"] },
+          { foreignKeyName: "company_decision_contexts_opportunity_id_workspace_id_fkey"; columns: ["opportunity_id", "workspace_id"]; isOneToOne: false; referencedRelation: "company_opportunities"; referencedColumns: ["id", "workspace_id"] },
+        ]
+      }
+      company_outcomes: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          updated_at: string
+          source_note: string
+          observed_at: string | null
+          valid_until: string | null
+          evidence: Json
+          decision_context_id: string
+          actual_outcome: string | null
+          metrics: Json | null
+          human_feedback: string | null
+          lesson: string | null
+          recommendation: string | null
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+          source_note: string
+          observed_at?: string | null
+          valid_until?: string | null
+          evidence?: Json
+          decision_context_id: string
+          actual_outcome?: string | null
+          metrics?: Json | null
+          human_feedback?: string | null
+          lesson?: string | null
+          recommendation?: string | null
+        }
+        Update: never
+        Relationships: [
+          { foreignKeyName: "company_outcomes_workspace_id_fkey"; columns: ["workspace_id"]; isOneToOne: false; referencedRelation: "workspaces"; referencedColumns: ["id"] },
+          { foreignKeyName: "company_outcomes_decision_context_id_workspace_id_fkey"; columns: ["decision_context_id", "workspace_id"]; isOneToOne: false; referencedRelation: "company_decision_contexts"; referencedColumns: ["id", "workspace_id"] },
+        ]
+      }
       laya_move_choices: {
         Row: {
           id: string
