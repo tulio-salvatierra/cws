@@ -1,3 +1,5 @@
+import { loadMoves, moveToken, saveMove } from '../server/laya/move-responses.js'
+import { recommendation, scopeCheck, sourceVersion, visibleMoves } from '../server/laya/next-move.js'
 import { decoratePriorities } from '../server/laya/priority-review.js'
 import { evaluateLifecycleItems } from '../server/laya/lifecycle.js'
 import { loadResponseHistory, parseHistoryPosition } from '../server/laya/history.js'
@@ -32,6 +34,10 @@ export default async function handler(req, res) {
     if (owner.error) return res.status(502).json({ ok: false, error: 'Ownership could not be verified.' })
     if (owner.data?.role !== 'owner') return res.status(403).json({ ok: false, error: 'Only the workspace owner can respond to Laya.' })
     const body = parseBody(req.body)
+    if (body.action === 'next_move_choice') {
+      const saved = await saveMove(context, body)
+      return res.status(saved.status).json(saved.error ? { ok: false, error: saved.error } : { ok: true, response_id: saved.id })
+    }
     if (body.action !== 'laya_response') return res.status(400).json({ ok: false, error: 'Unknown CEO Today action.' })
     const saved = await saveOwnerResponse(context, body)
     return res.status(saved.status).json(saved.error ? { ok: false, error: saved.error } : { ok: true, response_id: saved.id })
@@ -81,6 +87,20 @@ export default async function handler(req, res) {
       unavailable_reason:token?null:'The exact evidence is unavailable or too large to sign safely; no response can be saved for this view.',
       responses:(history.data || []).filter(item=>item.evaluator===evaluation.evaluator && item.subject_type===evaluation.subject.type && item.subject_id===evaluation.subject.id)}
   }
+  const moves = decisions.can_manage ? await loadMoves(context) : { available: false, events: [], review: null }
+  if (moves.available) {
+    loaded.data.actions = visibleMoves(loaded.data.all_actions.length ? loaded.data.all_actions : loaded.data.actions, moves.events)
+    for (const item of loaded.data.actions) {
+      item.next_move = recommendation(item, new Date(), moves.events)
+      item.move_token = moveToken(context, item)
+      const scope = moves.events.find(row => row.card_id === item.id && row.action === 'scope')
+      item.scope_check = scope && scope.source_version !== sourceVersion(item)
+        ? { ...scopeCheck(null), text: 'Source evidence changed; recheck the agreement and revision allowance.' }
+        : scopeCheck(scope?.scope_evidence)
+      item.scope_evidence = scope?.scope_evidence || null
+    }
+  }
+  loaded.data.move_review = { available: moves.available, groups: moves.review }
   for (const item of loaded.data.actions) {
     item.owner_response = attachResponse(item.evaluation, loaded.review_inputs.priorities[item.id])
   }

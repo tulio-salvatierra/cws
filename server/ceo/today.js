@@ -1,7 +1,7 @@
 import { buildSalesCommandQueue, chicagoDate } from '../sales/queue.js'
 import { buildMarketingOccurrencePlan, marketingLocalDate } from '../../src/marketing/weeklySlots.js'
 
-export const CEO_ACTION_LIMIT = 5
+export const CEO_ACTION_LIMIT = 3
 
 const TIER = {
   urgent: 1,
@@ -381,29 +381,11 @@ function fallbackAction() {
 }
 
 function compareActions(left, right) {
-  if (left.priority_tier !== right.priority_tier) return left.priority_tier - right.priority_tier
-
-  // Tier-two Sales cards retain the frozen S1 order exactly, even when their
-  // actionable dates differ across categories.
-  if (left.priority_tier === TIER.sales) {
-    if (left.sales_order !== null && right.sales_order !== null) return left.sales_order - right.sales_order || left.id.localeCompare(right.id)
-    if (left.sales_order !== null) return -1
-    if (right.sales_order !== null) return 1
-  }
-
-  if (left.priority_tier === TIER.deliver && left.operations_order !== null && right.operations_order !== null) {
-    return compareOperationsActions(left, right)
-  }
-
-  if (left.priority_tier === TIER.controlMoney && left.accounting_order !== null && right.accounting_order !== null) {
-    return compareAccountingActions(left, right)
-  }
-
-  if (left.priority_tier === TIER.protect && left.compliance_order !== null && right.compliance_order !== null) {
-    return compareComplianceActions(left, right)
-  }
-
-  return String(left.actionable_on).localeCompare(String(right.actionable_on))
-    || String(left.source_timestamp).localeCompare(String(right.source_timestamp))
+  if (left.priority_tier === right.priority_tier && left.priority_tier === TIER.controlMoney) return compareAccountingActions(left, right)
+  if (left.priority_tier === right.priority_tier && left.priority_tier === TIER.protect) return compareComplianceActions(left, right)
+  // Owner-approved V1 order: lane, recorded due date, oldest source, stable ID.
+  return left.priority_tier - right.priority_tier
+    || String(left.actionable_on || '9999').localeCompare(String(right.actionable_on || '9999'))
+    || String(left.source_timestamp || '9999').localeCompare(String(right.source_timestamp || '9999'))
     || left.id.localeCompare(right.id)
 }

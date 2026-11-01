@@ -251,3 +251,7 @@ At the end of each meaningful work cycle, ask:
 > What decisions, assumptions, or repeated questions surfaced that we can define now?
 
 Classify each finding as one of: product definition, technical convention, agent instruction, UI pattern, testing checklist, business strategy, content opportunity, or one-time exception.
+
+## Laya Decision Rules V1 (2026-11-01)
+
+Owner-approved release changes CEO Today to Top 3 with fixed primary lane → due/eligibility date → oldest source ordering, concise evidence-only why text, Do it now / Later (two Chicago calendar days) / More, recommendation closure outcomes and a 30-day rule review. Owner-only append-only choices and scope evidence do not complete department records or authorize external actions. Existing Act/Dismiss history remains. Scope comparison requires recorded agreement/request/revision evidence and protects the $50/hour floor without pricing or commitments. See `docs/verification/laya-decision-rules-v1.md` for exact semantics, validation and limits. This supersedes the five-card and session-only deferral descriptions.

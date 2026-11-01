@@ -2303,3 +2303,7 @@ is READY on the verified CWS aliases. A read-only authenticated check confirmed
 the Leads input, the reference-only explanation, the new table column, and the
 unchanged Sales queue. No stored reference existed yet, so no outbound profile
 link was opened; no Lead record or external provider action occurred.
+
+## 2026-11-01 — Laya Decision Rules V1 release
+
+Owner authorized deployment and migration with company-context excluded. Isolated release adds Top 3, evidence-only recommendations, explicit owner choices/outcomes, scope checks and 30-day review in CEO Today. 822 tests/82 files, lint and build pass. Production migration 20261101181750 applied with owner-only reads/server-only append; zero choices and no company profiles. Application deployment and live verification pending.

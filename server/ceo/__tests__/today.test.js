@@ -319,7 +319,7 @@ describe('CEO Today prioritizer', () => {
     expect(operationsActions(result)[0]).toMatchObject({ priority_tier: 4 })
   })
 
-  it('orders Operations work by state, then oldest blocker timestamp, then stable project id', () => {
+  it('orders delivery work by oldest recorded source then stable ID, without state scoring', () => {
     const result = buildCeoToday({
       now: new Date('2026-09-06T18:00:00.000Z'),
       operationsProjects: [
@@ -332,15 +332,15 @@ describe('CEO Today prioritizer', () => {
     })
 
     expect(operationsActions(result).map((item) => item.id)).toEqual([
+      'operations:client',
       'operations:cws-a',
       'operations:cws-b',
       'operations:cws-late',
       'operations:ready',
-      'operations:client',
     ])
   })
 
-  it('keeps the top-five cap deterministic while retaining lower-ranked Operations candidates for inspection', () => {
+  it('keeps the top-three cap deterministic while retaining lower-ranked Operations candidates for inspection', () => {
     const leads = Array.from({ length: 5 }, (_, index) => lead({ id: `lead-${index}`, company: `Company ${index}` }))
     const result = buildCeoToday({
       now: new Date('2026-09-06T18:00:00.000Z'),
@@ -428,7 +428,7 @@ describe('CEO Today prioritizer', () => {
     expect(accountingActions(result)).toEqual([])
   })
 
-  it('deduplicates repeated projection records and preserves the deterministic top-five cap', () => {
+  it('deduplicates repeated projection records and preserves the deterministic top-three cap', () => {
     const result = buildCeoToday({
       now: friday,
       leads: Array.from({ length: 5 }, (_, index) => lead({ id: `lead-${index}`, company: `Company ${index}` })),

@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      laya_move_choices: {
+        Row: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at: string
+          card_id: string
+          title: string
+          action: string
+          outcome: string | null
+          defer_until: string | null
+          source_version: string
+          recommendation: Json
+          evaluation: Json
+          scope_evidence: Json | null
+        }
+        Insert: {
+          id: string
+          workspace_id: string
+          created_by: string
+          created_at?: string
+          card_id: string
+          title: string
+          action: string
+          outcome?: string | null
+          defer_until?: string | null
+          source_version: string
+          recommendation: Json
+          evaluation: Json
+          scope_evidence?: Json | null
+        }
+        Update: never
+        Relationships: [
+          {
+            foreignKeyName: "laya_move_choices_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_runs: {
         Row: {
           agent_key: string

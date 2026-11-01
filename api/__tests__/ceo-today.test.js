@@ -471,3 +471,36 @@ it('decorates ordered priorities with owner-only exact capabilities and strips i
  expect(review.input_snapshot.inputs.action.id).toBe(visible.id)
  vi.unstubAllEnvs()
 })
+
+describe('Next Move integration in the existing CEO route', () => {
+  beforeEach(() => { vi.clearAllMocks(); vi.stubEnv('GENERATION_SUPABASE_SERVICE_ROLE_KEY','synthetic-key'); mocks.missingOutreachEnv.mockReturnValue([]) })
+  afterEach(() => vi.unstubAllEnvs())
+  it('requires active ownership for next-move choices before any insert', async () => {
+    const client={from:vi.fn(()=>query({data:{role:'member'}}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'w',user:{id:'u'}})
+    const res=response()
+    await handler({method:'POST',body:{action:'next_move_choice',choice:'do'}},res)
+    expect(res.status).toHaveBeenCalledWith(403)
+    expect(client.from.mock.calls).toEqual([['workspace_members']])
+  })
+  it('projects owner-only move controls and a complete empty review without writing on GET', async () => {
+    const client={from:vi.fn(table=>query({data:table==='workspace_members'?{role:'owner'}:[]}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'w',user:{id:'u'}})
+    const res=response()
+    await handler({method:'GET'},res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    const payload=res.json.mock.calls[0][0]
+    expect(payload.move_review).toEqual({available:true,groups:[]})
+    expect(payload.actions[0]).toMatchObject({next_move:expect.objectContaining({why:expect.any(Object)}),move_token:expect.any(String)})
+    expect(client.from.mock.calls.some(([table])=>table==='laya_move_choices')).toBe(true)
+    // The fake client exposes SELECT only; any attempted GET write throws.
+  })
+  it('rejects invalid next-move reviews through the existing POST route', async () => {
+    const client={from:vi.fn(()=>query({data:{role:'owner'}}))}
+    mocks.authenticateWorkspace.mockResolvedValue({client,workspaceId:'w',user:{id:'u'}})
+    const res=response()
+    await handler({method:'POST',body:{action:'next_move_choice',choice:'do',review_token:'forged'}},res)
+    expect(res.status).toHaveBeenCalledWith(409)
+    expect(client.from.mock.calls).toEqual([['workspace_members']])
+  })
+})

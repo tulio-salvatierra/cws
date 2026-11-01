@@ -1,3 +1,4 @@
+import NextMoveControls, { MoveReview } from './NextMoveControls'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PriorityEvaluation from './PriorityEvaluation'
@@ -72,6 +73,8 @@ export default function AdminOverview() {
 
       {ceo?.deal_fit && <DealFits summary={ceo.deal_fit} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
 
+      <MoveReview review={ceo?.move_review} />
+
       <LayaResponseHistory history={ceo?.laya_response_history} />
 
       <BusinessDecisions summary={ceo?.business_decisions} onReload={async () => setCeo(await loadCeoToday())} />
@@ -105,11 +108,11 @@ function CeoActionCard({ item, onNotNow, onReload }) {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">{item.department} · {item.business_priority}</p>
         <h2 className="!mt-2 !border-0 !pt-0 text-xl font-semibold text-white">{item.human_action}</h2>
       </div>
-      <button type="button" onClick={onNotNow} className="text-sm text-gray-400 transition hover:text-white">Not now</button>
+      {!item.next_move && <button type="button" onClick={onNotNow} className="text-sm text-gray-400 transition hover:text-white">Not now</button>}
     </div>
     {item.lifecycle_stage && <p className="mt-2 text-xs text-emerald-200">Negocio Listo · {item.lifecycle_stage.replaceAll('_',' ')}</p>}
-    <p className="mt-4 text-sm leading-6 text-gray-300"><span className="font-medium text-white">Why now:</span> {item.why_now}</p>
-    <PriorityEvaluation item={item} onReload={onReload} />
-    <Link to={item.href} className="mt-5 inline-flex rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400">{item.cta_label}</Link>
+    <p className="mt-4 text-sm leading-6 text-gray-300"><span className="font-medium text-white">Why now:</span> {item.next_move?.why.text || item.why_now}</p>
+    {item.next_move ? <NextMoveControls item={item} onReload={onReload} /> : <PriorityEvaluation item={item} onReload={onReload} />}
+    {!item.next_move && <Link to={item.href} className="mt-5 inline-flex rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400">{item.cta_label}</Link>}
   </article>
 }
