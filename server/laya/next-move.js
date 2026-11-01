@@ -7,6 +7,10 @@ const populated = v => typeof v === 'string' && v.trim().length > 0
 
 // Five templates; every interpolation retains the exact source field underneath More.
 export function evidenceWhy(fields) {
+  const occurrence = fields.marketingOccurrence
+  if (occurrence?.reads_complete === true && occurrence.state === 'missed' && occurrence.attempt_id === null && occurrence.resolution_id === null && validDate(occurrence.scheduled_date) && populated(occurrence.label)) {
+    return { template: 1, text: `${occurrence.label} was scheduled for ${occurrence.scheduled_date}; no publishing attempt or owner resolution is recorded in CWS for that slot.` }
+  }
   const { due, status, updated, lane, client, onlyOpen, projectStatus, task, lastAction, actionDate } = fields
   if (validDate(due) && populated(lastAction) && validDate(actionDate) && populated(task)) return { template: 5, text: `${task} is due ${due}; the last recorded action was ${lastAction} on ${actionDate}.` }
   if (validDate(due) && onlyOpen === true && populated(lane) && populated(client)) return { template: 3, text: `Due ${due}; the only open ${lane} task for ${client}.` }
@@ -19,7 +23,13 @@ export function evidenceWhy(fields) {
 export function recommendation(item, now = new Date(), events = []) {
   const today = chicagoDate(now)
   const claims = item.evaluation?.why || []
-  const source = claims.find(c => c.source?.id === item.obligation_id || c.source?.id === item.project_id || c.source?.id === item.lead_id)?.source || claims[0]?.source
+  const projectedOccurrence = item.evaluation?.marketing_occurrence
+  const marketingOccurrence = item.source_type === 'marketing_missed'
+    && projectedOccurrence?.slot_key === item.id.slice('marketing:missed:'.length)
+    && projectedOccurrence.scheduled_date === item.actionable_on
+    && projectedOccurrence.workspace_id === item.evaluation?.subject?.workspace_id
+    ? projectedOccurrence : null
+  const source = item.source_type === 'marketing_missed' ? marketingOccurrence : claims.find(c => c.source?.id === item.obligation_id || c.source?.id === item.project_id || c.source?.id === item.lead_id)?.source || claims[0]?.source
   const row = source?.fields || {}
   // No note-text parsing, guessed dates, or invented deadlines.
   const dueSource = claims.find(c => [c.source?.fields?.due_on, c.source?.fields?.due_date, c.source?.fields?.next_due_date].some(d => validDate(d) && d === item.actionable_on))?.source
@@ -30,7 +40,7 @@ export function recommendation(item, now = new Date(), events = []) {
   const last = events.filter(e => e.card_id === item.id && ['do','later','handoff','drop'].includes(e.action) && Date.parse(e.created_at) <= now.getTime()).sort((a,b) => b.created_at.localeCompare(a.created_at))[0]
   const project = claims.find(c => c.source?.table === 'operations_projects')?.source
   const client = claims.find(c => c.source?.table === 'clients' && c.source.fields?.id === project?.fields?.client_id)?.source
-  const fields = { due, status, updated, task: item.human_action,
+  const fields = { ...(marketingOccurrence ? { marketingOccurrence } : {}), due, status, updated, task: item.human_action,
     projectStatus: project?.fields?.status || null, client: client?.fields?.name || null,
     open: project ? ['setup','in_progress','waiting_on_client','waiting_on_cws'].includes(project.fields.status) : false,
     lastAction: last?.action || null, actionDate: last ? chicagoDate(new Date(last.created_at)) : null }

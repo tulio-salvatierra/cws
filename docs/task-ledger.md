@@ -156,3 +156,5 @@
 | CWS-LAYA-DECISION-RULES-V1-20261101 | Codex | Released and verified | Existing CEO Today Top 3, evidence-only rules, explicit choices/outcomes, scope check and 30-day review; company-context excluded | 823 tests/82 files, lint/build; migration20261101181750; 5e2eac2 READY; live Top3/control/form/review and handoff persistence verified; no acceptance/outcome test pollution |
 
 | LAYA-COMPANY-WORLD-MODEL-001 | Codex | Schema verified; application release awaiting explicit approval | Canonical company context, owner-only read model and Next Move coexistence | 53 SQL assertions + actual database loaders + 839 application tests/lint/build pass; migration 20261101182102 applied; main push blocked by automatic approval review; live API verification pending |
+
+| CWS-LAYA-MARKETING-WHY-20261101 | Codex | Fix tested; release verification pending | Exact missed-slot schedule and complete source-register absence replace generic missing-fields fallback; no external-publication claim | 846 tests/84 files (after preserving the separate company-context release), lint/build; no migration or company-context changes |

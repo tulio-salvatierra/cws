@@ -44,7 +44,7 @@ export function evaluatePriority(input) {
   const today=chicagoDate(new Date(now)), missing=[]
   const rows=key=>sources.filter(s=>s.table===types[key]).map(s=>s.row)
   const row=principal?.row
-  let verdict='needs_data', next='Review the source records before following this priority.', money=null
+  let verdict='needs_data', next='Review the source records before following this priority.', money=null, marketingOccurrence=null
   if(!Object.keys(availability).length || Object.values(availability).some(value=>value!==true))missing.push('Required source reads are unavailable or reached their completeness limit.')
   if(sources.some(s=>s.table==='marketing_publish_destination_results' ? !rows('attempts').some(a=>a.id===s.row.attempt_id) : s.row.workspace_id!==workspaceId))missing.push('Source workspace/linkage is inconsistent.')
   if(action.source_type==='sales_command') {
@@ -91,6 +91,11 @@ export function evaluatePriority(input) {
     const attempts=rows('attempts').map(a=>({...a,destination_results:sources.filter(s=>s.table==='marketing_publish_destination_results' && s.row.attempt_id===a.id).map(s=>s.row)}))
     const plan=buildMarketingOccurrencePlan({attempts,resolutions:rows('resolutions'),now:new Date(now)})
     const key=action.id.split(':').slice(2).join(':'), slot=[...(plan.currentWeekSlots || []),...plan.missedSlots].find(s=>s.slotKey===key)
+    if(slot && !missing.length && action.source_type==='marketing_missed' && slot.state==='missed' && !slot.attempt && !slot.resolution) {
+      marketingOccurrence={kind:'derived_schedule',policy:'src/marketing/weeklySlots.js',workspace_id:workspaceId,
+        slot_key:slot.slotKey,label:slot.label,scheduled_date:slot.slotDate,state:slot.state,
+        attempt_id:null,resolution_id:null,reads_complete:true}
+    }
     if(!slot)missing.push('The frozen Chicago slot policy and current source register do not establish this occurrence.')
     else if(action.source_type==='marketing_ready')missing.push('CEO calendar readiness is not a verified exact asset, caption and destination publish preview; review those in Marketing.')
     else if(slot.state==='resolved' || slot.resolution){verdict='skip';next='The recorded owner resolution already closes this occurrence; do not retry or republish.'}
@@ -100,7 +105,7 @@ export function evaluatePriority(input) {
   } else if(action.source_type==='fallback')missing.push('This is the frozen fallback prompt, not a recorded prospect or proof of no business work. Review Sales and missing evidence first.')
   else missing.push('This priority source type is unsupported.')
   const why=sources.map(({table,row})=>({claim:`Recorded ${table} evidence used for this priority review.`,source:{table,id:row.id || row.occurrence_slot_key,workspace_id:row.workspace_id || workspaceId,version:row.updated_at || row.created_at || null,fields:{...row}}}))
-  return {evaluator:'priority_review',policy_version:'priority-review-v1',subject:{type:'ceo_priority',id:action.id,workspace_id:workspaceId},verdict:missing.length?'needs_data':verdict,next_action:missing.length?'Review and complete the missing source evidence before following this priority.':next,why,assumptions:['Act/Dismiss records intent only; it does not perform a call, message, publish, payment, filing, delivery change or activation.','The existing priority projection and order remain unchanged.'],missing_data:missing,money_at_stake:missing.length?null:money,related_decisions:[],policy_sources:[{document:'docs/product-definition.md',section:'2'},{document:'server/ceo/today.js',rule:'frozen priority projection'},...(String(action.source_type || '').startsWith('marketing_')?[{document:'src/marketing/weeklySlots.js',rule:'WEEKLY_MARKETING_SLOTS and Chicago missed-occurrence policy'}]:[])],evaluated_at:new Date(now).toISOString(),business_date:today,time_zone:'America/Chicago'}
+  return {evaluator:'priority_review',policy_version:'priority-review-v1',subject:{type:'ceo_priority',id:action.id,workspace_id:workspaceId},verdict:missing.length?'needs_data':verdict,...(marketingOccurrence?{marketing_occurrence:marketingOccurrence}:{}),next_action:missing.length?'Review and complete the missing source evidence before following this priority.':next,why,assumptions:['Act/Dismiss records intent only; it does not perform a call, message, publish, payment, filing, delivery change or activation.','The existing priority projection and order remain unchanged.'],missing_data:missing,money_at_stake:missing.length?null:money,related_decisions:[],policy_sources:[{document:'docs/product-definition.md',section:'2'},{document:'server/ceo/today.js',rule:'frozen priority projection'},...(String(action.source_type || '').startsWith('marketing_')?[{document:'src/marketing/weeklySlots.js',rule:'WEEKLY_MARKETING_SLOTS and Chicago missed-occurrence policy'}]:[])],evaluated_at:new Date(now).toISOString(),business_date:today,time_zone:'America/Chicago'}
 }
 
 export function decoratePriorities(data, context, lifecycleInputs={}) {

@@ -1,16 +1,19 @@
-Task ID: LAYA-COMPANY-WORLD-MODEL-001
+Task ID: CWS-LAYA-MARKETING-WHY-20261101
 Agent: Codex
-Date: 2026-11-01
-Objective: Resolve database verification and release Company World Model alongside the concurrent Next Move implementation.
-Files changed: World Model migration, read-only assembler/types/tests, existing CEO view branch, database table types, 53-assertion database fixtures/runner and actual-loader smoke test, documentation and project records.
-Database or API changes: Production migration 20261101182102 applied. Reuses the existing canonical workspace. GET /api/ceo-today?view=world_model requires active ownership. All seven new tables retain owner RLS, explicit nulls and no server writes; snapshots/context/outcomes are append-only. No seeds, decision activation, provider calls or autonomous actions.
-Verification: Disposable network-isolated Supabase PostgreSQL 17.11 container. Relevant baseline schema/helper definitions inspected read-only from production; synthetic auth/data only. Exact World Model and already-released Next Move migrations applied. 23 World Model + 12 coexistence + 18 existing business-decision pgTAP assertions pass. Actual loadWorldModel/loadMoves against this DB pass: all eight sources readable, canonical identity/null/zero/proposed status preserved, outcome lesson linked, Next Move hash unchanged by reads. Combined release tree: 839 tests/84 files, lint, import casing and build/prerender pass with existing verified CWS public client configuration. No placeholder production build settings. Diff check passes.
-Production schema: Seven tables have RLS and owner policies; anonymous SELECT denied; service INSERT denied on all company tables; append-only histories deny owner UPDATE. Next Move server insertion remains allowed. Security advisors unchanged from baseline; no new finding on these tables. Existing unrelated security advisories were not modified.
-Concurrent work: Next Move was independently committed to main as 856c5dc and migration 20261101181750 applied. Release worktree /tmp/laya-world-release builds on it, avoiding duplicate migration and preserving concurrent release docs. Original shared dirty checkout preserved.
-Known limitations: Local schema fixture is targeted, not a complete historical migration replay. No production fixture insertion or Next Move save was performed. Company facts remain unknown until owner-populated. World Model API live verification and deployment remain pending. Automatic approval review rejected git push to main because it interpreted the user instruction as verification authorization without explicit authorization for this exact production release. No push or World Model application deployment occurred.
-Release: Schema 20261101182102 applied and all seven company tables verified empty. Application release committed locally, not pushed; explicit approval required by automatic review before main/production publishing.
-Recommended next task: Obtain explicit approval to publish this tested commit to CWS main/production, then verify exact deployed revision, authenticated World Model GET and standard CEO Next Move GET. Do not bypass the rejected push via an alternative deployment path.
-Project-memory files updated: Task handoff, latest-codex, project log and ledger.
-Permanent decisions added: None. Global memory unchanged.
-
-Concurrent Next Move production verification is preserved in laya-decision-rules-v1-2026-11-01.md. Owner explicitly approved publishing World Model commit 1ae0b8a; current release merges latest main to retain the signed-review fix.
+Objective: Correct the live Marketing why line using actual schedule and publishing records.
+Files inspected: Existing instructions and release handoff; CEO projection; priority evaluator; next-move templates; weekly schedule; production attempt/resolution records and authenticated dashboard.
+Files changed: server/laya/priority-review.js, server/laya/next-move.js, server/laya/__tests__/next-move.test.js, project log, ledger and this handoff.
+Database or API changes: Add derived marketing_occurrence evidence to existing priority evaluation only for an established missed slot with complete same-workspace reads. No schema or business writes.
+Security decisions: Unknown/incomplete reads cannot prove absence. Require exact slot/date/workspace match. Retain full signed source evidence and policy provenance. Do not claim publication outside CWS.
+Decisions made: Correct an explanation defect without changing ranking, actions, schedule, company context or provider state.
+Assumptions: Existing weekly policy remains authoritative for scheduled occurrences; CWS register absence is not external provider absence.
+Tests added: Six regressions covering correct slot, unrelated source rows, capped/failed reads, attempts/resolutions and mismatches.
+Tests run: 846 tests/84 files (after preserving the separate company-context release), lint, production build/import check, diff check pass. Production records inspected read-only.
+Known issues: Existing history cap and legacy oversized evaluation restriction unchanged. Deployment and live wording verification follow this commit.
+Recommended next task: Verify deployed card and derived evidence, without recording choices or publishing.
+Questions requiring Tulio: None; this corrects the previously authorized release.
+Project-memory files updated: This handoff, project-log.md, task-ledger.md.
+Permanent decisions added: None.
+Reusable learnings added: None.
+Memory updates withheld: No company-context changes included.
+Git diff summary: Two implementation files, one test file, three documentation files; clean starting checkout at 4e146aa.

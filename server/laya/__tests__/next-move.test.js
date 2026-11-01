@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { evaluatePriority, priorityInputs } from '../priority-review.js'
 import { evidenceWhy, recommendation, review30Days, scopeCheck, sourceVersion, visibleMoves } from '../next-move.js'
 const now = new Date('2026-11-01T18:00:00Z')
 const source = (fields, table = 'leads') => ({ claim: '', source: { id: 'row', table, workspace_id: 'w', fields } })
@@ -54,5 +55,34 @@ describe('Laya Decision Rules V1', () => {
     expect(visibleMoves(cards,[{...event,action:'close',outcome:'yes'}],now)).not.toContain(card)
     expect(visibleMoves(cards,[{...event,action:'close',outcome:'not_yet'}],now)).toContain(card)
     expect(visibleMoves([{...card,source_timestamp:'changed'}],[{...event,action:'drop'}],now)).toHaveLength(1)
+  })
+})
+
+// Synthetic schedule/register fixtures, not production client data.
+describe('Marketing missed-slot evidence explanation', () => {
+  const marketingCard = {id:'marketing:missed:2026-10-26:post-b',source_type:'marketing_missed',department:'MARKETING',priority_tier:1,actionable_on:'2026-10-30',human_action:'Resolve missed Marketing post'}
+  const context = {workspaceId:'w',now,availability:{attempts:true,resolutions:true,destinations:true},
+    attempts:[{id:'unrelated',workspace_id:'w',marketing_slot_key:'2026-10-26:post-a',provider_status:'posted',updated_at:'2026-10-29T00:00:00Z'}]}
+  const explain = (ctx=context, card=marketingCard) => recommendation({...card,evaluation:evaluatePriority(priorityInputs(ctx,card))},now)
+  it('uses the exact scheduled occurrence and complete absence checks, never a different post', () => {
+    const result=explain()
+    expect(result.why).toEqual({template:1,text:'Post B was scheduled for 2026-10-30; no publishing attempt or owner resolution is recorded in CWS for that slot.'})
+    expect(result.source).toMatchObject({kind:'derived_schedule',policy:'src/marketing/weeklySlots.js',slot_key:'2026-10-26:post-b',attempt_id:null,resolution_id:null})
+    expect(result.type).toBe('marketing_action')
+    expect(result.fields.due).toBeNull()
+  })
+  it.each(['attempts','resolutions','destinations'])('withholds absence claims when %s reads fail or hit their cap', key => {
+    expect(explain({...context,availability:{...context.availability,[key]:false}}).why.template).toBeNull()
+  })
+  it('withholds the missed explanation when the slot has an attempt or owner resolution', () => {
+    expect(explain({...context,attempts:[{...context.attempts[0],marketing_slot_key:'2026-10-26:post-b'}]}).why.template).toBeNull()
+    expect(explain({...context,resolutions:[{id:'resolved',workspace_id:'w',occurrence_slot_key:'2026-10-26:post-b'}]}).why.template).toBeNull()
+  })
+  it('rejects mismatched or missing occurrence evidence instead of borrowing another record', () => {
+    const evaluation=evaluatePriority(priorityInputs(context,marketingCard))
+    for(const change of [{slot_key:'2026-10-26:post-a'},{scheduled_date:'2026-10-31'},{workspace_id:'other'}]) {
+      expect(recommendation({...marketingCard,evaluation:{...evaluation,marketing_occurrence:{...evaluation.marketing_occurrence,...change}}},now).why.template).toBeNull()
+    }
+    expect(recommendation({...marketingCard,evaluation:{why:[source({status:'posted',updated_at:'2026-10-29T00:00:00Z'},'marketing_publish_attempts')]}},now).why.template).toBeNull()
   })
 })
