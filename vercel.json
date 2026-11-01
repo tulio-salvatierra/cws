@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "codex/laya-source-date-fix": false
+    }
+  },
   "functions": {
     "api/laya-assess.js": {
       "maxDuration": 60

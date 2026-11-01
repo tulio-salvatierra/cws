@@ -27,6 +27,14 @@ describe('Laya Decision Rules V1', () => {
     expect(recommendation(card,now,events).why.template).toBe(5)
     expect(recommendation(card,now,[{...events[0],created_at:'2026-11-02T15:00:00Z'}]).why.template).toBe(1)
   })
+  it('uses the source date matched to the card when the row has multiple date fields', () => {
+    const item = {...card, evaluation:{why:[source({status:'open',due_on:'2026-11-10',due_date:'2026-11-01'})]}}
+    const result = recommendation(item, now)
+    expect(result.type).toBe('money_follow_up')
+    expect(result.fields.due).toBe('2026-11-01')
+    expect(result.why.text).toBe('Due 2026-11-01; still marked open.')
+    expect(result.due_source.fields.due_date).toBe(result.fields.due)
+  })
   it('keeps scope unknown until evidence exists and checks revisions and the exact floor', () => {
     const evidence={agreement_reference:'Agreement section 2',request:'Another page',inclusion:'addition'}
     expect(scopeCheck(null).status).toBe('needs_data')

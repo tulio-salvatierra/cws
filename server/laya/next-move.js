@@ -24,7 +24,8 @@ export function recommendation(item, now = new Date(), events = []) {
   // No note-text parsing, guessed dates, or invented deadlines.
   const dueSource = claims.find(c => [c.source?.fields?.due_on, c.source?.fields?.due_date, c.source?.fields?.next_due_date].some(d => validDate(d) && d === item.actionable_on))?.source
   const dueRow = dueSource?.fields || row
-  const due = [dueRow.due_on, dueRow.due_date, dueRow.next_due_date].find(validDate) || null
+  const dates = [dueRow.due_on, dueRow.due_date, dueRow.next_due_date]
+  const due = dates.find(d => validDate(d) && d === item.actionable_on) || dates.find(validDate) || null
   const status = row.status || row.response_state || null
   const updated = populated(row.updated_at) && validDate(row.updated_at.slice(0, 10)) && Number.isFinite(Date.parse(row.updated_at)) ? chicagoDate(new Date(row.updated_at)) : null
   const last = events.filter(e => e.card_id === item.id && ['do','later','handoff','drop'].includes(e.action) && Date.parse(e.created_at) <= now.getTime()).sort((a,b) => b.created_at.localeCompare(a.created_at))[0]
