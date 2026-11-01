@@ -9,8 +9,8 @@ Decisions made: Correct an explanation defect without changing ranking, actions,
 Assumptions: Existing weekly policy remains authoritative for scheduled occurrences; CWS register absence is not external provider absence.
 Tests added: Six regressions covering correct slot, unrelated source rows, capped/failed reads, attempts/resolutions and mismatches.
 Tests run: 846 tests/84 files (after preserving the separate company-context release), lint, production build/import check, diff check pass. Production records inspected read-only.
-Known issues: Existing history cap and legacy oversized evaluation restriction unchanged. Deployment and live wording verification follow this commit.
-Recommended next task: Verify deployed card and derived evidence, without recording choices or publishing.
+Known issues: Existing history cap and legacy oversized evaluation restriction unchanged. Deployed code 8b152da; dpl_HtnKqG6S5WxMyNVwizjt6wP5wHb9 READY. Authenticated live card and source disclosure verified; browser/runtime error scans empty.
+Recommended next task: No further work for this correction.
 Questions requiring Tulio: None; this corrects the previously authorized release.
 Project-memory files updated: This handoff, project-log.md, task-ledger.md.
 Permanent decisions added: None.
