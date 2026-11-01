@@ -2308,6 +2308,8 @@ link was opened; no Lead record or external provider action occurred.
 
 Owner authorized deployment and migration with company-context excluded. Isolated release adds Top 3, evidence-only recommendations, explicit owner choices/outcomes, scope checks and 30-day review in CEO Today. 822 tests/82 files, lint and build pass. Production migration 20261101181750 applied with owner-only reads/server-only append; zero choices and no company profiles. Application deployment and live verification pending.
 
+Release receipt: 856c5dc + 5e2eac2 pushed to main; deployment dpl_A9HhyKC9QKqcPNAne3yV4MoLtwVE READY on production aliases. Live verification found and fixed duplicate evidence inflating Marketing tokens. 823 tests/82 files, lint/build pass. Authenticated three-card GET, all enabled controls, outcome prompt/cancel, scope form and review verified. Handoff POST/GET200 persisted one retained handoff-only event; no acceptance/outcome values fabricated. Production access/constraint checks passed under rollback; legacy responses3 and publishing counts18/51 unchanged; browser/runtime error scans clear. All82 local migration versions applied; separate company task applied20261101182102 during verification, excluded from this release. Detailed limits in verification report.
+
 
 ## 2026-11-01 — Company World Model database verification and release
 

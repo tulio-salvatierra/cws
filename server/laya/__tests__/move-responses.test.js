@@ -15,6 +15,16 @@ describe('Next move owner choices',()=>{
     expect(readMoveToken(token,ctx,new Date(now.getTime()+15*60000))).toBeNull()
     expect(moveToken(ctx,{...card,human_action:'x'.repeat(100001)},now)).toBeNull()
   })
+  it('signs large evidence once while binding every source field',()=>{
+    const large={...card,evaluation:{why:[{source:{id:'one',fields:{status:'scheduled'}}},{source:{id:'large',fields:{detail:'x'.repeat(45000)}}}]}}
+    const token=moveToken(context(),large,now)
+    expect(token).not.toBeNull()
+    const review=readMoveToken(token,context(),now)
+    expect(review.evaluation).toEqual(large.evaluation)
+    expect(review.source_version).toHaveLength(64)
+    const changed={...large,evaluation:{why:[...large.evaluation.why,{source:{id:'new'}}]}}
+    expect(readMoveToken(moveToken(context(),changed,now),context(),now).source_version).not.toBe(review.source_version)
+  })
   it('saves only a signed choice and uses Chicago calendar days across DST',async()=>{
     const ctx=context(),token=moveToken(ctx,card,now)
     const insert=vi.fn(()=>({select:()=>({single:async()=>({data:{id:'saved'}})})}))

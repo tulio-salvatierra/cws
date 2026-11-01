@@ -12,3 +12,5 @@ Release: Schema 20261101182102 applied and all seven company tables verified emp
 Recommended next task: Obtain explicit approval to publish this tested commit to CWS main/production, then verify exact deployed revision, authenticated World Model GET and standard CEO Next Move GET. Do not bypass the rejected push via an alternative deployment path.
 Project-memory files updated: Task handoff, latest-codex, project log and ledger.
 Permanent decisions added: None. Global memory unchanged.
+
+Concurrent Next Move production verification is preserved in laya-decision-rules-v1-2026-11-01.md. Owner explicitly approved publishing World Model commit 1ae0b8a; current release merges latest main to retain the signed-review fix.
