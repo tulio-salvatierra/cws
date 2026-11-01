@@ -2,7 +2,7 @@
 
 Date: 2026-11-01
 Base: `f271fa3` (fresh checkout of `tulio-salvatierra/cws`).
-Status: owner authorized release; isolated 822-test release validated. Production migration 20261101181750 applied; application deployment and live verification pending.
+Status: released to production and verified. Code 5e2eac27c8d06a9ab4421e68ac45d54103186344; Vercel dpl_A9HhyKC9QKqcPNAne3yV4MoLtwVE READY on www.cicerowebstudio.xyz; migration 20261101181750 applied.
 
 ## Target and preserved behavior
 
@@ -43,7 +43,7 @@ Concurrent company-world-model changes appeared in the shared checkout during th
 ## Validation
 
 - Unchanged baseline: 798 tests / 79 files passed.
-- Isolated release tree: 822 tests / 82 files passed; company-context code and tests excluded.
+- Isolated release tree: 823 tests / 82 files passed; company-context code and tests excluded.
 - Focused fixtures cover all templates and fallback, actual versus generated dates, four types, revision limits, exact floor, time window, acceptance denominator, pending/skipped outcomes, Chicago DST, top-three backfill, owner/workspace/expiry binding, tampering, invalid input, duplicate/conflicting retries and unavailable history.
 - React → signed save-path tests cover intent, deferral, outcome prompt/cancel, Not yet, handoff and failed saves. API tests verify ownership and mutation-free GET.
 - Disposable PostgreSQL 17: migration applied locally; owner read/service insert allowed; member/anonymous access, browser insert, update/delete, and close without outcome rejected. `scripts/test-laya-moves.sql` is for an empty disposable database only, not production.
@@ -52,4 +52,12 @@ Concurrent company-world-model changes appeared in the shared checkout during th
 
 ## Release authorization and verification
 
-Owner explicitly authorized deployment, migration and live verification on 2026-11-01, with company-context work separate. Migration 20261101181750 applied successfully; production RLS enabled, authenticated SELECT only, service-role SELECT/INSERT only, zero choice rows. Company profiles remain absent. Application release and live checks pending.
+Owner explicitly authorized deployment, migration and live verification on 2026-11-01, with company-context work separate. Release commits 856c5dc and 5e2eac2 contain only Decision Rules changes. Migration 20261101181750 applied successfully. Production RLS enabled, authenticated SELECT only, service-role SELECT/INSERT only. Rolled-back production transaction verified service insertion, owner reads, nonowner isolation, denied browser inserts and update/delete, and rejection of a close without outcome; no QA rows retained.
+
+Live authenticated CEO Today GET returned 200 with three cards and available review data. Live verification initially found duplicated source evidence exceeded the Marketing signed-review limit. Fixed with a SHA-256 source-version fingerprint while retaining the complete signed evaluation; regression test covers large evidence and changed source binding. All three move tokens and controls now available. Existing legacy Marketing Act/Dismiss remains subject to its pre-existing oversized-evidence limit; new choice controls are independent.
+
+Verified More, Close task prompt (Yes/No/Not yet/Skip), cancel, scope fields and $50/hour explanation. One real Marketing handoff was generated through the UI: POST 200, refreshed GET 200, copyable draft and saved notice visible, database contains exactly one handoff with null outcome. This retained verification event does not count as accepted, dropped, deferred, Yes or No. The 30-day review returns zero decision/outcome counts and null acceptance, not an invented rate. No acceptance/outcome/scope answers or deferrals were fabricated in production; those branches were covered by automated UI/API tests and the database checks rather than persisted live choices. No message was sent to Claude or clients.
+
+Existing evaluation count remains 3; Marketing publish-attempt count remains 18 and published-post count remains 51 across the handoff check. Browser error log empty; released deployment error/fatal scan returned no logs. The existing project lifecycle card and department links remain visible. Daily Apps Script check-in is outside this clarified CWS OS release and was not changed.
+
+All 82 migration versions in this isolated release exist remotely. During verification, separate work applied company-world-model version 20261101182102 (remote total 83). That migration and its application code were not applied, copied, committed or deployed by this task; no rollback or modification was attempted. This is an explicit concurrent-work difference, not full-tree parity.
