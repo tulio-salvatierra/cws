@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { chicagoDate } from '../sales/queue.js'
 
 export const MOVE_POLICY = 'laya-decision-rules-v1'
@@ -101,5 +102,5 @@ export function visibleMoves(items, events, now = new Date()) {
 }
 
 export function sourceVersion(item) {
-  return JSON.stringify([item.source_type, item.source_timestamp, item.actionable_on, (item.evaluation?.why || []).map(c => c.source)])
+  return createHash('sha256').update(JSON.stringify([item.source_type, item.source_timestamp, item.actionable_on, (item.evaluation?.why || []).map(c => c.source)])).digest('hex')
 }
