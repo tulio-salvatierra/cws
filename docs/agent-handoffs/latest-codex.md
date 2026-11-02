@@ -1,19 +1,19 @@
-Task ID: CWS-LAYA-MARKETING-WHY-20261101
+Task ID: CWS-LAYA-SALES-WHY-20261102
 Agent: Codex
-Objective: Correct the live Marketing why line using actual schedule and publishing records.
-Files inspected: Existing instructions and release handoff; CEO projection; priority evaluator; next-move templates; weekly schedule; production attempt/resolution records and authenticated dashboard.
-Files changed: server/laya/priority-review.js, server/laya/next-move.js, server/laya/__tests__/next-move.test.js, project log, ledger and this handoff.
-Database or API changes: Add derived marketing_occurrence evidence to existing priority evaluation only for an established missed slot with complete same-workspace reads. No schema or business writes.
-Security decisions: Unknown/incomplete reads cannot prove absence. Require exact slot/date/workspace match. Retain full signed source evidence and policy provenance. Do not claim publication outside CWS.
-Decisions made: Correct an explanation defect without changing ranking, actions, schedule, company context or provider state.
-Assumptions: Existing weekly policy remains authoritative for scheduled occurrences; CWS register absence is not external provider absence.
-Tests added: Six regressions covering correct slot, unrelated source rows, capped/failed reads, attempts/resolutions and mismatches.
-Tests run: 846 tests/84 files (after preserving the separate company-context release), lint, production build/import check, diff check pass. Production records inspected read-only.
-Known issues: Existing history cap and legacy oversized evaluation restriction unchanged. Deployed code 8b152da; dpl_HtnKqG6S5WxMyNVwizjt6wP5wHb9 READY. Authenticated live card and source disclosure verified; browser/runtime error scans empty.
-Recommended next task: No further work for this correction.
-Questions requiring Tulio: None; this corrects the previously authorized release.
-Project-memory files updated: This handoff, project-log.md, task-ledger.md.
+Objective: Explain the two Sales cards using actual contact opportunity and timing, preserving ranking.
+Files inspected: CEO/Sales projection, priority evaluator, next-move helpers/tests, prior handoff; live lead/contact/send/promise records and dashboard.
+Files changed: server/laya/priority-review.js, server/laya/next-move.js, server/laya/__tests__/next-move.test.js; log, ledger and this handoff.
+Database or API changes: Add derived sales_opportunity to existing evaluation for eligible new-prospect commands with complete scoped reads. No schema change or business-data write.
+Security decisions: Bind lead/command/workspace; no absence claims from incomplete reads; do not equate missing email history to never contacted. No external actions.
+Decisions made: Explain opportunity without inventing urgency; acknowledge recorded past contact and response; completed promises are not due. No ranking/queue code changed.
+Assumptions: Existing Sales command eligibility is preserved, including phone-only prospects; this correction does not redesign that policy.
+Tests added: Seven regressions covering first/prior contact, Chicago date, completed/due promises, read failures, successful intro and closed leads.
+Tests run: 853 tests/84 files, lint, build/import check and diff check passed; existing decoration test asserts order and priority fields are unchanged. Live source records checked read-only.
+Known issues: Existing unrelated limits unchanged; deployed wording verification pending.
+Recommended next task: Verify both rendered explanations and unchanged Top3 after deployment.
+Questions requiring Tulio: None.
+Project-memory files updated: Log, ledger and latest-codex.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No company-context changes included.
-Git diff summary: Two implementation files, one test file, three documentation files; clean starting checkout at 4e146aa.
+Memory updates withheld: Company-context work remains separate.
+Git diff summary: Three code/test files and three docs; no ranking, scheduling or source-record edits.

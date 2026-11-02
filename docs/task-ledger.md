@@ -158,3 +158,5 @@
 | LAYA-COMPANY-WORLD-MODEL-001 | Codex | Schema verified; application release awaiting explicit approval | Canonical company context, owner-only read model and Next Move coexistence | 53 SQL assertions + actual database loaders + 839 application tests/lint/build pass; migration 20261101182102 applied; main push blocked by automatic approval review; live API verification pending |
 
 | CWS-LAYA-MARKETING-WHY-20261101 | Codex | Released and live verified | Exact missed-slot schedule and complete source-register absence replace generic missing-fields fallback; no external-publication claim | 846 tests/84 files (after preserving the separate company-context release), lint/build; no migration or company-context changes |
+
+| CWS-LAYA-SALES-WHY-20261102 | Codex | Tested; release verification pending | Contact-opportunity evidence replaces update-date-only why lines; ranking untouched |853 tests/84 files,lint/build; no schema or business writes|

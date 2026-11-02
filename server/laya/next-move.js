@@ -7,6 +7,14 @@ const populated = v => typeof v === 'string' && v.trim().length > 0
 
 // Five templates; every interpolation retains the exact source field underneath More.
 export function evidenceWhy(fields) {
+  const sales = fields.salesOpportunity
+  if (sales?.reads_complete === true && sales.category === 'new_prospect' && sales.no_successful_intro === true && (sales.has_phone || sales.has_email)) {
+    const channel = sales.has_email ? 'email' : 'phone'
+    const timing = sales.due_promises === 0 ? ' No due promise is recorded.' : ''
+    if (validDate(sales.last_contact_date) && sales.response_state === 'no_response') return { template: 2, text: `Last contact logged ${sales.last_contact_date}; response is marked “no response.” Review the next ${channel} contact.${timing}` }
+    if (sales.last_contact_date === null && sales.status === 'new') return { template: 2, text: `Prospect with no contact date or successful introductory email recorded in CWS; ${channel} available for first-contact review.${timing}` }
+    return { template: 2, text: `No successful introductory email is recorded in CWS; review the existing contact history before ${channel} outreach.${timing}` }
+  }
   const occurrence = fields.marketingOccurrence
   if (occurrence?.reads_complete === true && occurrence.state === 'missed' && occurrence.attempt_id === null && occurrence.resolution_id === null && validDate(occurrence.scheduled_date) && populated(occurrence.label)) {
     return { template: 1, text: `${occurrence.label} was scheduled for ${occurrence.scheduled_date}; no publishing attempt or owner resolution is recorded in CWS for that slot.` }
@@ -23,13 +31,17 @@ export function evidenceWhy(fields) {
 export function recommendation(item, now = new Date(), events = []) {
   const today = chicagoDate(now)
   const claims = item.evaluation?.why || []
+  const projectedSales = item.evaluation?.sales_opportunity
+  const salesOpportunity = item.source_type === 'sales_command' && projectedSales?.command_id === item.id
+    && projectedSales.lead_id === item.lead_id && projectedSales.workspace_id === item.evaluation?.subject?.workspace_id
+    ? projectedSales : null
   const projectedOccurrence = item.evaluation?.marketing_occurrence
   const marketingOccurrence = item.source_type === 'marketing_missed'
     && projectedOccurrence?.slot_key === item.id.slice('marketing:missed:'.length)
     && projectedOccurrence.scheduled_date === item.actionable_on
     && projectedOccurrence.workspace_id === item.evaluation?.subject?.workspace_id
     ? projectedOccurrence : null
-  const source = item.source_type === 'marketing_missed' ? marketingOccurrence : claims.find(c => c.source?.id === item.obligation_id || c.source?.id === item.project_id || c.source?.id === item.lead_id)?.source || claims[0]?.source
+  const source = salesOpportunity || (item.source_type === 'marketing_missed' ? marketingOccurrence : claims.find(c => c.source?.id === item.obligation_id || c.source?.id === item.project_id || c.source?.id === item.lead_id)?.source || claims[0]?.source)
   const row = source?.fields || {}
   // No note-text parsing, guessed dates, or invented deadlines.
   const dueSource = claims.find(c => [c.source?.fields?.due_on, c.source?.fields?.due_date, c.source?.fields?.next_due_date].some(d => validDate(d) && d === item.actionable_on))?.source
@@ -40,7 +52,7 @@ export function recommendation(item, now = new Date(), events = []) {
   const last = events.filter(e => e.card_id === item.id && ['do','later','handoff','drop'].includes(e.action) && Date.parse(e.created_at) <= now.getTime()).sort((a,b) => b.created_at.localeCompare(a.created_at))[0]
   const project = claims.find(c => c.source?.table === 'operations_projects')?.source
   const client = claims.find(c => c.source?.table === 'clients' && c.source.fields?.id === project?.fields?.client_id)?.source
-  const fields = { ...(marketingOccurrence ? { marketingOccurrence } : {}), due, status, updated, task: item.human_action,
+  const fields = { ...(salesOpportunity ? { salesOpportunity } : {}), ...(marketingOccurrence ? { marketingOccurrence } : {}), due, status, updated, task: item.human_action,
     projectStatus: project?.fields?.status || null, client: client?.fields?.name || null,
     open: project ? ['setup','in_progress','waiting_on_client','waiting_on_cws'].includes(project.fields.status) : false,
     lastAction: last?.action || null, actionDate: last ? chicagoDate(new Date(last.created_at)) : null }

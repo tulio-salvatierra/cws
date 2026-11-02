@@ -86,3 +86,33 @@ describe('Marketing missed-slot evidence explanation', () => {
     expect(recommendation({...marketingCard,evaluation:{why:[source({status:'posted',updated_at:'2026-10-29T00:00:00Z'},'marketing_publish_attempts')]}},now).why.template).toBeNull()
   })
 })
+
+
+describe('Sales first-contact queue explanations', () => {
+  const clock=new Date('2026-11-02T18:00:00Z')
+  const lead={id:'synthetic',workspace_id:'w',name:'Synthetic',status:'new',sales_classification:'prospect',response_state:'no_response',phone:'123',email:null,created_at:'2026-10-01T12:00:00Z',last_contacted_at:null}
+  const item={id:'sales:new_prospect:synthetic',lead_id:'synthetic',source_type:'sales_command',department:'SALES',actionable_on:'2026-10-01'}
+  const context={workspaceId:'w',now:clock,leads:[lead],availability:{leads:true,promises:true,sends:true}}
+  const explain=(changes={})=>recommendation({...item,evaluation:evaluatePriority(priorityInputs({...context,...changes},item))},clock)
+  it('explains first-contact eligibility without inventing urgency',()=>{
+    const result=explain()
+    expect(result.why.text).toBe('Prospect with no contact date or successful introductory email recorded in CWS; phone available for first-contact review. No due promise is recorded.')
+    expect(result.source).toMatchObject({lead_id:lead.id,reads_complete:true,no_successful_intro:true,due_promises:0})
+  })
+  it('acknowledges prior contact in Chicago time and ignores completed promises as urgency',()=>{
+    const result=explain({leads:[{...lead,status:'contacted',last_contacted_at:'2026-10-02T00:30:00Z'}],promises:[{id:'done',workspace_id:'w',lead_id:lead.id,due_on:'2026-10-01',completed_at:'2026-10-02T00:31:00Z'}]})
+    expect(result.why.text).toBe('Last contact logged 2026-10-01; response is marked “no response.” Review the next phone contact. No due promise is recorded.')
+    expect(result.why.text).not.toContain('first-contact')
+  })
+  it.each(['leads','promises','sends'])('does not make absence claims from incomplete %s reads',key=>{
+    expect(explain({availability:{...context.availability,[key]:false}}).fields.salesOpportunity).toBeUndefined()
+  })
+  it('does not reuse first-contact eligibility after a successful intro or for a closed lead',()=>{
+    expect(explain({sends:[{id:'sent',workspace_id:'w',lead_id:lead.id,send_type:'intro',status:'sent',sent_at:'2026-11-01T18:00:00Z'}]}).fields.salesOpportunity).toBeUndefined()
+    expect(explain({leads:[{...lead,status:'won'}]}).fields.salesOpportunity).toBeUndefined()
+  })
+  it('does not label a real due promise absent or claim first contact for a contacted lead with an unknown date',()=>{
+    expect(explain({promises:[{id:'due',workspace_id:'w',lead_id:lead.id,due_on:'2026-11-01',completed_at:null}]}).why.text).not.toContain('No due promise')
+    expect(explain({leads:[{...lead,status:'contacted'}]}).why.text).toContain('review the existing contact history')
+  })
+})
