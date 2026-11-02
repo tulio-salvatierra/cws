@@ -2324,3 +2324,5 @@ Marketing why-line release receipt: 8b152da deployed; dpl_HtnKqG6S5WxMyNVwizjt6w
 ## 2026-11-02 — Sales why lines grounded in contact opportunity
 
 Replaced update-date-only explanations for eligible new-prospect queue cards with complete, same-workspace contact/response/send/promise evidence. Prior contact is acknowledged in Chicago time; an existing contact is not called a first contact. First-contact wording is limited to new status with no contact date or successful intro recorded. No due promise is stated only when incomplete-free reads find none; completed promises are excluded. Existing queue/ranking and all business records unchanged. Seven regressions added;853 tests/84 files,lint/build pass. Production wording verification follows release.
+
+Sales why-line release receipt: 088fc99, deployment dpl_4qqwtPytTrHGMvVW2S6xV61vjkUX READY. Authenticated rendered contact-opportunity explanations verified; ordered Top3 titles identical before and after rollout. No choice, outreach or business-record mutation performed; browser/runtime error checks clear.

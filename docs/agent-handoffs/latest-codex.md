@@ -9,8 +9,8 @@ Decisions made: Explain opportunity without inventing urgency; acknowledge recor
 Assumptions: Existing Sales command eligibility is preserved, including phone-only prospects; this correction does not redesign that policy.
 Tests added: Seven regressions covering first/prior contact, Chicago date, completed/due promises, read failures, successful intro and closed leads.
 Tests run: 853 tests/84 files, lint, build/import check and diff check passed; existing decoration test asserts order and priority fields are unchanged. Live source records checked read-only.
-Known issues: Existing unrelated limits unchanged; deployed wording verification pending.
-Recommended next task: Verify both rendered explanations and unchanged Top3 after deployment.
+Known issues: Existing unrelated limits unchanged; 088fc99 deployed; dpl_4qqwtPytTrHGMvVW2S6xV61vjkUX READY. Live wording and unchanged ordered Top3 verified; browser/runtime error checks clear.
+Recommended next task: No further work for this correction.
 Questions requiring Tulio: None.
 Project-memory files updated: Log, ledger and latest-codex.
 Permanent decisions added: None.
