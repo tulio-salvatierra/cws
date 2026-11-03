@@ -2336,3 +2336,9 @@ Confirmed all20 apex sitemap URLs308 to same paths on www, all preferred URLs200
 Integrated the five supplied references on local `services-motion` from `654cf9c`: procedural three.js scene, scroll-driven desktop transitions, mobile card, reduced-motion and cleanup corrections. Existing data/assets/background and other components preserved; no new dependencies. Build (placeholder local client settings), lint and 857 tests pass; no Services type errors, nine pre-existing diagnostics elsewhere remain. Browser checks cover five selections, four mobile widths, static reduced motion, offscreen pause and route remount. No commit/push/deploy/merge; owner review pending. See latest-codex.md.
 
 Services release authorization: Tulio reviewed the local preview and explicitly approved pushing to main. Remote main remains 654cf9c with no intervening commits. The approved three-file implementation and required handoff/log updates are being committed for the main-triggered deployment; production verification follows.
+
+## 2026-11-03 — Portfolio refresh prepared
+
+Updated the shared desktop/mobile project list with Clean and Shiny, Upholstery of Chicago, Dominó de Barrio, refreshed Kike Vivaldy, and explicitly Upcoming Drum Chart AI without a launch link. Removed TAMM/community resources; no separate Social entry exists. Preserved four other projects and styling; captured four current site screenshots. Lint/build and 857 tests passed, desktop/mobile browser checks passed. Local branch only; release approval pending. See `agent-handoffs/cws-portfolio-20261103.md`.
+
+Portfolio release authorized: owner approved commit, merge, deploy and live verification. Rebased onto ec739cf, preserving the separately released Services motion implementation; documentation-only conflicts resolved by keeping both task records.
