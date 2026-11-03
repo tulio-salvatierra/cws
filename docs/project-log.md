@@ -2348,3 +2348,7 @@ Portfolio release authorized: owner approved commit, merge, deploy and live veri
 Owner-approved PR #59 merged as `287c8c8a16cba4e9bcaf7f856c18eb70aab29e26`. GitHub test and security checks passed. Vercel production deployment `dpl_6YDo1dibPeDhXd4ddjLURRgxtvZh` reached READY and owns both `www.cicerowebstudio.xyz` and `cicerowebstudio.xyz` aliases. Build duration: approximately 35 seconds.
 
 Live Chromium verification at 1440×900 and 390×844 passed: exact nine-project list; all image assets decode; four new/refreshed destination URLs match verified sources; removed entries absent; Upcoming label and no link for Drum Chart AI on desktop/mobile; mobile carousel navigates to the final project without horizontal overflow. Screenshots visually reviewed. Browser console contained informational messages only. Vercel error/fatal runtime-log scan for this deployment over the preceding ten minutes returned no logs. This is point-in-time verification, not a continuous monitoring claim. No business-data writes or form submissions.
+
+## 2026-11-03 — Retired personal portfolio removal
+
+Owner confirmed TulioSalvatierra.com is officially retired and requested its removal as a follow-up to the approved portfolio release. Removed the Portfolio Website entry from the shared desktop/mobile list; eight projects remain and numbering/carousel dots derive automatically from the data. Other projects and Upcoming behavior remain unchanged. Build and live checks follow this change.

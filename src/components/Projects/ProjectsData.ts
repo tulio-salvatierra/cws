@@ -36,14 +36,6 @@ export const projects: Project[] = [
     link: "https://www.carolinaskincenter.com/",
   },
   {
-    title: "Portfolio Website",
-    image: "/images/Visualizing_Creativity_Trust_and_Power.mp4",
-    alt: "Tulio's Portfolio Website",
-    description:
-      "Modern portfolio website showcasing web design, React development, and creative digital solutions with interactive animations.",
-    link: "https://www.tuliosalvatierra.com/",
-  },
-  {
     title: "Intermezzo Sound Studio",
     image: "/images/intermezzo.jpg",
     alt: "Intermezzo Sound Studio website",
