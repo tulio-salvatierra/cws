@@ -1,6 +1,6 @@
 # Portfolio refresh — 2026-11-03
 
-Implemented locally on `codex/portfolio-refresh`, based on `654cf9c` (the current GitHub main at inspection). No commit, push, merge, or deployment.
+Released through PR #59 after owner approval. Initially based on `654cf9c`, rebased onto `ec739cf` to preserve the separate Services release.
 
 - Removed TAMM and the Chicago community-resources entry. No separate Social project exists in the current portfolio data.
 - Added Clean and Shiny, Upholstery of Chicago, and Dominó de Barrio; refreshed Kike Vivaldy (the spelling used by the actual artist site).
@@ -33,4 +33,10 @@ Drum Chart AI: name/status supplied by owner. No confirmed launch URL or artwork
 
 Only portfolio code/assets and required project handoff/log/ledger changed. Existing TAMM references in service landing-page client lists are outside the requested portfolio list and remain untouched. Gallery data is photography, not a second project list.
 
-The original `/Users/tuliosalvatierra/Documents/Codex/cws` checkout had a deleted `workspace.jpg` and untracked `contractor.jpg`; neither was changed. Implementation is in the separate `work/cws-portfolio` checkout. Release requires the user’s approval.
+The original `/Users/tuliosalvatierra/Documents/Codex/cws` checkout had a deleted `workspace.jpg` and untracked `contractor.jpg`; neither was changed. Implementation is in the separate `work/cws-portfolio` checkout. Owner approved release; see verification below.
+
+## Release verification — 2026-11-03
+
+Owner-approved PR #59 merged as `287c8c8a16cba4e9bcaf7f856c18eb70aab29e26`. GitHub test and security checks passed. Vercel production deployment `dpl_6YDo1dibPeDhXd4ddjLURRgxtvZh` reached READY and owns both `www.cicerowebstudio.xyz` and `cicerowebstudio.xyz` aliases. Build duration: approximately 35 seconds.
+
+Live Chromium verification at 1440×900 and 390×844 passed: exact nine-project list; all image assets decode; four new/refreshed destination URLs match verified sources; removed entries absent; Upcoming label and no link for Drum Chart AI on desktop/mobile; mobile carousel navigates to the final project without horizontal overflow. Screenshots visually reviewed. Browser console contained informational messages only. Vercel error/fatal runtime-log scan for this deployment over the preceding ten minutes returned no logs. This is point-in-time verification, not a continuous monitoring claim. No business-data writes or form submissions.

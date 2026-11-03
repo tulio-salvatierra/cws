@@ -165,4 +165,4 @@
 
 | CWS-SERVICES-MOTION-20261103 | Codex | Owner approved release — production verification pending | Five-reference Services motion integration; preserved data/assets/background; no dependencies | Build/lint/857 tests pass; desktop/mobile/reduced-motion/offscreen/remount checks; nine unrelated TypeScript diagnostics remain; approved main push pending |
 
-| CWS-PORTFOLIO-20261103 | Codex | Release approved — production verification pending | Refresh portfolio projects/assets; explicit Upcoming status without launch link | Lint/build;857 tests/85 files;desktop/mobile browser checks;no push/deploy |
+| CWS-PORTFOLIO-20261103 | Codex | Released — production verified | Refresh portfolio projects/assets; explicit Upcoming status without launch link | PR #59;287c8c8;Vercel READY;lint/build/857 tests;live desktop/mobile images, links, Upcoming and carousel checks pass |

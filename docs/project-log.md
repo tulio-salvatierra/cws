@@ -2342,3 +2342,9 @@ Services release authorization: Tulio reviewed the local preview and explicitly 
 Updated the shared desktop/mobile project list with Clean and Shiny, Upholstery of Chicago, Dominó de Barrio, refreshed Kike Vivaldy, and explicitly Upcoming Drum Chart AI without a launch link. Removed TAMM/community resources; no separate Social entry exists. Preserved four other projects and styling; captured four current site screenshots. Lint/build and 857 tests passed, desktop/mobile browser checks passed. Local branch only; release approval pending. See `agent-handoffs/cws-portfolio-20261103.md`.
 
 Portfolio release authorized: owner approved commit, merge, deploy and live verification. Rebased onto ec739cf, preserving the separately released Services motion implementation; documentation-only conflicts resolved by keeping both task records.
+
+## Release verification — 2026-11-03
+
+Owner-approved PR #59 merged as `287c8c8a16cba4e9bcaf7f856c18eb70aab29e26`. GitHub test and security checks passed. Vercel production deployment `dpl_6YDo1dibPeDhXd4ddjLURRgxtvZh` reached READY and owns both `www.cicerowebstudio.xyz` and `cicerowebstudio.xyz` aliases. Build duration: approximately 35 seconds.
+
+Live Chromium verification at 1440×900 and 390×844 passed: exact nine-project list; all image assets decode; four new/refreshed destination URLs match verified sources; removed entries absent; Upcoming label and no link for Drum Chart AI on desktop/mobile; mobile carousel navigates to the final project without horizontal overflow. Screenshots visually reviewed. Browser console contained informational messages only. Vercel error/fatal runtime-log scan for this deployment over the preceding ten minutes returned no logs. This is point-in-time verification, not a continuous monitoring claim. No business-data writes or form submissions.
