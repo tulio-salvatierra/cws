@@ -3,7 +3,7 @@
  * Manages meta tags, canonical URLs, and structured data
  */
 
-const BASE_URL = 'https://cicerowebstudio.xyz';
+const BASE_URL = 'https://www.cicerowebstudio.xyz';
 
 export interface SEOData {
   title: string;
@@ -31,14 +31,7 @@ export function updateSEO(data: SEOData) {
   }
   metaDesc.setAttribute('content', data.description);
 
-  // Update canonical URL
-  let canonical = document.querySelector('link[rel="canonical"]');
-  if (!canonical) {
-    canonical = document.createElement('link');
-    canonical.setAttribute('rel', 'canonical');
-    document.head.appendChild(canonical);
-  }
-  canonical.setAttribute('href', data.canonical || `${BASE_URL}${window.location.pathname}`);
+  updateCanonicalUrl(data.canonical);
 
   // Update Open Graph tags
   updateMetaTag('property', 'og:title', data.title);
@@ -68,6 +61,18 @@ export function updateSEO(data: SEOData) {
   } else {
     updateMetaTag('name', 'robots', 'index, follow');
   }
+}
+
+/** Keep canonical and social URL in sync on direct loads and SPA navigation. */
+export function updateCanonicalUrl(url = `${BASE_URL}${window.location.pathname.replace(/\/+$/, '') || '/'}`) {
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonical);
+  }
+  canonical.setAttribute('href', url);
+  updateMetaTag('property', 'og:url', url);
 }
 
 /**

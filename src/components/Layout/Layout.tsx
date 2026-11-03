@@ -1,12 +1,17 @@
-import { Outlet } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useEffect, useLayoutEffect } from 'react';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import AppBackground from './AppBackground';
-import { generateOrganizationSchema, addJsonLd } from '../../lib/seo';
+import { generateOrganizationSchema, addJsonLd, updateCanonicalUrl } from '../../lib/seo';
 import './Layout.css';
 
 export default function Layout() {
+  const { pathname } = useLocation();
+  useLayoutEffect(() => {
+    updateCanonicalUrl();
+  }, [pathname]);
+
   useEffect(() => {
     const orgSchema = generateOrganizationSchema();
     addJsonLd(orgSchema, 'organization');

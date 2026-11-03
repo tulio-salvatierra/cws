@@ -2,50 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Negocio Listo (bilingual) -->
   <url>
-    <loc>https://cicerowebstudio.xyz/negocio-listo</loc>
+    <loc>https://www.cicerowebstudio.xyz/negocio-listo</loc>
     <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/en/negocio-listo</loc>
+    <loc>https://www.cicerowebstudio.xyz/en/negocio-listo</loc>
     <lastmod>2026-10-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <!-- Core pages -->
   <url>
-    <loc>https://cicerowebstudio.xyz/</loc>
+    <loc>https://www.cicerowebstudio.xyz/</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/about</loc>
+    <loc>https://www.cicerowebstudio.xyz/about</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/services</loc>
+    <loc>https://www.cicerowebstudio.xyz/services</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/blog</loc>
+    <loc>https://www.cicerowebstudio.xyz/blog</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/contact</loc>
+    <loc>https://www.cicerowebstudio.xyz/contact</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/policy</loc>
+    <loc>https://www.cicerowebstudio.xyz/policy</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
@@ -53,37 +53,37 @@
   
   <!-- Blog articles -->
   <url>
-    <loc>https://cicerowebstudio.xyz/blog/future-of-web-development-ai-tools</loc>
+    <loc>https://www.cicerowebstudio.xyz/blog/future-of-web-development-ai-tools</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/blog/mobile-first-website-design-why-it-matters</loc>
+    <loc>https://www.cicerowebstudio.xyz/blog/mobile-first-website-design-why-it-matters</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/blog/seo-strategies-that-work-2024</loc>
+    <loc>https://www.cicerowebstudio.xyz/blog/seo-strategies-that-work-2024</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/blog/scalable-ecommerce-lessons</loc>
+    <loc>https://www.cicerowebstudio.xyz/blog/scalable-ecommerce-lessons</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/blog/choose-right-web-design-package</loc>
+    <loc>https://www.cicerowebstudio.xyz/blog/choose-right-web-design-package</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/blog/why-lead-capture-forms-high-performing-website-chicago</loc>
+    <loc>https://www.cicerowebstudio.xyz/blog/why-lead-capture-forms-high-performing-website-chicago</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -91,37 +91,37 @@
 
   <!-- Dynamic landing pages -->
   <url>
-    <loc>https://cicerowebstudio.xyz/landing/cicero-web-design</loc>
+    <loc>https://www.cicerowebstudio.xyz/landing/cicero-web-design</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/landing/chicago-digital-marketing</loc>
+    <loc>https://www.cicerowebstudio.xyz/landing/chicago-digital-marketing</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/landing/berwyn-ecommerce</loc>
+    <loc>https://www.cicerowebstudio.xyz/landing/berwyn-ecommerce</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/landing/oak-park-seo</loc>
+    <loc>https://www.cicerowebstudio.xyz/landing/oak-park-seo</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/landing/elmwood-park-maintenance</loc>
+    <loc>https://www.cicerowebstudio.xyz/landing/elmwood-park-maintenance</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cicerowebstudio.xyz/landing/website-refresh-redesign</loc>
+    <loc>https://www.cicerowebstudio.xyz/landing/website-refresh-redesign</loc>
     <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

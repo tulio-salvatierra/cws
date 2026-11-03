@@ -160,3 +160,5 @@
 | CWS-LAYA-MARKETING-WHY-20261101 | Codex | Released and live verified | Exact missed-slot schedule and complete source-register absence replace generic missing-fields fallback; no external-publication claim | 846 tests/84 files (after preserving the separate company-context release), lint/build; no migration or company-context changes |
 
 | CWS-LAYA-SALES-WHY-20261102 | Codex | Released; live verified | Contact-opportunity evidence replaces update-date-only why lines; ranking untouched |853 tests/84 files,lint/build; no schema or business writes|
+
+| CWS-SEO-CANONICAL-20261103 | Codex | Implemented locally — release approval pending | Align sitemap/canonicals with verified HTTPS www; per-route canonical shells and SPA sync; existing redirects/review/API preserved |857 tests/85 files,lint/build,20 built canonical checks;production verification pending deployment |
