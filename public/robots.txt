@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /review/
 
-Sitemap: https://cicerowebstudio.xyz/sitemap.xml
+Sitemap: https://www.cicerowebstudio.xyz/sitemap.xml

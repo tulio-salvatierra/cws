@@ -2326,3 +2326,7 @@ Marketing why-line release receipt: 8b152da deployed; dpl_HtnKqG6S5WxMyNVwizjt6w
 Replaced update-date-only explanations for eligible new-prospect queue cards with complete, same-workspace contact/response/send/promise evidence. Prior contact is acknowledged in Chicago time; an existing contact is not called a first contact. First-contact wording is limited to new status with no contact date or successful intro recorded. No due promise is stated only when incomplete-free reads find none; completed promises are excluded. Existing queue/ranking and all business records unchanged. Seven regressions added;853 tests/84 files,lint/build pass. Production wording verification follows release.
 
 Sales why-line release receipt: 088fc99, deployment dpl_4qqwtPytTrHGMvVW2S6xV61vjkUX READY. Authenticated rendered contact-opportunity explanations verified; ordered Top3 titles identical before and after rollout. No choice, outreach or business-record mutation performed; browser/runtime error checks clear.
+
+## 2026-11-03 — Sitemap/canonical correction prepared
+
+Confirmed all20 apex sitemap URLs308 to same paths on www, all preferred URLs200. Corrected local SEO origins, generated route-specific canonical shells and SPA navigation synchronization while retaining API/review/fallback routing.857 tests/85 files,lint,build and20 built canonical checks pass. Production release awaits exact owner approval; no commit/push/deploy. Detailed evidence and remaining rendering/audit limits in agent-handoffs/cws-seo-canonical-20261103.md.

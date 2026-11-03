@@ -1,19 +1,19 @@
-Task ID: CWS-LAYA-SALES-WHY-20261102
+Task ID: CWS-SEO-CANONICAL-20261103
 Agent: Codex
-Objective: Explain the two Sales cards using actual contact opportunity and timing, preserving ranking.
-Files inspected: CEO/Sales projection, priority evaluator, next-move helpers/tests, prior handoff; live lead/contact/send/promise records and dashboard.
-Files changed: server/laya/priority-review.js, server/laya/next-move.js, server/laya/__tests__/next-move.test.js; log, ledger and this handoff.
-Database or API changes: Add derived sales_opportunity to existing evaluation for eligible new-prospect commands with complete scoped reads. No schema change or business-data write.
-Security decisions: Bind lead/command/workspace; no absence claims from incomplete reads; do not equate missing email history to never contacted. No external actions.
-Decisions made: Explain opportunity without inventing urgency; acknowledge recorded past contact and response; completed promises are not due. No ranking/queue code changed.
-Assumptions: Existing Sales command eligibility is preserved, including phone-only prospects; this correction does not redesign that policy.
-Tests added: Seven regressions covering first/prior contact, Chicago date, completed/due promises, read failures, successful intro and closed leads.
-Tests run: 853 tests/84 files, lint, build/import check and diff check passed; existing decoration test asserts order and priority fields are unchanged. Live source records checked read-only.
-Known issues: Existing unrelated limits unchanged; 088fc99 deployed; dpl_4qqwtPytTrHGMvVW2S6xV61vjkUX READY. Live wording and unchanged ordered Top3 verified; browser/runtime error checks clear.
-Recommended next task: No further work for this correction.
-Questions requiring Tulio: None.
-Project-memory files updated: Log, ledger and latest-codex.
-Permanent decisions added: None.
-Reusable learnings added: None.
-Memory updates withheld: Company-context work remains separate.
-Git diff summary: Three code/test files and three docs; no ranking, scheduling or source-record edits.
+Objective: Diagnose and correct sitemap/canonical redirects without changing legitimate redirects or private review routing.
+Files inspected: AGENTS.md, role instructions, product definition, technical conventions, decisions/learnings/log/ledger/latest handoff; sitemap, robots, index, routes, SEO helpers, bilingual data and prerender, package/build/test configuration; live production responses for all20 sitemap URLs and four protocol/hostname variants.
+Files changed: index.html, package.json, both robots files, public/sitemap.xml, src/lib/seo.ts, Layout.tsx, negocioListo.js, vercel.json; canonical-pages build helper and regressions; bilingual metadata expectations; report, log, ledger and this handoff.
+Database or API changes: None. Existing API/review/fallback rewrites retained.
+Security decisions: No private routes added to sitemap or generated shells; review disallow retained. No authenticated reads/writes or external publishing.
+Decisions made: Align source URLs to confirmed existing production HTTPS www. Do not change domain redirects/DNS.
+Assumptions: Existing page content and sitemap membership retained; no claim that HTTP200 proves rendered content quality.
+Tests added: Four canonical regressions; existing bilingual expectations updated.
+Tests run:857 tests/85 files;lint;import check/build;20 built canonical/og URL checks;diff check. Local build used fake client settings, not production credentials.
+Known issues: Not deployed; production still old.18 raw HTML shells lack content/H1 and inherit homepage titles/descriptions. Full Ahrefs access blocked by plan. Review-root robots meta/header absent, existing robots disallow retained. Unrelated pre-existing untracked asset left untouched.
+Recommended next task: After exact release approval, commit/push/merge, verify production and rerun audit; separately assess rendered public content.
+Questions requiring Tulio: Approve release of this exact correction?
+Project-memory files updated: report,log,ledger,latest-codex.
+Permanent decisions added:None.
+Reusable learnings added:None.
+Memory updates withheld:No unapproved permanent decisions; no claim of production resolution.
+Git diff summary:12 code/config/test files plus4 documentation files. No unrelated tracked edits. See cws-seo-canonical-20261103.md for evidence and release checks.

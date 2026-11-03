@@ -45,6 +45,74 @@
       "destination": "https://cws-review.vercel.app/:path*"
     },
     {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/services",
+      "destination": "/services.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/policy",
+      "destination": "/policy.html"
+    },
+    {
+      "source": "/blog/future-of-web-development-ai-tools",
+      "destination": "/blog/future-of-web-development-ai-tools.html"
+    },
+    {
+      "source": "/blog/mobile-first-website-design-why-it-matters",
+      "destination": "/blog/mobile-first-website-design-why-it-matters.html"
+    },
+    {
+      "source": "/blog/seo-strategies-that-work-2024",
+      "destination": "/blog/seo-strategies-that-work-2024.html"
+    },
+    {
+      "source": "/blog/scalable-ecommerce-lessons",
+      "destination": "/blog/scalable-ecommerce-lessons.html"
+    },
+    {
+      "source": "/blog/choose-right-web-design-package",
+      "destination": "/blog/choose-right-web-design-package.html"
+    },
+    {
+      "source": "/blog/why-lead-capture-forms-high-performing-website-chicago",
+      "destination": "/blog/why-lead-capture-forms-high-performing-website-chicago.html"
+    },
+    {
+      "source": "/landing/cicero-web-design",
+      "destination": "/landing/cicero-web-design.html"
+    },
+    {
+      "source": "/landing/chicago-digital-marketing",
+      "destination": "/landing/chicago-digital-marketing.html"
+    },
+    {
+      "source": "/landing/berwyn-ecommerce",
+      "destination": "/landing/berwyn-ecommerce.html"
+    },
+    {
+      "source": "/landing/oak-park-seo",
+      "destination": "/landing/oak-park-seo.html"
+    },
+    {
+      "source": "/landing/elmwood-park-maintenance",
+      "destination": "/landing/elmwood-park-maintenance.html"
+    },
+    {
+      "source": "/landing/website-refresh-redesign",
+      "destination": "/landing/website-refresh-redesign.html"
+    },
+    {
       "source": "/((?!api/|assets/|.*\\..*).*)",
       "destination": "/index.html"
     }

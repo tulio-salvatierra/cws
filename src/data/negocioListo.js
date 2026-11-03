@@ -2,7 +2,7 @@
 // Plain ESM with no asset imports so scripts/prerender-negocio-listo.mjs can read it in Node.
 // Source of plan copy: the owner-provided Negocio Listo graphics in public/images/negocio-listo.
 
-export const NL_SITE_URL = 'https://cicerowebstudio.xyz'
+export const NL_SITE_URL = 'https://www.cicerowebstudio.xyz'
 export const NL_PATHS = { es: '/negocio-listo', en: '/en/negocio-listo' }
 export const NL_WHATSAPP = '17863146121'
 export const NL_WHATSAPP_DISPLAY = '(786) 314-6121'
