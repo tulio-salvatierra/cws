@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { projects } from "./ProjectsData";
+import { projects, type Project } from "./ProjectsData";
 import problemDivider from "../../assets/images/problem/divider.svg";
 import navigateIcon from "../../assets/images/footer/navigate-icon.svg";
 import { useGSAP } from "@gsap/react";
@@ -13,16 +13,21 @@ function formatStep(current: number, total: number) {
   return `${String(current).padStart(2, "0")}/${String(total).padStart(2, "0")}`;
 }
 
-type ProjectEntryProps = {
-  title: string;
-  image: string;
-  alt: string;
-  description: string;
-  link: string;
-  step: string;
-};
+type ProjectEntryProps = Project & { step: string };
 
-function ProjectMedia({ image, alt }: { image: string; alt: string }) {
+function ProjectStatus({ status }: Pick<Project, "status">) {
+  return status === "upcoming" ? <span className="projects-card__status">Upcoming</span> : null;
+}
+
+function ProjectLink({ link, status }: Pick<Project, "link" | "status">) {
+  if (status === "upcoming" || !link) return null;
+  return <a href={link} target="_blank" rel="noopener noreferrer" className="projects-card__link">View project →</a>;
+}
+
+function ProjectMedia({ image, alt }: { image?: string; alt: string }) {
+  if (!image) {
+    return <div className="projects-card__media projects-card__placeholder" role="img" aria-label={alt}><span>Drum Chart AI</span><span>In development</span></div>;
+  }
   if (image.endsWith(".mp4")) {
     return (
       <video
@@ -59,6 +64,7 @@ function ProjectEntry({
   alt,
   description,
   link,
+  status,
   step,
 }: ProjectEntryProps) {
   return (
@@ -72,15 +78,9 @@ function ProjectEntry({
       <div className="projects-card__content">
         <span className="projects-card__step">{step}</span>
         <h3 className="projects-card__title">{title}</h3>
+        <ProjectStatus status={status} />
         <p className="projects-card__description">{description}</p>
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="projects-card__link"
-        >
-          View project →
-        </a>
+        <ProjectLink link={link} status={status} />
       </div>
     </>
   );
@@ -159,7 +159,7 @@ export default function Projects() {
           <span className="projects-section__icon" aria-hidden="true">
             <img src={navigateIcon} alt="" />
           </span>
-          <p className="projects-section__eyebrow">Success Stories</p>
+          <p className="projects-section__eyebrow">Selected Projects</p>
         </div>
 
         <div className="projects-section__list">
@@ -204,6 +204,7 @@ export default function Projects() {
                     {formatStep(index + 1, total)}
                   </span>
                   <h3 className="projects-card__title">{project.title}</h3>
+                  <ProjectStatus status={project.status} />
                   <p className="projects-card__description">
                     {project.description}
                   </p>
@@ -213,14 +214,7 @@ export default function Projects() {
                     <ProjectMedia image={project.image} alt={project.alt} />
                   </div>
                 </div>
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="projects-card__link"
-                >
-                  View project →
-                </a>
+                <ProjectLink link={project.link} status={project.status} />
               </div>
             ))}
           </div>

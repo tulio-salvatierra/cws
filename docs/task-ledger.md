@@ -164,3 +164,5 @@
 | CWS-SEO-CANONICAL-20261103 | Codex | Implemented locally — release approval pending | Align sitemap/canonicals with verified HTTPS www; per-route canonical shells and SPA sync; existing redirects/review/API preserved |857 tests/85 files,lint/build,20 built canonical checks;production verification pending deployment |
 
 | CWS-SERVICES-MOTION-20261103 | Codex | Owner approved release — production verification pending | Five-reference Services motion integration; preserved data/assets/background; no dependencies | Build/lint/857 tests pass; desktop/mobile/reduced-motion/offscreen/remount checks; nine unrelated TypeScript diagnostics remain; approved main push pending |
+
+| CWS-PORTFOLIO-20261103 | Codex | Release approved — production verification pending | Refresh portfolio projects/assets; explicit Upcoming status without launch link | Lint/build;857 tests/85 files;desktop/mobile browser checks;no push/deploy |

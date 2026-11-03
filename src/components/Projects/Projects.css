@@ -223,3 +223,33 @@
     display: none;
   }
 }
+
+.projects-card__status {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid #f5892f;
+  border-radius: 999px;
+  color: #f5892f;
+  font-family: "Clash", sans-serif;
+  font-size: 0.875rem;
+}
+
+.projects-card__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #1c1c1c;
+  color: #fff;
+  font-family: "Clash", sans-serif;
+  font-size: clamp(1.25rem, 3vw, 2.5rem);
+  text-align: center;
+}
+
+.projects-card__placeholder span:last-child {
+  color: #f5892f;
+  font-size: 1rem;
+}
