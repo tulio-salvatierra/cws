@@ -76,6 +76,26 @@ export function updateCanonicalUrl(url = `${BASE_URL}${window.location.pathname.
 }
 
 /**
+ * Apply the title/description for a public route from src/data/route-meta.json
+ * (the same file the build uses for static shells). Returns false for routes
+ * without an entry so pages that manage their own meta are left alone.
+ */
+export function applyRouteMeta(
+  routeMeta: Record<string, { title: string; description: string }>,
+  pathname = window.location.pathname,
+) {
+  const meta = routeMeta[pathname.replace(/\/+$/, '') || '/'];
+  if (!meta) return false;
+  document.title = meta.title;
+  updateMetaTag('name', 'description', meta.description);
+  updateMetaTag('property', 'og:title', meta.title);
+  updateMetaTag('property', 'og:description', meta.description);
+  updateMetaTag('name', 'twitter:title', meta.title);
+  updateMetaTag('name', 'twitter:description', meta.description);
+  return true;
+}
+
+/**
  * Helper function to update or create meta tags
  */
 function updateMetaTag(attribute: 'name' | 'property', value: string, content: string) {
@@ -98,8 +118,8 @@ export function generateOrganizationSchema() {
     '@id': `${BASE_URL}/#organization`,
     name: 'Cicero Web Studio',
     url: BASE_URL,
-    logo: `${BASE_URL}/logo.png`,
-    image: `${BASE_URL}/logo.png`,
+    logo: `${BASE_URL}/images/logo.png`,
+    image: `${BASE_URL}/images/logo.png`,
     description: 'I\'m Tulio — ex-logistics pro turned web dev — building modern, fast sites for small businesses in Humboldt Park, Portage Park & greater Chicago. No fluff, just results: more bookings, calls, and sales.',
     address: {
       '@type': 'PostalAddress',
@@ -113,7 +133,7 @@ export function generateOrganizationSchema() {
       contactType: 'Customer Service',
       email: 'info@cicerowebstudio.xyz',
       areaServed: ['Cicero', 'Chicago', 'Berwyn', 'Oak Park', 'Elmwood Park'],
-      availableLanguage: 'English'
+      availableLanguage: ['English', 'Spanish']
     },
     sameAs: [
       'https://www.instagram.com/cicerowebstudio',
@@ -127,12 +147,9 @@ export function generateOrganizationSchema() {
       dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
       opens: '09:00',
       closes: '18:00'
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '5.0',
-      reviewCount: '4'
     }
+    // No aggregateRating: Google doesn't allow self-served ratings on a
+    // LocalBusiness about itself. Reviews belong on the Google Business Profile.
   };
 }
 

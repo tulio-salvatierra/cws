@@ -3,14 +3,35 @@ import { useEffect, useLayoutEffect } from 'react';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import AppBackground from './AppBackground';
-import { generateOrganizationSchema, addJsonLd, updateCanonicalUrl } from '../../lib/seo';
+import { generateOrganizationSchema, addJsonLd, updateCanonicalUrl, applyRouteMeta } from '../../lib/seo';
+import routeMeta from '../../data/route-meta.json';
 import './Layout.css';
 
 export default function Layout() {
   const { pathname } = useLocation();
   useLayoutEffect(() => {
     updateCanonicalUrl();
+    applyRouteMeta(routeMeta, pathname);
   }, [pathname]);
+
+  // Lead tracking: one delegated listener pushes a GTM event for every
+  // tap-to-call / email link, so contact clicks are measurable per page.
+  useEffect(() => {
+    const onClick = (event: MouseEvent) => {
+      const link = (event.target as Element | null)?.closest?.('a[href^="tel:"], a[href^="mailto:"]');
+      if (!link) return;
+      const href = link.getAttribute('href') || '';
+      const w = window as unknown as { dataLayer?: unknown[] };
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        event: 'lead_click',
+        booking_method: href.startsWith('tel:') ? 'phone' : 'email',
+        booking_source: `page:${window.location.pathname}`,
+      });
+    };
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, []);
 
   useEffect(() => {
     const orgSchema = generateOrganizationSchema();
