@@ -170,3 +170,5 @@
 | CWS-PORTFOLIO-RETIRE-20261103 | Codex | Release in progress | Remove officially retired TulioSalvatierra.com from shared portfolio list; eight projects remain | Data-only change; lint/build/diff check passed; live verification follows release |
 
 | CWS-PORTFOLIO-CORRECTIONS-20261104 | Codex | Prepared — validation/release pending | Correct Carolina URL and remove Intermezzo listing; seven projects remain | Exact parsed-data transformation passed; execution environment unavailable for lint/build/browser; no merge or production deploy |
+
+| CWS-LANDING-TRUST-CLEANUP-20261104 | Codex | Draft review | Applied D1–D4 on six landing pages and isolated Service JSON-LD | 869 tests, lint, build, six static titles and 12 Chrome viewport checks passed. [Draft PR #62](https://github.com/tulio-salvatierra/cws/pull/62) |
