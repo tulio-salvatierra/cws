@@ -33,14 +33,7 @@ export const projects: Project[] = [
     alt: "Carolina's Skin Center Website",
     description:
       "Luxury skincare and medical aesthetics website with elegant design, responsive layout, and service-focused user experience.",
-    link: "https://www.carolinaskincenter.com/",
-  },
-  {
-    title: "Intermezzo Sound Studio",
-    image: "/images/intermezzo.jpg",
-    alt: "Intermezzo Sound Studio website",
-    description: "Remote music production studio website featuring recording services, audio engineering, and music production for emerging artists.",
-    link: "https://www.intermezzosoundstudio.com/",
+    link: "https://carolinaskincentre.com",
   },
   {
     title: "Kike Vivaldy",

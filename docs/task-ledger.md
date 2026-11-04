@@ -168,3 +168,5 @@
 | CWS-PORTFOLIO-20261103 | Codex | Released — production verified | Refresh portfolio projects/assets; explicit Upcoming status without launch link | PR #59;287c8c8;Vercel READY;lint/build/857 tests;live desktop/mobile images, links, Upcoming and carousel checks pass |
 
 | CWS-PORTFOLIO-RETIRE-20261103 | Codex | Release in progress | Remove officially retired TulioSalvatierra.com from shared portfolio list; eight projects remain | Data-only change; lint/build/diff check passed; live verification follows release |
+
+| CWS-PORTFOLIO-CORRECTIONS-20261104 | Codex | Prepared — validation/release pending | Correct Carolina URL and remove Intermezzo listing; seven projects remain | Exact parsed-data transformation passed; execution environment unavailable for lint/build/browser; no merge or production deploy |

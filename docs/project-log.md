@@ -2352,3 +2352,7 @@ Live Chromium verification at 1440×900 and 390×844 passed: exact nine-project 
 ## 2026-11-03 — Retired personal portfolio removal
 
 Owner confirmed TulioSalvatierra.com is officially retired and requested its removal as a follow-up to the approved portfolio release. Removed the Portfolio Website entry from the shared desktop/mobile list; eight projects remain and numbering/carousel dots derive automatically from the data. Other projects and Upcoming behavior remain unchanged. Build and live checks follow this change.
+
+## 2026-11-04 — Portfolio corrections prepared
+
+Corrected Carolina's project link to https://carolinaskincentre.com and removed Intermezzo Sound Studio from the shared desktop/mobile project array. Seven projects remain; other entries, order, Upcoming status and assets preserved. Based on main 3a3bb8a after inspecting existing open PRs and portfolio branch history. Parsed-data comparison passed. Execution environment became unavailable before lint/build/browser checks; CI pending. Isolated draft branch; no merge or production deployment authorized or performed.
