@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import process from 'node:process'
 import { describe, expect, it } from 'vitest'
 
-const migration = readFileSync(resolve(process.cwd(), 'supabase/migrations/20261104174536_lead_google_share_reference_constraint.sql'), 'utf8')
+const migration = readFileSync(resolve(process.cwd(), 'supabase/migrations/20261104175143_lead_google_share_reference_constraint.sql'), 'utf8')
 
 describe('Lead Google Business Profile database boundary', () => {
   it('adds the exact Google Share host while retaining the strict URL checks', () => {
