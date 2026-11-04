@@ -64,7 +64,7 @@ describe('Sales leads contact methods', () => {
 
     expect(res.status).toHaveBeenCalledWith(400)
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      error: 'Google Business Profile URL must be an HTTPS Google Maps or Business Profile link.',
+      error: 'Google Business Profile URL must be an HTTPS Google Maps, Business Profile, or Google Share link.',
     }))
   })
 

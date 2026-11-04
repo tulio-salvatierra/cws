@@ -1,4 +1,4 @@
-const SHORT_GOOGLE_HOSTS = new Set(['g.page', 'g.co', 'goo.gl', 'maps.app.goo.gl'])
+const SHORT_GOOGLE_HOSTS = new Set(['g.page', 'g.co', 'goo.gl', 'maps.app.goo.gl', 'share.google'])
 
 function isGoogleBusinessProfileHost(hostname) {
   const host = String(hostname || '').toLowerCase()

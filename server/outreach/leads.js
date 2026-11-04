@@ -38,7 +38,7 @@ export default async function handler(req, res) {
   const phone = cleanText(body.phone, 50)
   if (!email && !phone) return res.status(400).json({ ok: false, error: 'A verified business email or phone is required.' })
   const googleBusinessProfileUrl = normalizeGoogleBusinessProfileUrl(body.google_business_profile_url)
-  if (googleBusinessProfileUrl === false) return res.status(400).json({ ok: false, error: 'Google Business Profile URL must be an HTTPS Google Maps or Business Profile link.' })
+  if (googleBusinessProfileUrl === false) return res.status(400).json({ ok: false, error: 'Google Business Profile URL must be an HTTPS Google Maps, Business Profile, or Google Share link.' })
   const salesClassification = cleanText(body.sales_classification, 32)
   const responseState = cleanText(body.response_state, 32)
   if (salesClassification && !CLASSIFICATIONS.has(salesClassification)) return res.status(400).json({ ok: false, error: 'Invalid Sales classification.' })

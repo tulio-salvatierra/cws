@@ -10,7 +10,7 @@ vi.mock('../../../lib/supabase', () => ({
 
 import SalesPage from '../SalesPage'
 
-function response(payload) { return { ok: true, json: vi.fn().mockResolvedValue(payload) } }
+function response(payload, { ok = true } = {}) { return { ok, json: vi.fn().mockResolvedValue(payload) } }
 
 const salesState = {
   ok: true,
@@ -82,6 +82,22 @@ describe('SalesPage', () => {
     render(<MemoryRouter><SalesPage /></MemoryRouter>)
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Ada Plumbing', level: 2 })).toBeInTheDocument())
     expect(globalThis.fetch.mock.calls).toHaveLength(2)
+  })
+
+  it('keeps a failed Sales-detail save visible inside its open dialog', async () => {
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce(response(salesState))
+      .mockResolvedValueOnce(response({ error: 'Google Business Profile URL must be an HTTPS Google Maps, Business Profile, or Google Share link.' }, { ok: false }))
+
+    render(<MemoryRouter><SalesPage /></MemoryRouter>)
+
+    await screen.findByRole('heading', { name: 'Ada Plumbing', level: 2 })
+    fireEvent.click(screen.getByRole('button', { name: 'Edit lead' }))
+    fireEvent.change(screen.getByLabelText('Google Business Profile URL'), { target: { value: 'https://example.com/not-google' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save Sales details' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Google Business Profile URL must be an HTTPS Google Maps, Business Profile, or Google Share link.')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 
   it('does not discover on load or reload; the owner must prepare and then explicitly start discovery', async () => {

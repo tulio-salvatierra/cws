@@ -146,7 +146,16 @@ export default function SalesPage() {
 
     <TestLeadControls leads={sales.leads || []} workspaceId={sales.workspace_id} canManage={sales.can_manage_tests} onReload={load} />
 
-    {editingLead && <LeadEditor lead={editingLead} onCancel={() => setEditingLead(null)} onSave={async (changes) => { if (await ownerAction({ action: 'update_lead_sales_state', lead_id: editingLead.id, ...changes })) setEditingLead(null) }} />}
+    {editingLead && <LeadEditor lead={editingLead} onCancel={() => setEditingLead(null)} onSave={async (changes) => {
+      try {
+        await request(SALES_API_PATH, { method: 'POST', body: JSON.stringify({ action: 'update_lead_sales_state', lead_id: editingLead.id, ...changes }) })
+        setEditingLead(null)
+        await load()
+        return null
+      } catch (actionError) {
+        return actionError.message
+      }
+    }} />}
   </div></main>
 }
 
@@ -231,5 +240,15 @@ function VerificationCard({ candidate, busy, onVerify }) {
 
 function LeadEditor({ lead, onCancel, onSave }) {
   const [form, setForm] = useState({ sales_classification: lead.sales_classification || '', response_state: lead.response_state || '', phone: lead.phone || '', locality: lead.locality || '', google_business_profile_url: lead.google_business_profile_url || '', status: lead.status || 'contacted' })
-  return <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 grid place-items-center bg-slate-950/80 p-5"><form onSubmit={(event) => { event.preventDefault(); onSave(form) }} className="w-full max-w-lg rounded-3xl border border-white/10 bg-slate-900 p-6"><h2 className="text-xl font-semibold">Sales details for {lead.company || lead.name || lead.email}</h2><p className="mt-1 text-sm text-slate-400">Only the queue fields needed for Sales.</p><div className="mt-5 grid gap-3"><select value={form.sales_classification} onChange={(event) => setForm({ ...form, sales_classification: event.target.value })} className="rounded-xl bg-slate-800 p-3"><option value="">Unclassified</option><option value="inbound">Inbound</option><option value="prospect">Prospect</option></select><select value={form.response_state} onChange={(event) => setForm({ ...form, response_state: event.target.value })} className="rounded-xl bg-slate-800 p-3"><option value="">No recorded response</option><option value="no_response">No response</option><option value="warm">Warm / interested</option><option value="neutral">Neutral</option></select><select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="rounded-xl bg-slate-800 p-3"><option value="new">New</option><option value="contacted">Contacted</option><option value="responded">Responded</option><option value="won">Won</option><option value="lost">Closed / not interested</option><option value="unresponsive">Dormant / revisit later</option></select><input value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} placeholder="Phone" className="rounded-xl bg-slate-800 p-3" /><input value={form.locality} onChange={(event) => setForm({ ...form, locality: event.target.value })} placeholder="Locality" className="rounded-xl bg-slate-800 p-3" /><input aria-label="Google Business Profile URL" type="url" value={form.google_business_profile_url} onChange={(event) => setForm({ ...form, google_business_profile_url: event.target.value })} placeholder="Google Business Profile URL (optional)" className="rounded-xl bg-slate-800 p-3" /></div><div className="mt-5 flex gap-3"><button className="rounded-full bg-orange-300 px-4 py-2 font-semibold text-slate-950">Save Sales details</button><button type="button" onClick={onCancel} className="rounded-full border border-white/20 px-4 py-2">Cancel</button></div></form></div>
+  const [saveError, setSaveError] = useState('')
+  const [saving, setSaving] = useState(false)
+  async function submit(event) {
+    event.preventDefault()
+    setSaveError('')
+    setSaving(true)
+    const errorMessage = await onSave(form)
+    if (errorMessage) setSaveError(errorMessage)
+    setSaving(false)
+  }
+  return <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 grid place-items-center bg-slate-950/80 p-5"><form onSubmit={submit} className="w-full max-w-lg rounded-3xl border border-white/10 bg-slate-900 p-6"><h2 className="text-xl font-semibold">Sales details for {lead.company || lead.name || lead.email}</h2><p className="mt-1 text-sm text-slate-400">Only the queue fields needed for Sales.</p><div className="mt-5 grid gap-3"><select value={form.sales_classification} onChange={(event) => setForm({ ...form, sales_classification: event.target.value })} className="rounded-xl bg-slate-800 p-3"><option value="">Unclassified</option><option value="inbound">Inbound</option><option value="prospect">Prospect</option></select><select value={form.response_state} onChange={(event) => setForm({ ...form, response_state: event.target.value })} className="rounded-xl bg-slate-800 p-3"><option value="">No recorded response</option><option value="no_response">No response</option><option value="warm">Warm / interested</option><option value="neutral">Neutral</option></select><select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="rounded-xl bg-slate-800 p-3"><option value="new">New</option><option value="contacted">Contacted</option><option value="responded">Responded</option><option value="won">Won</option><option value="lost">Closed / not interested</option><option value="unresponsive">Dormant / revisit later</option></select><input value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} placeholder="Phone" className="rounded-xl bg-slate-800 p-3" /><input value={form.locality} onChange={(event) => setForm({ ...form, locality: event.target.value })} placeholder="Locality" className="rounded-xl bg-slate-800 p-3" /><input aria-label="Google Business Profile URL" type="url" value={form.google_business_profile_url} onChange={(event) => setForm({ ...form, google_business_profile_url: event.target.value })} placeholder="Google Business Profile URL (optional)" className="rounded-xl bg-slate-800 p-3" /></div>{saveError && <p role="alert" className="mt-4 text-sm text-rose-300">{saveError}</p>}<div className="mt-5 flex gap-3"><button disabled={saving} className="rounded-full bg-orange-300 px-4 py-2 font-semibold text-slate-950 disabled:opacity-50">{saving ? 'Saving…' : 'Save Sales details'}</button><button type="button" disabled={saving} onClick={onCancel} className="rounded-full border border-white/20 px-4 py-2 disabled:opacity-50">Cancel</button></div></form></div>
 }
