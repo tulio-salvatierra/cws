@@ -5,6 +5,7 @@ import Services from '../Services';
 import Process from '../Process';
 import Projects from '../Projects/Projects';
 import CtaSection from '../CtaSection';
+import LocationSection from '../LocationSection/LocationSection';
 
 // LocalBusiness JSON-LD is added once, site-wide, by Layout.
 export default function Home() {
@@ -32,6 +33,7 @@ export default function Home() {
       <div>
         <CtaSection />
       </div>
+      <LocationSection />
     </>
   );
 }
