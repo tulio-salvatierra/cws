@@ -925,7 +925,7 @@ async function updateLeadSalesState(context, body, res) {
   if (salesClassification && !CLASSIFICATIONS.has(salesClassification)) return res.status(400).json({ ok: false, error: 'Invalid Sales classification.' })
   if (responseState && !RESPONSE_STATES.has(responseState)) return res.status(400).json({ ok: false, error: 'Invalid response state.' })
   if (leadStatus && !LEAD_STATUSES.has(leadStatus)) return res.status(400).json({ ok: false, error: 'Invalid lead status.' })
-  if (googleBusinessProfileUrl === false) return res.status(400).json({ ok: false, error: 'Google Business Profile URL must be an HTTPS Google Maps or Business Profile link.' })
+  if (googleBusinessProfileUrl === false) return res.status(400).json({ ok: false, error: 'Google Business Profile URL must be an HTTPS Google Maps, Business Profile, or Google Share link.' })
   const changes = {
     sales_classification: salesClassification,
     response_state: responseState,

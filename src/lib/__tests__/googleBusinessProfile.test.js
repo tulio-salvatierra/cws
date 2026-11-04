@@ -6,6 +6,7 @@ describe('Google Business Profile reference URLs', () => {
     expect(normalizeGoogleBusinessProfileUrl(' https://www.google.com/maps?cid=123 ')).toBe('https://www.google.com/maps?cid=123')
     expect(normalizeGoogleBusinessProfileUrl('https://maps.app.goo.gl/example')).toBe('https://maps.app.goo.gl/example')
     expect(normalizeGoogleBusinessProfileUrl('https://g.page/example')).toBe('https://g.page/example')
+    expect(normalizeGoogleBusinessProfileUrl('https://share.google/E0cmvTR2hRiaIXGQ2')).toBe('https://share.google/E0cmvTR2hRiaIXGQ2')
   })
 
   it('rejects non-HTTPS, non-Google, malformed, and oversized values', () => {
