@@ -22,28 +22,9 @@ export function buildReviewJsonLd(page: LandingPageData) {
     };
   }
 
-  // Aggregate rating
-  if (page.rating) {
-    obj.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: page.rating.ratingValue.toString(),
-      reviewCount: page.rating.reviewCount.toString()
-    };
-  }
-
-  // Individual reviews
-  if (page.reviews?.length) {
-    obj.review = page.reviews.map(r => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: r.author },
-      reviewRating: { '@type': 'Rating', ratingValue: r.ratingValue.toString() },
-      reviewBody: r.body,
-      datePublished: r.datePublished
-    }));
-  }
-
-  // Optional: clarify itemReviewed
-  obj.itemReviewed = { '@type': type, name: page.serviceType };
+  // No aggregateRating/review here on purpose: the per-page rating and review
+  // data in landingPagesData isn't backed by real, verifiable reviews, and
+  // publishing it as structured data risks a Google manual action.
 
   return JSON.stringify(obj);
 }

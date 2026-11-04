@@ -7,7 +7,7 @@ const template = `<!doctype html>
     <title>Chicago Web Design That Drives Customers | Cicero Web Studio</title>
     <meta name="description" content="home" />
     <meta property="og:title" content="home" />
-    <meta property="og:image" content="https://cicerowebstudio.com/preview.jpg" />
+    <meta property="og:image" content="https://www.cicerowebstudio.xyz/og-image.jpg" />
     <meta property="og:url" content="https://www.cicerowebstudio.xyz/" />
     <meta property="og:locale" content="en_US" />
     <link rel="canonical" href="https://www.cicerowebstudio.xyz/" />
