@@ -7,7 +7,6 @@ import TrustSection from './TrustSection';
 import LocalHookSection from './LocalHookSection';
 import LandingPageContactForm from './LandingPageContactForm';
 import How from '../How/How';
-import Reviews from '../Reviews/Reviews';
 
 export default function LandingPage({ data }: LandingPageProps) {
   // Handle SEO meta tags and structured data
@@ -25,7 +24,6 @@ export default function LandingPage({ data }: LandingPageProps) {
       <LandingPageHero data={data} onCTAClick={scrollToContact} />
       <ProblemStatementSection data={data} />
       <SolutionSection data={data} />
-      <Reviews />
       <TrustSection data={data} />
       <How />
       <LocalHookSection data={data} />

@@ -1,19 +1,19 @@
-Task ID: CWS-PORTFOLIO-CORRECTIONS-20261104
+Task ID: CWS-LANDING-TRUST-CLEANUP-20261104
 Agent: Codex
-Objective: Correct Carolina project URL and remove Intermezzo from selected projects.
-Files inspected: AGENTS.md, product definition, .agents/codex-project-instructions.md, Projects data/component, package.json, portfolio handoffs/log/ledger, open PRs and portfolio branch comparison.
-Files changed: ProjectsData.ts and required handoff/log/ledger.
+Objective: Clean up public landing-page trust claims, pricing, titles and structured data.
+Files inspected: AGENTS.md, Codex role instructions, product and memory docs, PR #61 handoff, landing data/types/components, route metadata, Layout and shared SEO utilities.
+Files changed: Landing data/types/components, SEO hook and schema builder, canonical metadata, regression tests, project memory and two verification screenshots.
 Database or API changes: None.
-Security decisions: No business-data access or writes.
-Decisions made: Set exact owner-provided https://carolinaskincentre.com; remove only Intermezzo listing.
-Assumptions: Intermezzosudio refers to Intermezzo Sound Studio.
-Tests added: None for reversible data edits.
-Tests run: Parsed before/after project arrays and asserted exact expected transformation, seven projects, unchanged remaining content/order and Upcoming entry; passed.
-Known issues: Execution environment became unavailable before lint/build/browser checks. Live site fetched but rendered portfolio verification unavailable. CI pending.
-Recommended next task: Complete CI and browser checks; merge/deploy only after explicit owner authorization.
-Questions requiring Tulio: Release authorization remains outstanding.
+Security decisions: Removed unsupported public review and pricing claims.
+Decisions made: Applied D1–D4. Used Site Maintenance in Elmwood Park to keep the full title within 60 characters.
+Assumptions: PR #61 was verified merged, so the cleanup branch starts from updated main.
+Tests added: Schema shape, removed data fields, organization script identity across navigation and landing title length.
+Tests run: 869 tests, lint, build, generated titles and Chrome checks on all six landing routes at 1440×900 and 390×844.
+Known issues: The build reports the existing bundle-size warning.
+Recommended next task: Review draft PR #62.
+Questions requiring Tulio: None for this draft.
 Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No production verification or deployment claim.
-Git diff summary: One application data file; three documentation files. Based on main 3a3bb8a, preserving prior portfolio refresh and retired personal-site removal. Assets and unrelated client mentions preserved.
+Memory updates withheld: Production verification.
+Git diff summary: Landing-page changes and verification evidence in [draft PR #62](https://github.com/tulio-salvatierra/cws/pull/62). Work isolated from the original checkout.

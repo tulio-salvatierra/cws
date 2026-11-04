@@ -75,6 +75,7 @@ describe('per-route titles and descriptions', () => {
     const { landingPagesData } = await import('../../src/data/landingPagesData')
     const { articles } = await import('../../src/data/articles')
     for (const page of landingPagesData) {
+      expect(page.meta.title.length, page.id).toBeLessThanOrEqual(60)
       expect(routeMeta[`/landing/${page.id}`]).toEqual({ title: page.meta.title, description: page.meta.description })
     }
     for (const article of articles) {

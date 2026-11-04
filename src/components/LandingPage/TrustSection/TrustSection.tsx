@@ -21,19 +21,6 @@ export default function TrustSection({ data }: TrustSectionProps) {
               </div>
             ))}
           </div>
-          
-          {/* Testimonial */}
-          <div className="max-w-3xl mx-auto">
-            <blockquote className="text-xl text-orange-500 italic mb-6">
-              "{data.trustSection.testimonial.text}"
-            </blockquote>
-            <div className="text-orange-500 font-semibold">
-              {data.trustSection.testimonial.author}
-            </div>
-            <div className="text-orange-500 text-sm">
-              {data.trustSection.testimonial.business}
-            </div>
-          </div>
         </div>
       </div>
     </section>

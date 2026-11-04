@@ -25,16 +25,10 @@ export const landingPagesData: LandingPageData[] = [
         'Performance-first build for speed & Core Web Vitals',
         'Local SEO setup (titles, metas, schema, GBP linking)',
         'Simple editing workflow so you can update content fast'
-      ],
-      startingPrice: 'Starting at $1,250+'
+      ]
     },
     trustSection: {
-      clients: ['TAMM Cleaning Services', "Carolina's Skin Center", 'Intermezzo Sound Studio'],
-      testimonial: {
-        text: 'Cicero Web Studio transformed our online presence. The site looks professional, loads fast, and we\'re getting more calls each month.',
-        author: 'Mariana Josan',
-        business: 'Local Business Owner'
-      }
+      clients: ['Carolina Skin Centre', 'Upholstery of Chicago', 'Clean and Shiny']
     },
     howItWorks: {
       title: 'How It Works',
@@ -62,23 +56,11 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Cicero', 'Garfield Ridge', 'Clearing', 'Chicagoland']
     },
     meta: {
-      title: 'Cicero Web Design | Affordable Web Design Cicero | Cicero Web Studio',
-      description: 'Cicero web design services for small businesses. Affordable web design Cicero with fast, mobile-friendly websites. Cicero small business websites that attract local customers. Get a free quote today.',
-      keywords: ['Cicero web design', 'affordable web design Cicero', 'Cicero small business websites', 'web design', 'Cicero web designer', 'responsive design', 'local SEO']
+      title: 'Web Design in Cicero, IL | Cicero Web Studio',
+      description: 'Cicero web design services for small businesses. Affordable web design Cicero with fast, mobile-friendly websites. Cicero small business websites that attract local customers. Get a free quote today.'
     },
-    itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/cicero-web-design.png',
-    sku: 'CWS-WD-001',
-    priceNumberUSD: 1250,
-    rating: { ratingValue: 4.9, reviewCount: 37 },
-    reviews: [
-      {
-        author: 'Mariana Josan',
-        ratingValue: 5,
-        body: 'Cicero Web Studio transformed our online presence. The site looks professional, loads fast, and we\'re getting more calls each month.',
-        datePublished: '2025-03-01'
-      }
-    ]
+    sku: 'CWS-WD-001'
   },
   {
     id: 'chicago-digital-marketing',
@@ -106,16 +88,10 @@ export const landingPagesData: LandingPageData[] = [
         'Content marketing strategy for long-term growth and engagement with target audiences',
         'Digital marketing channels optimization including affiliate marketing and influencer marketing',
         'Monthly reporting and strategy adjustments to maximize your digital marketing efforts'
-      ],
-      startingPrice: 'Starting at $899+'
+      ]
     },
     trustSection: {
-      clients: ['TAMM Cleaning Services', 'Carolina\'s Skin Center', 'Intermezzo Sound Studio'],
-      testimonial: {
-        text: 'Our online presence has completely transformed since working with Cicero Web Studio. We\'re getting more leads than ever before.',
-        author: 'Sarah Johnson',
-        business: 'Chicago Business Owner'
-      }
+      clients: ['Carolina Skin Centre', 'Upholstery of Chicago', 'Clean and Shiny']
     },
     howItWorks: {
       title: 'How It Works',
@@ -143,23 +119,11 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Chicago', 'Cicero', 'Garfield Ridge']
     },
     meta: {
-      title: 'Digital Marketing Chicago | Local SEO & PPC Services | Cicero Web Studio',
-      description: 'Digital marketing Chicago services including local SEO services Chicago and Google Business Profile optimization. Expert SEO, PPC, and social media marketing that drives traffic and increases brand awareness.',
-      keywords: ['digital marketing Chicago', 'local SEO services Chicago', 'Google Business Profile optimization', 'digital marketing', 'Chicago', 'SEO', 'PPC', 'social media marketing']
+      title: 'Digital Marketing in Chicago, IL | Cicero Web Studio',
+      description: 'Digital marketing Chicago services including local SEO services Chicago and Google Business Profile optimization. Expert SEO, PPC, and social media marketing that drives traffic and increases brand awareness.'
     },
-    itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/digital-marketing.png',
-    sku: 'CWS-DM-001',
-    priceNumberUSD: 899,
-    rating: { ratingValue: 4.8, reviewCount: 31 },
-    reviews: [
-      {
-        author: 'Sarah Johnson',
-        ratingValue: 5,
-        body: 'Our online presence has completely transformed since working with Cicero Web Studio. We\'re getting more leads than ever before.',
-        datePublished: '2025-02-15'
-      }
-    ]
+    sku: 'CWS-DM-001'
   },
   {
     id: 'berwyn-ecommerce',
@@ -185,16 +149,10 @@ export const landingPagesData: LandingPageData[] = [
         'Secure payment processing integration',
         'Mobile-optimized shopping experience',
         'Inventory management system'
-      ],
-      startingPrice: 'Starting at $2,499+'
+      ]
     },
     trustSection: {
-      clients: ['TAMM Cleaning Services', 'Carolina\'s Skin Center', 'Intermezzo Sound Studio'],
-      testimonial: {
-        text: 'Our online store has been a game-changer. We\'re now reaching customers across the entire Chicago area.',
-        author: 'Mike Rodriguez',
-        business: 'Berwyn Business Owner'
-      }
+      clients: ['Carolina Skin Centre', 'Upholstery of Chicago', 'Clean and Shiny']
     },
     howItWorks: {
       title: 'How It Works',
@@ -222,23 +180,11 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Berwyn', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'Berwyn Ecommerce Website | Ecommerce Website Development | Cicero Web Studio',
-      description: 'Berwyn ecommerce website development services. Professional ecommerce website development for businesses in Berwyn. Online stores that drive sales and grow your business.',
-      keywords: ['Berwyn ecommerce website', 'ecommerce website development', 'e-commerce', 'online store', 'Berwyn', 'web development']
+      title: 'E-commerce in Berwyn, IL | Cicero Web Studio',
+      description: 'Berwyn ecommerce website development services. Professional ecommerce website development for businesses in Berwyn. Online stores that drive sales and grow your business.'
     },
-    itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/ecommerce-development.png',
-    sku: 'CWS-EC-001',
-    priceNumberUSD: 2499,
-    rating: { ratingValue: 4.9, reviewCount: 19 },
-    reviews: [
-      {
-        author: 'Mike Rodriguez',
-        ratingValue: 5,
-        body: 'Our online store has been a game-changer. We\'re now reaching customers across the entire Chicago area.',
-        datePublished: '2025-01-28'
-      }
-    ]
+    sku: 'CWS-EC-001'
   },
   {
     id: 'oak-park-seo',
@@ -265,16 +211,10 @@ export const landingPagesData: LandingPageData[] = [
         'Local keyword research and targeting for Oak Park',
         'Citation building and directory submissions',
         'Monthly ranking reports and adjustments'
-      ],
-      startingPrice: 'Starting at $599+'
+      ]
     },
     trustSection: {
-      clients: ['TAMM Cleaning Services', 'Carolina\'s Skin Center', 'Intermezzo Sound Studio'],
-      testimonial: {
-        text: 'Since working with Cicero Web Studio, we\'re now the top result for our services in Oak Park. Business has never been better.',
-        author: 'Jennifer Chen',
-        business: 'Oak Park Business Owner'
-      }
+      clients: ['Carolina Skin Centre', 'Upholstery of Chicago', 'Clean and Shiny']
     },
     howItWorks: {
       title: 'How It Works',
@@ -302,23 +242,11 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Oak Park', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'Oak Park SEO Services | On-Page SEO Services | Cicero Web Studio',
-      description: 'Oak Park SEO services for local businesses. Expert on-page SEO services and local SEO strategies to get found by customers searching in Oak Park.',
-      keywords: ['Oak Park SEO services', 'on-page SEO services', 'local SEO', 'Oak Park', 'search engine optimization', 'Google rankings']
+      title: 'Local SEO in Oak Park, IL | Cicero Web Studio',
+      description: 'Oak Park SEO services for local businesses. Expert on-page SEO services and local SEO strategies to get found by customers searching in Oak Park.'
     },
-    itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/local-seo.png',
-    sku: 'CWS-LSEO-001',
-    priceNumberUSD: 599,
-    rating: { ratingValue: 4.7, reviewCount: 28 },
-    reviews: [
-      {
-        author: 'Jennifer Chen',
-        ratingValue: 5,
-        body: 'Since working with Cicero Web Studio, we\'re now the top result for our services in Oak Park. Business has never been better.',
-        datePublished: '2025-02-05'
-      }
-    ]
+    sku: 'CWS-LSEO-001'
   },
   {
     id: 'elmwood-park-maintenance',
@@ -344,16 +272,10 @@ export const landingPagesData: LandingPageData[] = [
         'Performance optimization and speed improvements',
         'Content updates and bug fixes',
         '24/7 monitoring and support'
-      ],
-      startingPrice: 'Starting at $199+'
+      ]
     },
     trustSection: {
-      clients: ['TAMM Cleaning Services', 'Carolina\'s Skin Center', 'Intermezzo Sound Studio'],
-      testimonial: {
-        text: 'Having Cicero Web Studio handle our website maintenance gives us peace of mind. Our site is always running smoothly.',
-        author: 'David Thompson',
-        business: 'Elmwood Park Business Owner'
-      }
+      clients: ['Carolina Skin Centre', 'Upholstery of Chicago', 'Clean and Shiny']
     },
     howItWorks: {
       title: 'How It Works',
@@ -381,23 +303,11 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Elmwood Park', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'Elmwood Park Website Maintenance | Website Maintenance Services | Cicero Web Studio',
-      description: 'Elmwood Park website maintenance services for businesses. Professional website maintenance services including security updates, performance optimization, and ongoing support. Keep your site secure, fast, and up-to-date.',
-      keywords: ['Elmwood Park website maintenance', 'website maintenance services', 'website maintenance', 'Elmwood Park', 'web support', 'website updates']
+      title: 'Site Maintenance in Elmwood Park, IL | Cicero Web Studio',
+      description: 'Elmwood Park website maintenance services for businesses. Professional website maintenance services including security updates, performance optimization, and ongoing support. Keep your site secure, fast, and up-to-date.'
     },
-    itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/website-maintenance.png',
-    sku: 'CWS-WM-001',
-    priceNumberUSD: 199,
-    rating: { ratingValue: 4.8, reviewCount: 22 },
-    reviews: [
-      {
-        author: 'David Thompson',
-        ratingValue: 5,
-        body: 'Having Cicero Web Studio handle our website maintenance gives us peace of mind. Our site is always running smoothly.',
-        datePublished: '2025-01-20'
-      }
-    ]
+    sku: 'CWS-WM-001'
   },
   {
     id: 'website-refresh-redesign',
@@ -423,16 +333,10 @@ export const landingPagesData: LandingPageData[] = [
         'Mobile-first, responsive layouts',
         'Improved site speed and performance',
         'SEO-friendly structure to boost rankings'
-      ],
-      startingPrice: 'Starting at $1,000+'
+      ]
     },
     trustSection: {
-      clients: ['TAMM Cleaning Services', "Carolina's Skin Center", 'Intermezzo Sound Studio'],
-      testimonial: {
-        text: 'The redesign by Cicero Web Studio gave our site a professional edge. Customers are staying longer and contacting us more.',
-        author: 'Laura Martinez',
-        business: 'Chicago Business Owner'
-      }
+      clients: ['Carolina Skin Centre', 'Upholstery of Chicago', 'Clean and Shiny']
     },
     howItWorks: {
       title: 'How It Works',
@@ -460,23 +364,11 @@ export const landingPagesData: LandingPageData[] = [
       areas: ['Chicago', 'Cicero', 'Chicagoland']
     },
     meta: {
-      title: 'Website Refresh Services | Website Redesign Chicago | Cicero Web Studio',
-      description: 'Website refresh services for Chicago businesses. Professional website redesign Chicago services that are modern, mobile-friendly, and improve performance, SEO, and customer experience.',
-      keywords: ['website refresh services', 'website redesign Chicago', 'website redesign', 'Chicago website refresh', 'modern website design']
+      title: 'Website Redesign in Chicago, IL | Cicero Web Studio',
+      description: 'Website refresh services for Chicago businesses. Professional website redesign Chicago services that are modern, mobile-friendly, and improve performance, SEO, and customer experience.'
     },
-    itemReviewedType: 'Service',
     imageUrl: 'https://cicerowebstudio.xyz/images/website-redesign.png',
-    sku: 'CWS-WRR-001',
-    priceNumberUSD: 1000,
-    rating: { ratingValue: 4.9, reviewCount: 24 },
-    reviews: [
-      {
-        author: 'Laura Martinez',
-        ratingValue: 5,
-        body: 'The redesign by Cicero Web Studio gave our site a professional edge. Customers are staying longer and contacting us more.',
-        datePublished: '2025-02-10'
-      }
-    ]
+    sku: 'CWS-WRR-001'
   }
 ];
 
