@@ -1,30 +1,15 @@
-import { LandingPageData } from '../types/landingPage';
+import type { LandingPageData } from '../types/landingPage';
+import { BASE_URL } from './seo';
 
-export function buildReviewJsonLd(page: LandingPageData) {
-  const type = page.itemReviewedType || 'Service';
-  const obj: any = {
+export function buildServiceJsonLd(page: LandingPageData) {
+  return {
     '@context': 'https://schema.org',
-    '@type': type,
-    name: page.serviceType || page.headline,
-    description: page.meta?.description || page.subtext,
-    areaServed: page.localHook?.areas,
+    '@type': 'Service',
+    name: page.serviceType,
+    description: page.meta.description,
+    areaServed: page.localHook.areas,
+    url: `${BASE_URL}/landing/${page.id}`,
+    provider: { '@id': `${BASE_URL}/#organization` },
+    ...(page.imageUrl && { image: page.imageUrl }),
   };
-
-  if (page.imageUrl) obj.image = page.imageUrl;
-
-  // Offers (use numeric starting price if provided)
-  if (page.priceNumberUSD) {
-    obj.offers = {
-      '@type': 'Offer',
-      priceCurrency: 'USD',
-      price: page.priceNumberUSD,
-      availability: 'http://schema.org/InStock'
-    };
-  }
-
-  // No aggregateRating/review here on purpose: the per-page rating and review
-  // data in landingPagesData isn't backed by real, verifiable reviews, and
-  // publishing it as structured data risks a Google manual action.
-
-  return JSON.stringify(obj);
 }

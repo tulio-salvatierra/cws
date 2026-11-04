@@ -3,7 +3,7 @@
  * Manages meta tags, canonical URLs, and structured data
  */
 
-const BASE_URL = 'https://www.cicerowebstudio.xyz';
+export const BASE_URL = 'https://www.cicerowebstudio.xyz';
 
 export interface SEOData {
   title: string;

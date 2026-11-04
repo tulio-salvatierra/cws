@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { LandingPageData } from '../types/landingPage';
-import { buildReviewJsonLd } from '../lib/jsonld';
+import { buildServiceJsonLd } from '../lib/jsonld';
+import { addJsonLd } from '../lib/seo';
 
 export function useLandingPageSEO(data: LandingPageData) {
   useEffect(() => {
@@ -18,35 +19,10 @@ export function useLandingPageSEO(data: LandingPageData) {
       document.head.appendChild(meta);
     }
 
-    // Update meta keywords
-    const metaKeywords = document.querySelector('meta[name="keywords"]');
-    if (metaKeywords) {
-      metaKeywords.setAttribute('content', data.meta.keywords.join(', '));
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'keywords';
-      meta.content = data.meta.keywords.join(', ');
-      document.head.appendChild(meta);
-    }
+    addJsonLd(buildServiceJsonLd(data), 'landing-service');
 
-    // Add JSON-LD structured data for reviews
-    const existingJsonLd = document.querySelector('script[type="application/ld+json"]');
-    if (existingJsonLd) {
-      existingJsonLd.remove();
-    }
-
-    const jsonLdScript = document.createElement('script');
-    jsonLdScript.type = 'application/ld+json';
-    jsonLdScript.textContent = buildReviewJsonLd(data);
-    document.head.appendChild(jsonLdScript);
-
-    // Cleanup function
     return () => {
-      const jsonLd = document.querySelector('script[type="application/ld+json"]');
-      if (jsonLd && jsonLd.textContent === buildReviewJsonLd(data)) {
-        jsonLd.remove();
-      }
+      document.querySelector('script[data-jsonld-id="landing-service"]')?.remove();
     };
   }, [data]);
 }
-

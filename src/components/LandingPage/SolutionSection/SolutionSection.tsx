@@ -13,9 +13,12 @@ export default function SolutionSection({ data }: SolutionSectionProps) {
           <h2 className="text-3xl md:text-4xl font-main font-black text-orange-500 mb-6">
             {data.solution.title}
           </h2>
-          <div className="text-2xl font-bold text-orange-500 mb-8">
-            Starting at {data.solution.startingPrice}
-          </div>
+          <Link to="/negocio-listo" className="btn-bounce group">
+            <div className="btn-bounce-bg"></div>
+            <div className="btn-bounce-text__wrap">
+              <span className="btn-bounce-text">See plans and pricing</span>
+            </div>
+          </Link>
         </div>
         
         <div className="grid md:grid-cols-2 gap-8">
