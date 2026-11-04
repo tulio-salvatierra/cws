@@ -16,4 +16,4 @@ Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No production verification or release occurred.
-Git diff summary: [PR #69](https://github.com/tulio-salvatierra/cws/pull/69) is being rewritten before merge to remove a GitGuardian false positive caused by a disposable-container test password. The corrected runner generates a fresh local-only database password at runtime, so no credential-like value is committed. No migration apply, deployment, Square action, or customer-data write.
+Git diff summary: [PR #69](https://github.com/tulio-salvatierra/cws/pull/69) was rebuilt as clean commit `0ad5fb5`; GitGuardian, GitHub tests, and the Vercel preview pass. Merging to `main` will deploy code that requires the pending additive `20261104205413_agreement_billing_start_date.sql` migration, so merge/deployment awaits one explicit combined Production approval. No migration apply, deployment, Square action, or customer-data write.
