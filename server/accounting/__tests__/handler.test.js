@@ -64,6 +64,24 @@ describe('Accounting endpoint', () => {
     expect(res.status).toHaveBeenCalledWith(403)
   })
 
+  it('starts a client agreement billing schedule only through the owner RPC, without a provider call', async () => {
+    const rpc = vi.fn().mockResolvedValue({ data: 'agreement-a', error: null })
+    mocks.authenticateAccountingOwner.mockResolvedValue({ ...context, client: { rpc } })
+    const fetchSpy = vi.fn(); vi.stubGlobal('fetch', fetchSpy)
+    const res = response(); await handler({ method: 'POST', body: { action: 'start_client_agreement_billing', id: 'agreement-a', billing_start_date: '2026-10-11' } }, res)
+    expect(rpc).toHaveBeenCalledWith('start_client_service_agreement_billing', expect.objectContaining({ p_workspace_id: 'workspace-a', p_user_id: 'owner-a', p_id: 'agreement-a', p_billing_start_date: '2026-10-11' }))
+    expect(fetchSpy).not.toHaveBeenCalled(); vi.unstubAllGlobals()
+    expect(res.status).toHaveBeenCalledWith(200)
+  })
+
+  it('rejects a future agreement billing date before calling the database', async () => {
+    const rpc = vi.fn()
+    mocks.authenticateAccountingOwner.mockResolvedValue({ ...context, client: { rpc } })
+    const res = response(); await handler({ method: 'POST', body: { action: 'start_client_agreement_billing', id: 'agreement-a', billing_start_date: '2999-01-01' } }, res)
+    expect(rpc).not.toHaveBeenCalled()
+    expect(res.status).toHaveBeenCalledWith(400)
+  })
+
   it('creates an integer-cent obligation only after client and project share the owner workspace', async () => {
     const clientQuery = query({ data: { id: 'client-a', workspace_id: 'workspace-a' }, error: null })
     const projectQuery = query({ data: { id: 'project-a', workspace_id: 'workspace-a', client_id: 'client-a' }, error: null })

@@ -12,11 +12,12 @@ export function agreementSummary(agreement, installments = [], obligations = [],
   const received = rows.reduce((sum, r) => sum + r.received, 0)
   const due = rows.filter(r => !r.obligation?.due_date || r.obligation.due_date <= today).reduce((sum, r) => sum + r.remaining, 0)
   const overdue = rows.filter(r => r.obligation?.due_date && r.obligation.due_date < today).reduce((sum, r) => sum + r.remaining, 0)
-  const future = agreement.launch_date
+  const scheduleStart = agreement.billing_start_date || agreement.launch_date || null
+  const future = scheduleStart
     ? rows.filter(r => r.obligation?.due_date > today).reduce((sum, r) => sum + r.remaining, 0)
     : Number(agreement.monthly_cents) * agreement.term_months
-  const end = agreement.launch_date ? billingDate(agreement.launch_date, 'monthly', agreement.term_months) : null
+  const end = scheduleStart ? billingDate(scheduleStart, 'monthly', agreement.term_months) : null
   return { rows, received, due, overdue, future, remaining: due + future, total: Number(agreement.setup_cents) + Number(agreement.monthly_cents) * agreement.term_months,
-    end, status: !agreement.launch_date ? 'Awaiting website launch' : end <= today ? 'Term completed' : 'Active',
-    activeMonthly: agreement.launch_date && agreement.launch_date <= today && end > today ? Number(agreement.monthly_cents) : 0 }
+    end, status: !scheduleStart ? 'Billing not started' : end <= today ? 'Term completed' : 'Active',
+    activeMonthly: scheduleStart && scheduleStart <= today && end > today ? Number(agreement.monthly_cents) : 0 }
 }

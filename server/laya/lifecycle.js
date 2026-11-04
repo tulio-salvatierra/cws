@@ -34,9 +34,10 @@ export function evaluateLifecycle(inputs) {
   if (agreement) {
     if (!cents(agreement.setup_cents) || !cents(agreement.monthly_cents) || !Number.isSafeInteger(agreement.term_months) || agreement.term_months < 1) missing.push('Agreement prices or term are missing or invalid.')
     if (agreement.launch_date && (!realDate(agreement.launch_date) || agreement.launch_date > today)) missing.push('The recorded launch date is invalid or in the future.')
+    if (agreement.billing_start_date && (!realDate(agreement.billing_start_date) || agreement.billing_start_date > today)) missing.push('The recorded billing start date is invalid or in the future.')
     const indexes = inputs.installments.map(row => row.installment)
     if (new Set(indexes).size !== indexes.length || new Set(inputs.installments.map(row => row.financial_obligation_id)).size !== indexes.length || indexes.some(n => !Number.isSafeInteger(n) || n < 0 || n > agreement.term_months)) missing.push('Installment numbers are duplicate or inconsistent with the recorded term.')
-    if (agreement.launch_date && (indexes.filter(n => n > 0).length !== agreement.term_months || (agreement.setup_cents > 0 && !indexes.includes(0)))) missing.push('The launched agreement does not have a complete recorded installment schedule.')
+    if ((agreement.billing_start_date || agreement.launch_date) && (indexes.filter(n => n > 0).length !== agreement.term_months || (agreement.setup_cents > 0 && !indexes.includes(0)))) missing.push('The billing-started agreement does not have a complete recorded installment schedule.')
     for (const installment of inputs.installments) {
       const bill = inputs.obligations.find(row => row.id === installment.financial_obligation_id)
       const currentReceipts = inputs.receipts.filter(row => row.financial_obligation_id === bill?.id && cents(row.amount_cents) && Number.isFinite(Date.parse(row.received_at)) && Date.parse(row.received_at) <= Date.parse(now))

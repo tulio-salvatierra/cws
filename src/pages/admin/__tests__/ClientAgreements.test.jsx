@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import ClientAgreements from '../ClientAgreements'
-const agreement = { id:'a',client_id:'c',product_name:'Website',setup_cents:30000,monthly_cents:15000,term_months:12,launch_date:null }
+const agreement = { id:'a',client_id:'c',product_name:'Website',setup_cents:30000,monthly_cents:15000,term_months:12,billing_start_date:null,launch_date:null }
 describe('client product agreements',()=>{
  it('creates an agreement using the existing setup bill without recording new cash',async()=>{
   const onAction=vi.fn().mockResolvedValue({ok:true})
@@ -15,14 +15,23 @@ describe('client product agreements',()=>{
   await waitFor(()=>expect(onAction).toHaveBeenCalledWith(expect.objectContaining({action:'create_client_agreement',setup_obligation_id:'o',setup_cents:30000,monthly_cents:15000,term_months:12})))
   expect(onAction).toHaveBeenCalledTimes(1)
  })
- it('requires an explicit launch confirmation and explains Square is pending',async()=>{
+ it('records a billing start separately from a finished website launch and explains Square is unchanged',async()=>{
   const onAction=vi.fn().mockResolvedValue({ok:true})
   render(<ClientAgreements agreements={[agreement]} clients={[{id:'c',name:'Upholstery'}]} onAction={onAction} />)
-  expect(screen.getByText(/Square: setup pending/)).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button',{name:'Website is live — start monthly billing'}))
+  expect(screen.getByText(/automatic collection and payment sync are not connected/)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'Start monthly billing'}))
   expect(onAction).not.toHaveBeenCalled()
+  fireEvent.change(screen.getByLabelText('Actual billing start date'),{target:{value:'2026-01-31'}})
+  fireEvent.click(screen.getByRole('button',{name:'Confirm billing start and schedule'}))
+  await waitFor(()=>expect(onAction).toHaveBeenCalledWith({action:'start_client_agreement_billing',id:'a',billing_start_date:'2026-01-31'}))
+  expect(screen.queryByRole('button',{name:'Record finished website launch'})).not.toBeInTheDocument()
+ })
+ it('records the finished site launch after billing has already started without rebuilding its schedule',async()=>{
+  const onAction=vi.fn().mockResolvedValue({ok:true})
+  render(<ClientAgreements agreements={[{...agreement,billing_start_date:'2026-01-01'}]} clients={[{id:'c',name:'Upholstery'}]} onAction={onAction} />)
+  fireEvent.click(screen.getByRole('button',{name:'Record finished website launch'}))
   fireEvent.change(screen.getByLabelText('Actual website launch date'),{target:{value:'2026-01-31'}})
-  fireEvent.click(screen.getByRole('button',{name:'Confirm launch and billing schedule'}))
+  fireEvent.click(screen.getByRole('button',{name:'Confirm finished website launch'}))
   await waitFor(()=>expect(onAction).toHaveBeenCalledWith({action:'launch_client_agreement',id:'a',launch_date:'2026-01-31'}))
  })
 })

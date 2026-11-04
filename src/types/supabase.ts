@@ -865,6 +865,7 @@ export type Database = {
       client_service_agreements: {
         Row: {
           client_id: string
+          billing_start_date: string | null
           created_at: string
           created_by: string
           id: string
@@ -879,6 +880,7 @@ export type Database = {
         }
         Insert: {
           client_id: string
+          billing_start_date?: string | null
           created_at?: string
           created_by: string
           id: string
@@ -893,6 +895,7 @@ export type Database = {
         }
         Update: {
           client_id?: string
+          billing_start_date?: string | null
           created_at?: string
           created_by?: string
           id?: string

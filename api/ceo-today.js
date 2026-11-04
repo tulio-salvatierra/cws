@@ -145,7 +145,7 @@ export async function loadCeoToday(context, now = new Date()) {
     context.client.from('compliance_completions').select(complianceCompletionFields).eq('workspace_id', context.workspaceId).order('completed_at', { ascending: false }),
     context.client.from('negocio_listo_evidence').select('*').eq('workspace_id',context.workspaceId).order('revision',{ascending:false}).limit(1000),
     context.client.from('negocio_listo_completeness').select('*').eq('workspace_id',context.workspaceId).order('created_at',{ascending:false}).limit(10),
-    context.client.from('client_service_agreements').select('id,workspace_id,client_id,product_name,setup_cents,monthly_cents,term_months,launch_date,created_at').eq('workspace_id',context.workspaceId),
+    context.client.from('client_service_agreements').select('id,workspace_id,client_id,product_name,setup_cents,monthly_cents,term_months,billing_start_date,launch_date,created_at').eq('workspace_id',context.workspaceId),
     context.client.from('agreement_installments').select('id,workspace_id,agreement_id,installment,financial_obligation_id').eq('workspace_id',context.workspaceId),
     context.client.from('negocio_listo_deal_budgets').select('*').eq('workspace_id',context.workspaceId).order('revision',{ascending:false}).limit(1000),
     context.client.from('project_costs').select('id,workspace_id,operations_project_id,amount_cents,incurred_on,updated_at').eq('workspace_id',context.workspaceId).limit(1000),
