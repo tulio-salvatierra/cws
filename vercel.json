@@ -53,6 +53,10 @@
       "destination": "/services.html"
     },
     {
+      "source": "/chicago-web-design",
+      "destination": "/chicago-web-design.html"
+    },
+    {
       "source": "/blog",
       "destination": "/blog.html"
     },
@@ -65,28 +69,24 @@
       "destination": "/policy.html"
     },
     {
-      "source": "/blog/future-of-web-development-ai-tools",
-      "destination": "/blog/future-of-web-development-ai-tools.html"
+      "source": "/blog/website-design-services-chicago-small-business",
+      "destination": "/blog/website-design-services-chicago-small-business.html"
     },
     {
-      "source": "/blog/mobile-first-website-design-why-it-matters",
-      "destination": "/blog/mobile-first-website-design-why-it-matters.html"
+      "source": "/blog/custom-website-vs-template-small-business",
+      "destination": "/blog/custom-website-vs-template-small-business.html"
     },
     {
-      "source": "/blog/seo-strategies-that-work-2024",
-      "destination": "/blog/seo-strategies-that-work-2024.html"
+      "source": "/blog/small-business-website-checklist-chicago",
+      "destination": "/blog/small-business-website-checklist-chicago.html"
     },
     {
-      "source": "/blog/scalable-ecommerce-lessons",
-      "destination": "/blog/scalable-ecommerce-lessons.html"
+      "source": "/blog/choose-website-designer-chicago",
+      "destination": "/blog/choose-website-designer-chicago.html"
     },
     {
-      "source": "/blog/choose-right-web-design-package",
-      "destination": "/blog/choose-right-web-design-package.html"
-    },
-    {
-      "source": "/blog/why-lead-capture-forms-high-performing-website-chicago",
-      "destination": "/blog/why-lead-capture-forms-high-performing-website-chicago.html"
+      "source": "/blog/website-refresh-vs-redesign-small-business",
+      "destination": "/blog/website-refresh-vs-redesign-small-business.html"
     },
     {
       "source": "/landing/cicero-web-design",

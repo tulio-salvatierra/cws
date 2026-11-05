@@ -33,6 +33,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.cicerowebstudio.xyz/chicago-web-design</loc>
+    <lastmod>2026-11-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.cicerowebstudio.xyz/blog</loc>
     <lastmod>2026-11-04</lastmod>
     <changefreq>weekly</changefreq>
@@ -53,38 +59,32 @@
   
   <!-- Blog articles -->
   <url>
-    <loc>https://www.cicerowebstudio.xyz/blog/future-of-web-development-ai-tools</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://www.cicerowebstudio.xyz/blog/website-design-services-chicago-small-business</loc>
+    <lastmod>2026-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.cicerowebstudio.xyz/blog/mobile-first-website-design-why-it-matters</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://www.cicerowebstudio.xyz/blog/custom-website-vs-template-small-business</loc>
+    <lastmod>2026-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.cicerowebstudio.xyz/blog/seo-strategies-that-work-2024</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://www.cicerowebstudio.xyz/blog/small-business-website-checklist-chicago</loc>
+    <lastmod>2026-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.cicerowebstudio.xyz/blog/scalable-ecommerce-lessons</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://www.cicerowebstudio.xyz/blog/choose-website-designer-chicago</loc>
+    <lastmod>2026-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.cicerowebstudio.xyz/blog/choose-right-web-design-package</loc>
-    <lastmod>2026-11-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://www.cicerowebstudio.xyz/blog/why-lead-capture-forms-high-performing-website-chicago</loc>
-    <lastmod>2026-11-04</lastmod>
+    <loc>https://www.cicerowebstudio.xyz/blog/website-refresh-vs-redesign-small-business</loc>
+    <lastmod>2026-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

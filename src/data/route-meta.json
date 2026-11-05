@@ -11,9 +11,13 @@
     "title": "Small Business Web Design in Chicago, IL | Cicero Web Studio",
     "description": "Custom websites, local SEO, and photo and video content for Chicago small businesses, in English or Spanish. Schedule a free call."
   },
+  "/chicago-web-design": {
+    "title": "Chicago Web Design for Small Businesses | Cicero Web Studio",
+    "description": "Chicago web design for small businesses: clear, mobile-friendly websites, practical planning, bilingual content, and ongoing updates when needed."
+  },
   "/blog": {
-    "title": "Small Business Website & SEO Blog | Cicero Web Studio",
-    "description": "Practical guides on websites, mobile design, local SEO, and lead capture for Chicago-area small business owners."
+    "title": "Website Guides for Chicago Small Businesses | Cicero Web Studio",
+    "description": "Practical guides for Chicago small-business owners planning a website, choosing what belongs in it, and making a useful next move."
   },
   "/contact": {
     "title": "Contact Cicero Web Studio | Chicago Web Design",
@@ -23,29 +27,25 @@
     "title": "Privacy Policy | Cicero Web Studio",
     "description": "How Cicero Web Studio collects, uses, and protects the information you share through this website."
   },
-  "/blog/future-of-web-development-ai-tools": {
-    "title": "AI Web Development Tools: The Future of Web Development for Your Business",
-    "description": "Discover how artificial intelligence is revolutionizing web development and creating new opportunities for businesses to build better, faster, and more intelligent digital experiences."
+  "/blog/website-design-services-chicago-small-business": {
+    "title": "What Website Design Services Does a Chicago Small Business Actually Need? | Cicero Web Studio",
+    "description": "A practical way to decide what belongs in a small-business website before paying for extra features or starting a redesign."
   },
-  "/blog/mobile-first-website-design-why-it-matters": {
-    "title": "Mobile-First Website Design: Why Your Business Needs It",
-    "description": "With over 60% of web traffic coming from mobile devices, having a mobile-first approach isn't just recommended—it's essential for business success."
+  "/blog/custom-website-vs-template-small-business": {
+    "title": "Custom Website vs. Template: What Is the Right Fit for a Small Business? | Cicero Web Studio",
+    "description": "A template can be a good starting point. A custom website can be useful when the business needs a clearer structure, content, or customer path."
   },
-  "/blog/seo-strategies-that-work-2024": {
-    "title": "SEO Strategies for Small Businesses That Actually Work",
-    "description": "Google's algorithm updates have changed the SEO landscape. Learn the strategies that are driving real results this year."
+  "/blog/small-business-website-checklist-chicago": {
+    "title": "A Small-Business Website Checklist for Chicago Owners | Cicero Web Studio",
+    "description": "Use this checklist to organize the information, customer paths, and decisions that make a business website easier to build and easier to use."
   },
-  "/blog/scalable-ecommerce-lessons": {
-    "title": "Ecommerce Scalability: Building Scalable E-commerce Solutions for Growth",
-    "description": "What separates successful e-commerce businesses from the rest? Discover the technical and strategic foundations that drive growth."
+  "/blog/choose-website-designer-chicago": {
+    "title": "How to Choose a Website Designer for Your Chicago Business | Cicero Web Studio",
+    "description": "A better website project starts with clear questions about scope, ownership, content, communication, and what happens after launch."
   },
-  "/blog/choose-right-web-design-package": {
-    "title": "Website Redesign Checklist: How to Choose the Right Web Design Package",
-    "description": "From basic landing pages to fully custom sites—learn how to pick the package that fits your goals and budget without overpaying."
-  },
-  "/blog/why-lead-capture-forms-high-performing-website-chicago": {
-    "title": "Why Lead Capture Forms Are the Heart of a High-Performing Website",
-    "description": "Beautiful sites don’t convert by themselves. Optimized lead forms turn visitors into real opportunities and drive measurable growth."
+  "/blog/website-refresh-vs-redesign-small-business": {
+    "title": "Website Refresh vs. Redesign: Which Does Your Small Business Need? | Cicero Web Studio",
+    "description": "Not every older website needs to be rebuilt. Learn how to separate a focused update from a larger redesign project."
   },
   "/landing/cicero-web-design": {
     "title": "Web Design in Cicero, IL | Cicero Web Studio",
