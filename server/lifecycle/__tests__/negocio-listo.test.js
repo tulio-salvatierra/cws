@@ -41,6 +41,13 @@ describe('Negocio Listo lifecycle evidence',()=>{
   expect(build({agreements:[{...agreement,launch_date:'2025-10-21'}],installments:monthly,obligations}).items[0].stage).toBe('term_completed')
   expect(build({agreements:[{...agreement,launch_date:'2026-10-21'}],installments:[],obligations:[]}).items[0].stage).toBe('needs_data')
  })
+ it('uses a recorded billing start for payment truth without treating a pre-launch project as launched',()=>{
+  const monthly=Array.from({length:12},(_,i)=>({id:`i${i}`,workspace_id:'w',agreement_id:'a',installment:i+1,financial_obligation_id:`b${i}`}))
+  const obligations=monthly.map((i,index)=>({...bill,id:i.financial_obligation_id,amount_cents:14900,due_date:`2027-${String(index+1).padStart(2,'0')}-21`}))
+  const row=build({agreements:[{...agreement,billing_start_date:'2026-10-21'}],installments:monthly,obligations}).items[0]
+  expect(row.stage).toBe('in_delivery')
+  expect(row.why_now).not.toMatch(/launch is recorded/i)
+ })
  it('tags intake prospect cards without duplicating the Sales queue',()=>{
   const lead={id:'l',workspace_id:'w',source:'negocio-listo|inline|en',status:'new',sales_classification:'inbound',name:'Synthetic',phone:'123',created_at:'2026-10-21T12:00:00Z'}
   const lifecycle=build({agreements:[],leads:[lead]})

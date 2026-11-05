@@ -1,7 +1,7 @@
 import { cents, cleanText, dateOnly, receiptTimestamp, validUuid } from './shared.js'
 import { businessToday } from '../../src/lib/businessExpenses.js'
 import { PAYMENT_METHODS } from './read-model.js'
-export const AGREEMENT_ACTIONS = ['create_client_agreement', 'launch_client_agreement', 'record_agreement_payment']
+export const AGREEMENT_ACTIONS = ['create_client_agreement', 'start_client_agreement_billing', 'launch_client_agreement', 'record_agreement_payment']
 export async function agreementAction(context, body, res) {
   const base = { p_workspace_id: context.workspaceId, p_user_id: context.user.id }
   let name, params
@@ -10,6 +10,11 @@ export async function agreementAction(context, body, res) {
     if (!validUuid(body.id) || !validUuid(body.client_id) || (body.offer_id && !validUuid(body.offer_id)) || (body.setup_obligation_id && !validUuid(body.setup_obligation_id)) || !cleanText(body.product_name, 200) || !Number.isSafeInteger(setup) || setup < 0 || setup > 1000000000 || !cents(body.monthly_cents) || !Number.isInteger(term) || term < 1 || term > 60) return res.status(400).json({ ok: false, error: 'Choose a customer, product, setup amount, monthly amount, and term of 1–60 months.' })
     name = 'create_client_service_agreement'
     params = { ...base, p_id: body.id, p_client_id: body.client_id, p_offer_id: body.offer_id || null, p_product_name: cleanText(body.product_name, 200), p_setup_cents: setup, p_monthly_cents: cents(body.monthly_cents), p_term_months: term, p_setup_obligation_id: body.setup_obligation_id || null }
+  } else if (body.action === 'start_client_agreement_billing') {
+    const date = dateOnly(body.billing_start_date)
+    if (!validUuid(body.id) || !date || date > businessToday()) return res.status(400).json({ ok: false, error: 'Choose the actual billing start date, today or earlier.' })
+    name = 'start_client_service_agreement_billing'
+    params = { ...base, p_id: body.id, p_billing_start_date: date }
   } else if (body.action === 'launch_client_agreement') {
     const date = dateOnly(body.launch_date)
     if (!validUuid(body.id) || !date || date > businessToday()) return res.status(400).json({ ok: false, error: 'Choose the actual website launch date, today or earlier.' })

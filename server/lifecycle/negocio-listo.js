@@ -23,7 +23,7 @@ export function buildNegocioListoLifecycle({workspaceId,leads=[],agreements=[],i
     const item={id:`lifecycle:agreement:${agreement.id}`,agreement_id:agreement.id,title:client?.name || agreement.product_name,
       stage:'needs_data',human_action:`Review Negocio Listo: ${client?.name || agreement.product_name}`,
       department:'OPERATIONS',business_priority:'DELIVER',priority_tier:4,href:'/admin/operations',cta_label:'Review project link',
-      source_timestamp:agreement.created_at,sources:[source('client_service_agreements',agreement,['client_id','product_name','setup_cents','term_months','launch_date'])]}
+      source_timestamp:agreement.created_at,sources:[source('client_service_agreements',agreement,['client_id','product_name','setup_cents','term_months','billing_start_date','launch_date'])]}
     if(client) item.sources.push(source('clients',client,['name']))
     const bills=scoped(installments,workspaceId).filter(i=>i.agreement_id===agreement.id).map(i=>{
       const bill=ownObligations.find(o=>o.id===i.financial_obligation_id && o.client_id===agreement.client_id)
@@ -44,15 +44,28 @@ export function buildNegocioListoLifecycle({workspaceId,leads=[],agreements=[],i
       if(entry?.bill){item.sources.push(source('financial_obligations',entry.bill,['amount_cents','status','due_date']));item.sources.push(...entry.payments.map(r=>source('payment_receipts',r,['amount_cents','received_at','financial_obligation_id'])))}
     }
     if (agreement.launch_date && agreement.launch_date>today) item.why_now='The recorded launch date is in the future; verify it before treating this agreement as launched.'
-    else if (agreement.launch_date) {
+    else if (agreement.billing_start_date || agreement.launch_date) {
       const due=bills.filter(b=>b.bill?.due_date && b.bill.due_date<=today && b.remaining>0).sort((a,b)=>a.bill.due_date.localeCompare(b.bill.due_date))[0]
       if(due) money(due,due.bill.due_date<today?'payment_overdue':'payment_due',`A linked installment has ${due.remaining} cents outstanding, due ${due.bill.due_date}. Review recorded payments; nothing is charged automatically.`)
-      else {
-        const ended=billingDate(agreement.launch_date,'monthly',agreement.term_months)<=today
+      else if (agreement.launch_date) {
+        const ended=billingDate(agreement.billing_start_date || agreement.launch_date,'monthly',agreement.term_months)<=today
         item.stage=ended?'term_completed':'launched';item.department='ACCOUNTING';item.business_priority='CONTROL MONEY';item.priority_tier=5
         item.why_now=ended?'The recorded launch date and term reach their end date. Review renewal/closure; no subscription is changed.':'Website launch is recorded. Provider references do not establish payment or live subscription status.'
         item.href=`/admin/accounting?client=${encodeURIComponent(agreement.client_id)}#client-agreements`;item.cta_label='Review agreement'
         if(bills.some(b=>!b.bill || b.remaining===null) || bills.filter(b=>b.installment.installment>0).length!==agreement.term_months){item.stage='needs_data';item.why_now='A linked installment is missing or void; reconcile agreement billing records.'}
+      }
+      // A confirmed billing start does not prove the finished site is live.
+      // Keep the existing Operations delivery action until launch is recorded.
+      else if(linked.length!==1) item.why_now=linked.length?'Multiple projects link to this agreement; review which project owns delivery.':'Link this agreement explicitly to its Operations project; customer names are not matched automatically.'
+      else {
+        const project=linked[0];item.project_id=project.id;item.href=`/admin/operations/${project.id}`;item.cta_label='Review delivery'
+        item.sources.push(source('operations_projects',project,['status','service_agreement_id','actual_hours']))
+        const blockers=scoped(requirements,workspaceId).filter(r=>r.project_id===project.id && r.status==='needed' && r.timing==='needed_now')
+        const waiting=blockers.find(r=>r.responsible_party==='client') || blockers[0]
+        if(project.status==='paused'){item.stage='paused';item.why_now='The linked project is paused; the owner must decide whether to resume it.'}
+        else if(project.status==='completed'){item.stage='launch_record_pending';item.why_now='Delivery is marked completed but no actual launch date is recorded in the agreement.';item.href=`/admin/accounting?client=${encodeURIComponent(agreement.client_id)}#client-agreements`;item.cta_label='Review launch record'}
+        else if(waiting){item.stage=waiting.responsible_party==='client'?'waiting_on_client':'waiting_on_cws';item.why_now=`Needed-now input: ${waiting.label}.`;item.sources.push(source('project_requirements',waiting,['status','timing','responsible_party','label']))}
+        else {item.stage=['waiting_on_client','waiting_on_cws'].includes(project.status)?project.status:'in_delivery';item.why_now=`Linked delivery state: ${project.status}. ${project.actual_hours==null?'No project hours have been entered.':`${project.actual_hours} whole project hours are recorded.`}`}
       }
     } else {
       const setup=bills.find(b=>b.installment.installment===0)

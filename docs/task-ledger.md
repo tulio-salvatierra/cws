@@ -172,3 +172,5 @@
 | CWS-PORTFOLIO-CORRECTIONS-20261104 | Codex | Prepared — validation/release pending | Correct Carolina URL and remove Intermezzo listing; seven projects remain | Exact parsed-data transformation passed; execution environment unavailable for lint/build/browser; no merge or production deploy |
 
 | CWS-LANDING-TRUST-CLEANUP-20261104 | Codex | Draft review | Applied D1–D4 on six landing pages and isolated Service JSON-LD | 869 tests, lint, build, six static titles and 12 Chrome viewport checks passed. [Draft PR #62](https://github.com/tulio-salvatierra/cws/pull/62) |
+
+| CWS-AGREEMENT-BILLING-START-20261104 | Codex | PR checks passed — combined release approval pending | Separates owner-confirmed billing start from finished-site launch; creates a deterministic agreement payment schedule without charging Square or asserting launch | Rebuilt PR #69 at `0ad5fb5` passes GitGuardian, GitHub tests, Vercel preview, local 877 tests/lint/build/diff check, and 16/16 disposable pgTAP assertions. Merge is held until the additive migration and dependent Production deployment are jointly authorized; no Production write or provider action |

@@ -10,9 +10,9 @@ export default function ClientAgreements({ agreements = [], installments = [], o
   const [adding, setAdding] = useState(Boolean(initialClientId))
   const [notice, setNotice] = useState('')
   return <section id="client-agreements" aria-label="Client agreements" className="mt-10 scroll-mt-8">
-    <div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-2xl font-semibold">Client products & agreements</h2><p className="mt-2 text-sm text-slate-400">Agreed customer prices, setup payments, and monthly balances. Billing begins when you confirm the website is live.</p></div><button className={button} onClick={() => setAdding(!adding)}>Assign product to client</button></div>
+    <div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-2xl font-semibold">Client products & agreements</h2><p className="mt-2 text-sm text-slate-400">Agreed customer prices, setup payments, and monthly balances. Billing and finished-site launch are recorded separately when each is actually confirmed.</p></div><button className={button} onClick={() => setAdding(!adding)}>Assign product to client</button></div>
     {notice && <p role="status" className="mt-3 text-emerald-200">{notice}</p>}
-    {adding && <AgreementForm clients={clients} offers={offers} obligations={obligations} installments={installments} initialClientId={initialClientId} busy={busy} onCancel={() => setAdding(false)} onSubmit={async body => { const result = await onAction(body); if (result) { setAdding(false); setNotice('Agreement saved. Monthly billing is waiting for website launch.') } return result }} />}
+    {adding && <AgreementForm clients={clients} offers={offers} obligations={obligations} installments={installments} initialClientId={initialClientId} busy={busy} onCancel={() => setAdding(false)} onSubmit={async body => { const result = await onAction(body); if (result) { setAdding(false); setNotice('Agreement saved. Record billing only when its actual start is confirmed.') } return result }} />}
     <div className="mt-4 space-y-4">{agreements.map(a => <AgreementCard canClassify={canClassify} corrections={corrections.filter(row => row.agreement_id === a.id)} key={a.id} agreement={a} client={clients.find(c => c.id === a.client_id)} summary={agreementSummary(a, installments, obligations, receipts)} busy={busy} onAction={onAction} />)}</div>
     {!agreements.length && <p className="mt-3 text-slate-400">No client agreements yet.</p>}
   </section>
@@ -46,6 +46,7 @@ function AgreementForm({ clients, offers, obligations, installments, initialClie
 function AgreementCard({ agreement: a, client, summary: s, busy, onAction, canClassify, corrections }) {
   const [classifying, setClassifying] = useState(false)
   const [reason, setReason] = useState('')
+  const [startingBilling, setStartingBilling] = useState(false)
   const [launch, setLaunch] = useState(false)
   const [date, setDate] = useState(businessToday)
   const [paying, setPaying] = useState(null)
@@ -53,7 +54,8 @@ function AgreementCard({ agreement: a, client, summary: s, busy, onAction, canCl
   return <article className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
     <h3 className="text-xl font-semibold">{client?.name || 'Client'} · {a.product_name}</h3>
     <p className="mt-2 text-orange-200">{s.status} · {a.term_months} months · {money(a.monthly_cents)}/month</p>
-    <p className="mt-1 text-sm text-slate-400">Setup: {money(a.setup_cents)} · {a.launch_date ? `Term: ${a.launch_date} to ${s.end} (end exclusive). Renewal requires review.` : 'Term starts on the website launch date.'}</p>
+    <p className="mt-1 text-sm text-slate-400">Setup: {money(a.setup_cents)} · {a.billing_start_date ? `Billing term: ${a.billing_start_date} to ${s.end} (end exclusive). Renewal requires review.` : 'Billing start has not been recorded.'}</p>
+    <p className="mt-1 text-sm text-slate-400">Finished website launch: {a.launch_date || 'Not recorded'}</p>
     {canClassify && !/^negocio listo(?:\s|$|[—-])/i.test(a.product_name.trim()) && <button type="button" className={`${button} mt-4`} disabled={busy} onClick={() => setClassifying(!classifying)}>Correct classification to Negocio Listo</button>}
     {classifying && canClassify && <form aria-label="Agreement classification correction" className="mt-4 space-y-3" onSubmit={async e => {
       e.preventDefault(); if (!reason.trim()) return
@@ -68,19 +70,25 @@ function AgreementCard({ agreement: a, client, summary: s, busy, onAction, canCl
     </form>}
     {canClassify && corrections?.length > 0 && <details className="mt-4"><summary>Classification correction history</summary>{corrections.map(row => <p key={row.id} className="mt-2 text-sm">{row.previous_name} → {row.corrected_name} · {row.created_at} · Owner {row.recorded_by} · Reason: {row.reason}</p>)}</details>}
     <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{[['Contract value',s.total],['Received',s.received],['Due now',s.due],['Future payments',s.future],['Overdue',s.overdue]].map(([label,n]) => <div key={label}><dt className="text-sm text-slate-400">{label}</dt><dd className="mt-1 text-xl">{money(n)}</dd></div>)}</dl>
-    <p className="mt-4 text-sm text-slate-300">Square: setup pending. Automatic collection and payment sync are not connected. Record confirmed payments below until connected.</p>
-    {!a.launch_date && <button disabled={busy} className={`${button} mt-4`} onClick={() => setLaunch(!launch)}>Website is live — start monthly billing</button>}
-    {launch && !a.launch_date && <form className="mt-4 space-y-3" onSubmit={async e => { e.preventDefault(); setMessage(''); const result = await onAction({ action: 'launch_client_agreement', id: a.id, launch_date: date }); setMessage(result ? 'Launch recorded. Monthly bills are ready; Square still needs setup.' : 'Launch was not saved. Check the Accounting error above.'); if (result) setLaunch(false) }}>
+    <p className="mt-4 text-sm text-slate-300">Square: automatic collection and payment sync are not connected. Starting this schedule does not create or change a Square subscription. Record only confirmed payments below.</p>
+    {!a.billing_start_date && <button disabled={busy} className={`${button} mt-4`} onClick={() => setStartingBilling(!startingBilling)}>Start monthly billing</button>}
+    {startingBilling && !a.billing_start_date && <form className="mt-4 space-y-3" onSubmit={async e => { e.preventDefault(); setMessage(''); const result = await onAction({ action: 'start_client_agreement_billing', id: a.id, billing_start_date: date }); setMessage(result ? 'Billing start recorded. Monthly bills are ready; Square has not been changed.' : 'Billing start was not saved. Check the Accounting error above.'); if (result) setStartingBilling(false) }}>
+      <Field label="Actual billing start date" required type="date" min="2000-01-01" max={businessToday()} value={date} onChange={setDate} />
+      <p className="text-sm text-slate-400">Creates {a.term_months} monthly bills of {money(a.monthly_cents)}, starting on this date. It does not charge the customer or mark the finished website as launched. Confirm the date carefully; it cannot be changed here after saving.</p>
+      <button disabled={busy} className={button}>Confirm billing start and schedule</button>
+    </form>}
+    {a.billing_start_date && !a.launch_date && <button disabled={busy} className={`${button} mt-4`} onClick={() => setLaunch(!launch)}>Record finished website launch</button>}
+    {launch && a.billing_start_date && !a.launch_date && <form className="mt-4 space-y-3" onSubmit={async e => { e.preventDefault(); setMessage(''); const result = await onAction({ action: 'launch_client_agreement', id: a.id, launch_date: date }); setMessage(result ? 'Finished website launch recorded. The existing billing schedule did not change.' : 'Launch was not saved. Check the Accounting error above.'); if (result) setLaunch(false) }}>
       <Field label="Actual website launch date" required type="date" min="2000-01-01" max={businessToday()} value={date} onChange={setDate} />
-      <p className="text-sm text-slate-400">Creates {a.term_months} monthly bills of {money(a.monthly_cents)}, starting on this date. It does not charge the customer. Confirm the date carefully; it cannot be changed here after saving.</p>
-      <button disabled={busy} className={button}>Confirm launch and billing schedule</button>
+      <p className="text-sm text-slate-400">Records the actual finished-site launch only. It does not charge the customer or alter the billing schedule that began on {a.billing_start_date}.</p>
+      <button disabled={busy} className={button}>Confirm finished website launch</button>
     </form>}
     {message && <p role="status" className="mt-3">{message}</p>}
     <details className="mt-4"><summary className="cursor-pointer">Payment schedule & history</summary><div className="mt-3 space-y-3">{s.rows.map(row => <div key={row.installment} className="rounded-xl border border-white/10 p-3">
       <div className="flex flex-wrap justify-between gap-2"><div><p>{row.installment === 0 ? 'Setup fee' : `Month ${row.installment} of ${a.term_months}`} · {row.obligation?.due_date || 'No due date'}</p><p className="text-sm text-slate-400">{money(row.received)} received · {money(row.remaining)} open{row.obligation?.status !== 'expected' ? ` · ${row.obligation?.status}` : row.remaining === 0 ? ' · Paid' : ''}</p></div>{row.remaining > 0 && <button disabled={busy} className={button} onClick={() => setPaying(row)}>Record payment for {row.installment === 0 ? 'setup' : `month ${row.installment}`}</button>}</div>
       {row.payments.map(r => <p key={r.id} className="mt-1 text-sm text-emerald-200">{money(r.amount_cents)} · {String(r.received_at).slice(0,10)} · {r.payment_method}{r.reference_note ? ` · ${r.reference_note}` : ''}</p>)}
       {paying?.financial_obligation_id === row.financial_obligation_id && <AgreementPayment key={row.financial_obligation_id} row={row} busy={busy} onCancel={() => setPaying(null)} onSubmit={async body => { const result = await onAction(body); if (result) { setPaying(null); setMessage('Payment saved. The balance and profitability totals have updated.') } return result }} />}
-    </div>)}{!a.launch_date && <p className="text-sm text-slate-400">{a.term_months} monthly payments of {money(a.monthly_cents)} will be dated when the website launches.</p>}</div></details>
+    </div>)}{!a.billing_start_date && <p className="text-sm text-slate-400">{a.term_months} monthly payments of {money(a.monthly_cents)} will be dated when billing starts. That date may be different from the finished-site launch date.</p>}</div></details>
   </article>
 }
 function AgreementPayment({ row, busy, onSubmit, onCancel }) {
