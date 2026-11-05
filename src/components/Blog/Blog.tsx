@@ -15,10 +15,10 @@ export default function Blog() {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-6xl md:text-8xl font-main font-black text-orange-500 mb-4">
-            Web Design Insights for Small Businesses
+            Website Guides for Chicago Small Businesses
           </h1>
           <p className="text-xl text-zinc-400 max-w-3xl mx-auto">
-            Expert web design insights for small businesses. Latest web design trends 2025, SEO strategies for small businesses, and actionable tips to grow your online presence.
+            Practical guidance for planning a website, choosing what belongs in it, and making a useful next move for your business.
           </p>
         </div>
 
@@ -136,25 +136,6 @@ export default function Blog() {
           </div>
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-8 text-center">
-          <h2 className="text-3xl font-main font-bold text-white mb-4">
-            Stay Updated
-          </h2>
-          <p className="text-orange-100 mb-6 max-w-2xl mx-auto">
-            Get the latest insights on web development, design trends, and business growth delivered to your inbox.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
-            />
-            <button className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors duration-200">
-              Subscribe
-            </button>
-          </div>
-        </div>
       </div>
     </section>
   );

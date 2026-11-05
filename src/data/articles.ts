@@ -11,474 +11,273 @@ export type Article = {
   tags: string[];
 };
 
+const author = 'Tulio Salvatierra';
+const date = 'November 5, 2026';
+
 export const articles: Article[] = [
   {
-    slug: 'future-of-web-development-ai-tools',
-    title: 'AI Web Development Tools: The Future of Web Development for Your Business',
-    excerpt: 'Discover how artificial intelligence is revolutionizing web development and creating new opportunities for businesses to build better, faster, and more intelligent digital experiences.',
-    content: `# The Future of Web Development: AI-Powered Tools and What They Mean for Your Business
+    slug: 'website-design-services-chicago-small-business',
+    title: 'What Website Design Services Does a Chicago Small Business Actually Need?',
+    excerpt: 'A practical way to decide what belongs in a small-business website before paying for extra features or starting a redesign.',
+    content: `A website project goes more smoothly when it starts with the business need—not a list of features.
 
-**TL;DR:** AI is transforming web development in 2025, enabling smarter, faster, and more personalized digital experiences for businesses in **Chicago**, **Portage Park**, and **Cicero**.
+For many Chicago small businesses, the useful first version of a site is simple: explain what you do, show where and how to reach you, and make the next step clear. That next step might be a call, a quote request, an appointment, or a visit.
 
----
+## Start with the customer's next action
 
-## 1) How AI is Changing Web Development
+Before choosing pages, ask one question: **what should a new customer be able to do here?**
 
-Artificial intelligence tools are automating repetitive tasks, improving code quality, and enabling dynamic content generation.
+- Call or text the business
+- Request a quote
+- Book an appointment
+- Visit a location
+- Understand the services before getting in touch
 
-**Key benefits:**
-- Faster development cycles
-- Enhanced user personalization
-- Improved accessibility and SEO
+That answer helps decide what needs to be prominent on the page. A contact form is useful when someone needs to describe a job. A phone number may be more useful when a customer needs an answer now. A business that takes appointments needs a clear booking path.
 
-> Question to ask: **“Are we leveraging AI tools to improve our website’s performance and user experience?”**
+## The essentials are usually practical
 
----
+Most small-business sites need accurate versions of:
 
-## 2) Practical AI Tools to Adopt Today
+- A short explanation of the business and who it serves
+- A clear services or offerings page
+- Contact information that is easy to find on a phone
+- Service area, location, or delivery information when it matters
+- Current hours, photos, and links that match the business's real information
 
-- **Code generators:** Automate boilerplate code creation.
-- **Chatbots:** Provide instant customer support.
-- **Content optimization:** AI-driven SEO and copywriting.
-- **Design assistants:** Generate layouts and graphics.
+These are not flashy additions. They are the information a customer checks before deciding whether to contact a business.
 
-> Tip: Use AI tools that integrate with your current stack for seamless workflows.
+## Add features because they solve a real need
 
----
+Some businesses genuinely need an online store, a booking system, a bilingual site, a gallery, or a request form. Others do not need all of those things on day one.
 
-## 3) Local SEO and AI: A Winning Combination
+The right question is not “What can a website include?” It is “What would make the information and next step clearer for this business right now?”
 
-Combine AI-powered content creation with localized SEO strategies targeting **Chicago**, **Portage Park**, and **Cicero** to boost search rankings and attract local customers.
+## Plan before paying for pages
 
-- Use AI to produce localized blog posts and landing pages.
-- Automate keyword research for neighborhood-specific terms.
-- Optimize metadata dynamically for local search queries.
+It helps to gather the basics before a project begins:
 
-> Question to ask: **“How can AI help us connect better with our local audience?”**
+1. A current service list
+2. The exact contact details customers should use
+3. Existing logo, photos, and brand materials
+4. The business's preferred customer action
+5. Any information that must be in English, Spanish, or both
 
----
+If you are unsure whether your website needs a refresh or a larger rebuild, start by writing down what customers cannot easily find or do today. That is a better project brief than a list of trends.
 
-## 4) Challenges and Considerations
-
-- Avoid over-reliance on AI-generated content without human review.
-- Ensure accessibility and ethical use of AI tools.
-- Stay updated with evolving AI technologies and best practices.
-
----
-
-## 5) Next Steps for Your Business
-
-- Evaluate current development processes for AI integration opportunities.
-- Train your team on AI tools relevant to web development.
-- Partner with experts who understand AI and local SEO.
-
----
-
-### Final Thought & CTA
-
-Embrace AI in your web development strategy to stay ahead in 2025 and beyond. For businesses in **Chicago**, **Portage Park**, and **Cicero**, AI-powered websites mean smarter growth and better customer engagement.
-
-**Cicero Web Studio** helps you harness AI for a competitive edge.  
-👉 https://cicerowebstudio.xyz — *Let’s innovate your web presence.*`,
-    author: 'Tulio Salvatierra',
-    date: 'March 15, 2025',
-    readTime: '8 min read',
-    category: 'Technology',
-    image: '/images/website.jpg',
-    tags: ['AI', 'Web Development', 'Technology', 'Future']
-  },
-  {
-    slug: 'mobile-first-website-design-why-it-matters',
-    title: 'Mobile-First Website Design: Why Your Business Needs It',
-    excerpt: "With over 60% of web traffic coming from mobile devices, having a mobile-first approach isn't just recommended—it's essential for business success.",
-    content: `# Why Your Business Needs a Mobile-First Website Design in 2025
-
-**TL;DR:** With mobile users dominating web traffic, adopting a mobile-first design is crucial for businesses in **Chicago**, **Portage Park**, and **Cicero** to engage customers effectively.
-
----
-
-## 1) The Mobile-First Mindset
-
-Designing for mobile first ensures:
-- Faster load times
-- Intuitive navigation on small screens
-- Better SEO performance, especially locally
-
-> Question to ask: **“Is our website optimized for the majority of users who visit from mobile devices?”**
-
----
-
-## 2) Key Elements of Mobile-First Design
-
-- Responsive layouts that adapt seamlessly to all screen sizes.
-- Touch-friendly buttons and forms.
-- Optimized images and media for quick loading.
-- Clear, concise content tailored for mobile consumption.
-
-> Tip: Test your site on devices used by your local audience in **Chicago**, **Portage Park**, and **Cicero**.
-
----
-
-## 3) Local SEO Benefits of Mobile-First
-
-Google prioritizes mobile-friendly sites in local search results. Ensure your site:
-- Loads quickly on mobile networks.
-- Displays localized content and contact info prominently.
-- Includes mobile-optimized maps and directions.
-
-> Question to ask: **“Are we capturing local mobile traffic effectively?”**
-
----
-
-## 4) Common Pitfalls to Avoid
-
-- Overloading pages with heavy media.
-- Neglecting accessibility features.
-- Poorly designed navigation menus.
-- Ignoring mobile usability testing.
-
----
-
-## 5) How to Get Started
-
-- Audit your current website’s mobile performance.
-- Prioritize mobile UX in redesign projects.
-- Collaborate with experts familiar with local market needs.
-
----
-
-### Final Thought & CTA
-
-A mobile-first website is no longer optional; it’s essential for growth in **Chicago**, **Portage Park**, and **Cicero**. Make your site work for your customers wherever they are.
-
-**Cicero Web Studio** specializes in mobile-first design that drives results.  
-👉 https://cicerowebstudio.xyz — *Let’s build your mobile-ready site.*`,
-    author: 'Tulio Salvatierra',
-    date: 'March 10, 2025',
+For a practical conversation about a small-business site, see [Chicago web design for small businesses](/chicago-web-design) or [contact Cicero Web Studio](/contact).`,
+    author,
+    date,
     readTime: '5 min read',
-    category: 'Design',
-    image: '/images/auto.jpg',
-    tags: ['Mobile', 'Design', 'UX']
-  },
-  {
-    slug: 'seo-strategies-that-work-2024',
-    title: 'SEO Strategies for Small Businesses That Actually Work',
-    excerpt: "Google's algorithm updates have changed the SEO landscape. Learn the strategies that are driving real results this year.",
-    content: `# SEO Strategies That Actually Work in 2025
-
-**TL;DR:** Stay ahead of Google’s evolving algorithms with proven SEO strategies tailored for businesses in **Chicago**, **Portage Park**, and **Cicero**.
-
----
-
-## 1) Understanding the 2025 SEO Landscape
-
-Google emphasizes user experience, relevance, and local intent more than ever.
-
-**Focus areas:**
-- Core Web Vitals and page speed
-- Quality, relevant content
-- Local SEO optimization
-
-> Question to ask: **“Are we aligning our SEO efforts with Google’s latest priorities?”**
-
----
-
-## 2) Proven SEO Tactics
-
-- Optimize for mobile and desktop performance.
-- Use localized keywords and phrases.
-- Build authoritative backlinks from local sources.
-- Regularly update content to maintain relevance.
-
-> Tip: Incorporate local landmarks and neighborhood names like **Chicago**, **Portage Park**, and **Cicero** in your content.
-
----
-
-## 3) Leveraging Structured Data and Rich Snippets
-
-Implement schema markup to help search engines understand your content and enhance your listings with rich snippets.
-
-- Use LocalBusiness schema for contact info.
-- Add FAQ schema for common customer questions.
-- Highlight reviews and testimonials.
-
-> Question to ask: **“Are we using structured data to improve our search visibility locally?”**
-
----
-
-## 4) Avoiding SEO Mistakes
-
-- Keyword stuffing or irrelevant keywords.
-- Ignoring mobile usability.
-- Neglecting local citations and directories.
-- Overlooking analytics and performance tracking.
-
----
-
-## 5) Measuring SEO Success
-
-- Track keyword rankings and organic traffic.
-- Monitor bounce rates and engagement.
-- Adjust strategies based on data insights.
-
----
-
-### Final Thought & CTA
-
-Effective SEO in 2025 requires a local focus and continuous adaptation. For businesses in **Chicago**, **Portage Park**, and **Cicero**, smart SEO means attracting the right customers at the right time.
-
-**Cicero Web Studio** delivers SEO strategies that drive measurable growth.  
-👉 https://cicerowebstudio.xyz — *Let’s boost your local search presence.*`,
-    author: 'Tulio Salvatierra',
-    date: 'March 5, 2025',
-    readTime: '6 min read',
-    category: 'Marketing',
-    image: '/images/support.png',
-    tags: ['SEO', 'Marketing', 'Google']
-  },
-  {
-    slug: 'scalable-ecommerce-lessons',
-    title: 'Ecommerce Scalability: Building Scalable E-commerce Solutions for Growth',
-    excerpt: 'What separates successful e-commerce businesses from the rest? Discover the technical and strategic foundations that drive growth.',
-    content: `# Building Scalable E-commerce Solutions in 2025: Lessons from Successful Online Stores
-
- Scaling your e-commerce business requires solid technology and strategy, especially when targeting customers in **Chicago**, **Portage Park**, and **Cicero**.
-
-
-
-## 1) Foundations of Scalable E-commerce
-
-
-- Robust platform architecture
-- Efficient inventory and order management
-- Seamless user experience across devices
-
- **“Is our e-commerce platform ready to handle growth and increased traffic?”**
-
----
-
-## 2) Strategies for Growth
-
-- Implement flexible payment and shipping options.
-- Personalize shopping experiences using customer data.
-- Optimize site speed and reliability.
-- Leverage marketing automation for customer retention.
-
-> Tip: Use localized promotions and content to engage shoppers in **Chicago**, **Portage Park**, and **Cicero**.
-
----
-
-## 3) Technical Considerations
-
-- Use cloud-based infrastructure for scalability.
-- Integrate with CRM and analytics tools.
-- Ensure mobile-first design for shopping on-the-go.
-
- **“Are our technical systems integrated and scalable for peak demand?”**
-
----
-
-## 4) Avoiding Common Pitfalls
-
-- Overcomplicating checkout processes.
-- Ignoring mobile optimization.
-- Neglecting customer support channels.
-- Failing to analyze and act on data.
-
----
-
-## 5) Preparing for the Future
-
-- Stay updated on e-commerce trends.
-- Invest in AI and automation.
-- Build strong relationships with local customers.
-
----
-
-### Final Thought & CTA
-
-Building a scalable e-commerce store means combining technology with customer-centric strategy. For businesses in **Chicago**, **Portage Park**, and **Cicero**, this approach drives sustainable growth.
-
-**Cicero Web Studio** helps you build e-commerce solutions that scale.  
-👉 https://cicerowebstudio.xyz — *Let’s grow your online store.*`,
-    author: 'Tulio Salvatierra',
-    date: 'February 28, 2025',
-    readTime: '7 min read',
-    category: 'E-commerce',
-    image: '/images/cleaning.jpg',
-    tags: ['E-commerce', 'Business', 'Technology']
-  },
-  {
-    slug: 'choose-right-web-design-package',
-    title: 'Website Redesign Checklist: How to Choose the Right Web Design Package',
-    excerpt: 'From basic landing pages to fully custom sites—learn how to pick the package that fits your goals and budget without overpaying.',
-    content: `# How to Choose the Right Web Design Package for Your Small Business in 2025
-
- Selecting the right web design package is crucial for success in **Chicago**, **Portage Park**, and **Cicero**. Match your needs with the right features and budget.
-
-</br>
-----
-
-## 1) Understanding Your Business Needs
-
-Identify your goals:
-- Brand awareness
-- Lead generation
-- E-commerce sales
-
-> Question to ask: **“What is the primary purpose of my website?”**
-
----
-
-## 2) Types of Web Design Packages
-
-- **Basic:** Landing pages and simple sites.
-- **Standard:** Multi-page sites with some customization.
-- **Premium:** Fully custom design and development.
-
-> Tip: Consider scalability and future growth when choosing.
-
----
-
-## 3) What to Look for in a Package
-
-- Mobile responsiveness and SEO optimization.
-- Integration with marketing tools.
-- Support and maintenance options.
-- Local SEO features for **Chicago**, **Portage Park**, and **Cicero**.
-
-> Question to ask: **“Does this package include features that help me reach my local audience?”**
-
----
-
-## 4) Budget Considerations
-
-- Balance features with cost.
-- Avoid paying for unnecessary extras.
-- Prioritize quality and support.
-
----
-
-## 5) Making the Decision
-
-- Request demos and portfolios.
-- Read client testimonials.
-- Ask about timelines and deliverables.
-
----
-
-### Final Thought & CTA
-
-Choosing the right web design package sets the foundation for your online success. For small businesses in **Chicago**, **Portage Park**, and **Cicero**, the right choice means better leads and growth.
-
-**Cicero Web Studio** offers tailored packages that fit your needs.  
-👉 https://cicerowebstudio.xyz — *Let’s find your perfect web design solution.*`,
-    author: 'Tulio Salvatierra',
-    date: 'March 20, 2025',
-    readTime: '6 min read',
-    category: 'Business',
-    image: '/images/csc.jpg',
-    tags: ['Web Design', 'Small Business', 'Budget']
-  },
-  {
-    slug: 'why-lead-capture-forms-high-performing-website-chicago',
-    title: 'Why Lead Capture Forms Are the Heart of a High-Performing Website',
-    excerpt: 'Beautiful sites don’t convert by themselves. Optimized lead forms turn visitors into real opportunities and drive measurable growth.',
-    content: `# Why Lead Capture Forms Are the Heart of a High‑Performing Website
-
-**TL;DR:** A good site doesn’t just look nice—it converts. Smart, short forms placed in the right spots turn visitors into leads for small businesses in **Chicago**, **Portage Park**, **Cicero**, and nearby neighborhoods.
-
----
-
-## 1) Why Forms Matter (and what problem they solve)
-
-A website without a form is like a storefront without a door—people may look inside, but they can’t come in.
-
-**Key idea:** Give visitors one clear action:
-- **Get a Quote**
-- **Book a Call**
-- **Request a Callback**
-
-> Question to ask: **“Do we have a form that invites action above the fold on desktop and mobile?”**
-
----
-
-## 2) The Anatomy of a High‑Converting Form
-
-- **Keep it short:** Name, email/phone, and one qualifier (project type, budget, or timeline).
-- **Clear microcopy:** Add trust lines like “We’ll never share your info.”
-- **Purposeful CTA:** “**Get My Free Quote**” beats “Submit.”
-- **Placement & repetition:** Above the fold and repeated at the end of key sections.
-- **Mobile‑first:** Most users are tapping—large inputs, auto‑capitalization off for emails, numeric keypad for phone.
-
-> Tip: On service pages for **Portage Park** and **Cicero**, use localized headlines and CTAs (e.g., “Get Your Portage Park Website Quote”).
-
----
-
-## 3) Turn Traffic Into Leads with Automation
-
-Connect forms to your stack so every submission moves work forward:
-- **Ads → Landing Page → Form → Thank‑You** (Google/Meta Ads)
-- **Auto‑responders:** Instant “We got your message” with next steps.
-- **Internal alerts:** Email/Slack notification to follow up in minutes.
-- **CRM:** Tag by neighborhood (“Chicago – Portage Park”, “Cicero – Small Business”) for smarter follow‑up.
-
-> Question to ask: **“What happens in the first 5 minutes after a form is submitted?”**
-
----
-
-## 4) Common Mistakes That Kill Conversions
-
-- Asking 10+ questions (each extra field lowers completion rates).
-- Hiding the form at the very bottom of a long page.
-- Vague buttons: “Submit,” “Send.”
-- Ignoring mobile speed and layout.
-- No proof nearby (testimonials, logos, “seen in” badges).
-
----
-
-## 5) Quick Checklist (Chicago Local SEO Friendly)
-
-- [ ] One primary form above the fold on each service page.
-- [ ] Localized headings: “Web Design in **Chicago** / **Portage Park** / **Cicero**.”
-- [ ] Add a testimonial near the form (e.g., **KikeVivaldy.com**, Intermezzo Sound Studio).
-- [ ] Fast page (Core Web Vitals), compressed images, lazy‑load below‑the‑fold media.
-- [ ] Unique thank‑you page with next steps (improves tracking + UX).
-
----
-
-## FAQ
-
-**Q1: Where should the form go?**  
-Above the fold on desktop **and** mobile, then again after your main benefits and once more near the footer.
-
-**Q2: How many fields are ideal?**  
-Start with 3–5. Add deeper questions only after the first contact.
-
-**Q3: Do forms help SEO in Chicago?**  
-Indirectly. Better UX lowers bounce and increases engagement—signals that can support rankings. Localized form headings/CTAs also align with **Chicago**, **Portage Park**, and **Cicero** searches.
-
-**Q4: Do I need CAPTCHA?**  
-Use invisible reCAPTCHA or simple honeypots to stop spam without hurting conversions.
-
----
-
-### Final Thought & CTA
-
-A great website doesn’t just exist online—it **starts conversations**. If your site isn’t generating leads, start with your form strategy.
-
-**Cicero Web Studio** helps Chicago small businesses design sites that attract and convert.  
-👉 https://cicerowebstudio.xyz — *Let’s make your website work for you.*`,
-    author: 'Tulio Salvatierra',
-    date: 'October 16, 2025',
-    readTime: '7 min read',
-    category: 'Marketing',
+    category: 'Website Planning',
     image: '/images/website.jpg',
-    tags: ['Lead Capture', 'Forms', 'Conversion', 'Small Business', 'Chicago']
-  }
+    tags: ['Website Planning', 'Chicago', 'Small Business'],
+  },
+  {
+    slug: 'custom-website-vs-template-small-business',
+    title: 'Custom Website vs. Template: What Is the Right Fit for a Small Business?',
+    excerpt: 'A template can be a good starting point. A custom website can be useful when the business needs a clearer structure, content, or customer path.',
+    content: `A template and a custom website are not opposite moral choices. They solve different problems.
+
+A template can be a sensible option when a business has straightforward information, good photos, and a clear way for customers to contact or book. A more tailored build becomes useful when the business needs help organizing its services, explaining its process, or creating a path that does not fit the template well.
+
+## When a template may be enough
+
+A template can be a practical fit when:
+
+- The business offers a small, clear set of services
+- The owner can keep the content current
+- A standard contact or booking path fits the workflow
+- The business does not need unusual pages or integrations
+
+The important part is not whether the starting point is a template. It is whether the final site gives customers accurate information and a clear next step.
+
+## When a tailored build can help
+
+A custom approach may be worth considering when the business has:
+
+- Several services that need a clearer structure
+- A process that customers need explained before contacting the business
+- A mix of calls, quotes, appointments, or location visits
+- Separate English and Spanish content that should be reviewed independently
+- Existing content that no longer matches the business
+
+“Custom” should not mean adding complexity for its own sake. It should mean making the site fit the business and the people who use it.
+
+## Compare the work, not just the label
+
+When you compare options, ask:
+
+1. Who will provide or review the written content?
+2. Can the pages grow if the business adds a service?
+3. Is the owner able to update key information later?
+4. Does the design make the contact path obvious on a phone?
+5. What happens after the site is launched?
+
+If you are deciding what to build first, start with the [small-business website checklist](/blog/small-business-website-checklist-chicago). You can also review the way Cicero Web Studio approaches [Chicago web design](/chicago-web-design).`,
+    author,
+    date,
+    readTime: '5 min read',
+    category: 'Website Planning',
+    image: '/images/Palette.png',
+    tags: ['Website Planning', 'Templates', 'Custom Website'],
+  },
+  {
+    slug: 'small-business-website-checklist-chicago',
+    title: 'A Small-Business Website Checklist for Chicago Owners',
+    excerpt: 'Use this checklist to organize the information, customer paths, and decisions that make a business website easier to build and easier to use.',
+    content: `A website can only be as accurate as the information behind it. Before starting a new site or a refresh, use this checklist to organize the basics.
+
+## 1. Define the first customer action
+
+Choose the main action you want a new visitor to take:
+
+- Call or text
+- Request a quote
+- Schedule an appointment
+- Visit a location
+- Send a message
+
+There can be more than one option, but one should be visually clear.
+
+## 2. Confirm the business facts
+
+Collect the information that should be consistent across the site:
+
+- Business name
+- Phone number and email
+- Address or service area
+- Hours
+- Social links
+- Google Business Profile link, if one is used
+
+If something is uncertain, leave it open for review instead of guessing. Incorrect hours or contact information can create avoidable customer confusion.
+
+## 3. List services in everyday language
+
+Write down each service, what it includes, and who it is for. Avoid copying language that the owner would not use in a conversation with a customer.
+
+For businesses with several offers, organize them into a few clear groups. Visitors should not have to decode internal service names to understand how the business can help.
+
+## 4. Gather usable visual material
+
+Start with what the business owns or has permission to use:
+
+- Logo files
+- Photos of work, team, products, or space
+- Brand colors or existing materials
+- Short videos, if they serve a clear purpose
+
+## 5. Decide what needs owner review
+
+Website projects often pause because nobody knows who must confirm the final copy, photos, access, or service details. Name the person responsible for each item early.
+
+For bilingual work, English and Spanish should be treated as separate content that needs its own review—not as an automatic translation step.
+
+This checklist is a starting point, not a requirement to have every answer immediately. It helps turn a loose idea into a useful project conversation.
+
+Read [how to choose a website designer](/blog/choose-website-designer-chicago) next, or [contact Cicero Web Studio](/contact) when you are ready to discuss your site.`,
+    author,
+    date,
+    readTime: '6 min read',
+    category: 'Website Planning',
+    image: '/images/Arrow.png',
+    tags: ['Website Checklist', 'Chicago', 'Small Business'],
+  },
+  {
+    slug: 'choose-website-designer-chicago',
+    title: 'How to Choose a Website Designer for Your Chicago Business',
+    excerpt: 'A better website project starts with clear questions about scope, ownership, content, communication, and what happens after launch.',
+    content: `Choosing a website designer is not only about how a portfolio looks. You are choosing a working process for turning business information into something customers can use.
+
+The best fit is usually the person or team that asks clear questions, explains the work plainly, and gives you a realistic way to review the important details.
+
+## Ask what the project includes
+
+Before agreeing to a project, make sure you understand:
+
+- Which pages and features are included
+- Who writes or approves the content
+- What the business needs to provide
+- How revisions are handled
+- What is included at launch and what is ongoing work
+
+An estimate should make the scope understandable. If a term feels vague, ask for an example of what it means for your business.
+
+## Ask about ownership and access
+
+You should know where the domain, website hosting, analytics, forms, and any third-party accounts live. A designer may manage some of these, but the business owner should understand what they are and how to access them.
+
+This is especially important when a business already has a domain, Google Business Profile, scheduling service, or social accounts.
+
+## Ask how content gets finished
+
+Content is often the part that takes the most coordination. A helpful process identifies what is needed, who reviews it, and which details must be confirmed before launch.
+
+You do not need polished marketing language before speaking with a designer. You do need enough real information to explain the services, customer questions, and contact path.
+
+## Review the site on a phone
+
+During review, check whether the main service is understandable quickly, contact details are easy to tap, forms and booking links work, and the information still reflects the real business.
+
+Use the [small-business website checklist](/blog/small-business-website-checklist-chicago) to prepare for that conversation. For a local, practical discussion, visit [Chicago web design for small businesses](/chicago-web-design).`,
+    author,
+    date,
+    readTime: '5 min read',
+    category: 'Hiring Help',
+    image: '/images/profile.png',
+    tags: ['Hiring Help', 'Chicago', 'Website Project'],
+  },
+  {
+    slug: 'website-refresh-vs-redesign-small-business',
+    title: 'Website Refresh vs. Redesign: Which Does Your Small Business Need?',
+    excerpt: 'Not every older website needs to be rebuilt. Learn how to separate a focused update from a larger redesign project.',
+    content: `An older website is not automatically a failed website. Sometimes the right move is a focused refresh: update outdated information, improve a contact path, add current photos, or reorganize one confusing page.
+
+Other times, the business has changed enough that a larger redesign makes more sense.
+
+## Start with what is no longer true
+
+Make a list of the information that has changed:
+
+- Services or pricing structure
+- Team, address, hours, or service area
+- Phone, email, booking, or quote process
+- Photos, branding, or current examples of work
+
+If the core structure still works, correcting and improving these areas may be enough.
+
+## A refresh is useful when the foundation is sound
+
+A refresh may fit when customers can still understand the business, the pages are organized in a usable way, the contact path works, and only certain information or visual elements are dated.
+
+The goal is not to make a site look new for a few weeks. It is to make the important information clearer and more accurate.
+
+## A redesign may be worth discussing when the structure is the problem
+
+A larger project can be reasonable when the site does not reflect the current business, visitors cannot find key services, or the existing platform makes necessary changes difficult.
+
+Before deciding, document the problem in plain language. “Customers cannot find the right service” is more useful than “the site feels old.”
+
+## Keep the customer path in view
+
+Whether the work is a refresh or redesign, review these questions:
+
+1. Can a first-time visitor understand what the business offers?
+2. Can they find the right way to contact, visit, or book?
+3. Does the information match the real business today?
+4. Can the owner keep it current?
+
+For help identifying the right scope, read [what website design services a small business actually needs](/blog/website-design-services-chicago-small-business) or [contact Cicero Web Studio](/contact).`,
+    author,
+    date,
+    readTime: '5 min read',
+    category: 'Website Planning',
+    image: '/images/video.png',
+    tags: ['Website Refresh', 'Website Redesign', 'Small Business'],
+  },
 ];
 
 export function getArticleBySlug(slug: string) {
-  return articles.find(a => a.slug === slug);
+  return articles.find((article) => article.slug === slug);
 }
-

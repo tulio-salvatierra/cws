@@ -13,6 +13,7 @@ import Home from "./components/Home/Home";
 import About from "./components/About";
 import Policy from "./components/Policy";
 import ServicesPage from "./components/ServicesPage";
+import ChicagoWebDesignPage from "./components/ChicagoWebDesignPage/ChicagoWebDesignPage";
 import Blog from "./components/Blog";
 import BlogPost from "./components/BlogPost";
 import Contact from "./components/Contact";
@@ -103,6 +104,7 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="services" element={<ServicesPage />} />
+              <Route path="chicago-web-design" element={<ChicagoWebDesignPage />} />
               <Route path="about" element={<About />} />
               <Route path="policy" element={<Policy />} />
               <Route path="blog" element={<Blog />} />

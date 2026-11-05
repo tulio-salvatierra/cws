@@ -34,6 +34,7 @@ export default function Breadcrumbs() {
     const staticLabels: Record<string, string> = {
       blog: 'Blog',
       services: 'Services',
+      'chicago-web-design': 'Chicago Web Design',
       about: 'About',
       policy: 'Policy',
       contact: 'Contact'
