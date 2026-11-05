@@ -174,3 +174,5 @@
 | CWS-LANDING-TRUST-CLEANUP-20261104 | Codex | Draft review | Applied D1–D4 on six landing pages and isolated Service JSON-LD | 869 tests, lint, build, six static titles and 12 Chrome viewport checks passed. [Draft PR #62](https://github.com/tulio-salvatierra/cws/pull/62) |
 
 | CWS-AGREEMENT-BILLING-START-20261104 | Codex | Released and Production verified | Separates owner-confirmed billing start from finished-site launch; creates a deterministic agreement payment schedule without charging Square or asserting launch | PR #69 merged `b584eb7`; Production migration `20261105165800_agreement_billing_start_date` and deployment `dpl_FqYYue8FCEQbsntSjAEuMiEXs111` verified. Local migration filename aligned to the exact remote version; Accounting and CEO live reads pass, with no new payment, obligation, provider action, or client data entry |
+
+| CWS-AHREFS-ANALYTICS-20261105 | Codex | Implemented locally — deployment approval pending | Adds the owner-supplied Ahrefs Analytics tag once to the shared public document head | Lint/build pass; built document has exactly one async analytics script; no database, CWS OS, provider, or customer-data change |
