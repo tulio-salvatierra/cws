@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import IntakeField from './IntakeField'
-import { initialAnswers, initialValue, serviceFields, summarize, validateAnswers, hasAnswer } from '../../lib/intake/model.js'
+import { initialAnswers, restoreAnswers, initialValue, serviceFields, summarize, validateAnswers, hasAnswer } from '../../lib/intake/model.js'
 import './IntakePage.css'
 const modules = import.meta.glob('../../content/intake/*.json', { eager: true, import: 'default' })
 const configs = Object.values(modules)
 function IntakeForm({ config }) {
   const storageKey = `cws:intake:${config.slug}:v1`
   const [answers, setAnswers] = useState(() => {
-    try { const saved = JSON.parse(localStorage.getItem(storageKey)); if (saved) return validateAnswers(config, saved) } catch { /* Draft unavailable or stale; use current config. */ }
+    try { const saved = JSON.parse(localStorage.getItem(storageKey)); if (saved) return restoreAnswers(config, saved) } catch { /* Draft unavailable or stale; use current config. */ }
     return initialAnswers(config)
   })
   const [storageStatus, setStorageStatus] = useState('')

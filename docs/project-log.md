@@ -2386,3 +2386,11 @@ CWS-INTAKE-20261106 adds `/intake/<slug>` from validated JSON configs, starting 
 ## 2026-11-06 — Intake branch and preview released
 
 Owner authorized GitHub push and a preview, explicitly excluding production. Implementation commit `cc486e47bf9de158035c3c1038effcb433a6dc11` is on `codex/client-intake`. Vercel deployment `dpl_YAwkVE4YSCpxKeBano3vvxmtAGJ4` reports READY with no alias error at https://cws-pah0j4d4t-t00lio-s-team.vercel.app/intake/sherry. Main remains unchanged. No production/domain/provider-email action occurred. Delivery remains unverified pending recipient setup and an authorized test.
+
+## 2026-11-06 — Intake production and delivery receipts
+
+PR #73 merged as f205349 and deployed to production. Live route returned 200, unknown slug 404, noindex headers/meta and sitemap exclusion verified. Owner then confirmed notification recipient; production env configured and unchanged commit redeployed as dpl_JB2dbX3gdTz78ao5w2kZCzBtz6gX (READY). Authorized synthetic POST returned 200 and Resend confirmed delivered at 19:17:47 UTC. No client answers or database writes used. Inbox placement/attachment retrieval not independently checked.
+
+## 2026-11-06 — Sherry intake simplification
+
+Owner requested focusing on team, certifications, availability, customers and service selection; removed premature business setup, assets, quotes and domain questions. Tulio handles ZIP codes from the supplied locations. All service cards remain intact. Browser draft restoration now retains remaining answers when retired questions exist, without relaxing API validation. Targeted 21 tests, lint, build and local browser checks passed; full suite passed (900 tests/91 files); authorized publication pending.

@@ -13,6 +13,16 @@ export function initialValue(field, suggested = false) {
 export function initialAnswers(config) {
   return { version: 1, sections: Object.fromEntries(config.sections.map(s => [s.id, Object.fromEntries(s.fields.map(f => [f.id, initialValue(f)]))])), services: config.services.map(s => ({ id: s.id, name: s.name, fields: Object.fromEntries(serviceFields(config, s).map(f => [f.id, initialValue(f, true)])) })) }
 }
+// Retain current answers when a config removes section questions from an older draft.
+export function restoreAnswers(config, saved) {
+  if (!isRecord(saved) || !isRecord(saved.sections)) return validateAnswers(config, saved)
+  const sections = Object.fromEntries(config.sections.map(section => {
+    const previous = saved.sections[section.id]
+    if (previous !== undefined && !isRecord(previous)) throw new Error('Invalid saved section')
+    return [section.id, Object.fromEntries(section.fields.map(field => [field.id, previous?.[field.id] ?? initialValue(field)]))]
+  }))
+  return validateAnswers(config, { ...saved, sections })
+}
 export function hasAnswer(value) {
   if (typeof value === 'string') return !!value.trim()
   if (Array.isArray(value)) return value.some(row => Object.values(row).some(hasAnswer))
