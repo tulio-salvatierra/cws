@@ -1,0 +1,393 @@
+{
+  "slug": "sherry",
+  "clientName": "Your new cleaning company",
+  "greeting": "Hi Cher and team",
+  "intro": "Let’s define what your new website should say. Choose which services to include, review the suggested steps, and tell us what is ready or still being decided. Suggestions are not claims about your company. You can leave questions blank and return on this device later. The broader service list is for consideration only; mark anything you do not offer as Not offered.",
+  "sections": [
+    {
+      "id": "business",
+      "title": "Your business",
+      "fields": [
+        {
+          "id": "phone",
+          "type": "text",
+          "label": "Website phone"
+        },
+        {
+          "id": "phone-pending",
+          "type": "checkbox",
+          "label": "Phone setup",
+          "options": [
+            "Not set up yet"
+          ],
+          "allowNotSure": false
+        },
+        {
+          "id": "email",
+          "type": "text",
+          "label": "Website email"
+        },
+        {
+          "id": "email-pending",
+          "type": "checkbox",
+          "label": "Email setup",
+          "options": [
+            "Not set up yet"
+          ],
+          "allowNotSure": false
+        },
+        {
+          "id": "area",
+          "type": "textarea",
+          "label": "Service area",
+          "help": "List the ZIP codes or towns you serve"
+        },
+        {
+          "id": "experience",
+          "type": "repeater",
+          "label": "Team experience",
+          "allowAdd": true,
+          "columns": [
+            {
+              "id": "name",
+              "type": "text",
+              "label": "Name"
+            },
+            {
+              "id": "years",
+              "type": "text",
+              "label": "Years"
+            },
+            {
+              "id": "work",
+              "type": "text",
+              "label": "Type of work"
+            }
+          ],
+          "prefill": [
+            {
+              "name": "Manny",
+              "years": "",
+              "work": ""
+            },
+            {
+              "name": "Celestino",
+              "years": "",
+              "work": ""
+            },
+            {
+              "name": "Emmanuel",
+              "years": "",
+              "work": ""
+            },
+            {
+              "name": "Cher",
+              "years": "",
+              "work": ""
+            }
+          ]
+        },
+        {
+          "id": "ikeca",
+          "type": "radio",
+          "label": "IKECA",
+          "options": [
+            "Have it",
+            "In progress",
+            "No"
+          ]
+        },
+        {
+          "id": "nadca",
+          "type": "radio",
+          "label": "NADCA",
+          "options": [
+            "Have it",
+            "In progress",
+            "No"
+          ]
+        },
+        {
+          "id": "osha-10",
+          "type": "radio",
+          "label": "OSHA 10",
+          "options": [
+            "Have it",
+            "In progress",
+            "No"
+          ]
+        },
+        {
+          "id": "osha-30",
+          "type": "radio",
+          "label": "OSHA 30",
+          "options": [
+            "Have it",
+            "In progress",
+            "No"
+          ]
+        },
+        {
+          "id": "other-certification",
+          "type": "text",
+          "label": "Other certification name"
+        },
+        {
+          "id": "other-certification-status",
+          "type": "radio",
+          "label": "Other certification status",
+          "options": [
+            "Have it",
+            "In progress",
+            "No"
+          ]
+        },
+        {
+          "id": "insured",
+          "type": "radio",
+          "label": "Licensed & insured",
+          "options": [
+            "Yes",
+            "In progress",
+            "No"
+          ]
+        },
+        {
+          "id": "hours",
+          "type": "radio",
+          "label": "Hours",
+          "options": [
+            "Phones answered 24/7",
+            "24/7 bookings, calls answered business hours",
+            "After-hours by appointment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "essentials",
+      "title": "Your website essentials",
+      "fields": [
+        {
+          "id": "business-name",
+          "type": "text",
+          "label": "Preferred business name"
+        },
+        {
+          "id": "brand",
+          "type": "textarea",
+          "label": "Logo and brand preferences",
+          "help": "Tell us what exists, what is still being created, and any colors you prefer"
+        },
+        {
+          "id": "customers",
+          "type": "checkbox",
+          "label": "Customers you serve",
+          "options": [
+            "Restaurants",
+            "Hotels",
+            "Commercial kitchens",
+            "Industrial facilities",
+            "Other commercial buildings"
+          ],
+          "allowOther": true
+        },
+        {
+          "id": "materials",
+          "type": "checkbox",
+          "label": "Materials ready to share",
+          "options": [
+            "Logo",
+            "Real job photos",
+            "Before/after photos",
+            "Service report sample",
+            "Customer-approved testimonials",
+            "Verified review link",
+            "Insurance or certification evidence"
+          ],
+          "help": "Check only what is ready. Share links below; do not include private credentials"
+        },
+        {
+          "id": "links",
+          "type": "textarea",
+          "label": "Links to materials"
+        },
+        {
+          "id": "quote-process",
+          "type": "textarea",
+          "label": "How should quotes work",
+          "help": "Who responds, site visits, information needed, and expected response time"
+        },
+        {
+          "id": "domain",
+          "type": "text",
+          "label": "Preferred website domain"
+        },
+        {
+          "id": "notes",
+          "type": "textarea",
+          "label": "Anything else Tulio should know"
+        }
+      ]
+    }
+  ],
+  "serviceFields": [
+    {
+      "id": "status",
+      "type": "radio",
+      "label": "Service status",
+      "options": [
+        "Include at launch",
+        "Later",
+        "Not offered"
+      ]
+    },
+    {
+      "id": "steps",
+      "type": "checkbox",
+      "label": "Steps you perform",
+      "options": [],
+      "allowAdd": true,
+      "ordered": true,
+      "help": "These are suggestions, not confirmed claims. Uncheck anything you do not do, add missing steps, and change their order"
+    },
+    {
+      "id": "equipment",
+      "type": "checkbox",
+      "label": "Equipment you use",
+      "options": [],
+      "allowAdd": true
+    },
+    {
+      "id": "codes",
+      "type": "checkbox",
+      "label": "Codes or standards you follow",
+      "options": [],
+      "allowAdd": true,
+      "help": "Select only what you can confirm. This does not establish certification"
+    },
+    {
+      "id": "scope",
+      "type": "textarea",
+      "label": "What is included and excluded"
+    },
+    {
+      "id": "proof",
+      "type": "textarea",
+      "label": "Experience, photos and supporting materials",
+      "help": "Describe relevant experience and share links you have permission to use"
+    }
+  ],
+  "services": [
+    {
+      "id": "hood",
+      "name": "Kitchen exhaust & hood cleaning",
+      "presets": {
+        "steps": [
+          "Cover cooking equipment with plastic",
+          "Remove and clean grease filters",
+          "Scrape heavy grease buildup",
+          "Apply degreaser",
+          "Hot-water pressure wash hood, ducts and fan",
+          "Clean rooftop exhaust fan",
+          "Install/check fan hinge kit",
+          "Contain and dispose of grease water",
+          "Polish hood",
+          "Before/after photos",
+          "Place service sticker"
+        ],
+        "equipment": [
+          "Hot-water pressure washer",
+          "Commercial degreaser",
+          "Scrapers",
+          "Plastic sheeting",
+          "Grease containment",
+          "Ladders",
+          "Access panels"
+        ],
+        "codes": [
+          "NFPA 96",
+          "Local fire code"
+        ]
+      }
+    },
+    {
+      "id": "duct",
+      "name": "Commercial air duct cleaning",
+      "presets": {
+        "steps": [
+          "Inspect and take before photos",
+          "Protect the area",
+          "Connect negative air machine",
+          "Agitate ducts with brushes/air whips",
+          "Clean vents, registers and grilles",
+          "Clean air handler",
+          "Clean coils",
+          "Apply sanitizer (optional)",
+          "Replace filters",
+          "After photos"
+        ],
+        "equipment": [
+          "HEPA negative air machine",
+          "Rotary brushes",
+          "Air whips",
+          "HEPA vacuum",
+          "Access doors",
+          "Inspection camera",
+          "Sanitizer"
+        ]
+      }
+    },
+    {
+      "id": "industrial",
+      "name": "Industrial cleaning",
+      "presets": {}
+    },
+    {
+      "id": "kitchen",
+      "name": "Commercial kitchen deep cleaning",
+      "presets": {}
+    },
+    {
+      "id": "janitorial",
+      "name": "Recurring janitorial cleaning",
+      "presets": {}
+    },
+    {
+      "id": "floor",
+      "name": "Hard-floor care",
+      "presets": {}
+    },
+    {
+      "id": "carpet",
+      "name": "Commercial carpet & upholstery cleaning",
+      "presets": {}
+    },
+    {
+      "id": "windows",
+      "name": "Commercial window cleaning",
+      "presets": {}
+    },
+    {
+      "id": "pressure",
+      "name": "Pressure washing & exterior cleaning",
+      "presets": {}
+    },
+    {
+      "id": "construction",
+      "name": "Post-construction cleaning",
+      "presets": {}
+    },
+    {
+      "id": "warehouse",
+      "name": "Warehouse & facility deep cleaning",
+      "presets": {}
+    },
+    {
+      "id": "specialty",
+      "name": "Specialized cleaning",
+      "presets": {}
+    }
+  ],
+  "allowAddService": true
+}
