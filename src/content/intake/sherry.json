@@ -2,46 +2,12 @@
   "slug": "sherry",
   "clientName": "Your new cleaning company",
   "greeting": "Hi Cher and team",
-  "intro": "Let’s define what your new website should say. Choose which services to include, review the suggested steps, and tell us what is ready or still being decided. Suggestions are not claims about your company. You can leave questions blank and return on this device later. The broader service list is for consideration only; mark anything you do not offer as Not offered.",
+  "intro": "Let’s focus on your team, the customers you want to serve, and the services to include on your website. Business setup details can wait. Tulio will organize the service-area ZIP codes from the locations you already shared. Review the suggested steps and uncheck anything you do not do. You can leave questions blank and return on this device later. The broader service list is for consideration only; mark anything you do not offer as Not offered.",
   "sections": [
     {
       "id": "business",
-      "title": "Your business",
+      "title": "Your team and availability",
       "fields": [
-        {
-          "id": "phone",
-          "type": "text",
-          "label": "Website phone"
-        },
-        {
-          "id": "phone-pending",
-          "type": "checkbox",
-          "label": "Phone setup",
-          "options": [
-            "Not set up yet"
-          ],
-          "allowNotSure": false
-        },
-        {
-          "id": "email",
-          "type": "text",
-          "label": "Website email"
-        },
-        {
-          "id": "email-pending",
-          "type": "checkbox",
-          "label": "Email setup",
-          "options": [
-            "Not set up yet"
-          ],
-          "allowNotSure": false
-        },
-        {
-          "id": "area",
-          "type": "textarea",
-          "label": "Service area",
-          "help": "List the ZIP codes or towns you serve"
-        },
         {
           "id": "experience",
           "type": "repeater",
@@ -143,16 +109,6 @@
           ]
         },
         {
-          "id": "insured",
-          "type": "radio",
-          "label": "Licensed & insured",
-          "options": [
-            "Yes",
-            "In progress",
-            "No"
-          ]
-        },
-        {
           "id": "hours",
           "type": "radio",
           "label": "Hours",
@@ -166,19 +122,8 @@
     },
     {
       "id": "essentials",
-      "title": "Your website essentials",
+      "title": "Your customers and notes",
       "fields": [
-        {
-          "id": "business-name",
-          "type": "text",
-          "label": "Preferred business name"
-        },
-        {
-          "id": "brand",
-          "type": "textarea",
-          "label": "Logo and brand preferences",
-          "help": "Tell us what exists, what is still being created, and any colors you prefer"
-        },
         {
           "id": "customers",
           "type": "checkbox",
@@ -191,37 +136,6 @@
             "Other commercial buildings"
           ],
           "allowOther": true
-        },
-        {
-          "id": "materials",
-          "type": "checkbox",
-          "label": "Materials ready to share",
-          "options": [
-            "Logo",
-            "Real job photos",
-            "Before/after photos",
-            "Service report sample",
-            "Customer-approved testimonials",
-            "Verified review link",
-            "Insurance or certification evidence"
-          ],
-          "help": "Check only what is ready. Share links below; do not include private credentials"
-        },
-        {
-          "id": "links",
-          "type": "textarea",
-          "label": "Links to materials"
-        },
-        {
-          "id": "quote-process",
-          "type": "textarea",
-          "label": "How should quotes work",
-          "help": "Who responds, site visits, information needed, and expected response time"
-        },
-        {
-          "id": "domain",
-          "type": "text",
-          "label": "Preferred website domain"
         },
         {
           "id": "notes",

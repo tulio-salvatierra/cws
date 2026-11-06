@@ -5,7 +5,7 @@ import process from 'node:process'
 import { readFileSync } from 'node:fs'
 import config from '../../../src/content/intake/sherry.json'
 import { validateConfig } from '../../../src/lib/intake/schema.js'
-import { initialAnswers, serviceFields, summarize, validateAnswers } from '../../../src/lib/intake/model.js'
+import { initialAnswers, restoreAnswers, serviceFields, summarize, validateAnswers } from '../../../src/lib/intake/model.js'
 const { send } = vi.hoisted(() => ({ send: vi.fn() }))
 vi.mock('../../../api/lib/resend.js', () => ({ getFromEmail: () => 'CWS <sender@example.com>', sendResendEmail: send }))
 import handler from '../handler.js'
@@ -15,6 +15,19 @@ function request(answers = initialAnswers(config), patch = {}) { return { method
 beforeEach(() => { send.mockReset().mockResolvedValue({ data: { id: 'test' }, error: null }); process.env.RESEND_API_KEY = 'test-only'; process.env.INTAKE_NOTIFY_EMAIL = 'owner@example.com' })
 describe('intake config and summaries', () => {
   it('validates Sherry and preserves name-only experience prefills', () => { expect(validateConfig(config)).toBe(config); const answers = initialAnswers(config); expect(answers.sections.business.experience[0]).toEqual({ name: 'Manny', years: '', work: '' }); expect(validateAnswers(config, answers)).toBe(answers) })
+  it('keeps retained answers and custom service choices when retired questions exist in a saved draft', () => {
+    const saved = initialAnswers(config)
+    saved.sections.business.phone = 'Old phone answer'
+    saved.sections.business.experience[0].years = '12'
+    saved.sections.essentials.notes = 'Keep these notes'
+    saved.services[0].fields.steps.added = ['Custom step']
+    const restored = restoreAnswers(config, saved)
+    expect(restored.sections.business.phone).toBeUndefined()
+    expect(restored.sections.business.experience[0].years).toBe('12')
+    expect(restored.sections.essentials.notes).toBe('Keep these notes')
+    expect(restored.services[0].fields.steps.added).toEqual(['Custom step'])
+    expect(() => validateAnswers(config, saved)).toThrow()
+  })
   it.each(['slug', 'allowAddService', 'serviceFields'])('fails clearly for invalid %s', key => { const copy = structuredClone(config); copy[key] = null; expect(() => validateConfig(copy, 'sherry.json')).toThrow('sherry.json') })
   it('rejects duplicate fields, unknown presets and invalid prefill types', () => { const copy = structuredClone(config); copy.sections[0].fields.push(copy.sections[0].fields[0]); expect(() => validateConfig(copy)).toThrow('duplicate'); const preset = structuredClone(config); preset.services[0].presets.fake = ['x']; expect(() => validateConfig(preset)).toThrow('preset fake'); const prefill = structuredClone(config); prefill.sections[0].fields[4].prefill = 42; expect(() => validateConfig(prefill)).toThrow('prefill') })
   it('renders ordered steps and experience without empty fields; unsure comes last', () => {
