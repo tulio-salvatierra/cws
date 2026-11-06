@@ -45,6 +45,38 @@ spending or client contact without Tulio's explicit OK.
 5. Edit skills in `skills/` only, never in the symlinked paths. Log changes in
    `docs/project-log.md`.
 
+## Full skill inventory (as of 2026-11-06)
+
+Check this list before proposing a new skill. Several CWS skills exist in Tulio's claude.ai
+account but are not yet in `skills/`.
+
+| Stage | Skill | Where it lives | What it actually does |
+| --- | --- | --- | --- |
+| Find leads | none | Gap | CWS OS Sales already has prospect discovery and a 5-per-day queue. Decide after real use whether a skill adds anything. |
+| Cold outreach | none (by design) | CWS OS Sales | Day 0/4/10 sequence, template drafts, owner-confirmed Resend send (`server/sales/queue.js`). Not a skill. |
+| Warm follow-up | `cws-follow-up` | `skills/` | Replies, post-call recaps, stalled proposals. |
+| Proposal | `negocio-listo-proposal` | `skills/` | One-page proposal, prices from `src/data/negocioListo.js`. |
+| Onboard | `new-client-setup` | claude.ai only | Sets up a client in CWS OS, Drive (SEO profile, status doc) and review pages. |
+| Brand & discovery | `client-design-picker` | claude.ai only | Builds the client's design review page at cicerowebstudio.xyz/review. |
+| Brand & discovery | `client-picks` | claude.ai only | Processes a client's website **review answers** (keep/change/remove) into a change list, scope flags, reply draft and Next Move tasks. **Not lead finding.** |
+| Launch | `local-seo-sprint` | claude.ai only | Local SEO setup sprint. |
+| Monthly care | `monthly-seo-checkup` | claude.ai only | Monthly site and SEO health check. |
+| Monthly care | `client-update` | `skills/` | Plain-language client update from the status doc. |
+| Any client chat | `handoff` | claude.ai only | Updates the client's Drive `00 STATUS.md` at the end of a chat. |
+| Billing | none (by design) | CWS OS Accounting | Agreements, billing start, payment schedules and receipts already live there. No invoice skill. |
+
+## Corrections to the 2026-11-06 ChatGPT proposal
+
+- `client-picks` is not a lead-finding skill (see table). There is no lead-finding skill yet.
+- `sales-followup` = `cws-follow-up` and `proposal-generator` = `negocio-listo-proposal`.
+  Already built; do not create duplicates.
+- Agreed: setup payment comes after the signed agreement and before onboarding, and billing
+  continues through the relationship. CWS OS Accounting is the source of truth for it.
+- Agreed: start with lead-to-payment. Next step is using the built skills on real work this
+  week, not building more. No new skill until one of these has run on a real lead or client.
+- The claude.ai-only skills can move into `skills/` later, one at a time, after a check
+  that they contain no client data (the repo is public).
+
 ## Open items (Tulio's call)
 
 - **Pricing conflict.** Tulio's notes say the standard is $150/mo + $300 setup. The public
