@@ -1,5 +1,7 @@
 /* global process */
 
+import intakeHandler from '../server/intake/handler.js'
+
 import { waitUntil } from '@vercel/functions'
 import {
   GoogleSheetsWebhookTimeoutError,
@@ -7,6 +9,7 @@ import {
 } from '../server/google-sheets-webhook.js'
 
 export default async function handler(req, res) {
+  if (req.query?.intake === '1' || new URL(req.url || '/', 'http://local').searchParams.get('intake') === '1') return intakeHandler(req, res)
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' })
   }

@@ -22,6 +22,7 @@ import Gallery from "./components/Gallery";
 import NegocioListo from "./components/NegocioListo";
 import { getLandingPageData } from "./data/landingPagesData";
 
+const IntakePage = lazy(() => import("./pages/intake/IntakePage"));
 const LoginPage = lazy(() => import("./pages/admin/LoginPage"));
 const ResetPasswordPage = lazy(() => import("./pages/admin/ResetPasswordPage"));
 const AdminPage = lazy(() => import("./pages/admin/AdminPage"));
@@ -71,7 +72,7 @@ function LandingPageWrapper() {
 // Ad and DM traffic lands on the Negocio Listo pages: skip the intro loader so the
 // page (and its video) is usable immediately instead of waiting for window load.
 const NEGOCIO_LISTO_PATH = /^\/(en\/)?negocio-listo\/?$/;
-const skipIntroLoader = typeof window !== "undefined" && (NEGOCIO_LISTO_PATH.test(window.location.pathname) || /^\/unsubscribe\/?$/.test(window.location.pathname));
+const skipIntroLoader = typeof window !== "undefined" && ((/^\/intake(?:\/|$)/.test(window.location.pathname)) || NEGOCIO_LISTO_PATH.test(window.location.pathname) || /^\/unsubscribe\/?$/.test(window.location.pathname));
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling
@@ -100,6 +101,8 @@ function App() {
       <div className={`app-shell ${loading ? "app-shell--loading" : ""}`}>
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
+            <Route path="/intake/:slug" element={<Suspense fallback={null}><IntakePage /></Suspense>} />
+            <Route path="/intake/*" element={<Suspense fallback={null}><IntakePage /></Suspense>} />
             <Route path="/unsubscribe" element={<UnsubscribePage />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />

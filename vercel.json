@@ -8,7 +8,8 @@
       "maxDuration": 60
     },
     "api/client-portal-intake.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "src/content/intake/**"
     },
     "api/marketing-linkedin.js": {
       "maxDuration": 30,
@@ -23,6 +24,14 @@
     {
       "source": "/api/command-queue",
       "destination": "/api/sales"
+    },
+    {
+      "source": "/api/intake",
+      "destination": "/api/client-portal-intake?intake=1"
+    },
+    {
+      "source": "/intake/:slug([a-z][a-z0-9-]*)",
+      "destination": "/intake/:slug.html"
     },
     {
       "source": "/api/outreach/webhook",
@@ -113,8 +122,28 @@
       "destination": "/landing/website-refresh-redesign.html"
     },
     {
-      "source": "/((?!api/|assets/|.*\\..*).*)",
+      "source": "/((?!intake(?:/|$)|api/|assets/|.*\\..*).*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/intake/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/intake",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ]
 }

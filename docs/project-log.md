@@ -2378,3 +2378,7 @@ Owner authorized the combined release. PR #69 merged as `b584eb7ab16dae609dca881
 ## 2026-11-05 — Ahrefs Analytics tag prepared
 
 Added the owner-supplied Ahrefs Analytics loader as one asynchronous static script in the public document head, next to the existing Google Tag Manager setup. This is present on all public routes because they share the Vite document shell; no admin route, database state, marketing publication, provider action, or server credential changes. Lint and production build pass, and the built document contains the analytics script exactly once. Deployment remains pending explicit owner approval.
+
+## 2026-11-06 — Config-driven website intake prepared locally
+
+CWS-INTAKE-20261106 adds `/intake/<slug>` from validated JSON configs, starting with `sherry.json`, in isolated branch `codex/client-intake` at `/private/tmp/cws-client-intake`. Combines website essentials with twelve candidate services, supplied hood/duct presets, ordered/addable steps and rows, guarded local drafts, reset confirmation, text export and a Resend email/JSON attachment path via the existing intake function. No database writes. Unknown configs are 404; generated pages have noindex metadata/headers and stay outside the sitemap. Lint, 899 tests across 91 files and local production build pass; mobile/desktop layout and local 200/404 checked. Email tests are mocked; actual delivery and hosted headers/routing remain unverified. Server env destination setup and explicit review/release remain pending. No commit, push or deployment occurred.
