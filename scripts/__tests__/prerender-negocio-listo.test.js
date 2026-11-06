@@ -19,7 +19,7 @@ describe('Negocio Listo prerender', () => {
   it('bakes Spanish metadata, hreflang and JSON-LD into the page head', () => {
     const html = renderPage(template, 'es')
     expect(html).toContain('<html lang="es">')
-    expect(html).toContain('<title>Negocio Listo: página web y perfil de Google desde $149/mes | Cicero Web Studio</title>')
+    expect(html).toContain('<title>Negocio Listo: página web y perfil de Google desde $150/mes | Cicero Web Studio</title>')
     expect(html).toContain('<link rel="canonical" href="https://www.cicerowebstudio.xyz/negocio-listo" />')
     expect(html).toContain('<meta property="og:image" content="https://www.cicerowebstudio.xyz/images/negocio-listo/og.jpg" />')
     expect(html).toContain('<meta property="og:locale" content="es_US" />')
@@ -28,7 +28,7 @@ describe('Negocio Listo prerender', () => {
     expect(html).not.toContain('Drives Customers')
     const jsonLd = JSON.parse(html.match(/<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/s)[1])
     const service = jsonLd['@graph'].find((node) => node['@type'] === 'Service')
-    expect(service.offers.map((offer) => offer.price)).toEqual(['149', '249', '349'])
+    expect(service.offers.map((offer) => offer.price)).toEqual(['150', '250', '350'])
   })
 
   it('renders an English snapshot with the plans and FAQ inside #root', () => {
