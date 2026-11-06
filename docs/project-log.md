@@ -2386,3 +2386,7 @@ CWS-INTAKE-20261106 adds `/intake/<slug>` from validated JSON configs, starting 
 ## 2026-11-06 — Intake branch and preview released
 
 Owner authorized GitHub push and a preview, explicitly excluding production. Implementation commit `cc486e47bf9de158035c3c1038effcb433a6dc11` is on `codex/client-intake`. Vercel deployment `dpl_YAwkVE4YSCpxKeBano3vvxmtAGJ4` reports READY with no alias error at https://cws-pah0j4d4t-t00lio-s-team.vercel.app/intake/sherry. Main remains unchanged. No production/domain/provider-email action occurred. Delivery remains unverified pending recipient setup and an authorized test.
+
+## 2026-11-06 — CWS-SKILLS-20261106 shared agent skills
+
+Added `skills/` as the single source for agent skills used by Claude and ChatGPT/Codex (open SKILL.md format). `.claude/skills` and `.agents/skills` are symlinks to it; `skills/` is added to `.vercelignore`. Three draft-only skills chosen from the CWS operations map: `cws-follow-up` (warm replies, call recaps, stalled proposals; explicitly not the CWS OS Day 0/4/10 cold sequence, which `server/sales/queue.js` already derives), `negocio-listo-proposal` (reads plans/prices from `src/data/negocioListo.js`; setup fee only as the owner states), `client-update` (from the client's Drive `00 STATUS.md`). No app code, database, provider or deployment change. Open: owner notes say $150/mo + $300 setup while the public page lists $149/$249/$349 tiers with setup by plan; the proposal skill follows the page and asks for the setup fee until the owner confirms.
