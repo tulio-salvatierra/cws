@@ -12,6 +12,10 @@ The CLI writes only these files automatically:
 
 It does **not** auto-approve permanent decisions or learnings.
 
+Older entries live in `docs/archive/`. The duplicate-task check only sees the current
+`docs/project-log.md`, so reuse of an archived task ID is not caught; always use a new,
+dated task ID.
+
 When the input includes proposed decisions or learnings, the CLI writes a review file into:
 
 - `docs/memory-proposals/`

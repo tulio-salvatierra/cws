@@ -3,6 +3,9 @@
 Read `docs/product-definition.md` first; it is the canonical scope (v3, DEC-034–038).
 Role-specific instructions live in `.agents/`. Project memory lives in `docs/`
 (`decisions.md`, `learnings.md`, `task-ledger.md`, `project-log.md`, `agent-handoffs/`).
+`docs/archive/` holds older log entries and completed ledger rows: history only, don't
+read it unless a task asks about that period. Archive again when `project-log.md` passes
+about 60 KB (move entries older than two weeks; never edit archived text).
 
 ## What this repo is
 
