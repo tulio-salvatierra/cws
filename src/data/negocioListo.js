@@ -53,7 +53,7 @@ export const NEGOCIO_LISTO = {
       popular: 'MÁS POPULAR',
       choose: 'Elegir',
       perMonth: '/mes',
-      finePrint: 'Contrato mínimo de 12 meses. Cuota de instalación según el plan.',
+      finePrint: 'Instalación única de $300. Contrato mínimo de 12 meses.',
       items: [
         { id: 'basico', name: 'Básico', price: 150, tagline: 'Tu negocio listo en línea', features: ['Sitio web bilingüe de 5 páginas', 'Hosting y cambios pequeños incluidos', 'Perfil de Google configurado y optimizado', 'SEO local básico'] },
         { id: 'crecer', name: 'Crecer', price: 250, popular: true, tagline: 'Más llamadas, más reseñas', features: ['Todo lo de Básico', 'Publicaciones mensuales en tu perfil de Google', 'Sistema para pedir reseñas', 'Respuesta automática por texto cuando pierdes una llamada', 'Reporte mensual de una página'] },
@@ -72,7 +72,7 @@ export const NEGOCIO_LISTO = {
     faq: {
       title: 'Preguntas frecuentes',
       items: [
-        { q: '¿Cuánto cuesta Negocio Listo?', a: 'Hay tres planes mensuales: Básico a $150, Crecer a $250 y Destacado a $350. El contrato mínimo es de 12 meses y la cuota de instalación depende del plan.' },
+        { q: '¿Cuánto cuesta Negocio Listo?', a: 'Hay tres planes mensuales: Básico a $150, Crecer a $250 y Destacado a $350. El contrato mínimo es de 12 meses y hay una cuota de instalación única de $300.' },
         { q: '¿Tengo que pagar mucho por adelantado?', a: 'No. En vez de pagar $1,000 o más por un sitio web, pagas un plan mensual que incluye la página, el hosting y los cambios pequeños.' },
         { q: '¿La página está en español y en inglés?', a: 'Sí. Todos los planes incluyen un sitio web bilingüe de 5 páginas, para que te encuentren clientes que hablan español y clientes que hablan inglés.' },
         { q: '¿Qué es la revisión gratis del perfil de Google?', a: 'Son 10 minutos, en español. Revisamos tu perfil de Google y te decimos qué te falta para aparecer cuando buscan tu servicio cerca de ellos.' },
@@ -175,7 +175,7 @@ export const NEGOCIO_LISTO = {
       popular: 'MOST POPULAR',
       choose: 'Choose',
       perMonth: '/mo',
-      finePrint: '12-month minimum. Setup fee varies by plan.',
+      finePrint: 'One-time $300 setup. 12-month minimum.',
       items: [
         { id: 'basico', name: 'Básico', price: 150, tagline: 'Your business, ready online', features: ['Bilingual 5-page website', 'Hosting and small edits included', 'Google Business Profile set up and optimized', 'Local SEO basics'] },
         { id: 'crecer', name: 'Crecer', price: 250, popular: true, tagline: 'More calls, more reviews', features: ['Everything in Básico', 'Monthly Google profile posts', 'Review-request system', 'Automatic text-back when you miss a call', '1-page monthly report'] },
@@ -194,7 +194,7 @@ export const NEGOCIO_LISTO = {
     faq: {
       title: 'Questions',
       items: [
-        { q: 'How much does Negocio Listo cost?', a: 'There are three monthly plans: Básico at $150, Crecer at $250 and Destacado at $350. There is a 12-month minimum and the setup fee varies by plan.' },
+        { q: 'How much does Negocio Listo cost?', a: 'There are three monthly plans: Básico at $150, Crecer at $250 and Destacado at $350. There is a 12-month minimum and there is a one-time $300 setup fee.' },
         { q: 'Do I have to pay a lot upfront?', a: 'No. Instead of paying $1,000 or more for a website, you pay a monthly plan that includes the site, hosting and small edits.' },
         { q: 'Is the website in English and Spanish?', a: 'Yes. Every plan includes a bilingual 5-page website, so both English- and Spanish-speaking customers can find you.' },
         { q: 'What is the free Google profile check?', a: 'It takes 10 minutes. We review your Google profile and show you what’s missing to show up when people search for your service nearby.' },

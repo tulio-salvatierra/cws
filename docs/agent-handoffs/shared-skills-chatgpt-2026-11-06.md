@@ -24,7 +24,7 @@ spending or client contact without Tulio's explicit OK.
 | Skill | Use when | Key rules |
 | --- | --- | --- |
 | `cws-follow-up` | Replying to a prospect, recapping a demo/call, nudging a stalled proposal | Does **not** replace the CWS OS Sales Day 0/4/10 cold sequence. No unconfirmed prices. Draft only. |
-| `negocio-listo-proposal` | Turning call notes into a one-page proposal | Prices come from `src/data/negocioListo.js` every time. Setup fee only as Tulio states it. 12-month minimum. Flags scope creep. |
+| `negocio-listo-proposal` | Turning call notes into a one-page proposal | Prices come from `src/data/negocioListo.js` every time. Setup fee ($300) also from the page. 12-month minimum. Flags scope creep. |
 | `client-update` | Monthly note or progress update to a client | Reads `Clients/<Business>/00 STATUS.md` in Drive. Plain language, client's language, no jargon, no invented numbers. |
 
 ## How to use them on your side
@@ -81,7 +81,8 @@ account but are not yet in `skills/`.
 
 - **Pricing resolved (2026-11-06).** Tulio set Negocio Listo monthly plans to $150 / $250 / $350
   (Básico / Crecer / Destacado) everywhere; the site change is on branch `claude/nl-pricing`.
-  The setup fee is still not published, so the proposal skill keeps asking for it.
+  Setup fee set to a one-time $300 on 2026-11-08 and published on the page; the proposal
+  skill reads it from there.
 - Merge PR from `claude/shared-skills`. It doesn't change the app build, and `skills/` is
   excluded from deploys.
 - Next candidates on the ops map: mini-audit (prospecting), launch checklist, upsell offer.

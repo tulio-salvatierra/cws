@@ -17,9 +17,8 @@ Plans, prices and features come from the live Negocio Listo page, defined in thi
 cicerowebstudio.xyz). Read it every time. Don't rely on memory or this file for numbers.
 
 At the time of writing it lists Básico, Crecer and Destacado monthly plans, an optional
-Contenido add-on, and a 12-month minimum term. **The setup fee is not on the page.** Use only
-the setup fee Tulio states for this proposal. If he hasn't, leave `[setup fee — Tulio to
-confirm]` in the draft and list it under questions.
+Contenido add-on, a one-time $300 setup fee and a 12-month minimum term. Use the setup fee
+from the page too; if the page and these notes ever disagree, the page wins and you flag it.
 
 Never invent a discount, a custom price, a legacy price or a payment plan. Older clients on
 lower legacy prices are exceptions and never a reference for new proposals.
@@ -41,8 +40,7 @@ before drafting. Don't fill gaps with assumptions.
    words ("No apareces en Google Maps cuando buscan 'roofer Cicero'").
 3. **Lo que vamos a hacer / What we'll do**: the recommended plan's features from the
    source file, tied to the findings above. Plan name in bold.
-4. **Inversión / Investment**: monthly price from the source file, setup fee as confirmed
-   by Tulio, 12-month minimum, add-on only if discussed.
+4. **Inversión / Investment**: monthly price from the source file, setup fee from the page, 12-month minimum, add-on only if discussed.
 5. **Cómo empezamos / How we start**: three steps. Sign and pay the setup fee, send logo,
    photos and service list, and we build while they keep working. First draft timing only
    if Tulio gave one.

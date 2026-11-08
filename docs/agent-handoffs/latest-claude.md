@@ -1,26 +1,22 @@
-Task ID: CWS-SKILLS-20261106
+Task ID: CWS-NL-SETUP-ARCHIVE-20261108
 Agent: Claude
-Objective: Centralize agent skills so Claude and ChatGPT/Codex share one copy, and write the first three CWS skills.
+Objective: Merge the skills and pricing PRs, publish the $300 setup fee, update plan graphics to $150/$250/$350, and archive bloated memory files.
 
 Files changed:
-- `skills/README.md`, `skills/cws-follow-up/SKILL.md`, `skills/negocio-listo-proposal/SKILL.md`, `skills/client-update/SKILL.md` (new)
-- `.claude/skills` and `.agents/skills` (new symlinks to `skills/`)
-- `.vercelignore` (excludes `skills`)
-- `docs/agent-handoffs/shared-skills-chatgpt-2026-11-06.md` (new, handoff for ChatGPT/Codex)
-- `docs/project-log.md`, `docs/task-ledger.md` (appended)
-
-Inspected: `AGENTS.md`, `.agents/claude-project-instructions.md`, `docs/agent-memory-workflow.md`, `docs/product-definition.md` (Sales, Negocio Listo), `docs/accounting/profitability-and-catalog.md`, `server/sales/queue.js`, `server/outreach/templates.js`, `src/data/negocioListo.js`.
+- `src/data/negocioListo.js`, `public/llms.txt` (one-time $300 setup fee, ES/EN)
+- `skills/negocio-listo-proposal/SKILL.md` (setup fee read from the page)
+- `public/images/negocio-listo/{es,en}-0{2,3,4}-*.png` (prices redrawn)
+- `docs/project-log.md`, `docs/task-ledger.md` (trimmed; new entries)
+- `docs/archive/project-log-2026-07-21-to-2026-10-24.md`, `docs/archive/task-ledger-completed-to-2026-11-08.md` (new)
+- `AGENTS.md`, `docs/agent-memory-workflow.md` (archive rule)
+- `docs/agent-handoffs/shared-skills-chatgpt-2026-11-06.md` (setup fee resolved)
 
 Findings:
-- CWS OS Sales already derives Day 0/4/10 follow-ups and prepares template drafts with owner-confirmed send, so `cws-follow-up` is scoped to warm conversations only.
-- Negocio Listo pricing conflict resolved by owner: $150 / $250 / $350 monthly. Setup fee is still not published; the proposal skill asks for it.
+- Plan graphics use Clash Display Bold (`src/assets/fonts/clash.woff2`) with tight tracking; prices were redrawn by fitting size and tracking to the original glyphs.
+- `scripts/save-agent-memory.mjs` duplicate check only sees the live project log; documented.
 
-Follow-up (same day): owner set Negocio Listo monthly prices to $150 / $250 / $350. Branch `claude/nl-pricing` updates `src/data/negocioListo.js` (plans, SEO titles/descriptions, FAQ, JSON-LD offers and priceRange), the hero "from" price in `NegocioListo.jsx`, `public/llms.txt` and the prerender test. Full suite 899/899, lint and build (placeholder client env) pass; built ES/EN pages show only $150/$250/$350 and schema offers 150/250/350.
+Tests run: full suite, lint, production build with placeholder client env.
 
-Tests run: see follow-up above; the skills change itself is Markdown and symlinks only.
+Not changed: Accounting draft catalog offers in the database still list $149/$249/$349 (production data; owner edit). `en-02-basico-150-v2.png` already showed $150 and $300 setup; untouched. Contenido add-on stays +$300/mo.
 
-Memory updates withheld: no decision or learning added; pricing source of truth needs owner confirmation.
-
-Not changed: Accounting draft catalog offers in the database still say $149/$249/$349 (production data, needs owner-confirmed edit in Accounting); social graphics in `public/images/negocio-listo/` have prices baked in and are not used by the page.
-
-Next: owner reviews and merges both PRs (merging deploys the price change to production), uploads skill zips to claude.ai, adds skills in the ChatGPT desktop app.
+Next: owner updates Accounting draft offers; next archive when the live log passes about 60 KB.
