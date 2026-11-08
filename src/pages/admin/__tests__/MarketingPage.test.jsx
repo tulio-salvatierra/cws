@@ -341,6 +341,8 @@ describe('MarketingPage failed-slot recovery', () => {
     render(<MarketingPage />)
     await waitFor(() => expect(screen.getByRole('button', { name: 'Close failed slot' })).toBeEnabled())
     expect(screen.getByText('Failed — close required')).toBeInTheDocument()
+    expect(screen.getByRole('note')).toHaveTextContent('Same error on 3 channels (LinkedIn, Facebook, Instagram): Image ratio is unsupported.')
+    expect(screen.queryAllByText('Image ratio is unsupported.')).toHaveLength(0)
     fireEvent.click(screen.getByRole('button', { name: 'Close failed slot' }))
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(3))
 

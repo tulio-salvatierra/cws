@@ -9,10 +9,12 @@ afterEach(()=>vi.unstubAllGlobals())
 describe('goal/deal owner responses',()=>{
  it('keeps response behavior clear and the full limitations available on demand',()=>{
   render(<LayaOwnerResponse review={review} label="Priority" onReload={vi.fn()}/>)
-  expect(screen.getByText('Act or Dismiss saves your choice and reason. You carry out the next step separately.')).toBeVisible()
+  const summary=screen.getByText('Act or Dismiss saves your choice and reason. You carry out the next step separately.')
   const limitations=screen.getByText(/Act\/Dismiss records your response to this exact evaluation/)
+  expect(summary).not.toBeVisible()
   expect(limitations).not.toBeVisible()
   fireEvent.click(screen.getByText('What happens when I respond?'))
+  expect(summary).toBeVisible()
   expect(limitations).toBeVisible()
   expect(fetch).not.toHaveBeenCalled()
  })

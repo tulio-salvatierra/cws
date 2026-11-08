@@ -1,6 +1,7 @@
 import LayaSavedFeedback from './LayaSavedFeedback'
 import { useEffect, useId, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { formatChicagoDateTime, humanizeKey } from '../../lib/adminFormat'
 
 const types = { decision_review: 'Decision', goal_pace: 'Goal pace', deal_fit: 'Deal fit', lifecycle: 'Lifecycle', priority_review: 'Priority' }
 
@@ -81,7 +82,7 @@ export default function LayaResponseHistory({ history }) {
       {!items.length && <p className="mt-3 text-sm">{state.filter === 'all' && state.response === 'all' && !state.from && !state.to && !state.search ? 'No saved Laya responses yet.' : 'No saved responses match these filters.'}</p>}
       {items.map(row => <article key={row.id} className="mt-4 border-t border-gray-700 pt-4">
         <h3 className="font-semibold">{types[row.evaluator] || row.evaluator} · {row.response === 'act' ? 'Act' : 'Dismiss'}</h3>
-        <p className="mt-1 text-xs text-gray-400">{row.created_at} · {row.subject_type || 'business_decision'} · {row.subject_id || row.decision_id}</p>
+        <p className="mt-1 text-xs text-gray-400" title={`${row.created_at} · ${row.subject_id || row.decision_id}`}>{formatChicagoDateTime(row.created_at)} (Chicago) · {humanizeKey(row.subject_type || 'business_decision')}</p>
         <p className="mt-2 text-sm whitespace-pre-wrap">Saved subject: {[row.input_snapshot?.inputs?.action?.human_action, row.input_snapshot?.decision?.title, row.input_snapshot?.decision?.decision, row.input_snapshot?.inputs?.lead?.name, row.input_snapshot?.inputs?.lead?.company, row.input_snapshot?.inputs?.agreement?.product_name].filter(Boolean).join(' · ') || row.subject_id || row.decision_id}</p>
         <p className="mt-2 whitespace-pre-wrap">Reason: {row.reason}</p>
         <LayaSavedFeedback response={row} />

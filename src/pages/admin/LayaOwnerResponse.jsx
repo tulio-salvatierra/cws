@@ -3,6 +3,7 @@ import LayaSavedFeedback from './LayaSavedFeedback'
 import { optionalFeedbackPayload } from '../../../shared/laya-feedback'
 import {useState} from 'react'
 import {supabase} from '../../lib/supabase'
+import {formatChicagoDateTime} from '../../lib/adminFormat'
 
 export default function LayaOwnerResponse({review,label,onReload}) {
  const [category,setCategory]=useState(''),[alternative,setAlternative]=useState('')
@@ -23,8 +24,7 @@ export default function LayaOwnerResponse({review,label,onReload}) {
  }
  return <div className="[&_p]:mb-0 mt-4 border-t border-sky-300/20 pt-3 text-sm" aria-label={`${label} responses`}>
   <p className="font-medium text-gray-200">Your response</p>
-  <p className="mt-1 max-w-prose text-sm leading-6 text-gray-400">Act or Dismiss saves your choice and reason. You carry out the next step separately.</p>
-  <details className="mt-2 text-xs leading-5 text-gray-400"><summary className="cursor-pointer py-1 text-sky-200">What happens when I respond?</summary><p className="mt-2 max-w-prose">Act/Dismiss records your response to this exact evaluation. It does not change goals, budgets, subscriptions or priorities, accept a deal, reserve capacity, change delivery/launch/payment records, or activate a decision.</p></details>
+  <details className="mt-2 text-xs leading-5 text-gray-400"><summary className="cursor-pointer py-1 text-sky-200">What happens when I respond?</summary><p className="mt-2 max-w-prose">Act or Dismiss saves your choice and reason. You carry out the next step separately.</p><p className="mt-2 max-w-prose">Act/Dismiss records your response to this exact evaluation. It does not change goals, budgets, subscriptions or priorities, accept a deal, reserve capacity, change delivery/launch/payment records, or activate a decision.</p></details>
   {review.can_respond && <div className="mt-3 flex flex-wrap gap-3 text-sky-200">{['act','dismiss'].map(value=><button key={value} className="rounded-lg border border-sky-300/30 px-4 py-2.5 font-medium transition hover:bg-sky-300/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 disabled:opacity-50" disabled={busy} type="button" onClick={()=>{setChoice(value);setReviewToken(review.review_token);setReason('');setCategory('');setAlternative('');setError('');setNotice('')}}>{value==='act'?'Act':'Dismiss'}</button>)}</div>}
   {review.unavailable_reason && <p className="mt-2 text-amber-200">{review.unavailable_reason}</p>}
   {review.history_available===false && <p className="mt-2 text-amber-200">Response history is unavailable. Reload to try again.</p>}
@@ -37,7 +37,7 @@ export default function LayaOwnerResponse({review,label,onReload}) {
   </form>}
   {error && <p role="alert" className="mt-2 text-rose-200">{error}</p>}{notice && <p role="status" className="mt-2 text-sky-200">{notice}</p>}
   {!!review.responses?.length && <details className="mt-3 text-gray-300"><summary>Saved responses ({review.responses.length} among the latest 30 across Laya)</summary>
-   {review.responses.map(row=><article key={row.id} className="mt-3 border-t border-gray-700 pt-3"><p>{row.response==='act'?'Act':'Dismiss'} · {row.created_at}</p><p className="mt-1 whitespace-pre-wrap">Reason: {row.reason}</p><LayaSavedFeedback response={row} /><p className="mt-1 text-xs">Reviewed {row.evaluation.policy_version} · {row.evaluation.business_date} · {row.evaluation.verdict.replaceAll('_',' ')}</p><details className="mt-2 text-xs"><summary>Exact reviewed input snapshot and evaluation</summary><pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all">{JSON.stringify({input_snapshot:row.input_snapshot,evaluation:row.evaluation},null,2)}</pre></details></article>)}
+   {review.responses.map(row=><article key={row.id} className="mt-3 border-t border-gray-700 pt-3"><p>{row.response==='act'?'Act':'Dismiss'} · <span title={row.created_at}>{formatChicagoDateTime(row.created_at)} (Chicago)</span></p><p className="mt-1 whitespace-pre-wrap">Reason: {row.reason}</p><LayaSavedFeedback response={row} /><p className="mt-1 text-xs">Reviewed {row.evaluation.policy_version} · {row.evaluation.business_date} · {row.evaluation.verdict.replaceAll('_',' ')}</p><details className="mt-2 text-xs"><summary>Exact reviewed input snapshot and evaluation</summary><pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all">{JSON.stringify({input_snapshot:row.input_snapshot,evaluation:row.evaluation},null,2)}</pre></details></article>)}
   </details>}
  </div>
 }
