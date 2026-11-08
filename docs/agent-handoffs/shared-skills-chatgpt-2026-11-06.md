@@ -79,9 +79,9 @@ account but are not yet in `skills/`.
 
 ## Open items (Tulio's call)
 
-- **Pricing conflict.** Tulio's notes say the standard is $150/mo + $300 setup. The public
-  page lists $149 / $249 / $349 tiers with "setup fee by plan". The proposal skill follows
-  the page and asks for the setup fee until Tulio confirms which is current.
+- **Pricing resolved (2026-11-06).** Tulio set Negocio Listo monthly plans to $150 / $250 / $350
+  (Básico / Crecer / Destacado) everywhere; the site change is on branch `claude/nl-pricing`.
+  The setup fee is still not published, so the proposal skill keeps asking for it.
 - Merge PR from `claude/shared-skills`. It doesn't change the app build, and `skills/` is
   excluded from deploys.
 - Next candidates on the ops map: mini-audit (prospecting), launch checklist, upsell offer.

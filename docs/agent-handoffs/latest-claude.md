@@ -13,10 +13,14 @@ Inspected: `AGENTS.md`, `.agents/claude-project-instructions.md`, `docs/agent-me
 
 Findings:
 - CWS OS Sales already derives Day 0/4/10 follow-ups and prepares template drafts with owner-confirmed send, so `cws-follow-up` is scoped to warm conversations only.
-- Negocio Listo pricing differs between owner notes ($150/mo + $300 setup) and the public page ($149/$249/$349, setup by plan). The proposal skill reads the page and asks for the setup fee.
+- Negocio Listo pricing conflict resolved by owner: $150 / $250 / $350 monthly. Setup fee is still not published; the proposal skill asks for it.
 
-Tests run: none needed (Markdown and symlinks only; no app code touched).
+Follow-up (same day): owner set Negocio Listo monthly prices to $150 / $250 / $350. Branch `claude/nl-pricing` updates `src/data/negocioListo.js` (plans, SEO titles/descriptions, FAQ, JSON-LD offers and priceRange), the hero "from" price in `NegocioListo.jsx`, `public/llms.txt` and the prerender test. Full suite 899/899, lint and build (placeholder client env) pass; built ES/EN pages show only $150/$250/$350 and schema offers 150/250/350.
+
+Tests run: see follow-up above; the skills change itself is Markdown and symlinks only.
 
 Memory updates withheld: no decision or learning added; pricing source of truth needs owner confirmation.
 
-Next: owner confirms pricing, merges the PR, uploads skill zips to claude.ai, adds skills in the ChatGPT desktop app.
+Not changed: Accounting draft catalog offers in the database still say $149/$249/$349 (production data, needs owner-confirmed edit in Accounting); social graphics in `public/images/negocio-listo/` have prices baked in and are not used by the page.
+
+Next: owner reviews and merges both PRs (merging deploys the price change to production), uploads skill zips to claude.ai, adds skills in the ChatGPT desktop app.

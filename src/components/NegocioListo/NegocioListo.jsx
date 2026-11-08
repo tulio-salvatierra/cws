@@ -147,7 +147,7 @@ export default function NegocioListo({ lang = 'es' }) {
               <a className="nl-btn nl-btn--primary" href="#formulario" onClick={(e) => { e.preventDefault(); scrollToId('formulario') }}>{copy.hero.ctaPrimary}</a>
               <a className="nl-btn nl-btn--secondary" href="#planes" onClick={(e) => { e.preventDefault(); scrollToId('planes') }}>{copy.hero.ctaSecondary}</a>
             </div>
-            <p className="nl-from"><span className="nl-from__label">{copy.hero.from}</span> <span className="nl-from__price">$149</span><span className="nl-from__per">{copy.hero.perMonth}</span></p>
+            <p className="nl-from"><span className="nl-from__label">{copy.hero.from}</span> <span className="nl-from__price">$150</span><span className="nl-from__per">{copy.hero.perMonth}</span></p>
           </div>
         </div>
       </section>
