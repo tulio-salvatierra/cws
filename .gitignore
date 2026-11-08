@@ -41,7 +41,8 @@ ayuda-terremoto-venezuela/
 .agents.local/
 agents.local/
 .codex/
-.claude/
+.claude/*
+!.claude/skills
 .superpowers/
 .tmp/
 skills-lock.json

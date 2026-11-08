@@ -5,6 +5,7 @@ dist
 .agents
 .codex
 .claude
+skills
 .tmp
 **/__tests__/**
 **/*.test.js
