@@ -32,7 +32,7 @@ function MaskedText({
   useGSAP(
     () => {
       const el = textRef.current;
-      if (!el) return;
+      if (!el || document.documentElement.hasAttribute("data-prerender")) return;
 
       // ensure base node is visible
       gsap.set(el, { opacity: 1 });

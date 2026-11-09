@@ -1,19 +1,19 @@
-Task ID: CWS-INTAKE-20261106
+Task ID: CWS-PUBLIC-PRERENDER-20261105
 Agent: Codex
-Objective: Simplify Sherry intake for pre-launch service planning and publish at the existing live URL, as owner authorized.
-Files inspected: Repo agent instructions, product definition, technical conventions, decisions, learnings, intake config/model/UI/tests, latest handoff/log/ledger.
-Files changed: Sherry config, draft restoration helper/UI, intake tests, handoff/log/ledger.
-Database or API changes: None. Server answer validation remains strict.
-Security decisions: Only browser draft restoration discards retired section fields; no recipient or delivery behavior changed.
-Decisions made: Remove phone/email/setup, service area, licensing/insurance, business name, brand, materials/links, quotes and domain questions. Retain team experience, certifications, hours, customer types, notes and all service pickers. Explain that Tulio handles ZIP codes from the existing location list.
-Assumptions: Licensing/insurance deferred until business setup. Per-service proof fields unchanged, consistent with owner's approval of service cards.
-Tests added: Saved-draft regression preserves remaining answers/custom steps after retired questions are removed. Existing autosave test now uses retained notes field.
-Tests run: 21 targeted tests, lint and production build passed; local browser confirms revised fields. Full suite: 900 tests across 91 files passed.
-Known issues: No new email test sent; prior production test delivered successfully. Existing per-instance rate limit limitation unchanged.
-Recommended next task: Complete checks, merge and verify updated live page.
-Questions requiring Tulio: None; publish at same link confirmed, no client message requested.
+Objective: Deliver crawlable HTML for public sitemap routes and link four previously unlinked pages.
+Files inspected: Product and technical conventions, canonical and intake builds, Vercel routing, public navigation and footer.
+Files changed: Public prerender build, fallback rewrite, Services, Footer, Contact, animation hooks, project memory.
+Database or API changes: None.
+Security decisions: Capture only public sitemap paths and block external requests during prerender.
+Decisions made: Serve the homepage snapshot as the default document and keep an empty fallback shell. Generate intake documents before prerendering.
+Assumptions: Existing React startup replaces static snapshots.
+Tests added: Build assertions for rendered headings, links and application errors.
+Tests run: 912 tests, lint, build and generated HTML assertions covering all 20 pages, four incoming links and the fallback shell.
+Known issues: Existing bundle size warning.
+Recommended next task: Verify CI, preview and production. Recheck Ahrefs after release.
+Questions requiring Tulio: None.
 Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No system memory update.
-Git diff summary: Isolated codex/simplify-sherry-intake worktree from f205349. Previous local release notes and original CWS/Cherry checkouts preserved.
+Memory updates withheld: Remote verification until checks finish.
+Git diff summary: Public SEO and build changes based on current main in an isolated worktree.

@@ -23,7 +23,13 @@ export default function ServicesPage() {
             Professional Web Design Services in Chicago
           </h2>
           <p className="font-main text-zinc-900 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
-            I'm Tulio — ex-logistics pro turned web dev, building modern websites for small businesses in Humboldt Park, Portage Park & greater Chicago. No fluff, just results: more bookings, calls, and sales. Serving small businesses across Chicago, Cicero, and surrounding Chicagoland areas with professional web design services, website redesign, and conversion-focused solutions. Explore our location-specific services: <a href="/landing/cicero-web-design" className="text-orange-500 hover:text-orange-400 underline">Cicero web design</a>, <a href="/landing/oak-park-seo" className="text-orange-500 hover:text-orange-400 underline">Oak Park SEO</a>, and <a href="/landing/elmwood-park-maintenance" className="text-orange-500 hover:text-orange-400 underline">Elmwood Park website maintenance</a>.
+            I'm Tulio — ex-logistics pro turned web dev, building modern websites for small businesses in Humboldt Park, Portage Park & greater Chicago. No fluff, just results: more bookings, calls, and sales. Serving small businesses across Chicago, Cicero, and surrounding Chicagoland areas with professional web design services, website redesign, and conversion-focused solutions. Explore our services:
+            {' '}<a href="/landing/cicero-web-design" className="text-orange-500 hover:text-orange-400 underline">Cicero web design</a>,
+            {' '}<a href="/landing/oak-park-seo" className="text-orange-500 hover:text-orange-400 underline">Oak Park SEO</a>,
+            {' '}<a href="/landing/elmwood-park-maintenance" className="text-orange-500 hover:text-orange-400 underline">Elmwood Park website maintenance</a>,
+            {' '}<a href="/landing/chicago-digital-marketing" className="text-orange-500 hover:text-orange-400 underline">Chicago digital marketing</a>,
+            {' '}<a href="/landing/berwyn-ecommerce" className="text-orange-500 hover:text-orange-400 underline">Berwyn e-commerce</a>, and
+            {' '}<a href="/landing/website-refresh-redesign" className="text-orange-500 hover:text-orange-400 underline">website refresh and redesign</a>.
           </p>
         </div>
 

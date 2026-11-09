@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/intake-pages.mjs --validate && npm run check:imports && vite build && node scripts/prerender-negocio-listo.mjs && node scripts/canonical-pages.mjs && node scripts/intake-pages.mjs",
+    "build": "node scripts/intake-pages.mjs --validate && npm run check:imports && vite build && node scripts/prerender-negocio-listo.mjs && node scripts/canonical-pages.mjs && node scripts/intake-pages.mjs && node scripts/prerender-public-pages.mjs",
     "check:imports": "node scripts/check-import-casing.mjs",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -67,3 +67,5 @@ Open work and the 40 most recent tasks. Older completed rows: `docs/archive/task
 | CWS-CEO-MONEY-20261108 | Claude | Merged to main (#80) | Read-only money tiles on CEO Today from the existing accounting read model; unavailable state instead of zeros; 266 tests and lint pass | Owner confirms totals match Accounting on production |
 | CWS-CEO-LEADS-20261109 | Claude | Merged to main (#81) | Leads added or contacted in the last 7 days on CEO Today with Log call, Replied, Follow-up, Not interested via the existing Sales endpoint; 241 tests and lint pass | Owner records this week's calls from CEO Today; confirm Sales queue reflects them |
 | CWS-NL-BILLING-RULE-20261109 | Claude | Shipping | DEC-040 billing rule recorded; proposal skill states it EN/ES; Sherry's signed terms checked ($149 at launch) | Owner decides whether to ask Sherry to move to the new terms; supply SQUARE_ACCESS_TOKEN for the Signed → agreement → Square automation |
+
+| CWS-PUBLIC-PRERENDER-20261105 | Codex | Local checks passed | Prerender all 20 sitemap URLs and add four incoming links | Verify GitHub CI and Vercel preview before merging, then check production |
