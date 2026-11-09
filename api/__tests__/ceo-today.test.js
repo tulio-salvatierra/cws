@@ -130,6 +130,7 @@ describe('CEO Today endpoint', () => {
 
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json.mock.calls[0][0]).toMatchObject({ ok: true })
+    expect(res.json.mock.calls[0][0].money).toMatchObject({ available: true, received_amount_cents: expect.any(Number), monthly_recurring_revenue_cents: expect.any(Number) })
     expect(res.json.mock.calls[0][0].actions).toEqual(expect.arrayContaining([
       expect.objectContaining({ department: 'SALES', human_action: 'Call Ada Plumbing' }),
     ]))

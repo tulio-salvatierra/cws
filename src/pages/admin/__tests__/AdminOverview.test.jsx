@@ -185,4 +185,23 @@ describe('AdminOverview CEO Today', () => {
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
     expect(globalThis.fetch.mock.calls[0][1]?.method).toBeUndefined()
   })
+
+  it('shows read-only money tiles that link to Accounting', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...ceoToday, money: { available: true, monthly_recurring_revenue_cents: 22000, received_amount_cents: 101500, outstanding_amount_cents: 165000, overdue_amount_cents: 0 } }))
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+    const tiles = await screen.findByRole('region', { name: 'Money' })
+    expect(tiles).toHaveTextContent('$220')
+    expect(tiles).toHaveTextContent('$1,015')
+    expect(tiles).toHaveTextContent('$1,650')
+    expect(tiles).toHaveTextContent('Nothing late')
+    expect(screen.getByRole('link', { name: /Monthly recurring/ })).toHaveAttribute('href', '/admin/accounting')
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('says money is unavailable instead of showing zeros', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(response({ ...ceoToday, money: { available: false } }))
+    render(<MemoryRouter><AdminOverview /></MemoryRouter>)
+    expect(await screen.findByText(/Money totals are unavailable right now/)).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Money' })).not.toBeInTheDocument()
+  })
 })

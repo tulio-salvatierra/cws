@@ -15,6 +15,7 @@ import { loadReviewSummary } from '../server/laya/marketing.js'
 import { buildOperationsReadModel } from '../server/operations/readiness.js'
 import { buildAccountingReadModel } from '../server/accounting/read-model.js'
 import { buildComplianceReadModel } from '../server/compliance/read-model.js'
+import { agreementSummary } from '../src/lib/clientAgreements.js'
 
 const complianceRequirementFields = 'id, workspace_id, title, category, authority_name, source_url, jurisdiction, description, applicability_status, verified_by_owner_at, verified_by_owner_id, verified_source_at, recurrence_type, recurrence_interval, last_completed_at, next_due_date, status, notes, created_at, updated_at'
 const complianceCompletionFields = 'id, workspace_id, compliance_requirement_id, completed_at, notes, created_at'
@@ -226,6 +227,9 @@ export async function loadCeoToday(context, now = new Date()) {
   const priorityContext={workspaceId:context.workspaceId,now,destinations:destinationResults,
     ...Object.fromEntries(Object.entries(querySources).map(([key,result])=>[key,result.data || []])),
     availability:{...Object.fromEntries(Object.entries(querySources).map(([key,result])=>[key,!result.error && (result.data || []).length<(key==='attempts'?50:1000)])),destinations:destinationsComplete}}
+  // Read-only money snapshot for the CEO Today tiles; same totals as the Accounting page.
+  const moneyAvailable=[obligations,receipts,recurringRevenue,agreements].every(result=>!result.error && (result.data || []).length<1000)
+  data.money=moneyAvailable?{available:true,...accounting.summary,monthly_recurring_revenue_cents:accounting.summary.monthly_recurring_revenue_cents+(agreements.data || []).reduce((sum,agreement)=>sum+agreementSummary(agreement).activeMonthly,0)}:{available:false}
   const priorities=decoratePriorities(data,priorityContext,lifecycleReviewInputs)
   return {review_inputs:{goal:goalInput,lifecycle:lifecycleReviewInputs,priorities},data,error:null}
 }

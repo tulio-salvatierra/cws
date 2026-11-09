@@ -1,17 +1,16 @@
-Task ID: CWS-ADMIN-GLASS-20261108
+Task ID: CWS-CEO-MONEY-20261108
 Agent: Claude
-Objective: Apply the owner-approved graphite + glass admin look and make the side panel sticky.
+Objective: Ship the graphite + glass admin PR and add money tiles to CEO Today.
 
 Files changed:
-- `src/components/admin/admin-theme.css` (new, scoped to `.cws-admin`)
-- `src/components/admin/AdminLayout.jsx` (new shell, sticky sidebar / phone top bar)
-- `src/pages/admin/AdminOverview.jsx` (date line, "Do next", Laya sections folded)
-- `src/pages/admin/SalesPage.jsx` (compact lead rows, secondary actions in a "…" menu)
+- `api/ceo-today.js` (`money` snapshot: accounting summary + active agreement monthly revenue)
+- `src/pages/admin/AdminOverview.jsx` (MoneyTiles, links to Accounting)
+- `api/__tests__/ceo-today.test.js`, `src/pages/admin/__tests__/AdminOverview.test.jsx`
 
-Findings: `overflow-x: hidden` on both html and body (src/index.css) disables sticky positioning site-wide; admin overrides it with `overflow-x: clip` via `:has(.cws-admin)`. Public `article h2/h3/p/a` styles leak into admin cards; reset with `:where(.cws-admin)` so page Tailwind classes still win.
+Findings: CEO Today already built the accounting read model for its projection, so the tiles need no new query; the Accounting endpoint adds active agreement monthly revenue to MRR, mirrored here so both pages show the same number.
 
-Tests run: `src/pages/admin`, `src/components/admin` (146 passed); eslint clean on changed files; local browser check with stubbed auth and data (CEO Today, Sales desktop + 390px, Accounting).
+Tests run: ceo-today API, src/pages/admin, server/ceo, server/accounting (266 passed); eslint clean; local browser check with stubbed data.
 
-Not changed: API, data, behavior; other pages restyled only through the theme layer. Design mock lives on the owner's Design canvas (CEO Today + Sales).
+Not changed: Accounting page, data, write paths.
 
-Next: owner checks the Vercel preview and merges; optional follow-up: money tiles on CEO Today from Accounting data.
+Next: owner confirms the CEO Today tiles match the Accounting page in production.
