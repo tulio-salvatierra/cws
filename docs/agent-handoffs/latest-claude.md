@@ -1,20 +1,17 @@
-Task ID: CWS-ADMIN-UI-20261108
+Task ID: CWS-ADMIN-GLASS-20261108
 Agent: Claude
-Objective: Audit the live admin dashboard and apply the owner-selected UI fixes (1, 2, 5, 9).
+Objective: Apply the owner-approved graphite + glass admin look and make the side panel sticky.
 
 Files changed:
-- `src/components/admin/AdminLayout.jsx` (sticky desktop sidebar, admin tab title)
-- `src/App.jsx` (skip intro loader on /admin)
-- `server/laya/deal-fit.js` (dollars instead of cents in check text)
-- `src/lib/adminFormat.js`, `src/lib/__tests__/adminFormat.test.js` (new: Chicago date-time, key humanizer)
-- `src/pages/admin/LayaResponseHistory.jsx`, `src/pages/admin/LayaOwnerResponse.jsx` (readable timestamps; disclaimer behind toggle)
-- `src/pages/admin/MarketingPage.jsx` (shared provider error shown once)
-- `src/pages/admin/__tests__/LayaOwnerResponse.test.jsx`, `src/pages/admin/__tests__/MarketingPage.test.jsx`
+- `src/components/admin/admin-theme.css` (new, scoped to `.cws-admin`)
+- `src/components/admin/AdminLayout.jsx` (new shell, sticky sidebar / phone top bar)
+- `src/pages/admin/AdminOverview.jsx` (date line, "Do next", Laya sections folded)
+- `src/pages/admin/SalesPage.jsx` (compact lead rows, secondary actions in a "…" menu)
 
-Findings (live audit, 2026-11-08): sidebar scrolled away on long pages; intro loader and public SEO title on /admin; raw cents, ISO timestamps and UUIDs in Laya text; Friday Post B showed one Instagram aspect-ratio error under all four channels.
+Findings: `overflow-x: hidden` on both html and body (src/index.css) disables sticky positioning site-wide; admin overrides it with `overflow-x: clip` via `:has(.cws-admin)`. Public `article h2/h3/p/a` styles leak into admin cards; reset with `:where(.cws-admin)` so page Tailwind classes still win.
 
-Tests run: `src/pages/admin`, `src/components/admin`, `server/laya`, `adminFormat` (395 passed); eslint clean. Full suite not run against a complete checkout (trimmed copy lacked `public/`).
+Tests run: `src/pages/admin`, `src/components/admin` (146 passed); eslint clean on changed files; local browser check with stubbed auth and data (CEO Today, Sales desktop + 390px, Accounting).
 
-Not changed: accent colors, CEO Today layout, Sales card density, history filter layout, publishing behavior when one channel rejects the post.
+Not changed: API, data, behavior; other pages restyled only through the theme layer. Design mock lives on the owner's Design canvas (CEO Today + Sales).
 
-Next: owner checks the Vercel preview of PR #78 and merges; then chooses among deferred items.
+Next: owner checks the Vercel preview and merges; optional follow-up: money tiles on CEO Today from Accounting data.

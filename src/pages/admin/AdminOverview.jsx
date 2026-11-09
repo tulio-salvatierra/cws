@@ -54,9 +54,13 @@ export default function AdminOverview() {
     [ceo, notNow],
   )
 
-  return <div className="p-6 md:p-10">
+  const today = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'long', month: 'long', day: 'numeric' }).format(new Date())
+  const reviewCount = (ceo?.negocio_listo?.items?.length || 0) + (ceo?.deal_fit?.items?.length || 0) + (ceo?.laya_reviews?.pending?.length || 0)
+
+  return <div className="px-5 py-8 md:px-12 md:py-10">
     <div className="max-w-5xl">
-      <h1 className="text-3xl font-semibold text-white">CEO Today</h1>
+      <p className="text-xs uppercase tracking-[0.16em] text-gray-400">{today}</p>
+      <h1 className="mt-2 text-4xl font-semibold text-white md:text-[2.6rem]">CEO Today</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-400">What should I work on right now?</p>
 
       {error && <p role="alert" className="mt-6 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">{error}</p>}
@@ -64,11 +68,17 @@ export default function AdminOverview() {
 
       {ceo?.goal_pace && <GoalPace pace={ceo.goal_pace} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
 
-      {ceo && <section className="mt-7 space-y-3" aria-label="CEO Today actions">
+      {ceo && <h2 className="mt-9 text-lg font-semibold text-white">Do next</h2>}
+      {ceo && <section className="mt-3 space-y-3" aria-label="CEO Today actions">
         {actions.map((item) => <CeoActionCard key={item.id} item={item} onReload={async () => setCeo(await loadCeoToday())} onNotNow={() => setNotNow((current) => new Set(current).add(item.id))} />)}
         {!actions.length && <p className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5 text-sm text-gray-400">No further action is shown in this view. Reload to recalculate from current department state.</p>}
       </section>}
 
+      <details className="cws-admin-laya mt-9 rounded-2xl border border-gray-800 bg-gray-900/60 p-5 [&[open]>summary]:mb-2">
+        <summary className="flex cursor-pointer list-none flex-wrap items-baseline justify-between gap-2">
+          <span className="text-lg font-semibold text-white">Laya reviews</span>
+          <span className="text-sm text-gray-400">{reviewCount ? `${reviewCount} to look at · ` : ''}Deal fit, lifecycle, decisions and history</span>
+        </summary>
       {ceo?.negocio_listo && <LifecycleReviews summary={ceo.negocio_listo} onReload={async () => setCeo(await loadCeoToday())} />}
 
       {ceo?.deal_fit && <DealFits summary={ceo.deal_fit} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
@@ -78,6 +88,8 @@ export default function AdminOverview() {
       <LayaResponseHistory history={ceo?.laya_response_history} />
 
       <BusinessDecisions summary={ceo?.business_decisions} onReload={async () => setCeo(await loadCeoToday())} />
+
+      </details>
 
       <section className="mt-7 rounded-2xl border border-indigo-400/30 bg-gray-900/60 p-5" aria-label="Marketing content reviews">
         <h2 className="text-lg font-semibold text-white">Marketing · Content reviews</h2>
