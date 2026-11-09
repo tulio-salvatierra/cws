@@ -436,3 +436,42 @@ describe('Marketing per-channel captions', () => {
     expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeEnabled()
   })
 })
+
+describe('Evergreen image format picker', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    useAuthMock.mockReturnValue({ session: { access_token: 'access-token' } })
+    const run = { id: 'run-1', status: 'needs_review', output: { ideas: [{ id: 'idea-1', title: 'Format test', caption: 'A caption', hook: 'A hook' }] } }
+    const asset = { id: 'asset-1', idea_run_id: 'run-1', idea_id: 'idea-1', format_id: 'instagram-story', status: 'ready', preview_url: 'https://example.test/story.jpg', image_validation: { width: 1080, height: 1920, padded: true } }
+    globalThis.fetch = vi.fn(async (url, options) => {
+      if (options?.method === 'POST') return response({ ok: true })
+      return response(url === '/api/marketing-creative' ? creativeBody({ idea_runs: [run], creative_assets: [asset] }) : statusBody({ offer_catalog: [catalogOffer()] }))
+    })
+  })
+  afterEach(() => { localStorage.clear(); vi.unstubAllGlobals() })
+
+  it('filters formats by channel, remembers the choice, and submits the selected preset', async () => {
+    render(<MarketingPage />)
+    await screen.findByText('Format test')
+    fireEvent.change(screen.getByLabelText('Social channel'), { target: { value: 'LinkedIn' } })
+    const picker = screen.getByLabelText('Image format')
+    expect(within(picker).queryByRole('option', { name: 'Story' })).not.toBeInTheDocument()
+    expect(within(picker).queryByRole('option', { name: /Reel/ })).not.toBeInTheDocument()
+    fireEvent.change(picker, { target: { value: 'linkedin-feed-landscape' } })
+    expect(localStorage.getItem('cws-evergreen-image-format')).toBe('linkedin-feed-landscape')
+    fireEvent.click(screen.getByRole('button', { name: 'Create visual draft' }))
+    await waitFor(() => expect(globalThis.fetch.mock.calls.some(([, options]) => options?.body?.includes('linkedin-feed-landscape'))).toBe(true))
+    const request = globalThis.fetch.mock.calls.find(([, options]) => options?.method === 'POST')
+    expect(JSON.parse(request[1].body)).toMatchObject({ action: 'generate_visual_draft', idea_id: 'idea-1', format_id: 'linkedin-feed-landscape' })
+  })
+
+  it('shows the saved Story for its preset without offering shared-feed approval', async () => {
+    localStorage.setItem('cws-evergreen-image-format', 'instagram-story')
+    render(<MarketingPage />)
+    await screen.findByText('Format test')
+    expect(screen.getByLabelText('Image format')).toHaveValue('instagram-story')
+    expect(screen.getByRole('link', { name: 'Open / download image' })).toHaveAttribute('href', 'https://example.test/story.jpg')
+    expect(screen.queryByRole('button', { name: 'Approve for evergreen library' })).not.toBeInTheDocument()
+    expect(screen.getByText(/Padded, no cropping/)).toBeInTheDocument()
+  })
+})

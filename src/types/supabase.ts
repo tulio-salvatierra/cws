@@ -1495,6 +1495,8 @@ export type Database = {
           asset_run_id: string
           created_at: string
           created_by: string
+          format_id: string
+          image_validation: Json | null
           failure_message: string | null
           id: string
           idea_id: string
@@ -1512,6 +1514,8 @@ export type Database = {
           asset_run_id: string
           created_at?: string
           created_by: string
+          format_id?: string
+          image_validation?: Json | null
           failure_message?: string | null
           id?: string
           idea_id: string
@@ -1529,6 +1533,8 @@ export type Database = {
           asset_run_id?: string
           created_at?: string
           created_by?: string
+          format_id?: string
+          image_validation?: Json | null
           failure_message?: string | null
           id?: string
           idea_id?: string

@@ -1,7 +1,6 @@
 /* global process */
 
 import { createHash, randomUUID } from 'node:crypto'
-import { Buffer } from 'node:buffer'
 import { createClient } from '@supabase/supabase-js'
 import { handleMarketingAssessment } from '../server/laya/marketing.js'
 import {
@@ -18,9 +17,11 @@ import {
   storyIdeaInstructions,
 } from '../server/marketing/creative.js'
 
+import { DEFAULT_IMAGE_FORMAT, getImageFormat } from '../src/marketing/imageFormats.js'
+import { normalizeImageOutput, hasValidatedOutput } from '../server/marketing/image-output.js'
+
 const DEFAULT_TEXT_MODEL = 'gpt-5.6'
 const DEFAULT_IMAGE_MODEL = 'gpt-5.6'
-const MAX_RESPONSE_BYTES = 10 * 1024 * 1024
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export default async function handler(req, res) {
@@ -116,6 +117,8 @@ async function generateStoryIdeas(res, client, context, body) {
 }
 
 async function generateVisualDraft(res, client, context, body) {
+  const preset = getImageFormat(body.format_id ?? DEFAULT_IMAGE_FORMAT)
+  if (!preset) return res.status(400).json({ ok: false, error: 'Choose a supported social image format.' })
   if (getMissingOpenAiEnv().length) return res.status(503).json({ ok: false, error: 'Marketing creative requires server-side OpenAI configuration.' })
   const ideaRunId = optionalUuid(body.idea_run_id)
   const requestKey = optionalUuid(body.request_key)
@@ -135,7 +138,10 @@ async function generateVisualDraft(res, client, context, body) {
 
   const existingRun = await findRunByRequestKey(client, context.workspaceId, ASSET_AGENT_KEY, requestKey)
   if (existingRun.error) return databaseFailure(res, existingRun.error)
-  if (existingRun.data) return res.status(200).json({ ok: true, replayed: true, run_id: existingRun.data.id })
+  if (existingRun.data) {
+    if ((existingRun.data.input?.format_id ?? DEFAULT_IMAGE_FORMAT) !== preset.id || existingRun.data.input?.idea_id !== ideaId || existingRun.data.input?.idea_run_id !== ideaRunId) return res.status(409).json({ ok: false, error: 'This generation request belongs to a different idea or format.' })
+    return res.status(200).json({ ok: true, replayed: true, run_id: existingRun.data.id })
+  }
 
   const queued = await queueRun(client, context, {
     agentKey: ASSET_AGENT_KEY,
@@ -146,19 +152,22 @@ async function generateVisualDraft(res, client, context, body) {
       idea_id: idea.id,
       idea_snapshot: idea,
       offer_snapshot: offerSnapshot(offer.data),
-      format: 'feed-4x5',
+      format_id: preset.id,
     },
   })
   if (queued.error) {
     if (queued.error.code === '23505') {
       const replay = await findRunByRequestKey(client, context.workspaceId, ASSET_AGENT_KEY, requestKey)
       if (replay.error) return databaseFailure(res, replay.error)
-      if (replay.data) return res.status(200).json({ ok: true, replayed: true, run_id: replay.data.id })
+      if (replay.data) {
+        if ((replay.data.input?.format_id ?? DEFAULT_IMAGE_FORMAT) !== preset.id || replay.data.input?.idea_id !== ideaId || replay.data.input?.idea_run_id !== ideaRunId) return res.status(409).json({ ok: false, error: 'This generation request belongs to a different idea or format.' })
+        return res.status(200).json({ ok: true, replayed: true, run_id: replay.data.id })
+      }
     }
     return databaseFailure(res, queued.error)
   }
 
-  const reserved = await reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId: queued.data.id })
+  const reserved = await reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId: queued.data.id, formatId: preset.id })
   if (reserved.error) {
     await updateRun(client, queued.data.id, { status: 'superseded' })
     return databaseFailure(res, reserved.error)
@@ -172,21 +181,20 @@ async function generateVisualDraft(res, client, context, body) {
   if (running.error) return databaseFailure(res, running.error)
 
   try {
-    const generated = await requestImage({ offer: offer.data, idea, userId: context.userId })
-    const bytes = Buffer.from(generated.base64, 'base64')
-    if (!bytes.length || bytes.length > MAX_RESPONSE_BYTES) throw new Error('Generated image exceeded the allowed size.')
+    const generated = await requestImage({ offer: offer.data, idea, preset, userId: context.userId })
+    const { bytes, validation } = await normalizeImageOutput(generated.base64, preset)
     const uploaded = await client.storage.from(CREATIVE_IMAGE_BUCKET).upload(reserved.data.storage_object_path, bytes, {
-      contentType: 'image/png',
+      contentType: 'image/jpeg',
       upsert: false,
     })
     if (uploaded.error) throw new Error('Marketing visual draft storage failed.')
 
-    const ready = await client.from('marketing_creative_assets').update({ status: 'ready', failure_message: null })
+    const ready = await client.from('marketing_creative_assets').update({ status: 'ready', failure_message: null, image_validation: validation })
       .eq('id', reserved.data.id).eq('workspace_id', context.workspaceId).select('*').single()
-    if (ready.error) return databaseFailure(res, ready.error)
+    if (ready.error) throw new Error('The validated image could not be saved. Retry the draft.')
     const reviewed = await updateRun(client, queued.data.id, {
       status: 'needs_review',
-      output: { creative_asset_id: ready.data.id, format: 'feed-4x5', model: generated.model, response_id: generated.responseId, generated_at: new Date().toISOString() },
+      output: { creative_asset_id: ready.data.id, format_id: preset.id, image_validation: validation, model: generated.model, response_id: generated.responseId, generated_at: new Date().toISOString() },
       error_message: null,
     })
     if (reviewed.error) return databaseFailure(res, reviewed.error)
@@ -220,6 +228,9 @@ async function approveVisualDraft(res, client, context, body) {
   }
 
   try {
+    const preset = getImageFormat(locked.data.format_id)
+    if (!preset?.sharedFeed) throw new Error('This format is for download and review only. The shared scheduler accepts feed images, not Stories or Reel covers.')
+    if (locked.data.storage_object_path.endsWith('.jpg') && !hasValidatedOutput(locked.data, preset)) throw new Error('Image validation is missing. Generate another draft before library approval.')
     const media = await client.from('offer_media').insert({
       workspace_id: context.workspaceId,
       offer_id: locked.data.offer_id,
@@ -262,7 +273,7 @@ async function approveVisualDraft(res, client, context, body) {
   }
 }
 
-async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId }) {
+async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId, formatId }) {
   const id = randomUUID()
   const inserted = await client.from('marketing_creative_assets').insert({
     id,
@@ -271,8 +282,9 @@ async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaI
     idea_run_id: ideaRunId,
     idea_id: ideaId,
     asset_run_id: assetRunId,
+    format_id: formatId,
     storage_bucket: CREATIVE_IMAGE_BUCKET,
-    storage_object_path: `generated/${context.workspaceId}/${id}.png`,
+    storage_object_path: `generated/${context.workspaceId}/${id}.jpg`,
     status: 'generating',
     created_by: context.userId,
   }).select('*').single()
@@ -280,7 +292,7 @@ async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaI
   if (inserted.error.code !== '23505') return { data: null, error: inserted.error, replayed: false }
 
   const existing = await client.from('marketing_creative_assets').select('*')
-    .eq('workspace_id', context.workspaceId).eq('idea_run_id', ideaRunId).eq('idea_id', ideaId).maybeSingle()
+    .eq('workspace_id', context.workspaceId).eq('idea_run_id', ideaRunId).eq('idea_id', ideaId).eq('format_id', formatId).maybeSingle()
   if (existing.error || !existing.data) return { data: null, error: existing.error || inserted.error, replayed: false }
 
   // A failed agent run remains the durable audit record. A later explicit
@@ -290,7 +302,9 @@ async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaI
     const nextObjectId = randomUUID()
     const retried = await client.from('marketing_creative_assets').update({
       asset_run_id: assetRunId,
-      storage_object_path: `generated/${context.workspaceId}/${nextObjectId}.png`,
+      format_id: formatId,
+      image_validation: null,
+      storage_object_path: `generated/${context.workspaceId}/${nextObjectId}.jpg`,
       status: 'generating',
       failure_message: null,
     }).eq('id', existing.data.id).eq('workspace_id', context.workspaceId).eq('status', 'failed').select('*').maybeSingle()
@@ -318,13 +332,13 @@ async function requestStoryIdeas({ offer, userId }) {
   return { ...output, model: response.payload.model || model, response_id: response.payload.id || null }
 }
 
-async function requestImage({ offer, idea, userId }) {
+async function requestImage({ offer, idea, preset, userId }) {
   const model = process.env.OPENAI_MARKETING_IMAGE_MODEL || DEFAULT_IMAGE_MODEL
   const response = await openAiRequest({
     model,
-    instructions: buildImageInstructions(),
-    input: imagePrompt({ offer, idea }),
-    tools: [{ type: 'image_generation', size: '1024x1280', quality: 'medium', output_format: 'png' }],
+    instructions: buildImageInstructions(preset),
+    input: imagePrompt({ offer, idea, preset }),
+    tools: [{ type: 'image_generation', size: preset.modelSize, quality: 'medium', output_format: 'jpeg' }],
     safety_identifier: safetyIdentifier(userId),
   })
   const base64 = extractImageBase64(response.payload)
@@ -352,6 +366,8 @@ async function serializeCreativeAsset(client, asset) {
   }
   return {
     id: asset.id,
+    format_id: asset.format_id || DEFAULT_IMAGE_FORMAT,
+    image_validation: asset.image_validation || null,
     offer_id: asset.offer_id,
     idea_run_id: asset.idea_run_id,
     idea_id: asset.idea_id,
