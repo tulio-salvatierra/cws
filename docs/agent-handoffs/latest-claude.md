@@ -17,4 +17,4 @@ Tests run: `src/pages/admin`, `src/components/admin`, `server/laya`, `adminForma
 
 Not changed: accent colors, CEO Today layout, Sales card density, history filter layout, publishing behavior when one channel rejects the post.
 
-Next: owner pushes `claude/admin-ui-fixes`, checks the Vercel preview, merges; then chooses among deferred items.
+Next: owner checks the Vercel preview of PR #78 and merges; then chooses among deferred items.
