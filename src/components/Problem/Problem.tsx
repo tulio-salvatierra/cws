@@ -4,7 +4,7 @@ import MaskedLines from "../MaskedLines/MaskedLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import logoCicero from "../../assets/images/hero/cicero-web-studio.svg";
+import logoCicero from "../../assets/images/problem/cicero-web-studio-problem.webp";
 
 import problemDivider from "../../assets/images/problem/divider.svg";
 import workspacePhoto from "../../assets/images/problem/workspace.jpg";
