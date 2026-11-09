@@ -28,4 +28,12 @@ describe('buildRecentLeads', () => {
     expect(result.items.map((row) => row.id)).toEqual(['m'])
     expect(result.items[0].hypothesis).toBeNull()
   })
+
+  it('reads the recorded sales angle and website status and puts the best openers first', () => {
+    const angled = (id, angle, status) => lead({ id, company: id, created_at: '2026-11-08T15:00:00Z', source: JSON.stringify({ address: '1 Main St', angle, website_status: status, website: status === 'own_site' ? 'example.com' : null, angle_facts: ['Fact one', 'Fact two'], angle_opener: 'Hi there.', angle_upsell: 'Básico', angle_checked_at: '2026-11-09' }) })
+    const result = buildRecentLeads({ now, leads: [angled('reviews', 'Reviews', 'own_site'), lead({ id: 'plain', company: 'plain', created_at: '2026-11-09T15:00:00Z' }), angled('nosite', 'No website', 'none'), angled('bogus', 'Make it up', 'weird')] })
+    expect(result.items.map((row) => row.id)).toEqual(['nosite', 'reviews', 'plain', 'bogus'])
+    expect(result.items[0]).toMatchObject({ angle: 'No website', website_status: 'none', angle_facts: ['Fact one', 'Fact two'], angle_opener: 'Hi there.', angle_upsell: 'Básico', angle_checked_at: '2026-11-09' })
+    expect(result.items[3]).toMatchObject({ angle: null, website_status: null, angle_opener: null })
+  })
 })
