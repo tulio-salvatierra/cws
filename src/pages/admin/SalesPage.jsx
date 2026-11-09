@@ -137,7 +137,7 @@ export default function SalesPage() {
       <div className="mt-5 grid gap-4">{(sales.prospects || []).map((candidate) => <ProspectCard key={candidate.id} candidate={candidate} briefConfigured={sales.prospectBrief?.configured} busy={candidateActionId === candidate.id} onPrepareBrief={() => actOnCandidate(candidate.id, 'prepare_prospect_brief')} onRetryBrief={(runId) => actOnCandidate(candidate.id, 'retry_prospect_brief', { retry_of_run_id: runId })} onAdd={() => actOnCandidate(candidate.id, 'add_discovery_candidate_to_sales')} onDismiss={() => actOnCandidate(candidate.id, 'dismiss_discovery_candidate')} />)}{!(sales.prospects || []).length && <p className="text-sm text-slate-400">No verified prospects are waiting for review.</p>}</div>
     </section>
 
-    <section className="mt-8 space-y-3" aria-label="Sales command items">
+    <section className="mt-8 space-y-2" aria-label="Sales command items">
       {items.map((item) => <CommandItem key={item.id} item={item} onNotNow={() => setNotNow((current) => new Set(current).add(item.id))} onAction={ownerAction} onEdit={() => setEditingLead(item.lead)} />)}
       {!items.length && <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-slate-400">No Sales action is due right now.</div>}
     </section>
@@ -169,7 +169,38 @@ function CommandItem({ item, onNotNow, onAction, onEdit }) {
   const googleBusinessProfileUrl = normalizeGoogleBusinessProfileUrl(lead.google_business_profile_url)
   const emailPath = item.sendType ? `/admin/leads?lead_id=${encodeURIComponent(lead.id)}&send_type=${encodeURIComponent(item.sendType)}` : '/admin/leads'
   const subtitle = lead.name && lead.company ? `${lead.name} · ${lead.email || lead.phone || 'No public contact recorded'}` : lead.email || lead.phone || 'No public contact recorded'
-  return <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-200">{CATEGORY[item.category]}</p><h2 className="mt-2 text-xl font-semibold">{lead.company || lead.name || lead.email || lead.phone || 'Sales lead'}</h2><p className="mt-1 text-sm text-slate-400">{subtitle}</p></div><button type="button" onClick={onNotNow} className="text-sm text-slate-400 hover:text-white">Not now</button></div><p className="mt-4 text-sm text-slate-300">Reason: {item.reason}</p>{lead.last_contacted_at && <p className="mt-1 text-sm text-slate-400">Last contacted: {new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' }).format(new Date(lead.last_contacted_at))}</p>}<p className="mt-3 font-medium">Recommended action: {item.recommendation}</p>{briefContext && <div className="mt-4 rounded-2xl border border-emerald-300/20 bg-emerald-300/5 p-4"><BriefLine label="Why contact" value={briefContext.why_contact} /><BriefLine label="Conversation angle" value={briefContext.sales_angle} /><BriefLine label="Suggested opener" value={briefContext.outreach_hook} /></div>}<div className="mt-4 flex flex-wrap gap-3">{item.category === 'promised' ? <button type="button" onClick={() => onAction({ action: 'complete_promised_action', promised_action_id: item.promisedAction.id })} className="rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950">Complete promised action</button> : item.sendType && lead.email ? <Link to={emailPath} className="rounded-full bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950">Prepare email</Link> : null}{lead.phone && <><a href={`tel:${lead.phone}`} className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold">Call</a><button type="button" onClick={() => onAction({ action: 'record_call', lead_id: lead.id })} className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold">Log call</button></>}{googleBusinessProfileUrl && <a href={googleBusinessProfileUrl} target="_blank" rel="noreferrer" className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold">Open Google profile</a>}<button type="button" onClick={onEdit} className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold">Edit lead</button></div></article>
+  const name = lead.company || lead.name || lead.email || lead.phone || 'Sales lead'
+  const lastContacted = lead.last_contacted_at ? new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' }).format(new Date(lead.last_contacted_at)) : ''
+  const secondary = 'block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/[0.06]'
+  const primary = item.category === 'promised'
+    ? <button type="button" onClick={() => onAction({ action: 'complete_promised_action', promised_action_id: item.promisedAction.id })} className="rounded-xl bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950">Complete promised action</button>
+    : item.sendType && lead.email
+      ? <Link to={emailPath} className="rounded-xl bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950">Prepare email</Link>
+      : lead.phone ? <a href={`tel:${lead.phone}`} className="rounded-xl bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950">Call</a> : null
+  const callIsPrimary = !(item.category === 'promised') && !(item.sendType && lead.email) && Boolean(lead.phone)
+  return <article className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 md:px-5">
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+      <div aria-hidden="true" className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] font-semibold text-slate-300">{name.charAt(0).toUpperCase()}</div>
+      <div className="min-w-[12rem] flex-1"><h2 className="truncate text-base font-semibold">{name}</h2><p className="truncate text-xs text-slate-400">{subtitle}</p></div>
+      <div className="min-w-[12rem] flex-1"><p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-orange-200">{CATEGORY[item.category]}</p><p className="mt-0.5 text-xs text-slate-400">Reason: {item.reason}{lastContacted ? ` · Last contacted: ${lastContacted}` : ''}</p><p className="mt-0.5 text-xs text-slate-300">Recommended action: {item.recommendation}</p></div>
+      <div className="flex items-center gap-2">
+        {primary}
+        <details className="relative">
+          <summary aria-label={`More actions for ${name}`} className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 hover:text-white">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg>
+          </summary>
+          <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-white/10 bg-slate-950 p-1.5 shadow-2xl shadow-black/40">
+            {lead.phone && !callIsPrimary && <a href={`tel:${lead.phone}`} className={secondary}>Call</a>}
+            {lead.phone && <button type="button" onClick={() => onAction({ action: 'record_call', lead_id: lead.id })} className={secondary}>Log call</button>}
+            {googleBusinessProfileUrl && <a href={googleBusinessProfileUrl} target="_blank" rel="noreferrer" className={secondary}>Open Google profile</a>}
+            <button type="button" onClick={onEdit} className={secondary}>Edit lead</button>
+            <button type="button" onClick={onNotNow} className={secondary}>Not now</button>
+          </div>
+        </details>
+      </div>
+    </div>
+    {briefContext && <div className="mt-4 rounded-2xl border border-emerald-300/20 bg-emerald-300/5 p-4"><BriefLine label="Why contact" value={briefContext.why_contact} /><BriefLine label="Conversation angle" value={briefContext.sales_angle} /><BriefLine label="Suggested opener" value={briefContext.outreach_hook} /></div>}
+  </article>
 }
 
 function TransientBusinessCard({ business, busy, onInvestigate, onSkip }) {

@@ -1,0 +1,116 @@
+/*
+ * CWS OS admin: graphite + glass.
+ * Everything is scoped to .cws-admin so the public site is untouched.
+ * The utility remaps below give every admin page the same surfaces and one
+ * accent (CWS orange) without rewriting each page's markup.
+ */
+.cws-admin {
+  --cws-bg: #0b0d10;
+  --cws-glass: rgba(255, 255, 255, 0.04);
+  --cws-glass-strong: rgba(255, 255, 255, 0.07);
+  --cws-line: rgba(255, 255, 255, 0.08);
+  --cws-line-strong: rgba(255, 255, 255, 0.14);
+  --cws-muted: #8b93a1;
+  --cws-soft: #a6adb9;
+  --cws-accent: #f08a45;
+  --cws-accent-hover: #f59a5c;
+  --cws-accent-soft: #ffc79c;
+  --cws-accent-tint: rgba(240, 138, 69, 0.14);
+  --cws-accent-line: rgba(240, 138, 69, 0.35);
+  background:
+    radial-gradient(900px 520px at 78% -8%, rgba(232, 105, 31, 0.16), transparent 60%),
+    radial-gradient(700px 600px at 8% 105%, rgba(120, 140, 170, 0.12), transparent 60%),
+    linear-gradient(180deg, #111419 0%, var(--cws-bg) 100%);
+  background-attachment: fixed;
+  color: #e9ebef;
+}
+
+/* Shell */
+.cws-admin-sidebar {
+  background: rgba(13, 15, 19, 0.72);
+  border-bottom: 1px solid var(--cws-line);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+@media (min-width: 768px) {
+  .cws-admin-sidebar { border-bottom: 0; border-right: 1px solid var(--cws-line); background: rgba(255, 255, 255, 0.025); }
+}
+.cws-admin-mark {
+  width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #f08a45, #c9541a);
+  box-shadow: 0 6px 18px rgba(232, 105, 31, 0.35);
+  font-family: 'Clash', 'Sora', system-ui, sans-serif; font-weight: 700; font-size: 13px; color: #fff;
+}
+.cws-admin-display, .cws-admin h1 { font-family: 'Clash', system-ui, sans-serif; letter-spacing: -0.01em; }
+.cws-admin-nav {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 12px; border: 1px solid transparent;
+  color: var(--cws-soft); font-size: 14px; transition: background 0.15s, color 0.15s;
+}
+.cws-admin-nav:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+.cws-admin-nav.is-active {
+  color: #fff; font-weight: 500;
+  background: var(--cws-glass-strong); border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.cws-admin-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); flex-shrink: 0; }
+.cws-admin-nav.is-active .cws-admin-dot { background: var(--cws-accent); box-shadow: 0 0 8px rgba(240, 138, 69, 0.8); }
+
+/* Glass surfaces */
+.cws-admin-glass,
+.cws-admin .bg-gray-900, .cws-admin .bg-slate-900,
+.cws-admin .bg-gray-900\/50, .cws-admin .bg-gray-900\/60, .cws-admin .bg-gray-900\/70,
+.cws-admin .bg-slate-900\/60, .cws-admin .bg-white\/\[0\.04\] {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.025));
+  border-color: var(--cws-line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 20px 40px -28px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.cws-admin .bg-gray-950\/60, .cws-admin .bg-slate-950\/40, .cws-admin .bg-slate-950\/30,
+.cws-admin .bg-gray-950 { background: rgba(255, 255, 255, 0.025); }
+.cws-admin .bg-gray-800, .cws-admin .bg-slate-800, .cws-admin .bg-slate-950, .cws-admin .bg-slate-950\/80 {
+  background: rgba(255, 255, 255, 0.055);
+}
+.cws-admin .border-gray-800, .cws-admin .border-gray-700, .cws-admin .border-gray-700\/70,
+.cws-admin .border-white\/10 { border-color: var(--cws-line); }
+.cws-admin .border-white\/20, .cws-admin .border-gray-500\/40 { border-color: var(--cws-line-strong); }
+.cws-admin .text-gray-400, .cws-admin .text-slate-400 { color: var(--cws-muted); }
+.cws-admin .text-gray-300, .cws-admin .text-slate-300 { color: #c3c8d0; }
+
+/* One accent: indigo and sky become CWS orange */
+.cws-admin .text-indigo-100, .cws-admin .text-indigo-200, .cws-admin .text-indigo-300, .cws-admin .text-indigo-400,
+.cws-admin .text-sky-200, .cws-admin .hover\:text-indigo-200:hover { color: var(--cws-accent-soft); }
+.cws-admin .bg-indigo-500, .cws-admin .bg-indigo-600, .cws-admin .bg-orange-300 {
+  background: var(--cws-accent); color: #1a0f07;
+  box-shadow: 0 10px 24px -12px rgba(240, 138, 69, 0.8);
+}
+.cws-admin .hover\:bg-indigo-400:hover, .cws-admin .hover\:bg-indigo-500:hover { background: var(--cws-accent-hover); }
+.cws-admin .hover\:bg-indigo-400\/10:hover { background: var(--cws-accent-tint); }
+.cws-admin .border-indigo-300\/50, .cws-admin .border-indigo-400\/30, .cws-admin .border-indigo-400\/40,
+.cws-admin .border-indigo-400\/50, .cws-admin .border-sky-300\/20, .cws-admin .border-sky-300\/30,
+.cws-admin .hover\:border-indigo-500:hover { border-color: var(--cws-accent-line); }
+.cws-admin .focus\:border-indigo-400:focus, .cws-admin .focus\:border-indigo-500:focus { border-color: var(--cws-accent); }
+.cws-admin .focus\:ring-indigo-400\/20:focus { --tw-ring-color: rgba(240, 138, 69, 0.25); }
+.cws-admin .focus-visible\:outline-sky-300:focus-visible { outline-color: var(--cws-accent); }
+
+/* Form fields read as glass too */
+.cws-admin input:not([type='checkbox']):not([type='radio']), .cws-admin select, .cws-admin textarea {
+  border-radius: 12px;
+}
+.cws-admin ::selection { background: rgba(240, 138, 69, 0.35); }
+
+/* Undo the public blog-article styles that leak into admin <article> cards.
+   :where() keeps these weaker than the pages' own Tailwind classes. */
+:where(.cws-admin) article h2, :where(.cws-admin) article h3 { margin-top: 0; padding-top: 0; border-top: 0; }
+:where(.cws-admin) article p { margin-bottom: 0; }
+:where(.cws-admin) article a { text-decoration: none; font-weight: inherit; color: var(--cws-accent-soft); }
+:where(.cws-admin) h1, :where(.cws-admin) h2 { text-shadow: none; }
+
+/* The public site sets overflow-x: hidden on html and body, which turns body
+   into a scroll container and silently disables position: sticky. On admin
+   pages use clip instead (no scroll container), so the sidebar stays pinned. */
+html:has(.cws-admin), body:has(.cws-admin) { overflow-x: clip; }
+html:has(.cws-admin) { background: #0b0d10 !important; }
+body:has(.cws-admin) { background: #0b0d10 !important; }
