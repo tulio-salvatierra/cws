@@ -6,6 +6,9 @@ import SignNegocioListoForm from './SignNegocioListoForm'
 // Same endpoint and actions as the Sales page; nothing here sends a message.
 const SALES_API_PATH = '/api/command-queue'
 const STATUS = { new: 'New', contacted: 'Contacted', responded: 'Replied', unresponsive: 'No answer' }
+const WEBSITE = { none: 'No website', facebook_only: 'Facebook only', ordering_page: 'Ordering page only', not_linked: 'Site not linked on Google', links_elsewhere: 'Google links elsewhere', outdated: 'Outdated site', own_site: 'Has website' }
+const chip = 'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold'
+const WEBSITE_TONE = { own_site: 'border-emerald-300/30 text-emerald-200', none: 'border-orange-300/40 text-orange-200' }
 
 async function postSales(payload) {
   const { data } = await supabase.auth.getSession()
@@ -71,7 +74,12 @@ export default function RecentLeads({ summary, onReload }) {
           <div className="min-w-[14rem] flex-1">
             <h3 className="text-base font-semibold text-white">{lead.business}</h3>
             <p className="mt-0.5 text-xs text-slate-400">{[lead.contact_name, lead.phone, lead.email, lead.address || lead.locality].filter(Boolean).join(' · ') || 'No contact recorded'}</p>
-            {lead.hypothesis && <p className="mt-1 text-xs text-slate-300">{lead.hypothesis}</p>}
+            {(lead.angle || lead.website_status) && <div className="mt-2 flex flex-wrap gap-1.5">
+              {lead.angle && <span className={`${chip} border-orange-300/40 bg-orange-300/10 text-orange-100`} title={lead.angle_checked_at ? `Checked ${lead.angle_checked_at}` : undefined}>{lead.angle}</span>}
+              {lead.website_status && <span className={`${chip} ${WEBSITE_TONE[lead.website_status] || 'border-white/15 text-slate-300'}`} title={lead.website || undefined}>{WEBSITE[lead.website_status]}</span>}
+            </div>}
+            {lead.angle_facts?.length ? <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-xs text-slate-300">{lead.angle_facts.map((fact) => <li key={fact}>{fact}</li>)}</ul> : lead.hypothesis && <p className="mt-1 text-xs text-slate-300">{lead.hypothesis}</p>}
+            {lead.angle_opener && <p className="mt-1.5 text-xs text-slate-200"><span className="font-semibold text-orange-200">Opener: </span>{lead.angle_opener}{lead.angle_upsell ? <span className="text-slate-400"> · Pitch: {lead.angle_upsell}</span> : null}</p>}
           </div>
           <div className="min-w-[9rem]">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-orange-200">{STATUS[lead.status] || lead.status}{lead.response_state === 'warm' ? ' · Warm' : ''}</p>

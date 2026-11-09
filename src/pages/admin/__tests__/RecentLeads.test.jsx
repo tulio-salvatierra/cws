@@ -65,4 +65,14 @@ describe('RecentLeads', () => {
     expect(reload).not.toHaveBeenCalled()
     expect(screen.getByRole('heading', { name: 'Third City Cafe' })).toBeInTheDocument()
   })
+
+  it('shows the recorded angle, website status, facts and opener', () => {
+    const angled = { ...lead, angle: 'Unlinked site', website_status: 'not_linked', website: 'sites.google.com/view/example', angle_facts: ['No website on Google', '108 reviews'], angle_opener: 'I can connect your site to Google for free.', angle_upsell: 'Básico', angle_checked_at: '2026-11-09' }
+    render(<MemoryRouter><RecentLeads summary={{ ...summary, items: [angled] }} onReload={vi.fn()} /></MemoryRouter>)
+    expect(screen.getByText('Unlinked site')).toBeInTheDocument()
+    expect(screen.getByText('Site not linked on Google')).toHaveAttribute('title', 'sites.google.com/view/example')
+    expect(screen.getByText('108 reviews')).toBeInTheDocument()
+    expect(screen.getByText(/I can connect your site to Google for free\./)).toBeInTheDocument()
+    expect(screen.queryByText('New cafe with an empty Google profile.')).not.toBeInTheDocument()
+  })
 })

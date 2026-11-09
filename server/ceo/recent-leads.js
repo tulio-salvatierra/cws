@@ -10,16 +10,35 @@ export function chicagoDay(value) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
 }
 
+// Angles recorded by the lead-angle-check skill, best opener first.
+export const ANGLE_ORDER = ['Rebrand fix', 'No website', 'Unlinked site', 'Weak Google profile', 'Outdated site', 'Reviews', 'Visibility', 'No clear angle']
+export const WEBSITE_STATUS = { none: 'No website', facebook_only: 'Facebook only', ordering_page: 'Ordering page only', not_linked: 'Site not linked on Google', links_elsewhere: 'Google links elsewhere', outdated: 'Outdated site', own_site: 'Has website' }
+
+const EMPTY_NOTES = { hypothesis: null, address: null, angle: null, angle_facts: [], angle_opener: null, angle_upsell: null, angle_checked_at: null, website_status: null, website: null }
+
 function sourceNotes(source) {
-  if (typeof source !== 'string' || !source.trim().startsWith('{')) return { hypothesis: null, address: null }
+  if (typeof source !== 'string' || !source.trim().startsWith('{')) return EMPTY_NOTES
   try {
     const parsed = JSON.parse(source)
     const text = (value, max) => (typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : null)
-    return { hypothesis: text(parsed.opportunity_hypothesis, 300), address: text(parsed.address, 120) }
+    const angle = ANGLE_ORDER.includes(parsed.angle) ? parsed.angle : null
+    return {
+      hypothesis: text(parsed.opportunity_hypothesis, 300),
+      address: text(parsed.address, 120),
+      angle,
+      angle_facts: angle && Array.isArray(parsed.angle_facts) ? parsed.angle_facts.map((fact) => text(fact, 240)).filter(Boolean).slice(0, 3) : [],
+      angle_opener: angle ? text(parsed.angle_opener, 400) : null,
+      angle_upsell: angle ? text(parsed.angle_upsell, 160) : null,
+      angle_checked_at: angle ? text(parsed.angle_checked_at, 10) : null,
+      website_status: Object.hasOwn(WEBSITE_STATUS, parsed.website_status) ? parsed.website_status : null,
+      website: text(parsed.website, 200),
+    }
   } catch {
-    return { hypothesis: null, address: null }
+    return EMPTY_NOTES
   }
 }
+
+const angleRank = (row) => (row.angle ? ANGLE_ORDER.indexOf(row.angle) : ANGLE_ORDER.length)
 
 export function buildRecentLeads({ leads = [], now = new Date(), days = 7, limit = 40 } = {}) {
   const since = chicagoDay(new Date(now.getTime() - (days - 1) * DAY_MS))
@@ -45,10 +64,10 @@ export function buildRecentLeads({ leads = [], now = new Date(), days = 7, limit
       added_on: addedOn,
       contacted_on: contactedOn,
       added_this_week: Boolean(added),
-      hypothesis: notes.hypothesis,
-      address: notes.address,
+      ...notes,
     })
   }
-  rows.sort((a, b) => String(b.contacted_on || b.added_on).localeCompare(String(a.contacted_on || a.added_on)) || a.business.localeCompare(b.business))
+  // Best sales openers first (as checked by lead-angle-check), then newest activity.
+  rows.sort((a, b) => angleRank(a) - angleRank(b) || String(b.contacted_on || b.added_on).localeCompare(String(a.contacted_on || a.added_on)) || a.business.localeCompare(b.business))
   return { since, total: rows.length, items: rows.slice(0, limit) }
 }
