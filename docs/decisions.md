@@ -584,3 +584,25 @@ Date recorded: 2026-10-21
 Status: Approved (Tulio, direct instruction)
 
 The existing Marketing draft assessment, including `/api/laya-assess` and the Marketing assessment flow, may remain advisory. It cannot approve, publish, send, or change CEO Today ordering. Product definition §9a gates new in-app AI features; this exception does not authorize expanding the existing assessment. DEC-034 otherwise remains in force.
+
+## DEC-040 — Negocio Listo billing starts 14 days after the setup payment
+
+Date recorded: 2026-11-09
+Status: Approved (Tulio, direct instruction)
+
+### Decision
+
+Every Negocio Listo agreement uses the same payment shape:
+
+1. **Setup:** $300, one-time, paid at signing. Setup only; never bundled with the first month.
+2. **Monthly plan:** starts 14 days after the setup payment, at the plan price, and recurs on that day each month. The first design preview is timed to that day so the first monthly charge follows something the client can see.
+3. **Term:** 12 months counted from the first monthly payment.
+4. **Launch date does not move billing.** A client who delays launch (assets, approvals, their own timing) keeps paying on schedule.
+
+Applies to new agreements from this date. Agreements signed earlier keep their written terms unless the client agrees in writing to change them (e.g. the Sherry group, signed 2026-10-28: $149/month starting at launch).
+
+### Follow-ups
+
+- `skills/negocio-listo-proposal` states the rule in every proposal.
+- Planned app work: a "Signed" action that creates the client, agreement, setup bill and the 12 monthly bills from setup date + 14 days, plus the matching Square subscription (needs `SQUARE_ACCESS_TOKEN` and a migration allowing a future billing start date).
+
