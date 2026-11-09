@@ -130,7 +130,7 @@ export default function AccountingPage() {
 
     <Profitability receipts={receipts} expenses={expenses} projectCosts={projectCosts} subscriptions={subscriptions} month={month} onMonthChange={setMonth} loaded={Boolean(accounting)} busy={busy} onAction={ownerAction} />
 
-    <ClientAgreements canClassify={canClassify} corrections={corrections} agreements={agreements} installments={installments} obligations={obligations} receipts={receipts} clients={clients} offers={offers} busy={busy} onAction={ownerAction} initialClientId={new URLSearchParams(window.location.search).get('client') || ''} />
+    <ClientAgreements canClassify={canClassify} corrections={corrections} agreements={agreements} installments={installments} obligations={obligations} receipts={receipts} clients={clients} offers={offers} busy={busy} onAction={ownerAction} onReload={load} initialClientId={new URLSearchParams(window.location.search).get('client') || ''} />
 
     <BusinessExpenses selectedMonth={month} onMonthChange={setMonth} subscriptions={subscriptions} expenses={expenses} projects={projects} busy={busy} onAction={ownerAction} />
 

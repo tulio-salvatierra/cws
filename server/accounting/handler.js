@@ -1,4 +1,5 @@
 import { AGREEMENT_ACTIONS, agreementAction } from './agreements.js'
+import { SIGN_ACTION, signNegocioListo } from './negocio-listo-signing.js'
 import { agreementSummary } from '../../src/lib/clientAgreements.js'
 import { EXPENSE_ACTIONS, expenseAction } from './expenses.js'
 import {
@@ -82,6 +83,7 @@ async function runOwnerAction(req, res) {
   const context = await authenticateAccountingOwner(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
   const body = parseBody(req.body)
+  if (body.action === SIGN_ACTION) return signNegocioListo(context, body, res)
   if (AGREEMENT_ACTIONS.includes(body.action)) return agreementAction(context, body, res)
   if (EXPENSE_ACTIONS.includes(body.action)) return expenseAction(context, body, res)
   if (body.action === 'create_financial_obligation') return createFinancialObligation(context, body, res)

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import SignNegocioListoForm from './SignNegocioListoForm'
 
 // Same endpoint and actions as the Sales page; nothing here sends a message.
 const SALES_API_PATH = '/api/command-queue'
@@ -33,6 +34,7 @@ export default function RecentLeads({ summary, onReload }) {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [followUp, setFollowUp] = useState(null)
+  const [signing, setSigning] = useState('')
 
   if (!summary) return null
 
@@ -80,10 +82,12 @@ export default function RecentLeads({ summary, onReload }) {
             {lead.email && <Link to={`/admin/leads?lead_id=${encodeURIComponent(lead.id)}`} className={button}>Email</Link>}
             {lead.phone && <button type="button" disabled={busy === lead.id} className={button} onClick={() => run(lead, 'call logged', { action: 'record_call', lead_id: lead.id })}>Log call</button>}
             <button type="button" disabled={busy === lead.id} className={button} onClick={() => run(lead, 'marked as replied', salesState(lead, { status: 'responded', response_state: 'warm' }))}>Replied</button>
+            <button type="button" disabled={busy === lead.id} className={button} onClick={() => { setFollowUp(null); setSigning(signing === lead.id ? '' : lead.id) }}>Signed…</button>
             <button type="button" disabled={busy === lead.id} className={button} onClick={() => setFollowUp({ id: lead.id, text: `Follow up with ${lead.business}`, due: inDays(3) })}>Follow-up…</button>
             <button type="button" disabled={busy === lead.id} className={button} onClick={() => run(lead, 'marked not interested', salesState(lead, { status: 'lost', response_state: 'neutral' }))}>Not interested</button>
           </div>
         </div>
+        {signing === lead.id && <SignNegocioListoForm lead={lead} onCancel={() => setSigning('')} onClose={async () => { setSigning(''); try { await onReload() } catch (reloadError) { setError(reloadError.message) } }} />}
         {followUp?.id === lead.id && <form aria-label={`Follow-up for ${lead.business}`} className="mt-3 flex flex-wrap items-end gap-3 border-t border-white/10 pt-3" onSubmit={(event) => { event.preventDefault(); run(lead, `follow-up set for ${shortDay(followUp.due)}`, { action: 'create_promised_action', lead_id: lead.id, action_text: followUp.text, due_on: followUp.due }) }}>
           <label className="min-w-[14rem] flex-1 text-xs text-slate-400">What to do<input required maxLength={500} value={followUp.text} onChange={(event) => setFollowUp({ ...followUp, text: event.target.value })} className="mt-1 block w-full border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white" /></label>
           <label className="text-xs text-slate-400">Due<input required type="date" value={followUp.due} onChange={(event) => setFollowUp({ ...followUp, due: event.target.value })} className="mt-1 block border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white" /></label>
