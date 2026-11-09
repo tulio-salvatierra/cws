@@ -33,6 +33,17 @@ lower legacy prices are exceptions and never a reference for new proposals.
 If notes are thin, ask for what's missing (name, trade, the problem they care about most)
 before drafting. Don't fill gaps with assumptions.
 
+## Payment terms (every Negocio Listo proposal, DEC-040)
+
+Use these words or a close translation. Never tie the monthly start to the launch date.
+
+- **Setup:** $300 one-time, paid when you sign. (Setup only, never "setup + first month".)
+- **Monthly plan:** starts 14 days after the setup payment, the same week you see your first design, then the same day each month.
+- **Term:** 12 months from the first monthly payment.
+- **Launch timing doesn't change billing:** if the launch waits on your photos, approvals or your own timing, the plan continues as scheduled.
+
+Spanish: "Instalación: $300, un solo pago al firmar. Tu plan mensual empieza 14 días después de la instalación, la misma semana que ves tu primer diseño, y se cobra el mismo día cada mes. Contrato de 12 meses desde el primer pago mensual. Si el lanzamiento se retrasa por fotos, aprobaciones o tu propio tiempo, el plan sigue igual."
+
 ## Proposal structure (one page)
 
 1. **Para / For**: business and owner name, date.
@@ -40,10 +51,10 @@ before drafting. Don't fill gaps with assumptions.
    words ("No apareces en Google Maps cuando buscan 'roofer Cicero'").
 3. **Lo que vamos a hacer / What we'll do**: the recommended plan's features from the
    source file, tied to the findings above. Plan name in bold.
-4. **Inversión / Investment**: monthly price from the source file, setup fee from the page, 12-month minimum, add-on only if discussed.
-5. **Cómo empezamos / How we start**: three steps. Sign and pay the setup fee, send logo,
-   photos and service list, and we build while they keep working. First draft timing only
-   if Tulio gave one.
+4. **Inversión / Investment**: monthly price from the source file, setup fee from the page, 12-month minimum, add-on only if discussed. Always state the payment timing exactly as in **Payment terms** below.
+5. **Cómo empezamos / How we start**: three steps. Sign and pay the $300 setup (day 0), send logo,
+   photos and service list, and see the first design around day 14, when the monthly plan starts.
+   Other draft timing only if Tulio gave one.
 6. **Next step**: one line with a date to reply or book a call, and Tulio's contact.
 
 Keep it to one page. Plain, warm language a busy owner reads in two minutes. Many owners
