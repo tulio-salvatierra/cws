@@ -114,3 +114,8 @@
 html:has(.cws-admin), body:has(.cws-admin) { overflow-x: clip; }
 html:has(.cws-admin) { background: #0b0d10 !important; }
 body:has(.cws-admin) { background: #0b0d10 !important; }
+
+/* Glass cards use backdrop-filter, which gives each card its own stacking
+   layer, so a dropdown inside one card was painted under the next card.
+   Lift the card whose menu is open above its siblings. */
+.cws-admin article:has(details[open]) { position: relative; z-index: 40; }
