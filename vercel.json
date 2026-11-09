@@ -122,6 +122,10 @@
       "destination": "/landing/website-refresh-redesign.html"
     },
     {
+      "source": "/",
+      "destination": "/home.html"
+    },
+    {
       "source": "/((?!intake(?:/|$)|api/|assets/|.*\\..*).*)",
       "destination": "/index.html"
     }

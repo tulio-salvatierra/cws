@@ -188,3 +188,7 @@ Owner asked to see last week's leads on CEO Today and record actions there. `/ap
 
 Owner set one payment shape for every Negocio Listo agreement (DEC-040): $300 setup at signing (setup only), monthly plan starts 14 days after the setup payment and is timed to the first design preview, 12-month term from the first monthly payment, launch timing does not move billing. `skills/negocio-listo-proposal` now states it in EN/ES. Checked the Sherry group's written agreement (owner email Oct 27, accepted Oct 28, $300 setup paid Oct 28): it says $149/month starting at launch and a 12-month term from launch, so their billing changes only with their written OK. Only one client agreement exists in Accounting (Upholstery of Chicago); Sherry's is not recorded yet. App automation ("Signed" → agreement, bills, Square subscription) is planned and waits on `SQUARE_ACCESS_TOKEN`.
 
+
+## 2026-11-09 — CWS-PUBLIC-PRERENDER-20261105 public HTML and incoming links
+
+Generate HTML with existing headings, content, navigation and structured data for the 20 sitemap URLs. Serve the homepage snapshot through an exact rewrite to preserve the app shell for admin and intake. The Services page links to Chicago Digital Marketing, Berwyn E-commerce and Website Refresh and Redesign. The public footer links to Privacy Policy. Local build, lint, 912 tests and generated HTML checks passed.

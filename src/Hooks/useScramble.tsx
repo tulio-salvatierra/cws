@@ -58,6 +58,10 @@ export function useScramble(text: string, duration: number = 1) {
     if (!containerRef.current) return;
 
     const element = containerRef.current;
+    if (document.documentElement.hasAttribute("data-prerender")) {
+      element.textContent = text;
+      return;
+    }
     const targetText = text;
     const iterations = 10;
     const repeatInterval = 3000; // Repeat every 3 seconds

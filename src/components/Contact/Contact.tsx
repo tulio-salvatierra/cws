@@ -49,7 +49,7 @@ export default function Contact() {
           <Banner/>
           
           <MaskedLines
-            as="p"
+            as="h1"
             scroll
             scrollStart="top 85%"
             className="font-main text-[2rem] sm:text-[3rem] text-zinc-900 mt-1 text-left mx-auto leading-none tracking-wide w-100"

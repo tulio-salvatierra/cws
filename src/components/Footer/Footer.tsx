@@ -31,6 +31,7 @@ const FOOTER_NAV = [
   { label: "Services", url: SERICES_URL },
   { label: "Process", url: "/#process" },
   { label: "Contact", url: CONTACT_URL },
+  { label: "Privacy Policy", url: "/policy" },
 ] as const;
 
 function formatPhone(phone: number) {
