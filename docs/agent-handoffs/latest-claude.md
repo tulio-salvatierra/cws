@@ -1,17 +1,18 @@
-Task ID: CWS-CEO-LEADS-20261109
+Task ID: CWS-NL-SIGNED-20261109
 Agent: Claude
-Objective: Show last week's leads on CEO Today and let the owner record actions there.
+Objective: One "Signed" action that puts a Negocio Listo deal into Accounting and Square under DEC-040.
 
 Files changed:
-- `server/ceo/recent-leads.js`, `server/ceo/__tests__/recent-leads.test.js` (new)
-- `api/ceo-today.js` (`recent_leads` in the response)
-- `src/pages/admin/RecentLeads.jsx`, `src/pages/admin/__tests__/RecentLeads.test.jsx` (new)
-- `src/pages/admin/AdminOverview.jsx` (list placed under "Do next")
+- `server/accounting/negocio-listo-signing.js`, `server/accounting/square.js` (new), `server/accounting/handler.js` (route)
+- `supabase/migrations/20261109163646_schedule_agreement_billing.sql` (applied to production; version verified)
+- `src/pages/admin/SignNegocioListoForm.jsx` (new), `RecentLeads.jsx` ("Signed…"), `ClientAgreements.jsx` + `AccountingPage.jsx` ("Record Negocio Listo signing")
+- `env.keys.js`, `.env.example` (`SQUARE_ACCESS_TOKEN`)
+- Tests: `server/accounting/__tests__/negocio-listo-signing.test.js`, `src/pages/admin/__tests__/SignNegocioListoForm.test.jsx`
 
-Findings: `update_lead_sales_state` in `server/sales/handler.js` sets phone and locality to null when they are omitted; any caller must send current values (the new list does). Production on 2026-11-09: 12 phone-only prospects from batch `cws-new-business-2026-11-09` created Nov 8, none contacted yet.
+Findings: Square already had per-client static plans (Upholstery $150, 12 periods then ongoing) and a relative-price Carolina plan; the new flow creates one plan per tier and reuses it. Subscriptions are created without a card, so Square emails an invoice each month; a card the client saves in Square takes over automatically.
 
-Tests run: `api/__tests__/ceo-today.test.js`, `server/ceo`, `src/pages/admin` (241 passed); eslint clean; local browser check with stubbed data.
+Tests run: server/accounting + src/pages/admin (188 passed); eslint clean. Not run against live Square (no test charge made).
 
-Not changed: Sales endpoint, data model, Sales page.
+Not changed: existing manual agreement flow, Sherry's records (her written terms differ; owner deciding).
 
-Next: owner calls the Nov 8 batch and logs results from CEO Today; consider making `update_lead_sales_state` keep omitted fields instead of nulling them.
+Next: first real signing verifies the Square path end to end; build Square → Accounting payment sync (webhook) when ready.

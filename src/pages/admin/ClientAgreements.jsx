@@ -2,15 +2,18 @@ import { useState } from 'react'
 import { agreementSummary } from '../../lib/clientAgreements'
 import { businessToday } from '../../lib/businessExpenses'
 import { dollarsToCents } from '../../lib/money'
+import SignNegocioListoForm from './SignNegocioListoForm'
 const money = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(n || 0) / 100)
 const button = 'rounded-xl border border-white/20 px-4 py-2 text-sm disabled:opacity-50'
 const input = 'mt-1 w-full rounded-xl bg-slate-900 p-3 text-white'
 
-export default function ClientAgreements({ agreements = [], installments = [], obligations = [], receipts = [], clients = [], offers = [], busy, onAction, initialClientId = '', canClassify = false, corrections = [] }) {
+export default function ClientAgreements({ agreements = [], installments = [], obligations = [], receipts = [], clients = [], offers = [], busy, onAction, onReload, initialClientId = '', canClassify = false, corrections = [] }) {
   const [adding, setAdding] = useState(Boolean(initialClientId))
+  const [signing, setSigning] = useState(false)
   const [notice, setNotice] = useState('')
   return <section id="client-agreements" aria-label="Client agreements" className="mt-10 scroll-mt-8">
-    <div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-2xl font-semibold">Client products & agreements</h2><p className="mt-2 text-sm text-slate-400">Agreed customer prices, setup payments, and monthly balances. Billing and finished-site launch are recorded separately when each is actually confirmed.</p></div><button className={button} onClick={() => setAdding(!adding)}>Assign product to client</button></div>
+    <div className="flex flex-wrap justify-between gap-3"><div><h2 className="text-2xl font-semibold">Client products & agreements</h2><p className="mt-2 text-sm text-slate-400">Agreed customer prices, setup payments, and monthly balances. Billing and finished-site launch are recorded separately when each is actually confirmed.</p></div><div className="flex flex-wrap gap-2"><button className={button} onClick={() => { setAdding(false); setSigning(!signing) }}>Record Negocio Listo signing</button><button className={button} onClick={() => setAdding(!adding)}>Assign product to client</button></div></div>
+    {signing && <SignNegocioListoForm onCancel={() => setSigning(false)} onClose={async () => { setSigning(false); await onReload?.() }} />}
     {notice && <p role="status" className="mt-3 text-emerald-200">{notice}</p>}
     {adding && <AgreementForm clients={clients} offers={offers} obligations={obligations} installments={installments} initialClientId={initialClientId} busy={busy} onCancel={() => setAdding(false)} onSubmit={async body => { const result = await onAction(body); if (result) { setAdding(false); setNotice('Agreement saved. Record billing only when its actual start is confirmed.') } return result }} />}
     <div className="mt-4 space-y-4">{agreements.map(a => <AgreementCard canClassify={canClassify} corrections={corrections.filter(row => row.agreement_id === a.id)} key={a.id} agreement={a} client={clients.find(c => c.id === a.client_id)} summary={agreementSummary(a, installments, obligations, receipts)} busy={busy} onAction={onAction} />)}</div>
