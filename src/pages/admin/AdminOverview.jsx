@@ -7,6 +7,7 @@ import LifecycleReviews from './LifecycleReviews'
 import DealFits from './DealFits'
 import BusinessDecisions from './BusinessDecisions'
 import LayaResponseHistory from './LayaResponseHistory'
+import RecentLeads from './RecentLeads'
 import { supabase } from '../../lib/supabase'
 
 const departmentNavigation = [
@@ -75,6 +76,8 @@ export default function AdminOverview() {
         {actions.map((item) => <CeoActionCard key={item.id} item={item} onReload={async () => setCeo(await loadCeoToday())} onNotNow={() => setNotNow((current) => new Set(current).add(item.id))} />)}
         {!actions.length && <p className="rounded-2xl border border-gray-800 bg-gray-900/60 p-5 text-sm text-gray-400">No further action is shown in this view. Reload to recalculate from current department state.</p>}
       </section>}
+
+      {ceo?.recent_leads && <RecentLeads summary={ceo.recent_leads} onReload={async () => setCeo(await loadCeoToday())} />}
 
       <details className="cws-admin-laya mt-9 rounded-2xl border border-gray-800 bg-gray-900/60 p-5 [&[open]>summary]:mb-2">
         <summary className="flex cursor-pointer list-none flex-wrap items-baseline justify-between gap-2">
