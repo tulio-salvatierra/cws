@@ -9,6 +9,7 @@ import { canonicalPages } from './canonical-pages.mjs'
 
 const urls = canonicalPages(await readFile('public/sitemap.xml', 'utf8'))
 const template = await readFile('dist/index.html', 'utf8')
+await writeFile('dist/app-shell.html', template)
 // Capture from the original shell so rerunning a route cannot inherit an
 // earlier snapshot. Vite serves all built assets with their correct MIME types.
 const publicPaths = new Set(urls.map((url) => url.pathname))
@@ -66,7 +67,7 @@ try {
         return { html: root.innerHTML, schemas, h1: root.querySelector('main h1')?.textContent.trim(), links: root.querySelectorAll('a[href]').length }
       })
       if (errors.length || !snapshot.h1 || !snapshot.links) throw new Error(`${url.pathname}: ${errors.join('; ') || 'missing heading or links'}`)
-      const file = url.pathname === '/' ? 'dist/home.html' : `dist${url.pathname}.html`
+      const file = url.pathname === '/' ? 'dist/index.html' : `dist${url.pathname}.html`
       const shell = url.pathname === '/' ? template : await readFile(file, 'utf8')
       const document = new JSDOM(shell).window.document
       const root = document.getElementById('root')

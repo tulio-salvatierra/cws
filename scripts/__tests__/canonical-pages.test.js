@@ -16,7 +16,7 @@ describe('public canonical URLs', () => {
     }
     expect(config.rewrites).toContainEqual({ source: '/review/:path*', destination: 'https://cws-review.vercel.app/:path*' })
     expect(config.rewrites[0]).toEqual({ source: '/api/command-queue', destination: '/api/sales' })
-    expect(config.rewrites.at(-1).destination).toBe('/index.html')
+    expect(config.rewrites.at(-1).destination).toBe('/app-shell.html')
     expect(read('public/robots.txt')).toContain('Disallow: /review/')
     expect(read('public/robots.txt')).toContain('Sitemap: https://www.cicerowebstudio.xyz/sitemap.xml')
   })

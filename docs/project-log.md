@@ -191,4 +191,4 @@ Owner set one payment shape for every Negocio Listo agreement (DEC-040): $300 se
 
 ## 2026-11-09 — CWS-PUBLIC-PRERENDER-20261105 public HTML and incoming links
 
-Generate HTML with existing headings, content, navigation and structured data for the 20 sitemap URLs. Serve the homepage snapshot through an exact rewrite to preserve the app shell for admin and intake. The Services page links to Chicago Digital Marketing, Berwyn E-commerce and Website Refresh and Redesign. The public footer links to Privacy Policy. Local build, lint, 912 tests and generated HTML checks passed.
+Generate HTML with existing headings, content, navigation and structured data for the 20 sitemap URLs. Serve the homepage snapshot as the default document and preserve a separate app shell for fallback routes. The Services page links to Chicago Digital Marketing, Berwyn E-commerce and Website Refresh and Redesign. The public footer links to Privacy Policy. Local build, lint, 912 tests and generated HTML checks passed.
