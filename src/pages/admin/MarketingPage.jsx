@@ -1,3 +1,4 @@
+import { DEFAULT_IMAGE_FORMAT, IMAGE_FORMATS, IMAGE_PLATFORMS, getImageFormat } from '../../marketing/imageFormats.js'
 import { MARKETING_PLATFORMS, MARKETING_CAPTION_LIMIT, GOOGLE_BUSINESS_CTA_URL, marketingPlatformName, marketingDestinationsVerified } from '../../marketing/channels.js'
 import { CATALOG_CAPTION_PLATFORM_LABELS, PLATFORM_CAPTION_LIMITS, effectivePlatformCaptions, platformCaptionError } from '../../marketing/platformCaptions.js'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -229,10 +230,11 @@ export default function MarketingPage() {
     return runCreative('generate_story_ideas', key, { offer_id: offerId, request_key: creativeReferenceKeysRef.current[key] })
   }
 
-  function generateVisual(ideaRunId, ideaId) {
+  function generateVisual(ideaRunId, ideaId, formatId) {
     const key = `visual:${ideaRunId}:${ideaId}`
-    creativeReferenceKeysRef.current[key] ||= crypto.randomUUID()
-    return runCreative('generate_visual_draft', key, { idea_run_id: ideaRunId, idea_id: ideaId, request_key: creativeReferenceKeysRef.current[key] })
+    const requestKey = `${key}:${formatId}`
+    creativeReferenceKeysRef.current[requestKey] ||= crypto.randomUUID()
+    return runCreative('generate_visual_draft', key, { idea_run_id: ideaRunId, idea_id: ideaId, format_id: formatId, request_key: creativeReferenceKeysRef.current[requestKey] })
   }
 
   function approveVisual(asset, caption) {
@@ -249,6 +251,7 @@ export default function MarketingPage() {
     return runCreative('generate_visual_draft', `visual:${asset.idea_run_id}:${asset.idea_id}`, {
       idea_run_id: asset.idea_run_id,
       idea_id: asset.idea_id,
+      format_id: asset.format_id,
       request_key: crypto.randomUUID(),
     })
   }
@@ -402,6 +405,14 @@ function ChannelPanel({ platform, state, captions, channelEdits, onChannelCaptio
 
 function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVisual, onRetryVisual, onApproveVisual, onEvaluate }) {
   const [assetCaptions, setAssetCaptions] = useState({})
+  const [formatId, setFormatId] = useState(() => {
+    try { const saved = localStorage.getItem('cws-evergreen-image-format'); return getImageFormat(saved) ? saved : DEFAULT_IMAGE_FORMAT } catch { return DEFAULT_IMAGE_FORMAT }
+  })
+  const format = getImageFormat(formatId)
+  function selectFormat(id) {
+    setFormatId(id)
+    try { localStorage.setItem('cws-evergreen-image-format', id) } catch { /* Preference storage is optional. */ }
+  }
   const usableOffers = offers.filter(offer => offer.status !== 'retired')
 
   return <section aria-labelledby="creative-studio-heading" className="mt-8 rounded-2xl border border-indigo-400/20 bg-indigo-400/5 p-5 sm:p-6">
@@ -410,6 +421,12 @@ function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVis
     <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Generate ideas first. Create a visual only for an idea you choose. Nothing here schedules or publishes a post.</p>
     {creative.error && <p role="alert" className="mt-4 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-sm text-rose-200">{creative.error}</p>}
 
+    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+      <label className="text-sm text-gray-300">Social channel<select aria-label="Social channel" disabled={Boolean(busy)} value={format.platform} onChange={event => selectFormat(IMAGE_FORMATS.find(item => item.platform === event.target.value).id)} className="mt-1 block w-full rounded-lg border border-gray-700 bg-gray-950 p-2">{IMAGE_PLATFORMS.map(platform => <option key={platform}>{platform}</option>)}</select></label>
+      <label className="text-sm text-gray-300">Image format<select aria-label="Image format" disabled={Boolean(busy)} value={formatId} onChange={event => selectFormat(event.target.value)} className="mt-1 block w-full rounded-lg border border-gray-700 bg-gray-950 p-2">{IMAGE_FORMATS.filter(item => item.platform === format.platform).map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
+    </div>
+    <p className="mt-3 text-sm text-indigo-100">{format.width} × {format.height} px · {format.ratio} · JPEG · under 5 MB</p>
+    <p className="mt-1 text-xs text-gray-400">The full composition is preserved. White padding may be added if the generated ratio differs. {format.sharedFeed ? 'Feed images can be reviewed for the shared evergreen library.' : 'Download and review only; this format cannot enter the shared feed scheduler.'} {format.placement === 'reel-cover' && 'A Reel cover is a still image, not a video.'}</p>
     <div className="mt-5 flex flex-wrap gap-3">
       {usableOffers.map(offer => <button key={offer.id} type="button" disabled={Boolean(busy)} onClick={() => onGenerateIdeas(offer.id)} className="rounded-full border border-indigo-300/50 px-4 py-2 text-sm font-semibold text-indigo-100 transition hover:bg-indigo-400/10 disabled:opacity-45">{busy === `ideas:${offer.id}` ? 'Generating ideas…' : `Generate ideas for ${offer.name}`}</button>)}
       {!usableOffers.length && <p className="text-sm text-amber-100">Add an offer before generating ideas.</p>}
@@ -420,12 +437,12 @@ function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVis
         <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="font-semibold text-white">Idea set</p><p className="mt-1 text-xs text-gray-500">{run.status === 'needs_review' ? 'Ready for owner review' : run.status}</p></div></div>
         {run.error_message && <p className="mt-3 text-sm text-rose-200">{run.error_message}</p>}
         {run.output?.ideas && <div className="mt-4 grid gap-3 lg:grid-cols-2">{run.output.ideas.map(idea => {
-          const asset = creative.assets.find(item => item.idea_run_id === run.id && item.idea_id === idea.id)
+          const asset = creative.assets.find(item => item.idea_run_id === run.id && item.idea_id === idea.id && (item.format_id || DEFAULT_IMAGE_FORMAT) === formatId)
           const key = `visual:${run.id}:${idea.id}`
           return <section key={idea.id} className="rounded-lg border border-gray-800 bg-gray-900/60 p-4">
             <p className="font-medium text-white">{idea.title}</p><p className="mt-2 text-sm text-gray-300">{idea.hook}</p><p className="mt-3 text-xs leading-5 text-gray-500">Suggested caption: {idea.caption}</p>
             <button type="button" onClick={() => onEvaluate({ topic: `${idea.title} · LinkedIn, Facebook, Instagram, Google Business Profile`, draft: asset ? assetCaptions[asset.id] ?? idea.caption : idea.caption })} className="mt-3 block text-sm text-indigo-300">Check this text with Laya</button>
-            {!asset && <button type="button" disabled={Boolean(busy)} onClick={() => onGenerateVisual(run.id, idea.id)} className="mt-4 rounded-full border border-indigo-300/50 px-3 py-2 text-sm font-semibold text-indigo-100 disabled:opacity-45">{busy === key ? 'Creating visual…' : 'Create visual draft'}</button>}
+            {!asset && <button type="button" disabled={Boolean(busy)} onClick={() => onGenerateVisual(run.id, idea.id, formatId)} className="mt-4 rounded-full border border-indigo-300/50 px-3 py-2 text-sm font-semibold text-indigo-100 disabled:opacity-45">{busy === key ? 'Creating visual…' : 'Create visual draft'}</button>}
             {asset && <VisualDraft asset={asset} idea={idea} caption={assetCaptions[asset.id] ?? idea.caption} busy={busy === `approve:${asset.id}`} retrying={busy === key} onCaptionChange={value => setAssetCaptions(current => ({ ...current, [asset.id]: value }))} onRetry={() => onRetryVisual(asset)} onApprove={() => onApproveVisual(asset, assetCaptions[asset.id] ?? idea.caption)} />}
           </section>
         })}</div>}
@@ -436,10 +453,11 @@ function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVis
 }
 
 function VisualDraft({ asset, idea, caption, busy, retrying, onCaptionChange, onRetry, onApprove }) {
+  const format = getImageFormat(asset.format_id || DEFAULT_IMAGE_FORMAT)
   if (asset.status === 'generating' || asset.status === 'approving') return <p className="mt-4 text-sm text-indigo-100">{asset.status === 'generating' ? 'Creating the visual draft…' : 'Adding this asset to the evergreen library…'}</p>
   if (asset.status === 'failed') return <div className="mt-4"><p className="text-sm text-rose-200">{asset.failure_message || 'The visual draft was not created.'}</p><button type="button" disabled={busy || retrying} onClick={onRetry} className="mt-3 rounded-full border border-rose-300/50 px-3 py-2 text-sm font-semibold text-rose-100 disabled:opacity-45">{retrying ? 'Retrying visual…' : 'Retry visual draft'}</button></div>
   if (asset.status === 'approved') return <p className="mt-4 text-sm text-emerald-200">Added to the evergreen library. It remains separate from publishing.</p>
-  return <div className="mt-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Visual draft</p>{asset.preview_url ? <img src={asset.preview_url} alt={`Draft visual for ${idea.title}`} className="mt-3 max-h-[28rem] w-full rounded-lg border border-gray-700 bg-white object-contain" /> : <p className="mt-3 text-sm text-amber-100">The draft is ready, but its private preview could not be loaded.</p>}<label className="mt-4 block text-xs text-gray-400">Caption to add with this image<textarea aria-label={`Caption for ${idea.title}`} value={caption} onChange={event => onCaptionChange(event.target.value)} rows={4} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm leading-6 text-white" /></label><p className="mt-2 text-xs text-gray-500">Approving confirms this 4:5 image for LinkedIn, Facebook, and Instagram. You can still decide later whether to publish.</p><button type="button" disabled={busy || !caption.trim()} onClick={onApprove} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-45">{busy ? 'Adding…' : 'Approve for evergreen library'}</button></div>
+  return <div className="mt-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Visual draft · {format?.platform} {format?.label}</p><p className="mt-1 text-xs text-gray-400">{asset.image_validation ? `${asset.image_validation.width} × ${asset.image_validation.height} · JPEG · ${asset.image_validation.padded ? 'Padded, no cropping' : 'No cropping'}` : 'Legacy draft — dimensions have not been automatically validated.'}</p>{asset.preview_url ? <img src={asset.preview_url} alt={`Draft visual for ${idea.title}`} className="mt-3 max-h-[28rem] w-full rounded-lg border border-gray-700 bg-white object-contain" /> : <p className="mt-3 text-sm text-amber-100">The draft is ready, but its private preview could not be loaded.</p>}{asset.preview_url && <a href={asset.preview_url} target="_blank" rel="noreferrer" className="mt-3 block text-sm text-indigo-300">Open / download image</a>}{format?.sharedFeed ? <><label className="mt-4 block text-xs text-gray-400">Caption to add with this image<textarea aria-label={`Caption for ${idea.title}`} value={caption} onChange={event => onCaptionChange(event.target.value)} rows={4} className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm leading-6 text-white" /></label><p className="mt-2 text-xs text-gray-500">Approving confirms this feed image for LinkedIn, Facebook, and Instagram. You can still decide later whether to publish.</p><button type="button" disabled={busy || !caption.trim()} onClick={onApprove} className="mt-4 rounded-full bg-indigo-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-45">{busy ? 'Adding…' : 'Approve for evergreen library'}</button></> : <p className="mt-3 text-sm text-amber-100">Saved as a private draft. Download for {format?.label}; the shared scheduler only accepts compatible feed images.</p>}</div>
 }
 
 function OfferCatalog({ offers, saving, onSave, embedded = false }) {

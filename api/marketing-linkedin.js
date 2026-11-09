@@ -709,7 +709,7 @@ async function uploadAsset(client, asset) {
     : await readFile(join(process.cwd(), 'public', asset.assetPath))
   if (image.length > 5 * 1024 * 1024) throw new ProviderError(400, 'Google Business Profile images must be 5 MB or smaller.')
   const form = new FormData()
-  form.set('file', new Blob([image], { type: mimeTypeForAsset(asset.assetPath) }), assetFilename(asset))
+  form.set('file', new Blob([image], { type: mimeTypeForAsset(asset.assetSource === 'generated' ? asset.assetObjectPath : asset.assetPath) }), assetFilename(asset))
   form.set('teamId', process.env.BUNDLE_SOCIAL_TEAM_ID)
   const body = await providerRequest('/upload/', { method: 'POST', body: form })
   const id = typeof body?.uploadId === 'string'
@@ -722,7 +722,7 @@ async function uploadAsset(client, asset) {
 }
 
 async function readGeneratedAsset(client, asset) {
-  if (asset.assetBucket !== 'marketing-creative' || !/^generated\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.png$/i.test(asset.assetObjectPath || '')) {
+  if (asset.assetBucket !== 'marketing-creative' || !/^generated\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:png|jpg)$/i.test(asset.assetObjectPath || '')) {
     throw new ProviderError(400, 'Generated Marketing asset storage reference is invalid.')
   }
   const downloaded = await client.storage.from(asset.assetBucket).download(asset.assetObjectPath)
@@ -731,7 +731,7 @@ async function readGeneratedAsset(client, asset) {
 }
 
 function assetFilename(asset) {
-  return asset.assetSource === 'generated' ? `${asset.offerId || 'marketing'}-creative.png` : asset.assetPath.split('/').at(-1)
+  return asset.assetSource === 'generated' ? `${asset.offerId || 'marketing'}-creative.${asset.assetObjectPath.endsWith('.jpg') ? 'jpg' : 'png'}` : asset.assetPath.split('/').at(-1)
 }
 
 // Records which catalog caption each destination text came from. A text the

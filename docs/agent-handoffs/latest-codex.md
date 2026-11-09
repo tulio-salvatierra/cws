@@ -1,19 +1,19 @@
-Task ID: CWS-PUBLIC-PRERENDER-20261105
+Task ID: CWS-EVERGREEN-FORMATS-20261109
 Agent: Codex
-Objective: Deliver crawlable HTML for public sitemap routes and link four previously unlinked pages.
-Files inspected: Product and technical conventions, canonical and intake builds, Vercel routing, public navigation and footer.
-Files changed: Public prerender build, fallback rewrite, Services, Footer, Contact, animation hooks, project memory.
-Database or API changes: None.
-Security decisions: Capture only public sitemap paths and block external requests during prerender.
-Decisions made: Serve the homepage snapshot as the default document and keep an empty fallback shell. Generate intake documents before prerendering.
-Assumptions: Existing React startup replaces static snapshots.
-Tests added: Build assertions for rendered headings, links and application errors.
-Tests run: 912 tests, lint, build and generated HTML assertions covering all 20 pages, four incoming links and the fallback shell.
-Known issues: Existing bundle size warning.
-Recommended next task: Verify CI, preview and production. Recheck Ahrefs after release.
-Questions requiring Tulio: None.
+Objective: Add destination-aware image generation/export to existing Evergreen Creative Studio.
+Files inspected: Product definition, technical conventions, decisions, learnings, prior handoff; creative API/UI/prompts, offer catalog, publisher upload, existing creative migration/types/tests.
+Files changed: See docs/marketing/evergreen-image-formats.md; shared preset module, normalizer, creative API/UI/prompts, upload extension handling, migration/types, dependency lock, tests and project records.
+Database or API changes: Prepared 20261109172902_evergreen_image_formats.sql; applied to production with exact remote version. Existing generation accepts format_id; output includes format_id/image_validation. No new endpoint.
+Security decisions: Owner/workspace checks retained; invalid presets rejected before generation; no crop; strict raster/size validation; Story/Reel/non-shared variants cannot be approved into the feed scheduler; no external action performed.
+Decisions made: Conservative supported generation sizes with destination composition prompts; JPEG exports <=5,000,000 bytes; white contain padding on ratio mismatch; existing model settings preserved.
+Assumptions: Shared scheduler still publishes feed images only; 1200x628 LinkedIn landscape is download-only due to shared-feed ratio ceiling.
+Tests added: 28 processor, handler and UI cases; original prompt expectations updated.
+Tests run: 949 tests / 97 files pass; lint pass; full placeholder-env build and public prerender pass; isolated PostgreSQL migration checks pass; git diff --check pass.
+Known issues: Production migration verified; live authenticated generation and production verification unperformed. Conservative generation sizes may require padding. Existing 40 dependency advisories unchanged; existing bundle warning.
+Recommended next task: Review/apply exact-version migration before deployment, then perform one owner-triggered live generation/storage check without publishing.
+Questions requiring Tulio: None for local implementation.
 Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: Remote verification until checks finish.
-Git diff summary: Public SEO and build changes based on current main in an isolated worktree.
+Memory updates withheld: Release completion until migration/deployment/live verification.
+Git diff summary: Isolated current-main checkout at 277b1c3, branch codex/evergreen-image-formats; no pre-existing edits; release authorized; commit/merge pending. Original older CWS checkout remains untouched.
