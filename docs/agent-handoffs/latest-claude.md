@@ -1,22 +1,20 @@
-Task ID: CWS-NL-SETUP-ARCHIVE-20261108
+Task ID: CWS-ADMIN-UI-20261108
 Agent: Claude
-Objective: Merge the skills and pricing PRs, publish the $300 setup fee, update plan graphics to $150/$250/$350, and archive bloated memory files.
+Objective: Audit the live admin dashboard and apply the owner-selected UI fixes (1, 2, 5, 9).
 
 Files changed:
-- `src/data/negocioListo.js`, `public/llms.txt` (one-time $300 setup fee, ES/EN)
-- `skills/negocio-listo-proposal/SKILL.md` (setup fee read from the page)
-- `public/images/negocio-listo/{es,en}-0{2,3,4}-*.png` (prices redrawn)
-- `docs/project-log.md`, `docs/task-ledger.md` (trimmed; new entries)
-- `docs/archive/project-log-2026-07-21-to-2026-10-24.md`, `docs/archive/task-ledger-completed-to-2026-11-08.md` (new)
-- `AGENTS.md`, `docs/agent-memory-workflow.md` (archive rule)
-- `docs/agent-handoffs/shared-skills-chatgpt-2026-11-06.md` (setup fee resolved)
+- `src/components/admin/AdminLayout.jsx` (sticky desktop sidebar, admin tab title)
+- `src/App.jsx` (skip intro loader on /admin)
+- `server/laya/deal-fit.js` (dollars instead of cents in check text)
+- `src/lib/adminFormat.js`, `src/lib/__tests__/adminFormat.test.js` (new: Chicago date-time, key humanizer)
+- `src/pages/admin/LayaResponseHistory.jsx`, `src/pages/admin/LayaOwnerResponse.jsx` (readable timestamps; disclaimer behind toggle)
+- `src/pages/admin/MarketingPage.jsx` (shared provider error shown once)
+- `src/pages/admin/__tests__/LayaOwnerResponse.test.jsx`, `src/pages/admin/__tests__/MarketingPage.test.jsx`
 
-Findings:
-- Plan graphics use Clash Display Bold (`src/assets/fonts/clash.woff2`) with tight tracking; prices were redrawn by fitting size and tracking to the original glyphs.
-- `scripts/save-agent-memory.mjs` duplicate check only sees the live project log; documented.
+Findings (live audit, 2026-11-08): sidebar scrolled away on long pages; intro loader and public SEO title on /admin; raw cents, ISO timestamps and UUIDs in Laya text; Friday Post B showed one Instagram aspect-ratio error under all four channels.
 
-Tests run: full suite, lint, production build with placeholder client env.
+Tests run: `src/pages/admin`, `src/components/admin`, `server/laya`, `adminFormat` (395 passed); eslint clean. Full suite not run against a complete checkout (trimmed copy lacked `public/`).
 
-Not changed: Accounting draft catalog offers in the database still list $149/$249/$349 (production data; owner edit). `en-02-basico-150-v2.png` already showed $150 and $300 setup; untouched. Contenido add-on stays +$300/mo.
+Not changed: accent colors, CEO Today layout, Sales card density, history filter layout, publishing behavior when one channel rejects the post.
 
-Next: owner updates Accounting draft offers; next archive when the live log passes about 60 KB.
+Next: owner checks the Vercel preview of PR #78 and merges; then chooses among deferred items.

@@ -533,12 +533,14 @@ function DestinationVerification({ destination }) {
 
 function DestinationOutcomes({ results }) {
   const allTerminal = results.length > 0 && results.every(result => TERMINAL_STATUSES.has(result.provider_status))
-  return <section aria-label="Destination outcomes" className="mt-5 rounded-xl border border-gray-800 bg-gray-950/60 p-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Publish result</p>{allTerminal && <p className="mt-2 text-sm text-gray-400">This attempt is complete. Each destination retains its own outcome.</p>}<div className="mt-3 space-y-3">{results.map(result => <DestinationResult key={result.id || result.platform} result={result} />)}</div></section>
+  const errors = results.filter(result => result.provider_status === 'error' && result.provider_error)
+  const sharedError = errors.length > 1 && errors.every(result => result.provider_error === errors[0].provider_error) ? errors[0].provider_error : ''
+  return <section aria-label="Destination outcomes" className="mt-5 rounded-xl border border-gray-800 bg-gray-950/60 p-4"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-500">Publish result</p>{allTerminal && <p className="mt-2 text-sm text-gray-400">This attempt is complete. Each destination retains its own outcome.</p>}{sharedError && <p role="note" className="mt-3 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-sm text-rose-200">Same error on {errors.length} channels ({errors.map(result => platformName(result.platform)).join(', ')}): {sharedError}</p>}<div className="mt-3 space-y-3">{results.map(result => <DestinationResult key={result.id || result.platform} result={result} hideError={Boolean(sharedError) && result.provider_error === sharedError} />)}</div></section>
 }
 
-function DestinationResult({ result }) {
+function DestinationResult({ result, hideError = false }) {
   const detail = DESTINATION_DETAILS[result.provider_status] || DESTINATION_DETAILS.processing
-  return <div className="rounded-lg border border-gray-800 bg-gray-950/60 p-3 text-sm"><p className="font-medium text-white">{platformName(result.platform)}</p><p className="mt-1 text-gray-300">{detail.label}</p><p className="mt-1 text-xs text-gray-500">{detail.detail}</p>{result.provider_error && <p className="mt-2 text-rose-300">{result.provider_error}</p>}{result.provider_permalink && <a className="mt-2 inline-block text-indigo-300 hover:text-indigo-200" href={result.provider_permalink} target="_blank" rel="noreferrer">View post →</a>}</div>
+  return <div className="rounded-lg border border-gray-800 bg-gray-950/60 p-3 text-sm"><p className="font-medium text-white">{platformName(result.platform)}</p><p className="mt-1 text-gray-300">{detail.label}</p><p className="mt-1 text-xs text-gray-500">{detail.detail}</p>{result.provider_error && !hideError && <p className="mt-2 text-rose-300">{result.provider_error}</p>}{result.provider_permalink && <a className="mt-2 inline-block text-indigo-300 hover:text-indigo-200" href={result.provider_permalink} target="_blank" rel="noreferrer">View post →</a>}</div>
 }
 
 function AttemptHistory({ attempt }) {

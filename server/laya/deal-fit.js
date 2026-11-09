@@ -5,6 +5,7 @@ import { isNegocioListo } from '../ceo/goal-pace.js'
 const FLOOR_CENTS = 5000
 const SETUP_CENTS = 30000
 const cents = value => (typeof value === 'number' || (typeof value === 'string' && /^(0|[1-9]\d*)$/.test(value))) && Number.isSafeInteger(Number(value)) && Number(value) >= 0
+const usd = value => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(value)/100)
 const source = (table,row,fields) => ({table,id:row.id,workspace_id:row.workspace_id,fields:Object.fromEntries(fields.map(field=>[field,row[field] ?? null]))})
 
 // AUTO only. A gross revenue/hour budget is an upper bound, not an estimate of
@@ -19,7 +20,7 @@ export function evaluateDealFit({workspaceId,agreement=null,lead=null,projects=[
   if(agreement) {
     const validSetup=cents(agreement.setup_cents)
     const setup=validSetup?Number(agreement.setup_cents):null
-    checks.push({key:'setup_fee',status:setup===null?'needs_data':setup>=SETUP_CENTS?'meets':'revise',label:'Setup fee',detail:setup===null?'Record a valid setup fee.':`Recorded setup fee: ${setup} cents; approved baseline: ${SETUP_CENTS} cents. This is an agreed fee, not payment evidence.`})
+    checks.push({key:'setup_fee',status:setup===null?'needs_data':setup>=SETUP_CENTS?'meets':'revise',label:'Setup fee',detail:setup===null?'Record a valid setup fee.':`Recorded setup fee: ${usd(setup)}; approved baseline: ${usd(SETUP_CENTS)}. This is an agreed fee, not payment evidence.`})
     if(!validSetup)missing.push('A valid recorded setup fee is missing.')
     why.push({claim:'Setup comparison uses the agreement snapshot; it does not establish that the fee was paid.',source:source('client_service_agreements',agreement,['product_name','setup_cents'])})
   } else {
@@ -48,7 +49,7 @@ export function evaluateDealFit({workspaceId,agreement=null,lead=null,projects=[
   const floorStatus=net===null?'needs_data':net>=totalHours*FLOOR_CENTS?'meets':'revise'
   checks.push({key:'hourly_floor',status:floorStatus,label:'$50/hour floor',detail:net===null?'A complete current owner budget matching the reviewed records is required. Actual hours or future revenue alone cannot establish affordability.':`Budgeted term contribution after direct costs: ${net} cents over ${totalHours} whole labor hours. ${floorStatus==='meets'?'Meets':'Below'} the $50/hour floor; this is an estimate, not realized profit.`,gross_term_cents:gross,gross_hour_ceiling:gross===null?null:gross/FLOOR_CENTS,floor_cents:FLOOR_CENTS,net_term_cents:net,total_budget_hours:valid?totalHours:null})
   if(!valid)missing.push('Complete current owner labor/cost and dated capacity evidence is missing, stale, inconsistent or invalidated by changed records.')
-  if(gross!==null)why.push({claim:`Recorded gross term value is ${gross} cents; before costs it permits at most ${gross/FLOOR_CENTS} labor hours at $50/hour. This is not collected cash or a labor forecast.`,source:source('client_service_agreements',agreement,['setup_cents','monthly_cents','term_months'])})
+  if(gross!==null)why.push({claim:`Recorded gross term value is ${usd(gross)}; before costs it permits at most ${gross/FLOOR_CENTS} labor hours at $50/hour. This is not collected cash or a labor forecast.`,source:source('client_service_agreements',agreement,['setup_cents','monthly_cents','term_months'])})
   const capacityStatus=!valid?'needs_data':budget.deal_window_hours<=budget.available_hours-budget.committed_hours?'meets':'hold'
   checks.push({key:'capacity',status:capacityStatus,label:'Capacity',detail:!valid?'Complete current owner evidence for a dated window, available hours, other committed work and this deal’s demand is required.':`Window ${budget.window_start} through ${budget.window_end}: ${budget.available_hours} available hours minus ${budget.committed_hours} other committed hours; this deal needs ${budget.deal_window_hours} hours. ${capacityStatus==='meets'?'Fits':'Exceeds'} this reviewed window only; no future capacity is reserved.`})
   if(budget)why.push({claim:valid?'Owner confirmed complete term labor/direct costs and capacity for the exact reviewed records and window.':'Recorded budget is not sufficient for a current verified decision; reload and review its date, completeness and source snapshot.',source:{...source('negocio_listo_deal_budgets',{...budget,id:String(budget.revision)},['setup_hours','monthly_hours','setup_cost_cents','monthly_cost_cents','window_start','window_end','available_hours','committed_hours','deal_window_hours','verified_on','labor_cost_complete','capacity_complete','source_note','created_by','created_at']),snapshot:budget.snapshot}})

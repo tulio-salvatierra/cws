@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../Hooks/useAuth'
 
@@ -13,10 +14,16 @@ const NAV = [
 export default function AdminLayout({ children }) {
   const { signOut } = useAuth()
 
+  useEffect(() => {
+    const previous = document.title
+    document.title = 'CWS OS · Admin'
+    return () => { document.title = previous }
+  }, [])
+
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-52 flex-shrink-0 border-b border-gray-800 md:border-b-0 md:border-r flex flex-col py-4 md:py-6 px-3">
+      <aside className="w-full md:w-52 flex-shrink-0 md:sticky md:top-0 md:h-screen md:overflow-y-auto border-b border-gray-800 md:border-b-0 md:border-r flex flex-col py-4 md:py-6 px-3">
         <div className="text-indigo-400 font-bold text-sm px-3 mb-3 md:mb-6 tracking-wide uppercase">
           CWS OS
         </div>
