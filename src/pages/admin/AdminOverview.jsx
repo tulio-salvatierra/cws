@@ -66,6 +66,8 @@ export default function AdminOverview() {
       {error && <p role="alert" className="mt-6 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">{error}</p>}
       {!error && !ceo && <p className="mt-6 text-sm text-gray-400">Loading today’s priorities…</p>}
 
+      {ceo?.money && <MoneyTiles money={ceo.money} />}
+
       {ceo?.goal_pace && <GoalPace pace={ceo.goal_pace} canManage={ceo.business_decisions?.can_manage} onReload={async () => setCeo(await loadCeoToday())} />}
 
       {ceo && <h2 className="mt-9 text-lg font-semibold text-white">Do next</h2>}
@@ -111,6 +113,25 @@ export default function AdminOverview() {
       </section>
     </div>
   </div>
+}
+
+const usd = (cents) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(cents || 0) / 100)
+
+function MoneyTiles({ money }) {
+  if (!money.available) return <p className="mt-7 text-sm text-gray-400">Money totals are unavailable right now. <Link to="/admin/accounting" className="text-indigo-300">Open Accounting</Link></p>
+  const tiles = [
+    ['Monthly recurring', money.monthly_recurring_revenue_cents, 'Active plans'],
+    ['Received', money.received_amount_cents, 'All confirmed receipts'],
+    ['Outstanding', money.outstanding_amount_cents, 'Expected, not yet paid'],
+    ['Overdue', money.overdue_amount_cents, money.overdue_amount_cents > 0 ? 'Needs follow-up' : 'Nothing late'],
+  ]
+  return <section aria-label="Money" className="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    {tiles.map(([label, cents, note]) => <Link key={label} to="/admin/accounting" className="rounded-2xl border border-gray-800 bg-gray-900/60 p-4 transition hover:border-indigo-500 md:p-5">
+      <p className="text-xs text-gray-400">{label}</p>
+      <p className="cws-admin-display mt-2 text-2xl font-semibold text-white md:text-[1.75rem]">{usd(cents)}</p>
+      <p className={`mt-1 text-xs ${label === 'Overdue' && cents > 0 ? 'text-amber-200' : 'text-gray-500'}`}>{note}</p>
+    </Link>)}
+  </section>
 }
 
 function CeoActionCard({ item, onNotNow, onReload }) {
