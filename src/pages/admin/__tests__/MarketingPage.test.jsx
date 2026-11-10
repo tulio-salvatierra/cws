@@ -465,6 +465,19 @@ describe('Evergreen image format picker', () => {
     expect(JSON.parse(request[1].body)).toMatchObject({ action: 'generate_visual_draft', idea_id: 'idea-1', format_id: 'linkedin-feed-landscape' })
   })
 
+  it('offers reference-based remaking for a legacy feed draft', async () => {
+    const run = { id: 'run-1', output: { ideas: [{ id: 'idea-1', title: 'Legacy feed', caption: 'Caption' }] } }
+    const asset = { id: 'asset-1', idea_run_id: 'run-1', idea_id: 'idea-1', format_id: 'instagram-feed-portrait', status: 'ready', image_validation: null }
+    globalThis.fetch = vi.fn(async (url, options) => options?.method === 'POST' ? response({ ok: true }) : response(url === '/api/marketing-creative' ? creativeBody({ idea_runs: [run], creative_assets: [asset] }) : statusBody({ offer_catalog: [catalogOffer()] })))
+    render(<MarketingPage />)
+    await screen.findByText('Legacy feed')
+    expect(screen.getByText(/Generated in 4:5/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Remake without borders' }))
+    await waitFor(() => expect(globalThis.fetch.mock.calls.some(([, options]) => options?.method === 'POST')).toBe(true))
+    const request = globalThis.fetch.mock.calls.find(([, options]) => options?.method === 'POST')
+    expect(JSON.parse(request[1].body)).toMatchObject({ action: 'generate_visual_draft', regenerate: true, format_id: 'instagram-feed-portrait' })
+  })
+
   it('shows the saved Story for its preset without offering shared-feed approval', async () => {
     localStorage.setItem('cws-evergreen-image-format', 'instagram-story')
     render(<MarketingPage />)

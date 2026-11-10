@@ -13,7 +13,7 @@ Task: CWS-EVERGREEN-FORMATS-20261109.
 | Instagram / Facebook | Reel cover, static image | 1080 × 1920 |
 | LinkedIn | Square feed | 1200 × 1200 |
 | LinkedIn | Portrait feed | 1080 × 1350 |
-| LinkedIn | Landscape feed | 1200 × 628 |
+| LinkedIn | Landscape feed | 1200 × 624 |
 
 Every preset exports sRGB JPEG with a conservative 5,000,000-byte cap. These are
 application export presets, not a promise that a platform will accept every post.
@@ -35,7 +35,7 @@ shared feed library. It uses the Responses API and existing server configuration
   binds replays/retries to that selection, stores checked JPEG bytes and metadata,
   and refuses non-shared-feed or unvalidated JPEG library approval.
 - `server/marketing/image-output.js`: bounded raster decode, EXIF orientation,
-  transparency flattening, sRGB conversion, contain resizing and white padding.
+  transparency flattening, sRGB conversion and proportional resizing. Wrong-ratio output is rejected; no padding is added.
   No crop or stretch. Compliant JPEG bytes are retained unchanged. Compression
   tries quality 92, 85, 75, then 65; output that still exceeds the cap fails closed.
 - `api/marketing-linkedin.js`: existing generated-media reader accepts PNG/JPEG and
@@ -43,14 +43,24 @@ shared feed library. It uses the Responses API and existing server configuration
 - `src/types/supabase.ts`: new format and validation fields reflected in types.
 - `package.json` / lockfile: pinned server-side `sharp` 0.35.5. No new paid service.
 
-The existing mainline model setting is preserved. Story and Reel cover presets explicitly
-select the `gpt-image-2` image tool at 1152x2048 (native 9:16, both edges multiples
-of 16), then proportionally downsize to 1080x1920. Their validation rejects a
-mismatched ratio instead of adding padding. Prompts request scene detail to all
-edges, preserving the full subject without borders or inset images. Feed presets
-retain their existing supported sizes and contain behavior.
+The existing mainline model setting is preserved; every preset explicitly selects
+`gpt-image-2` for native-ratio image generation. Model sizes are 1152x1152 for
+Instagram/Facebook squares, 1200x1200 for LinkedIn square, 1152x1440 for 4:5
+portrait feeds, 1152x2048 for 9:16 Story/Reel covers, and 1600x832 for LinkedIn
+landscape. Export is proportional, with no upscaling, padding, cropping or stretching.
 
-An unapproved padded Story/Reel draft offers **Remake without borders**. Its private
+LinkedIn landscape exports at 1200x624 (25:13), four pixels shorter than the
+original 1200x628 preset. Exact 300:157 generation would require 4800x2512 to
+meet the image model's 16-pixel edge increments, exceeding its 3840 maximum edge.
+The new ratio is within LinkedIn's documented 3:1 to 4:5 photo range and keeps the
+existing landscape download-only restriction. UI dimensions and prompts use the
+actual export ratio. Existing saved files are not silently resized.
+
+Validation rejects mismatched output. Prompts request natural scene detail at every
+edge while preserving complete subjects. Automated tests cover generation requests
+and real image normalization for all 11 presets.
+
+An unapproved padded or legacy unvalidated draft in any format offers **Remake without borders**. Its private
 image is passed as a short-lived reference, asking the model to retain subject,
 pose, lighting and composition while extending the scene. A fresh storage object
 preserves the old file; failure restores the original ready draft. Approved assets

@@ -9,7 +9,7 @@ const makeImage = (width, height) => sharp({ create: { width, height, channels: 
 
 describe('social image exports', () => {
   it.each(IMAGE_FORMATS)('validates actual bytes for $id', async preset => {
-    const source = await makeImage(...(preset.fullFrame ? [144, 256] : [120, 150]))
+    const source = await makeImage(...preset.modelSize.split('x').map(Number))
     const result = await normalizeImageOutput(source.toString('base64'), preset)
     const actual = await sharp(result.bytes).metadata()
     expect(actual).toMatchObject({ width: preset.width, height: preset.height, format: 'jpeg', space: 'srgb' })
@@ -18,17 +18,19 @@ describe('social image exports', () => {
     expect(result.validation.cropped).toBe(false)
   })
 
-  it('pads a mismatched ratio instead of cropping or stretching the subject', async () => {
-    const preset = getImageFormat('instagram-feed-portrait')
-    const { bytes, validation } = await normalizeImageOutput((await makeImage(100, 100)).toString('base64'), preset)
-    expect(validation.padded).toBe(true)
-    const { data, info } = await sharp(bytes).raw().toBuffer({ resolveWithObject: true })
-    const pixel = (x, y) => [...data.subarray((y * info.width + x) * info.channels, (y * info.width + x) * info.channels + 3)]
-    expect(pixel(540, 100)).toEqual([255, 255, 255])
-    expect(pixel(540, 675)[0]).toBeGreaterThan(250)
-    expect(pixel(540, 675)[1]).toBeLessThan(5)
-    expect(pixel(540, 100)).toEqual([255, 255, 255])
-    expect(pixel(540, 200)[1]).toBeLessThan(5)
+  it.each(IMAGE_FORMATS)('rejects wrong-ratio output instead of padding $id', async preset => {
+    await expect(normalizeImageOutput((await makeImage(100, 110)).toString('base64'), preset)).rejects.toThrow(/wrong aspect ratio/)
+  })
+
+  it.each(IMAGE_FORMATS)('requests an exact supported native ratio for $id', preset => {
+    const [width, height] = preset.modelSize.split('x').map(Number)
+    expect(width * preset.height).toBe(height * preset.width)
+    expect(width % 16).toBe(0)
+    expect(height % 16).toBe(0)
+    expect(Math.max(width, height)).toBeLessThanOrEqual(3840)
+    expect(width * height).toBeGreaterThanOrEqual(655360)
+    expect(width * height).toBeLessThanOrEqual(8294400)
+    expect(preset.imageModel).toBe('gpt-image-2')
   })
 
   it('rejects mismatched Story output instead of adding borders and preserves edge content for 9:16', async () => {

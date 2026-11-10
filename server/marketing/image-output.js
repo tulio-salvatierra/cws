@@ -4,8 +4,7 @@ import { Buffer } from 'node:buffer'
 const MAX_INPUT_BYTES = 10 * 1024 * 1024
 const decoderOptions = { limitInputPixels: 40_000_000, failOn: 'warning' }
 
-// Never crop or stretch: preserve the entire composition, padding in white only
-// when the model's actual ratio differs from the requested export canvas.
+// Preserve the entire composition: only resize matching ratios, never pad, crop or stretch.
 export async function normalizeImageOutput(base64, preset) {
   if (typeof base64 !== 'string' || base64.length > Math.ceil(MAX_INPUT_BYTES / 3) * 4 || !/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) throw new Error('Generated image data is invalid or too large.')
   const source = Buffer.from(base64, 'base64')
@@ -16,7 +15,7 @@ export async function normalizeImageOutput(base64, preset) {
   const width = rotated ? metadata.height : metadata.width
   const height = rotated ? metadata.width : metadata.height
   const padded = width * preset.height !== height * preset.width
-  if (preset.fullFrame && padded) throw new Error('The model returned the wrong aspect ratio. Retry to generate a full-frame 9:16 image without cropping or borders.')
+  if (padded) throw new Error(`The model returned the wrong aspect ratio. Retry to generate a full-frame ${preset.ratio} image without cropping or borders.`)
   // Preserve compliant JPEG bytes, avoiding an unnecessary lossy re-encode.
   if (metadata.format === 'jpeg' && !metadata.orientation && metadata.space === 'srgb' && width === preset.width && height === preset.height && source.length <= preset.maxBytes) {
     return { bytes: source, validation: result(source.length, false, false) }

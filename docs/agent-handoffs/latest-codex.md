@@ -18,4 +18,6 @@ Reusable learnings added: None.
 Memory updates withheld: None; migration/deployment/live verification complete.
 Git diff summary: Isolated current-main checkout at 277b1c3, branch codex/evergreen-image-formats; no pre-existing edits; PR #85 merged as 484006a; production dpl_GHbfn7fLBb6EDFLWdaNo6RXLXSiU READY. Original older CWS checkout remains untouched.
 
-Follow-up CWS-STORY-FULL-FRAME-20261110: native 9:16 image tool output and composition-reference remakes implemented; 954 tests, lint and full build passed; release/live verification in progress. No migration required or publishing authorized.
+Follow-up CWS-STORY-FULL-FRAME-20261110: native 9:16 image tool output and composition-reference remakes implemented; 954 tests, lint and full build passed; PR #90 merged, production READY, reference-based live remake verified at 1080x1920 JPEG with no padding/cropping. Original retained; nothing approved or published. No migration required or publishing authorized.
+
+Current follow-up CWS-FEED-FULL-FRAME-20261110: all presets now request exact model aspect ratios, reject mismatches and allow reference-based legacy/padded draft remake. LinkedIn landscape export 1200x624. Automated validation/release/live private feed check in progress; no migration or publishing.

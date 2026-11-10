@@ -6,6 +6,7 @@ const { createClientMock } = vi.hoisted(() => ({ createClientMock: vi.fn() }))
 vi.mock('@supabase/supabase-js', () => ({ createClient: createClientMock }))
 
 import handler from '../marketing-creative.js'
+import { IMAGE_FORMATS, getImageFormat } from '../../src/marketing/imageFormats.js'
 
 const requestId = '11111111-1111-4111-8111-111111111111'
 
@@ -140,46 +141,63 @@ describe('format-aware generation and approval', () => {
     expect(globalThis.fetch).not.toHaveBeenCalled()
   })
 
-  it('passes a supported size and destination brief, then stores validated JPEG bytes', async () => {
+  it.each(IMAGE_FORMATS)('passes native size and stores borderless JPEG for $id', async preset => {
     const { default: sharp } = await import('sharp')
-    const generated = await sharp({ create: { width: 144, height: 256, channels: 3, background: '#336699' } }).png().toBuffer()
-    const asset = { id: requestId, workspace_id: 'workspace-1', format_id: 'instagram-story', storage_bucket: 'marketing-creative', storage_object_path: `generated/${requestId}/${requestId}.jpg`, status: 'ready' }
+    const [width, height] = preset.modelSize.split('x').map(Number)
+    const generated = await sharp({ create: { width, height, channels: 3, background: '#336699' } }).png().toBuffer()
+    const asset = { id: requestId, workspace_id: 'workspace-1', format_id: preset.id, storage_bucket: 'marketing-creative', storage_object_path: `generated/${requestId}/${requestId}.jpg`, status: 'ready' }
     const { client, calls, storage } = scriptedClient({ agent_runs: [ideaRun, null, { id: requestId }, { id: requestId }, { id: requestId }], offers: [{ id: requestId }], marketing_creative_assets: [asset, asset] })
     createClientMock.mockReturnValue(client)
     globalThis.fetch.mockResolvedValue({ ok: true, json: async () => ({ id: 'response-1', output: [{ type: 'image_generation_call', result: generated.toString('base64') }] }) })
     const res = response()
-    await handler(post({ action: 'generate_visual_draft', idea_run_id: requestId, idea_id: 'idea-1', request_key: requestId, format_id: 'instagram-story' }), res)
+    await handler(post({ action: 'generate_visual_draft', idea_run_id: requestId, idea_id: 'idea-1', request_key: requestId, format_id: preset.id }), res)
     expect(res.statusCode).toBe(201)
     const request = JSON.parse(globalThis.fetch.mock.calls[0][1].body)
-    expect(request.tools[0]).toMatchObject({ type: 'image_generation', model: 'gpt-image-2', size: '1152x2048', output_format: 'jpeg' })
-    expect(JSON.parse(request.input).format).toMatchObject({ aspect_ratio: '9:16', export_width: 1080, export_height: 1920, intended_use: 'Instagram Story' })
+    expect(request.tools[0]).toMatchObject({ type: 'image_generation', model: 'gpt-image-2', size: preset.modelSize, output_format: 'jpeg' })
+    expect(JSON.parse(request.input).format).toMatchObject({ aspect_ratio: preset.ratio, export_width: preset.width, export_height: preset.height, intended_use: `${preset.platform} ${preset.label}` })
     expect(request.store).toBe(false)
     const [path, bytes, options] = storage.upload.mock.calls[0]
     expect(path).toMatch(/\.jpg$/)
     expect(options).toEqual({ contentType: 'image/jpeg', upsert: false })
-    expect(await sharp(bytes).metadata()).toMatchObject({ width: 1080, height: 1920, format: 'jpeg' })
-    expect(calls.find(c => c.values?.status === 'ready').values.image_validation).toMatchObject({ format_id: 'instagram-story', padded: false, cropped: false })
+    expect(await sharp(bytes).metadata()).toMatchObject({ width: preset.width, height: preset.height, format: 'jpeg' })
+    expect(calls.find(c => c.values?.status === 'ready').values.image_validation).toMatchObject({ format_id: preset.id, padded: false, cropped: false })
     expect(calls.some(c => c.table === 'offer_media')).toBe(false)
   })
 
 
-  it('remakes a padded ready Story using its private image reference, retaining the original object', async () => {
+  it.each(['instagram-story', 'instagram-feed-portrait', 'facebook-feed-square', 'linkedin-feed-landscape'])('remakes padded or legacy %s using its private reference', async formatId => {
     const { default: sharp } = await import('sharp')
-    const generated = await sharp({ create: { width: 144, height: 256, channels: 3, background: '#336699' } }).jpeg().toBuffer()
-    const original = { id: requestId, asset_run_id: 'old-run', format_id: 'instagram-story', storage_bucket: 'marketing-creative', storage_object_path: 'generated/original.jpg', status: 'ready', image_validation: { padded: true } }
+    const preset = getImageFormat(formatId)
+    const [width, height] = preset.modelSize.split('x').map(Number)
+    const generated = await sharp({ create: { width, height, channels: 3, background: '#336699' } }).jpeg().toBuffer()
+    const original = { id: requestId, asset_run_id: 'old-run', format_id: formatId, storage_bucket: 'marketing-creative', storage_object_path: 'generated/original.jpg', status: 'ready', image_validation: formatId === 'instagram-story' ? { padded: true } : null }
     const replacement = { ...original, asset_run_id: requestId, storage_object_path: 'generated/replacement.jpg' }
     const { client, calls, storage } = scriptedClient({ agent_runs: [ideaRun, null, { id: requestId }, { id: requestId }, { id: requestId }], offers: [{ id: requestId }], marketing_creative_assets: [{ error: { code: '23505' } }, original, replacement, replacement] })
     createClientMock.mockReturnValue(client)
     globalThis.fetch.mockResolvedValue({ ok: true, json: async () => ({ output: [{ type: 'image_generation_call', result: generated.toString('base64') }] }) })
     const res = response()
-    await handler(post({ action: 'generate_visual_draft', idea_run_id: requestId, idea_id: 'idea-1', request_key: requestId, format_id: 'instagram-story', regenerate: true }), res)
+    await handler(post({ action: 'generate_visual_draft', idea_run_id: requestId, idea_id: 'idea-1', request_key: requestId, format_id: formatId, regenerate: true }), res)
     expect(res.statusCode).toBe(201)
     const request = JSON.parse(globalThis.fetch.mock.calls[0][1].body)
     expect(request.input[0].content[1]).toEqual({ type: 'input_image', image_url: 'https://private.example.test/image.jpg' })
     expect(request.input[0].content[0].text).toMatch(/Preserve the subject, pose/)
+    expect(request.input[0].content[0].text).toContain(`full-frame ${preset.ratio} scene`)
     expect(storage.createSignedUrl).toHaveBeenCalledWith(original.storage_object_path, 300)
     expect(storage.upload.mock.calls[0][0]).toBe(replacement.storage_object_path)
     expect(calls.find(c => c.values?.status === 'needs_review').values.output.source_storage_object_path).toBe(original.storage_object_path)
+  })
+
+  it('does not remake an approved feed asset', async () => {
+    const original = { id: requestId, status: 'approved', format_id: 'instagram-feed-portrait', storage_object_path: 'generated/original.png', approved_media_id: requestId }
+    const { client, storage, calls } = scriptedClient({ agent_runs: [ideaRun, null, { id: requestId }, { id: requestId }], offers: [{ id: requestId }], marketing_creative_assets: [{ error: { code: '23505' } }, original] })
+    createClientMock.mockReturnValue(client)
+    const res = response()
+    await handler(post({ action: 'generate_visual_draft', idea_run_id: requestId, idea_id: 'idea-1', request_key: requestId, format_id: original.format_id, regenerate: true }), res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.replayed).toBe(true)
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    expect(storage.upload).not.toHaveBeenCalled()
+    expect(calls.some(c => c.table === 'marketing_creative_assets' && c.operation === 'update')).toBe(false)
   })
 
   it('restores the original padded draft when a remake fails', async () => {
