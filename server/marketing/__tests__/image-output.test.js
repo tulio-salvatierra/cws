@@ -9,7 +9,7 @@ const makeImage = (width, height) => sharp({ create: { width, height, channels: 
 
 describe('social image exports', () => {
   it.each(IMAGE_FORMATS)('validates actual bytes for $id', async preset => {
-    const source = await makeImage(120, 150)
+    const source = await makeImage(...(preset.fullFrame ? [144, 256] : [120, 150]))
     const result = await normalizeImageOutput(source.toString('base64'), preset)
     const actual = await sharp(result.bytes).metadata()
     expect(actual).toMatchObject({ width: preset.width, height: preset.height, format: 'jpeg', space: 'srgb' })
@@ -19,16 +19,26 @@ describe('social image exports', () => {
   })
 
   it('pads a mismatched ratio instead of cropping or stretching the subject', async () => {
-    const preset = getImageFormat('instagram-story')
+    const preset = getImageFormat('instagram-feed-portrait')
     const { bytes, validation } = await normalizeImageOutput((await makeImage(100, 100)).toString('base64'), preset)
     expect(validation.padded).toBe(true)
     const { data, info } = await sharp(bytes).raw().toBuffer({ resolveWithObject: true })
     const pixel = (x, y) => [...data.subarray((y * info.width + x) * info.channels, (y * info.width + x) * info.channels + 3)]
     expect(pixel(540, 100)).toEqual([255, 255, 255])
-    expect(pixel(540, 960)[0]).toBeGreaterThan(250)
-    expect(pixel(540, 960)[1]).toBeLessThan(5)
-    expect(pixel(540, 400)).toEqual([255, 255, 255])
-    expect(pixel(540, 430)[1]).toBeLessThan(5)
+    expect(pixel(540, 675)[0]).toBeGreaterThan(250)
+    expect(pixel(540, 675)[1]).toBeLessThan(5)
+    expect(pixel(540, 100)).toEqual([255, 255, 255])
+    expect(pixel(540, 200)[1]).toBeLessThan(5)
+  })
+
+  it('rejects mismatched Story output instead of adding borders and preserves edge content for 9:16', async () => {
+    const preset = getImageFormat('instagram-story')
+    await expect(normalizeImageOutput((await makeImage(100, 150)).toString('base64'), preset)).rejects.toThrow(/wrong aspect ratio/)
+    const result = await normalizeImageOutput((await makeImage(144, 256)).toString('base64'), preset)
+    expect(result.validation).toMatchObject({ width: 1080, height: 1920, padded: false, cropped: false })
+    const pixel = await sharp(result.bytes).extract({ left: 0, top: 0, width: 1, height: 1 }).raw().toBuffer()
+    expect(pixel[0]).toBeGreaterThan(250)
+    expect(pixel[1]).toBeLessThan(5)
   })
 
   it('preserves an already compliant JPEG byte for byte', async () => {

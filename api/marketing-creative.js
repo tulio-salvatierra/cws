@@ -167,7 +167,7 @@ async function generateVisualDraft(res, client, context, body) {
     return databaseFailure(res, queued.error)
   }
 
-  const reserved = await reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId: queued.data.id, formatId: preset.id })
+  const reserved = await reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId: queued.data.id, formatId: preset.id, regenerate: body.regenerate === true })
   if (reserved.error) {
     await updateRun(client, queued.data.id, { status: 'superseded' })
     return databaseFailure(res, reserved.error)
@@ -181,7 +181,13 @@ async function generateVisualDraft(res, client, context, body) {
   if (running.error) return databaseFailure(res, running.error)
 
   try {
-    const generated = await requestImage({ offer: offer.data, idea, preset, userId: context.userId })
+    let referenceUrl
+    if (reserved.previous) {
+      const signed = await client.storage.from(reserved.previous.storage_bucket).createSignedUrl(reserved.previous.storage_object_path, 300)
+      if (signed.error || !signed.data?.signedUrl) throw new Error('The existing draft could not be loaded as a composition reference.')
+      referenceUrl = signed.data.signedUrl
+    }
+    const generated = await requestImage({ offer: offer.data, idea, preset, userId: context.userId, referenceUrl })
     const { bytes, validation } = await normalizeImageOutput(generated.base64, preset)
     const uploaded = await client.storage.from(CREATIVE_IMAGE_BUCKET).upload(reserved.data.storage_object_path, bytes, {
       contentType: 'image/jpeg',
@@ -194,14 +200,17 @@ async function generateVisualDraft(res, client, context, body) {
     if (ready.error) throw new Error('The validated image could not be saved. Retry the draft.')
     const reviewed = await updateRun(client, queued.data.id, {
       status: 'needs_review',
-      output: { creative_asset_id: ready.data.id, format_id: preset.id, image_validation: validation, model: generated.model, response_id: generated.responseId, generated_at: new Date().toISOString() },
+      output: { creative_asset_id: ready.data.id, format_id: preset.id, image_validation: validation, source_storage_object_path: reserved.previous?.storage_object_path || null, image_model: preset.imageModel || null, model: generated.model, response_id: generated.responseId, generated_at: new Date().toISOString() },
       error_message: null,
     })
     if (reviewed.error) return databaseFailure(res, reviewed.error)
     return res.status(201).json({ ok: true, creative_asset: await serializeCreativeAsset(client, ready.data) })
   } catch (error) {
     const message = safeErrorMessage(error)
-    await client.from('marketing_creative_assets').update({ status: 'failed', failure_message: message })
+    await client.from('marketing_creative_assets').update(reserved.previous ? {
+      status: 'ready', failure_message: null, asset_run_id: reserved.previous.asset_run_id,
+      storage_object_path: reserved.previous.storage_object_path, image_validation: reserved.previous.image_validation,
+    } : { status: 'failed', failure_message: message })
       .eq('id', reserved.data.id).eq('workspace_id', context.workspaceId)
     const failed = await updateRun(client, queued.data.id, { status: 'failed', output: null, error_message: message })
     if (failed.error) return databaseFailure(res, failed.error)
@@ -273,7 +282,7 @@ async function approveVisualDraft(res, client, context, body) {
   }
 }
 
-async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId, formatId }) {
+async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaId, assetRunId, formatId, regenerate }) {
   const id = randomUUID()
   const inserted = await client.from('marketing_creative_assets').insert({
     id,
@@ -298,7 +307,8 @@ async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaI
   // A failed agent run remains the durable audit record. A later explicit
   // owner retry reuses this one candidate asset, but receives a fresh private
   // object path so a partial upload can never collide with the retry.
-  if (existing.data.status === 'failed') {
+  const remaking = regenerate && getImageFormat(formatId)?.fullFrame && existing.data.status === 'ready' && existing.data.image_validation?.padded === true && !existing.data.approved_media_id && !existing.data.approved_caption_id
+  if (existing.data.status === 'failed' || remaking) {
     const nextObjectId = randomUUID()
     const retried = await client.from('marketing_creative_assets').update({
       asset_run_id: assetRunId,
@@ -307,9 +317,9 @@ async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaI
       storage_object_path: `generated/${context.workspaceId}/${nextObjectId}.jpg`,
       status: 'generating',
       failure_message: null,
-    }).eq('id', existing.data.id).eq('workspace_id', context.workspaceId).eq('status', 'failed').select('*').maybeSingle()
+    }).eq('id', existing.data.id).eq('workspace_id', context.workspaceId).eq('status', existing.data.status).eq('asset_run_id', existing.data.asset_run_id).select('*').maybeSingle()
     if (retried.error) return { data: null, error: retried.error, replayed: false }
-    if (retried.data) return { data: retried.data, error: null, replayed: false }
+    if (retried.data) return { data: retried.data, previous: remaking ? existing.data : null, error: null, replayed: false }
   }
   return { data: existing.data, error: null, replayed: true }
 }
@@ -332,13 +342,16 @@ async function requestStoryIdeas({ offer, userId }) {
   return { ...output, model: response.payload.model || model, response_id: response.payload.id || null }
 }
 
-async function requestImage({ offer, idea, preset, userId }) {
+async function requestImage({ offer, idea, preset, userId, referenceUrl }) {
   const model = process.env.OPENAI_MARKETING_IMAGE_MODEL || DEFAULT_IMAGE_MODEL
   const response = await openAiRequest({
     model,
     instructions: buildImageInstructions(preset),
-    input: imagePrompt({ offer, idea, preset }),
-    tools: [{ type: 'image_generation', size: preset.modelSize, quality: 'medium', output_format: 'jpeg' }],
+    input: referenceUrl ? [{ role: 'user', content: [
+      { type: 'input_text', text: imagePrompt({ offer, idea, preset }) + '\nEdit the reference into a full-frame 9:16 scene. Preserve the subject, pose, lighting, setting and relative composition. Replace only blank borders with a natural continuation of the scene; do not crop or stretch the subject.' },
+      { type: 'input_image', image_url: referenceUrl },
+    ] }] : imagePrompt({ offer, idea, preset }),
+    tools: [{ type: 'image_generation', ...(preset.imageModel ? { model: preset.imageModel } : {}), size: preset.modelSize, quality: 'medium', output_format: 'jpeg' }],
     safety_identifier: safetyIdentifier(userId),
   })
   const base64 = extractImageBase64(response.payload)

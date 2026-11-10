@@ -43,18 +43,19 @@ shared feed library. It uses the Responses API and existing server configuration
 - `src/types/supabase.ts`: new format and validation fields reflected in types.
 - `package.json` / lockfile: pinned server-side `sharp` 0.35.5. No new paid service.
 
-The existing mainline model setting is preserved. Because it does not identify the
-underlying image tool's resolution capabilities, requests use the conservative
-supported sizes 1024x1024, 1024x1536 and 1536x1024. The desired destination ratio
-is also supplied before generation. Thus a 9:16 export may need padding from a
-2:3 model image. This deliberately does not assume that arbitrary pixel sizes are
-supported by every configured model; exact custom-ratio generation would require
-verifying and explicitly configuring the underlying image model.
+The existing mainline model setting is preserved. Story and Reel cover presets explicitly
+select the `gpt-image-2` image tool at 1152x2048 (native 9:16, both edges multiples
+of 16), then proportionally downsize to 1080x1920. Their validation rejects a
+mismatched ratio instead of adding padding. Prompts request scene detail to all
+edges, preserving the full subject without borders or inset images. Feed presets
+retain their existing supported sizes and contain behavior.
 
-Story and Reel-cover drafts remain private and downloadable. LinkedIn's
-1200x628 landscape also remains download-only because its ratio slightly exceeds
-the conservative 1.91 shared-feed ceiling. Square/portrait feeds can use the
-existing owner approval flow. This does not add Story/Reel publishing.
+An unapproved padded Story/Reel draft offers **Remake without borders**. Its private
+image is passed as a short-lived reference, asking the model to retain subject,
+pose, lighting and composition while extending the scene. A fresh storage object
+preserves the old file; failure restores the original ready draft. Approved assets
+cannot be remade. The preview uses the image's own aspect ratio without a white
+surround. AI editing can vary details; the result remains an owner-review draft.
 
 ## Migration and release dependency
 
@@ -87,8 +88,7 @@ must match the actual applied version, per repository conventions. The owner sub
   are outside this change.
 - Existing build bundle-size warning remains.
 
-Live authenticated generation/storage verification and the production migration
-are outstanding release checks. Tests exercise actual image decoding/resizing
+The initial production migration and live padded Story generation were verified November 9–10. Full-frame follow-up verification is tracked in the task ledger. Tests exercise actual image decoding/resizing
 with synthetic raster fixtures and mocked network/storage; none spend API credits
 or submit content. Old library images are not retroactively resized.
 

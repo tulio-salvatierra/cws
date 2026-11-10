@@ -2,8 +2,8 @@
 const formats = {
   'feed-square': { label: 'Feed · Square', width: 1080, height: 1080, ratio: '1:1', modelSize: '1024x1024', placement: 'feed' },
   'feed-portrait': { label: 'Feed · Portrait', width: 1080, height: 1350, ratio: '4:5', modelSize: '1024x1536', placement: 'feed' },
-  story: { label: 'Story', width: 1080, height: 1920, ratio: '9:16', modelSize: '1024x1536', placement: 'story' },
-  'reel-cover': { label: 'Reel cover (image only)', width: 1080, height: 1920, ratio: '9:16', modelSize: '1024x1536', placement: 'reel-cover' },
+  story: { label: 'Story', width: 1080, height: 1920, ratio: '9:16', modelSize: '1152x2048', imageModel: 'gpt-image-2', fullFrame: true, placement: 'story' },
+  'reel-cover': { label: 'Reel cover (image only)', width: 1080, height: 1920, ratio: '9:16', modelSize: '1152x2048', imageModel: 'gpt-image-2', fullFrame: true, placement: 'reel-cover' },
 }
 export const IMAGE_PLATFORMS = ['Instagram', 'Facebook', 'LinkedIn']
 export const IMAGE_FORMATS = IMAGE_PLATFORMS.flatMap(platform => {
