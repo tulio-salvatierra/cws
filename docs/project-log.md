@@ -231,3 +231,10 @@ Authenticated production UI generated one Instagram Story from an existing idea.
 ## 2026-11-10 — CWS-STORY-FULL-FRAME-20261110 borderless Story generation
 
 Owner requested native Story aspect ratio without white borders and with composition preserved. Story/Reel presets explicitly select gpt-image-2 at 1152x2048 and export proportionally to 1080x1920. Wrong-ratio output fails rather than padding. Added reference-image remake for unapproved padded tall drafts, fresh object path, original restoration on failure, and natural-aspect preview without white surround. No schema change or publication action. 954 tests, lint and full production build/prerender passed. Live remake follows deployment.
+
+Release verified: PR #90 merged as f7d9bce; production dpl_5Geb1sh1Nd1x1Wn7rTYwaxmR4NDX READY. Live reference-based Story remake generated 1152x2048, exported 1080x1920 JPEG (505977 bytes), padded false/cropped false. Private storage and original object retained, ready/needs_review, null approval references. Preview visually verified without borders and with subject/composition retained. Published posts 59, publish attempts 21 and approved assets 1 unchanged. No blocker.
+
+
+## 2026-11-10 — CWS-FEED-FULL-FRAME-20261110 all feed ratios
+
+Extended explicit gpt-image-2 native-ratio generation to square/portrait feeds across Instagram, Facebook and LinkedIn, plus LinkedIn landscape. Exact-ratio exports reject mismatched output rather than padding. Landscape uses 1200x624 (25:13), within LinkedIn photo limits and exactly generatable at 1600x832; prior 1200x628 cannot meet the model edge grid within its maximum edge. Legacy/unvalidated and padded unapproved drafts can be remade with their original image as a reference. Approved assets remain protected. 990 tests, lint and full build pass. Release/live private check in progress. No migration or publishing.

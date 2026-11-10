@@ -307,7 +307,7 @@ async function reserveCreativeAsset(client, context, { offerId, ideaRunId, ideaI
   // A failed agent run remains the durable audit record. A later explicit
   // owner retry reuses this one candidate asset, but receives a fresh private
   // object path so a partial upload can never collide with the retry.
-  const remaking = regenerate && getImageFormat(formatId)?.fullFrame && existing.data.status === 'ready' && existing.data.image_validation?.padded === true && !existing.data.approved_media_id && !existing.data.approved_caption_id
+  const remaking = regenerate && getImageFormat(formatId)?.fullFrame && existing.data.status === 'ready' && (!existing.data.image_validation || existing.data.image_validation.padded === true) && !existing.data.approved_media_id && !existing.data.approved_caption_id
   if (existing.data.status === 'failed' || remaking) {
     const nextObjectId = randomUUID()
     const retried = await client.from('marketing_creative_assets').update({
@@ -348,7 +348,7 @@ async function requestImage({ offer, idea, preset, userId, referenceUrl }) {
     model,
     instructions: buildImageInstructions(preset),
     input: referenceUrl ? [{ role: 'user', content: [
-      { type: 'input_text', text: imagePrompt({ offer, idea, preset }) + '\nEdit the reference into a full-frame 9:16 scene. Preserve the subject, pose, lighting, setting and relative composition. Replace only blank borders with a natural continuation of the scene; do not crop or stretch the subject.' },
+      { type: 'input_text', text: imagePrompt({ offer, idea, preset }) + `\nEdit the reference into a full-frame ${preset.ratio} scene. Preserve the subject, pose, lighting, setting and relative composition. Replace only blank borders with a natural continuation of the scene; do not crop or stretch the subject.` },
       { type: 'input_image', image_url: referenceUrl },
     ] }] : imagePrompt({ offer, idea, preset }),
     tools: [{ type: 'image_generation', ...(preset.imageModel ? { model: preset.imageModel } : {}), size: preset.modelSize, quality: 'medium', output_format: 'jpeg' }],
