@@ -9,11 +9,13 @@ Decisions made: Conservative supported generation sizes with destination composi
 Assumptions: Shared scheduler still publishes feed images only; 1200x628 LinkedIn landscape is download-only due to shared-feed ratio ceiling.
 Tests added: 28 processor, handler and UI cases; original prompt expectations updated.
 Tests run: 949 tests / 97 files pass; lint pass; full placeholder-env build and public prerender pass; isolated PostgreSQL migration checks pass; git diff --check pass.
-Known issues: Production migration verified; live authenticated generation and production verification unperformed. Conservative generation sizes may require padding. Existing 40 dependency advisories unchanged; existing bundle warning.
-Recommended next task: Review/apply exact-version migration before deployment, then perform one owner-triggered live generation/storage check without publishing.
+Known issues: Production migration, PR #85 merge and READY production deployment verified. Live authenticated Instagram Story generation/storage verified November 10: exact 1080x1920 JPEG, 430901 bytes, private storage, padded without cropping; ready/needs_review with no approval references. Conservative generation sizes may require padding. Existing 40 dependency advisories unchanged; existing bundle warning.
+Recommended next task: None for this release; private draft awaits owner review. No approval or publishing performed.
 Questions requiring Tulio: None for local implementation.
 Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: Release completion until migration/deployment/live verification.
-Git diff summary: Isolated current-main checkout at 277b1c3, branch codex/evergreen-image-formats; no pre-existing edits; release authorized; commit/merge pending. Original older CWS checkout remains untouched.
+Memory updates withheld: None; migration/deployment/live verification complete.
+Git diff summary: Isolated current-main checkout at 277b1c3, branch codex/evergreen-image-formats; no pre-existing edits; PR #85 merged as 484006a; production dpl_GHbfn7fLBb6EDFLWdaNo6RXLXSiU READY. Original older CWS checkout remains untouched.
+
+Follow-up CWS-STORY-FULL-FRAME-20261110: native 9:16 image tool output and composition-reference remakes implemented; 954 tests, lint and full build passed; release/live verification in progress. No migration required or publishing authorized.

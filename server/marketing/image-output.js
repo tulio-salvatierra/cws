@@ -16,6 +16,7 @@ export async function normalizeImageOutput(base64, preset) {
   const width = rotated ? metadata.height : metadata.width
   const height = rotated ? metadata.width : metadata.height
   const padded = width * preset.height !== height * preset.width
+  if (preset.fullFrame && padded) throw new Error('The model returned the wrong aspect ratio. Retry to generate a full-frame 9:16 image without cropping or borders.')
   // Preserve compliant JPEG bytes, avoiding an unnecessary lossy re-encode.
   if (metadata.format === 'jpeg' && !metadata.orientation && metadata.space === 'srgb' && width === preset.width && height === preset.height && source.length <= preset.maxBytes) {
     return { bytes: source, validation: result(source.length, false, false) }
