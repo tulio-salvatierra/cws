@@ -259,3 +259,8 @@ Implemented the owner-approved contact layout using shared site styles/component
 1001 tests across 98 files, lint, and full production build/public prerender pass with placeholder client environment. Local PostgreSQL migration check verifies valid insert, constraints and preserved RLS. No live lead insertion, email, production migration, commit, push, merge or deployment. Fresh isolated checkout based on a1afa67; original CWS checkout and its unrelated image edits untouched. Review branch: feat/contact-page-lead-capture.
 
 Owner follow-up authorized committing and pushing the review branch and opening a PR. Merge and migration application remain explicitly prohibited.
+
+
+## 2026-11-12 — CWS-CONTACT-20261112 PR #94 review
+
+Reviewed capture validation, ownership, duplicate handling, Sales detail projection, form state handling, Trustindex isolation, migration boundaries and CI. Initial tests/build/security/Vercel checks passed; Supabase Preview was skipped. Fixed long Unicode project messages being placed in PostgREST lookup URLs: candidate reads are now workspace/email/source scoped and capped at 20, with exact message/payload comparison on the server. Added long-message, distinct-inquiry and failed-lookup regressions. 1,013 tests across 98 files and lint pass locally. No migration application or merge; final remote checks pending for the fix commit.

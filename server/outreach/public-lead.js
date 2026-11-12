@@ -94,17 +94,28 @@ export default async function handler(req, res) {
 
   // The popup and the inline form can both be sent by one visitor: merge into the recent row.
   const since = new Date(Date.now() - DUPLICATE_WINDOW_MS).toISOString()
-  let recentQuery = client.from('leads').select('id, email, company').eq('workspace_id', owner.data.workspace_id)
+  let recent
   if (isContact) {
-    // Only identical contact inquiries are retries. Never overwrite another inquiry or a Sales record.
-    recentQuery = recentQuery.eq('email', lead.email).eq('source', values.source)
-      .eq('name', lead.name).eq('inquiry_service', lead.service).eq('inquiry_message', lead.message)
-    recentQuery = lead.phone ? recentQuery.eq('phone', lead.phone) : recentQuery.is('phone', null)
-    recentQuery = lead.company ? recentQuery.eq('company', lead.company) : recentQuery.is('company', null)
+    // Keep free-text inquiry content out of PostgREST's GET URL. A 4,000-character
+    // message can exceed proxy URL limits once percent-encoded. Read a bounded
+    // set for this workspace/email/source, then compare exact payloads locally.
+    const candidates = await client.from('leads')
+      .select('id, name, phone, company, inquiry_service, inquiry_message')
+      .eq('workspace_id', owner.data.workspace_id)
+      .eq('email', lead.email).eq('source', values.source)
+      .gte('created_at', since).order('created_at', { ascending: false }).limit(20)
+    recent = {
+      error: candidates.error,
+      data: candidates.data?.find((row) => row.name === values.name
+        && row.phone === values.phone && row.company === values.company
+        && row.inquiry_service === lead.service && row.inquiry_message === lead.message),
+    }
   } else {
-    recentQuery = recentQuery.eq('phone', lead.phone).is('inquiry_message', null)
+    recent = await client.from('leads').select('id, email, company')
+      .eq('workspace_id', owner.data.workspace_id).eq('phone', lead.phone)
+      .is('inquiry_message', null).gte('created_at', since)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle()
   }
-  const recent = await recentQuery.gte('created_at', since).order('created_at', { ascending: false }).limit(1).maybeSingle()
   if (recent.error) return res.status(502).json({ ok: false, error: 'Lead capture is unavailable.' })
 
   if (recent.data && isContact) return res.status(200).json({ ok: true, merged: true })

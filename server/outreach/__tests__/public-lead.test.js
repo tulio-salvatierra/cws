@@ -92,14 +92,14 @@ describe('contact page capture', () => {
     expect(res.status).toHaveBeenCalledWith(201)
     expect(inserted.insert).toHaveBeenCalledWith(expect.objectContaining({workspace_id:'ws',created_by:'owner',phone:null,email:contact.email,inquiry_service:'new',inquiry_message:contact.message,source:'contact-page|contact|en',sales_classification:'inbound'}))
     expect(recent.eq).toHaveBeenCalledWith('workspace_id','ws')
-    expect(recent.eq).toHaveBeenCalledWith('inquiry_message',contact.message)
+    expect(recent.eq).not.toHaveBeenCalledWith('inquiry_message', expect.anything())
   })
   it.each([{email:'bad'}, {name:' '}, {service:'bad'}, {message:''}, {message:'x'.repeat(4001)}, {phone:'123'}])('rejects invalid contact fields %j', async patch => {
     const res=response(); await handler({method:'POST',body:{...contact,...patch}},res)
     expect(res.status).toHaveBeenCalledWith(400); expect(mocks.createOutreachClient).not.toHaveBeenCalled()
   })
   it('acknowledges an identical retry without overwriting the existing row', async () => {
-    const client={from:vi.fn().mockReturnValueOnce(query({data:{workspace_id:'ws',user_id:'owner'}})).mockReturnValueOnce(query({data:{id:'existing'}}))}
+    const client={from:vi.fn().mockReturnValueOnce(query({data:{workspace_id:'ws',user_id:'owner'}})).mockReturnValueOnce(query({data:[{id:'existing',name:contact.name,phone:null,company:null,inquiry_service:'new',inquiry_message:contact.message}]}))}
     mocks.createOutreachClient.mockReturnValue(client);const res=response()
     await handler({method:'POST',body:contact},res)
     expect(res.status).toHaveBeenCalledWith(200);expect(client.from).toHaveBeenCalledTimes(2)
@@ -108,4 +108,33 @@ describe('contact page capture', () => {
     mocks.createOutreachClient.mockReturnValue({from:vi.fn().mockReturnValueOnce(query({data:{workspace_id:'ws',user_id:'owner'}})).mockReturnValueOnce(query({data:null})).mockReturnValueOnce(query({error:{message:'failed'}}))})
     const res=response(); await handler({method:'POST',body:contact},res);expect(res.status).toHaveBeenCalledWith(502)
   })
+  it('accepts a full-length Unicode message without placing it in a query URL', async () => {
+    const message = '界'.repeat(4000)
+    const recent = query({ data: [], error: null }); const inserted = query({ error: null })
+    mocks.createOutreachClient.mockReturnValue({ from: vi.fn()
+      .mockReturnValueOnce(query({ data: { workspace_id: 'ws', user_id: 'owner' } }))
+      .mockReturnValueOnce(recent).mockReturnValueOnce(inserted) })
+    const res=response(); await handler({method:'POST',body:{...contact,message}},res)
+    expect(res.status).toHaveBeenCalledWith(201)
+    expect(inserted.insert).toHaveBeenCalledWith(expect.objectContaining({inquiry_message:message}))
+    expect(recent.eq.mock.calls.flat()).not.toContain(message)
+    expect(recent.limit).toHaveBeenCalledWith(20)
+  })
+  it('preserves a different inquiry and inserts the new message', async () => {
+    const inserted = query({ error: null })
+    mocks.createOutreachClient.mockReturnValue({ from: vi.fn()
+      .mockReturnValueOnce(query({ data: { workspace_id: 'ws', user_id: 'owner' } }))
+      .mockReturnValueOnce(query({ data: [{id:'old',name:contact.name,phone:null,company:null,inquiry_service:'new',inquiry_message:'Previous project'}] }))
+      .mockReturnValueOnce(inserted) })
+    const res=response(); await handler({method:'POST',body:contact},res)
+    expect(res.status).toHaveBeenCalledWith(201)
+    expect(inserted.update).not.toHaveBeenCalled()
+  })
+  it('fails closed when duplicate lookup fails', async () => {
+    const client={from:vi.fn().mockReturnValueOnce(query({data:{workspace_id:'ws',user_id:'owner'}})).mockReturnValueOnce(query({data:null,error:{message:'offline'}}))}
+    mocks.createOutreachClient.mockReturnValue(client)
+    const res=response(); await handler({method:'POST',body:contact},res)
+    expect(res.status).toHaveBeenCalledWith(502);expect(client.from).toHaveBeenCalledTimes(2)
+  })
+
 })

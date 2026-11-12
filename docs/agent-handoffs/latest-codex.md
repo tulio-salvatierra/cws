@@ -17,3 +17,6 @@ Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: None.
 Git diff summary: Fresh checkout at a1afa67, local branch feat/contact-page-lead-capture. Committed and pushed; draft PR #94 is open. Rebased onto current main 22eb6f2, preserving concurrent project log and ledger entries. Merge and migration remain prohibited. No pre-existing changes in isolated checkout; original checkout has unrelated image edits and is untouched.
+
+
+PR #94 review follow-up (2026-11-12): Found and fixed a valid long-message submission failure risk: the previous PostgREST duplicate lookup put up to 4,000 Unicode characters into a GET URL. The query now reads at most 20 recent rows scoped by workspace/email/source and compares the exact submitted fields server-side. It still never overwrites a different inquiry. Added regressions for long Unicode messages, different inquiries and failed lookups. 1,013 tests / 98 files and lint pass on the rebased branch. No migration or merge performed; final GitHub checks are being verified for this follow-up commit. Recent-retry detection is bounded to 20 candidates and is not a concurrent-request uniqueness guarantee.
