@@ -238,3 +238,9 @@ Release verified: PR #90 merged as f7d9bce; production dpl_5Geb1sh1Nd1x1Wn7rTYwa
 ## 2026-11-10 — CWS-FEED-FULL-FRAME-20261110 all feed ratios
 
 Extended explicit gpt-image-2 native-ratio generation to square/portrait feeds across Instagram, Facebook and LinkedIn, plus LinkedIn landscape. Exact-ratio exports reject mismatched output rather than padding. Landscape uses 1200x624 (25:13), within LinkedIn photo limits and exactly generatable at 1600x832; prior 1200x628 cannot meet the model edge grid within its maximum edge. Legacy/unvalidated and padded unapproved drafts can be remade with their original image as a reference. Approved assets remain protected. 990 tests, lint and full build pass. Release/live private check in progress. No migration or publishing.
+
+## 2026-11-12 — CWS-EVERGREEN-BRANDING-20261112
+
+Added branding/README.md and branding/evergreen-generation.md, linked from root and Codex/Claude guidance. Verified public CSS/font/logo sources, positioning copy and current generation/validation code; distinguished suggested visual direction from verified facts and scoped admin tokens separately. Documentation only, no automatic prompt loading or runtime changes. Checks passed: 38 relative links, documented hex values present in inspected sources, all 11 preset sizes/ratios, git diff --check. Isolated checkout based on a1afa67; original CWS checkout untouched. No commit, push, merge, deployment, generation or publication.
+
+Follow-up: Owner authorized committing the guides and opening a review PR; merge and deployment remain unauthorized.

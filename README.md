@@ -17,3 +17,9 @@ npm run memory:save -- --input docs/examples/agent-memory-input.example.json --a
 ```
 
 See [docs/agent-memory-workflow.md](docs/agent-memory-workflow.md) for the full workflow and input format.
+
+## Evergreen brand reference
+
+For CWS brand or Evergreen image work, read the [canonical brand guide](branding/README.md)
+and [generation instructions](branding/evergreen-generation.md). Keep brand rules there;
+these documents do not change application prompts automatically.

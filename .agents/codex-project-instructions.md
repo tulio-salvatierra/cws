@@ -84,3 +84,8 @@ Memory updates withheld:
 Git diff summary:
 ```
 
+## Evergreen brand reference
+
+For CWS brand or Evergreen image work, read the [canonical brand guide](../branding/README.md)
+and [generation instructions](../branding/evergreen-generation.md). Keep brand rules there;
+these documents do not change application prompts automatically.
