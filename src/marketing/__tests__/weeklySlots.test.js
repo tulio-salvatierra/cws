@@ -214,3 +214,21 @@ describe('Google Business destination history', () => {
     expect(isFailedWithoutPublication(attempt)).toBe(false)
   })
 })
+
+
+describe('saved slot drafts', () => {
+  const now = new Date('2026-09-10T17:00:00.000Z')
+  const draft = { slot_key: '2026-09-07:post-b', asset_id: assets[2].id, caption: 'Reviewed Friday text.', platform_captions: {} }
+  it('uses the exact draft and does not silently substitute a retired image', () => {
+    const plan = buildMarketingOccurrencePlan({ now, assets, drafts: [draft] })
+    expect(plan.currentWeekSlots[1]).toMatchObject({ asset: { id: assets[2].id }, caption: draft.caption, platformCaptions: {} })
+    const retired = buildMarketingOccurrencePlan({ now, assets: assets.map(asset => ({ ...asset, enabled: asset.id !== draft.asset_id })), drafts: [draft] })
+    expect(retired.currentWeekSlots[1].asset).toBeNull()
+    expect(retired.currentWeekSlots[1].state).toBe('upcoming')
+  })
+  it('keeps an attempted slot immutable even when a draft remains', () => {
+    const attempt = { ...failedAttempt(assets[0].id), marketing_slot_key: draft.slot_key, caption: 'Attempt snapshot.' }
+    const plan = buildMarketingOccurrencePlan({ now, assets, drafts: [draft], attempts: [attempt] })
+    expect(plan.currentWeekSlots[1]).toMatchObject({ asset: { id: assets[0].id }, caption: 'Attempt snapshot.', draft: null })
+  })
+})

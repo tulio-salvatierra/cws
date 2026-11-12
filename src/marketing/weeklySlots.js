@@ -75,6 +75,8 @@ export function buildMarketingOccurrencePlan({
   assets = EVERGREEN_ASSETS,
   attempts = [],
   resolutions = [],
+  drafts = [],
+  selectableAssets = assets,
   startDate = MISSED_SLOT_HANDLING_START_DATE,
 } = {}) {
   const firstWeekStart = marketingWeekStart(new Date(`${startDate}T12:00:00.000Z`))
@@ -82,7 +84,7 @@ export function buildMarketingOccurrencePlan({
   const allSlots = []
 
   for (let weekStart = firstWeekStart; weekStart <= currentWeekStart; weekStart = addDays(weekStart, 7)) {
-    allSlots.push(...buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, includeMissed: true }))
+    allSlots.push(...buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, drafts, selectableAssets, includeMissed: true }))
   }
 
   const missedSlots = allSlots
@@ -138,7 +140,7 @@ export function marketingLocalDate(now = new Date()) {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
-function buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, includeMissed }) {
+function buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, drafts = [], selectableAssets = assets, includeMissed }) {
   const plannedAssetIds = new Set()
   return WEEKLY_MARKETING_SLOTS.map(definition => {
     const slotDate = addDays(weekStart, definition.weekdayIndex - 1)
@@ -146,11 +148,13 @@ function buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, incl
     const attempt = attempts.find(candidate => candidate.marketing_slot_key === slotKey) || null
     const resolution = resolutions.find(candidate => candidate.occurrence_slot_key === slotKey) || null
     const carriedResolution = resolutions.find(candidate => candidate.target_slot_key === slotKey) || null
+    const draft = !attempt && !resolution && !carriedResolution ? drafts.find(row => row.slot_key === slotKey) : null
     const asset = attempt
       ? assetForAttempt(attempt, assets)
       : carriedResolution
         ? assetForResolution(carriedResolution, assets)
-        : chooseNextUnplannedAsset(assets, attempts, plannedAssetIds)
+        : draft ? selectableAssets.find(candidate => candidate.id === draft.asset_id && candidate.enabled) || null
+          : chooseNextUnplannedAsset(assets, attempts, plannedAssetIds)
     if (asset) plannedAssetIds.add(asset.id)
     const fullyPosted = attempt && isFullyPosted(attempt)
     const state = resolution
@@ -167,10 +171,11 @@ function buildWeekSlotPlan({ weekStart, now, assets, attempts, resolutions, incl
       slotKey,
       slotDate,
       asset,
-      caption: attempt?.caption || carriedResolution?.caption || resolution?.caption || asset?.defaultCaption || '',
+      draft,
+      caption: attempt?.caption || draft?.caption || carriedResolution?.caption || resolution?.caption || asset?.defaultCaption || '',
       platformCaptions: attempt
         ? platformCaptionTexts(attempt.platform_captions) || {}
-        : carriedResolution || resolution ? {} : platformDefaultTexts(asset),
+        : draft ? draft.platform_captions || {} : carriedResolution || resolution ? {} : platformDefaultTexts(asset),
       state,
       attempt,
       resolution,

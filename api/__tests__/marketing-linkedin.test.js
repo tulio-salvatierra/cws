@@ -38,8 +38,8 @@ function m5Attempt(status = 'processing') { return { id: 'm5-attempt', reference
 function m5Results(status = 'processing') { return ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM'].map((platform, index) => ({ id: `m5-result-${index}`, attempt_id: 'm5-attempt', platform, provider_status: status, provider_error: null, provider_permalink: null })) }
 function m6Resolution(action = 'move') { return { occurrence_slot_key: m5SlotKey, origin_slot_key: m5SlotKey, action, target_slot_key: action === 'move' ? m5PostBSlotKey : null, asset_id: 'website-launch', asset_path: '/images/en-launch.png', caption: 'Edited M6 caption.', decided_at: '2026-09-09T12:00:00.000Z', created_at: '2026-09-09T12:00:00.000Z' } }
 
-function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], resultRows = { 'm4-posted': m4Results() }, resolutions = [], offers = [], media = [], captions = [] } = {}) {
-  const state = { attempts: attempts.map(attempt => ({ ...attempt })), resultRows: Object.fromEntries(Object.entries(resultRows).map(([id, rows]) => [id, rows.map(row => ({ ...row }))])), resolutions: resolutions.map(resolution => ({ ...resolution })), offers: offers.map(offer => ({ ...offer })), media: media.map(record => ({ ...record })), captions: captions.map(record => ({ ...record })), attemptInserts: [], destinationInserts: [], resolutionInserts: [], attemptUpdates: [], destinationUpdates: [], catalogInserts: [] }
+function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], resultRows = { 'm4-posted': m4Results() }, resolutions = [], offers = [], media = [], captions = [], drafts = [] } = {}) {
+  const state = { drafts: drafts.map(row => ({ ...row })), draftWrites: [], attempts: attempts.map(attempt => ({ ...attempt })), resultRows: Object.fromEntries(Object.entries(resultRows).map(([id, rows]) => [id, rows.map(row => ({ ...row }))])), resolutions: resolutions.map(resolution => ({ ...resolution })), offers: offers.map(offer => ({ ...offer })), media: media.map(record => ({ ...record })), captions: captions.map(record => ({ ...record })), attemptInserts: [], destinationInserts: [], resolutionInserts: [], attemptUpdates: [], destinationUpdates: [], catalogInserts: [] }
   const workspace = { data: { workspace_id: 'workspace-1', role: 'owner' }, error: null }
   const latestAttempt = () => state.attempts[0] || null
 
@@ -52,6 +52,7 @@ function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], res
       order: vi.fn(() => chain),
       limit: vi.fn(value => { chain.limitValue = value; return chain }),
       insert: vi.fn(values => { chain.operation = 'insert'; chain.values = values; return chain }),
+      upsert: vi.fn(values => { chain.operation = 'upsert'; chain.values = values; return chain }),
       update: vi.fn(values => { chain.operation = 'update'; chain.values = values; return chain }),
       maybeSingle: vi.fn(() => {
         if (table === 'workspace_members') return Promise.resolve(workspace)
@@ -97,6 +98,10 @@ function createDatabase({ attempts = [legacyM4Attempt, legacyFailedAttempt], res
       then: (resolve, reject) => {
         let response = { data: null, error: null }
         if (table === 'marketing_publish_attempts') response = { data: state.attempts, error: null }
+        if (table === 'marketing_slot_drafts') {
+          if (chain.operation === 'upsert') { state.drafts = [chain.values]; state.draftWrites.push(chain.values) }
+          response = { data: state.drafts, error: null }
+        }
         if (table === 'marketing_slot_resolutions') response = { data: state.resolutions, error: null }
         if (table === 'offers') response = { data: state.offers, error: null }
         if (table === 'offer_media') response = { data: state.media, error: null }
@@ -552,6 +557,43 @@ describe('per-platform Marketing captions', () => {
   })
 
   afterEach(() => vi.useRealTimers())
+
+  it('saves a chosen library draft without calling a provider and restores it on GET', async () => {
+    const alternate = { ...catalog.media[0], id: '88888888-8888-4888-8888-888888888888' }
+    const chosen = `catalog:${offerId}:${alternate.id}:${sharedId}`
+    const database = createDatabase({ ...catalog, media: [...catalog.media, alternate] })
+    createClientMock.mockReturnValue(database.client)
+    const saved = makeResponse()
+    await handler(request({ method: 'POST', body: { action: 'save_draft', slot_key: m5PostBSlotKey, asset_id: chosen, caption: 'Exact reviewed caption.', platform_captions: {} } }), saved)
+    expect(saved.statusCode).toBe(200)
+    expect(database.state.draftWrites).toHaveLength(1)
+    expect(database.state.attemptInserts).toEqual([])
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    expect(readFile).not.toHaveBeenCalled()
+    queueVerifiedAccounts()
+    const refreshed = makeResponse(); await handler(request(), refreshed)
+    const friday = refreshed.body.slots.find(row => row.slot_key === m5PostBSlotKey)
+    expect(friday.asset.id).toBe(chosen)
+    expect(friday.caption).toBe('Exact reviewed caption.')
+    expect(friday.platform_captions).toEqual({})
+    expect(friday.draft_saved_at).toBeTruthy()
+  })
+
+  it.each(['attempted', 'resolved', 'missed', 'inactive', 'wrong-workspace'])('rejects %s draft changes without publishing', async reason => {
+    const database = createDatabase({ ...catalog,
+      attempts: reason === 'attempted' ? [m5Attempt()] : [],
+      resolutions: reason === 'resolved' ? [m6Resolution('skip')] : [],
+      media: reason === 'inactive' ? [{ ...catalog.media[0], status: 'retired' }] : catalog.media,
+    })
+    if (reason === 'missed') vi.setSystemTime(new Date('2026-09-09T17:00:00.000Z'))
+    createClientMock.mockReturnValue(database.client)
+    const result = makeResponse()
+    await handler(request({ method: 'POST', body: { action: 'save_draft', slot_key: m5SlotKey, asset_id: reason === 'wrong-workspace' ? 'catalog:other:media:caption' : catalogAssetId, caption: 'Reviewed.' } }), result)
+    expect(result.statusCode).toBe(409)
+    expect(database.state.draftWrites).toEqual([])
+    expect(database.state.attemptInserts).toEqual([])
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+  })
 
   it('offers catalog channel captions as slot defaults and keeps the shared caption as the rotation key', async () => {
     const database = createDatabase(catalog); createClientMock.mockReturnValue(database.client); queueVerifiedAccounts()

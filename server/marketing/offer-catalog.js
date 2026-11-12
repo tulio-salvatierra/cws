@@ -12,6 +12,7 @@ export function buildOfferCatalog({ offers = [], media = [], captions = [], atte
   const mediaByOffer = groupByOffer(media)
   const captionsByOffer = groupByOffer(captions)
   const activeAssets = []
+  const selectableAssets = []
 
   for (const offer of offers.filter(offer => offer.status === ACTIVE)) {
     const selectedMedia = leastRecentlyUsed(
@@ -27,6 +28,11 @@ export function buildOfferCatalog({ offers = [], media = [], captions = [], atte
     )
     if (!selectedMedia || !selectedCaption) continue
     const platformCaptions = selectPlatformCaptions(offerCaptions, attempts)
+    for (const medium of (mediaByOffer.get(offer.id) || []).filter(isThreeChannelActiveMedia)) {
+      for (const caption of (captionsByOffer.get(offer.id) || []).filter(row => row.status === ACTIVE && !row.platform)) {
+        selectableAssets.push(toAsset({ offer, media: medium, caption, attempts, enabled: true }))
+      }
+    }
     activeAssets.push(toAsset({ offer, media: selectedMedia, caption: selectedCaption, attempts, enabled: true, platformCaptions }))
   }
 
@@ -44,6 +50,7 @@ export function buildOfferCatalog({ offers = [], media = [], captions = [], atte
 
   return {
     assets: [...activeAssets, ...historyAssets],
+    selectableAssets,
     offers: serializeOffers(offers, mediaByOffer, captionsByOffer),
     activeOfferCount: activeAssets.length,
   }
