@@ -287,3 +287,13 @@ Applied migration 20261112200524 with exact repository filename and verified con
 ## 2026-11-12 — Contact owner notification
 
 Added owner-requested email notification to fixed info@cicerowebstudio.xyz after saved contact inquiries, using existing Resend sender and validated visitor Reply-To. Plain-text contact/project details and Sales link; same persisted lead ID keys transient and browser retries. Saved inquiries survive notification failure; form receives retryable error rather than false notification confirmation. No migration, visitor outreach or Negocio Listo email changes. 1,026 tests across 100 files and lint passed; release verification pending.
+
+PR #97 opened; all applicable CI checks passed, including full build and Vercel preview (Supabase Preview skipped). Automatic approval review rejected production merge pending explicit authorization for automatic sending. No merge, production change or notification send occurred. Ready for owner release approval.
+
+## 2026-11-12 — Contact notifications released and delivered
+
+Owner explicitly approved merge and one labeled production email. PR #97 merged as b706bb1; production dpl_6hHsuxEM7poFXcLoUtXfdkDi8bMu READY with live aliases and post-merge Tests passed. Browser contact submission confirmed receipt; Resend reported delivered to the owner inbox at 22:14:06 UTC. Verified labeled test body, Reply-To, project details and Sales link. Owner UI excluded the synthetic lead from live priorities. Exactly one test email sent; no visitor outreach or migration. Final verification notes recorded locally.
+
+## 2026-11-12 — Negocio Listo owner notifications
+
+Extended existing owner notification flow to popup and inline submissions after successful lead insert/merge. Includes phone, optional email/business, plan, business type, website status, form/language and Sales link. Fixed recipient and optional validated Reply-To; no visitor outreach. Stable saved lead ID plus payload hash deduplicates exact retries while notifying changed details. Contact payload/key unchanged. 1032 tests/100 files and lint passed; no migration. CI/release pending.

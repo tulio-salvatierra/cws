@@ -4,7 +4,8 @@ Open work and the 40 most recent tasks. Older completed rows: `docs/archive/task
 
 | Task ID | Agent | Status | Result | Next |
 | --- | --- | --- | --- | --- |
-| CWS-CONTACT-NOTIFY-20261112 | Codex | 1026 tests/lint passed; release pending | Fixed owner email after saved contact inquiries; safe retries and Reply-To | Complete checks, deploy and verify delivery |
+| CWS-NL-NOTIFY-20261112 | Codex | Tests/lint passed; release pending | Owner notifications for NL popup/inline after insert/merge; idempotent payload retries | Verify CI and release |
+| CWS-CONTACT-NOTIFY-20261112 | Codex | Complete — merged, deployed and delivery verified | PR #97 / b706bb1; 1026 tests/lint/build; live form and Resend delivery verified | One authorized labeled test sent; synthetic lead excluded via owner controls |
 | CWS-CONTACT-20261112 | Codex | Complete — merged, deployed and live verified | PR #94; migration 20261112200524; 1020 tests plus lint/build; production capture and Trustindex verified | Synthetic inquiry excluded through owner test controls; no outreach; existing audit duration mismatch unchanged |
 | CWS-PORTRAIT-PREVIEW-20261112 | Codex | Release verification pending | Intrinsic aspect ratio, full-width images in every channel and weekly preview | 999 tests/lint/build pass; deploy and verify original image and no letterboxing |
 | CWS-SAVED-SLOT-DRAFTS-20261112 | Codex | Complete — merged, deployed and live verified | Private saved slot image/caption selection; generated-image failed-slot closure | PR #92, 999 test cases plus lint/build pass; Friday saved and four live previews verified after reload; no publishing |
