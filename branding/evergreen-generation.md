@@ -1,8 +1,12 @@
 # Evergreen image generation
 
-Read the [canonical brand guide](README.md) first. This is a reusable agent brief,
-not an automatic application integration, a new UI or authorization to generate,
-approve, schedule or publish content.
+Read the [canonical brand guide](README.md) first. The existing New Generation
+idea and image requests (including remakes) load both guides through the
+[server loader](../server/marketing/brand-guidance.js). Guide edits take effect
+after deployment. Missing, empty or oversized guides stop generation before
+the provider request. The selected preset and text-free/logo-free request rules
+remain authoritative; suggestions do not override a remake’s reference composition.
+This is not authorization to generate, approve, schedule or publish content.
 
 ## Verified current workflow
 

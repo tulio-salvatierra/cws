@@ -375,7 +375,7 @@ export default function MarketingPage() {
           {nextSlot?.asset ? <article className="mt-5 max-w-md overflow-hidden rounded-xl border border-gray-700 bg-white text-gray-900 shadow-xl shadow-black/20">
             <div className="flex items-center gap-3 px-4 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0a66c2] text-sm font-bold text-white">CW</div><div><p className="text-sm font-semibold text-gray-900">Cicero Web Studio</p><p className="text-xs text-gray-500">Social · Preview</p></div></div>
             <p data-testid="marketing-preview-caption" className="whitespace-pre-wrap px-4 pb-4 text-sm leading-6 text-gray-900">{captions[nextSlot.slot_key] ?? nextSlot.caption ?? 'Your caption will appear here.'}</p>
-            <div className="bg-gray-100"><img src={nextSlot.asset.asset_url || nextSlot.asset.asset_path} alt={`${nextSlot.asset.label} post preview`} className="block max-h-[34rem] w-full object-contain" /></div>
+            <div className="bg-gray-100"><img src={nextSlot.asset.asset_url || nextSlot.asset.asset_path} alt={`${nextSlot.asset.label} post preview`} className="block h-auto w-full" /></div>
             <div className="border-t border-gray-200 px-4 py-3 text-xs font-medium text-gray-500">Like · Comment · Repost · Send</div>
           </article> : <p className="mt-5 text-sm text-amber-200">Add a verified CWS evergreen offer graphic to prepare a post.</p>}
         </section>
@@ -415,7 +415,7 @@ function ChannelPanel({ platform, state, captions, channelEdits, onChannelCaptio
         <p className="mt-1 text-xs text-gray-400">{formatSlotDate(slot.slot_date)}</p>
         {slot.asset ? <div className="mt-4 overflow-hidden rounded-xl bg-white text-gray-900">
           <div className="p-4"><p className="font-semibold text-gray-900">Cicero Web Studio</p><p className="text-xs text-gray-500">{platformName(platform)} · Preview</p></div>
-          <img src={slot.asset.asset_url || slot.asset.asset_path} alt={`${slot.asset.label} ${platformName(platform)} preview`} className="max-h-80 w-full object-contain" />
+          <img src={slot.asset.asset_url || slot.asset.asset_path} alt={`${slot.asset.label} ${platformName(platform)} preview`} className="block h-auto w-full" />
           <p data-testid={`channel-preview-caption-${platform}`} className="whitespace-pre-wrap p-4 text-sm leading-6 text-gray-900">{caption}</p>
           {google && <div className="border-t border-gray-200 p-4"><a href={GOOGLE_BUSINESS_CTA_URL} target="_blank" rel="noreferrer" className="font-medium text-blue-700">Learn more →</a><p className="mt-1 text-xs text-gray-500">cicerowebstudio.xyz</p></div>}
         </div> : <p className="mt-4 text-gray-400">No post asset is ready for this slot.</p>}
@@ -446,7 +446,7 @@ function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVis
   return <section aria-labelledby="creative-studio-heading" className="mt-8 rounded-2xl border border-indigo-400/20 bg-indigo-400/5 p-5 sm:p-6">
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Creative studio</p>
     <h2 id="creative-studio-heading" className="mt-2 text-xl font-semibold text-white">Turn an offer into a reviewable post asset</h2>
-    <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Generate ideas first. Create a visual only for an idea you choose. Nothing here schedules or publishes a post.</p>
+    <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Generate ideas first. Create a visual only for an idea you choose. CWS brand guidance is included automatically; images are requested without text or logos. Nothing here schedules or publishes a post.</p>
     {creative.error && <p role="alert" className="mt-4 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-sm text-rose-200">{creative.error}</p>}
 
     <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -563,7 +563,7 @@ function WeeklySlot({ slot, draftAssets = [], selectedDraftAsset, onDraftAssetCh
       <p className="text-xs text-gray-400">{slot.draft_saved_at ? 'Draft saved in CWS. Save again after editing.' : 'Save the selected image and current captions to this slot.'} Nothing is scheduled or published. Channel previews show the saved image.</p>
     </div>}
     {slot.asset ? <>
-      <div className="mt-5 overflow-hidden rounded-xl border border-gray-700 bg-gray-100"><img src={slot.asset.asset_url || slot.asset.asset_path} alt={slot.asset.label} className="block max-h-[34rem] w-full object-contain" /></div>
+      <div className="mt-5 overflow-hidden rounded-xl border border-gray-700 bg-gray-100"><img src={slot.asset.asset_url || slot.asset.asset_path} alt={slot.asset.label} className="block h-auto w-full" /></div>
       <div className="mt-4 flex items-center gap-2"><h3 className="font-medium text-white">{slot.asset.label}</h3>{slot.asset.price && <span className="text-sm text-gray-400">{slot.asset.price}</span>}{fallback && <span className="rounded bg-amber-400/10 px-2 py-0.5 text-xs text-amber-100">Fallback asset</span>}</div>
       {fallback && <p className="mt-2 text-xs leading-5 text-gray-500">No priced CWS offer creative is currently available in the repository. Add one to replace this fallback in rotation.</p>}
       <label htmlFor={`${slot.key}-caption`} className="mt-5 block text-sm font-medium text-gray-200">Shared caption</label>

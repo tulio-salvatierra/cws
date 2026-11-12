@@ -245,11 +245,22 @@ Release verified: PR #91 merged as a1afa67; production dpl_GKiXWiCGUS3k3HTnYq2nh
 
 Added owner-only save_draft handling before provider access, a private workspace-scoped draft table, and an approved library selector with persistent shared/channel captions. Reloaded previews and publication resolve the exact saved asset; unavailable saved assets fail closed. Attempted/resolved slots remain immutable. Generated private PNG/JPEG paths are now accepted by slot resolutions so all-error attempts can be closed without retries. Unknown actions cannot fall through to publishing. Migration 20261112192039 applied. 998 full-suite tests plus one new UI save/preview regression pass; lint and full production build checked before release. Production release and Friday assignment verification pending. No publication authorized.
 
+Release verified: PR #92 merged as 22eb6f2; production dpl_gq7d96suN2Ad2WkgaNLFATZo9oqS READY. Earlier failed occurrence closed and Tuesday skipped using normal owner controls, failures preserved. Friday approved portrait and reviewed caption saved through save_draft; reload and all four live channel previews verified exact caption, 1080x1350 image and Not submitted status. No content published.
+
+## 2026-11-12 — Portrait preview frame
+
+Removed fixed image-height caps from all four channel previews, the weekly slot cards, and shared live preview. Images now render full width at their intrinsic aspect ratio. No crop, padding, image generation, stored asset changes, or publishing. Validation and live release pending.
 ## 2026-11-12 — CWS-EVERGREEN-BRANDING-20261112
 
 Added branding/README.md and branding/evergreen-generation.md, linked from root and Codex/Claude guidance. Verified public CSS/font/logo sources, positioning copy and current generation/validation code; distinguished suggested visual direction from verified facts and scoped admin tokens separately. Documentation only, no automatic prompt loading or runtime changes. Checks passed: 38 relative links, documented hex values present in inspected sources, all 11 preset sizes/ratios, git diff --check. Isolated checkout based on a1afa67; original CWS checkout untouched. No commit, push, merge, deployment, generation or publication.
 
 Follow-up: Owner authorized committing the guides and opening a review PR; merge and deployment remain unauthorized.
+
+PR #93 release follow-up: owner authorized merge and deployment verification. Merged as 7696188; production dpl_9YDWYMKUe9yPYQHbhQdo1TcbWDB5 READY with live CWS aliases. Post-merge 999 tests, lint/build passed; homepage/admin 200, creative API 401 as expected; no error/fatal runtime logs found for that deployment.
+
+## 2026-11-12 — CWS-EVERGREEN-BRAND-REQUESTS-20261112
+
+Connected both canonical branding guides to the existing idea/image instruction builders, including remakes. Fixed repository paths, bounded file loading and a clear failure before provider calls prevent silent unbranded fallback. Existing text/logo restrictions, presets, validation and owner confirmation remain intact. Explicit Vercel includeFiles bundles the guides; only this review branch has automatic deployment disabled. UI and agent documentation explain the connection. 1006 tests across 98 files, lint, full placeholder-env production build/prerender, relocated server loader check and diff checks passed. No paid generation, database change, merge or deployment; PR preparation only. Live generated-image quality and deployed packaging verification remain release checks after authorization.
 
 
 ## 2026-11-12 — CWS-CONTACT-20261112 contact page review branch
