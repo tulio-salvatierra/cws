@@ -279,3 +279,11 @@ Reviewed capture validation, ownership, duplicate handling, Sales detail project
 ## 2026-11-12 — Contact release migration
 
 Owner authorized release of PR #94. Applied contact_page_inquiry_details to production, remote version 20261112200524; matched committed filename. Verified both nullable columns, service/message constraints and enabled RLS. Merge and live verification follow after checks.
+
+## 2026-11-12 — Contact release verified
+
+Applied migration 20261112200524 with exact repository filename and verified constraints/RLS. PR #94 merged as c0a2710 after 1020 tests/99 files, lint/build, security and Vercel checks passed (Supabase Preview skipped). Post-merge Tests passed; production dpl_4ojxW72C7a2di4U6Cccu9a7uWy3U READY with live domains. Live contact form produced receipt confirmation and exactly one synthetic inquiry with correct owner scope/source/type/message and null optional phone. Sales displayed the inquiry; owner UI excluded it as test, verified in database. Trustindex rendered; desktop/mobile inspected, no horizontal overflow at 390px. No pricing/commitment changes or outreach. Final verification notes recorded locally after release.
+
+## 2026-11-12 — Contact owner notification
+
+Added owner-requested email notification to fixed info@cicerowebstudio.xyz after saved contact inquiries, using existing Resend sender and validated visitor Reply-To. Plain-text contact/project details and Sales link; same persisted lead ID keys transient and browser retries. Saved inquiries survive notification failure; form receives retryable error rather than false notification confirmation. No migration, visitor outreach or Negocio Listo email changes. 1,026 tests across 100 files and lint passed; release verification pending.

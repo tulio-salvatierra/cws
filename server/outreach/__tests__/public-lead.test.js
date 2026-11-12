@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ createOutreachClient: vi.fn(), missingOutreachEnv: vi.fn(() => []) }))
+const mocks = vi.hoisted(() => ({ createOutreachClient: vi.fn(), missingOutreachEnv: vi.fn(() => []), notify: vi.fn(async () => true) }))
 vi.mock('../shared.js', async (importOriginal) => ({
   ...(await importOriginal()),
   createOutreachClient: mocks.createOutreachClient,
   missingOutreachEnv: mocks.missingOutreachEnv,
 }))
+vi.mock('../contact-notification.js', () => ({ notifyContactLead: mocks.notify }))
 import handler, { buildSource, normalizePhone, readLead } from '../public-lead.js'
 
 function response() { const res = { status: vi.fn(() => res), json: vi.fn(() => res) }; return res }
@@ -19,7 +20,7 @@ function query(result) {
 const valid = { name: 'Ana', phone: '(708) 555-0101', business_name: 'Ana Roofing', form: 'popup', lang: 'es', business_type: 'roofing', plan_interest: 'crecer', elapsed_ms: 8000 }
 
 describe('Negocio Listo public lead capture', () => {
-  beforeEach(() => { vi.clearAllMocks(); mocks.missingOutreachEnv.mockReturnValue([]) })
+  beforeEach(() => { vi.clearAllMocks(); mocks.missingOutreachEnv.mockReturnValue([]); mocks.notify.mockResolvedValue(true) })
 
   it('normalizes US phones and rejects partial numbers', () => {
     expect(normalizePhone('(708) 555-0101')).toBe('+17085550101')
@@ -37,6 +38,7 @@ describe('Negocio Listo public lead capture', () => {
     await handler({ method: 'POST', body: { ...valid, phone: '123' } }, res)
     expect(res.status).toHaveBeenCalledWith(400)
     expect(mocks.createOutreachClient).not.toHaveBeenCalled()
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it('silently drops honeypot and instant submissions without writing', async () => {
@@ -46,6 +48,7 @@ describe('Negocio Listo public lead capture', () => {
       expect(res.status).toHaveBeenCalledWith(202)
     }
     expect(mocks.createOutreachClient).not.toHaveBeenCalled()
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
 
   it('inserts an inbound lead owned by the workspace owner', async () => {
@@ -58,6 +61,7 @@ describe('Negocio Listo public lead capture', () => {
     const res = response()
     await handler({ method: 'POST', body: valid }, res)
     expect(res.status).toHaveBeenCalledWith(201)
+    expect(mocks.notify).not.toHaveBeenCalled()
     expect(insertQuery.insert).toHaveBeenCalledWith(expect.objectContaining({
       workspace_id: 'ws-1', created_by: 'owner-1', phone: '+17085550101', company: 'Ana Roofing',
       sales_classification: 'inbound', source: 'negocio-listo|popup|es|plan=crecer|type=roofing',
@@ -81,7 +85,7 @@ describe('Negocio Listo public lead capture', () => {
 
 const contact = { form: 'contact', lang: 'en', name: 'Test Visitor', email: 'visitor@example.com', service: 'new', message: 'A new project', elapsed_ms: 5000 }
 describe('contact page capture', () => {
-  beforeEach(() => { vi.clearAllMocks(); mocks.missingOutreachEnv.mockReturnValue([]) })
+  beforeEach(() => { vi.clearAllMocks(); mocks.missingOutreachEnv.mockReturnValue([]); mocks.notify.mockResolvedValue(true) })
   it('stores an email-only inquiry with its details and server-owned workspace', async () => {
     const inserted = query({ error: null }); const recent = query({ data: null, error: null })
     mocks.createOutreachClient.mockReturnValue({ from: vi.fn()
@@ -91,6 +95,8 @@ describe('contact page capture', () => {
     await handler({ method: 'POST', body: { ...contact, workspace_id: 'attacker', created_by: 'attacker' } }, res)
     expect(res.status).toHaveBeenCalledWith(201)
     expect(inserted.insert).toHaveBeenCalledWith(expect.objectContaining({workspace_id:'ws',created_by:'owner',phone:null,email:contact.email,inquiry_service:'new',inquiry_message:contact.message,source:'contact-page|contact|en',sales_classification:'inbound'}))
+    expect(mocks.notify).toHaveBeenCalledWith(inserted.insert.mock.calls[0][0].id, expect.objectContaining({email:contact.email,inquiry_message:contact.message}))
+    expect(inserted.insert.mock.invocationCallOrder[0]).toBeLessThan(mocks.notify.mock.invocationCallOrder[0])
     expect(recent.eq).toHaveBeenCalledWith('workspace_id','ws')
     expect(recent.eq).not.toHaveBeenCalledWith('inquiry_message', expect.anything())
   })
@@ -103,10 +109,12 @@ describe('contact page capture', () => {
     mocks.createOutreachClient.mockReturnValue(client);const res=response()
     await handler({method:'POST',body:contact},res)
     expect(res.status).toHaveBeenCalledWith(200);expect(client.from).toHaveBeenCalledTimes(2)
+    expect(mocks.notify).toHaveBeenCalledWith('existing',expect.objectContaining({email:contact.email}))
   })
   it('reports a failed insert rather than success', async () => {
     mocks.createOutreachClient.mockReturnValue({from:vi.fn().mockReturnValueOnce(query({data:{workspace_id:'ws',user_id:'owner'}})).mockReturnValueOnce(query({data:null})).mockReturnValueOnce(query({error:{message:'failed'}}))})
     const res=response(); await handler({method:'POST',body:contact},res);expect(res.status).toHaveBeenCalledWith(502)
+    expect(mocks.notify).not.toHaveBeenCalled()
   })
   it('accepts a full-length Unicode message without placing it in a query URL', async () => {
     const message = '界'.repeat(4000)
@@ -137,4 +145,19 @@ describe('contact page capture', () => {
     expect(res.status).toHaveBeenCalledWith(502);expect(client.from).toHaveBeenCalledTimes(2)
   })
 
+})
+
+it('keeps the saved lead and allows notification retry after provider failure', async () => {
+  mocks.notify.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
+  const inserted=query({error:null})
+  const from=vi.fn().mockReturnValueOnce(query({data:{workspace_id:'ws',user_id:'owner'}})).mockReturnValueOnce(query({data:[]})).mockReturnValueOnce(inserted)
+  mocks.createOutreachClient.mockReturnValue({from})
+  const first=response();await handler({method:'POST',body:contact},first)
+  expect(first.status).toHaveBeenCalledWith(502)
+  const saved=inserted.insert.mock.calls[0][0]
+  from.mockReturnValueOnce(query({data:{workspace_id:'ws',user_id:'owner'}})).mockReturnValueOnce(query({data:[saved]}))
+  const retry=response();await handler({method:'POST',body:contact},retry)
+  expect(retry.status).toHaveBeenCalledWith(200)
+  expect(inserted.insert).toHaveBeenCalledTimes(1)
+  expect(mocks.notify.mock.calls.slice(-2).map(call=>call[0])).toEqual([saved.id,saved.id])
 })

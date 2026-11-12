@@ -1,8 +1,10 @@
+import { randomUUID } from 'node:crypto'
+import { notifyContactLead } from './contact-notification.js'
 import { cleanText, createOutreachClient, missingOutreachEnv, parseBody } from './shared.js'
 
 // Public, unauthenticated lead capture for Negocio Listo and the contact page.
-// Writes one inbound `leads` row owned by the workspace owner. No email or other
-// external action is triggered here (external actions need owner confirmation).
+// Writes one inbound `leads` row owned by the workspace owner. Contact inquiries
+// notify the fixed owner inbox, explicitly authorized by the owner; no visitor email.
 
 export const PUBLIC_LEAD_FORMS = new Set(['popup', 'inline', 'contact'])
 export const PUBLIC_LEAD_PLANS = new Set(['basico', 'crecer', 'destacado', 'unsure'])
@@ -118,7 +120,10 @@ export default async function handler(req, res) {
   }
   if (recent.error) return res.status(502).json({ ok: false, error: 'Lead capture is unavailable.' })
 
-  if (recent.data && isContact) return res.status(200).json({ ok: true, merged: true })
+  if (recent.data && isContact) {
+    if (!await notifyContactLead(recent.data.id, values)) return notificationFailure(res)
+    return res.status(200).json({ ok: true, merged: true })
+  }
 
   if (recent.data) {
     const updated = await client
@@ -135,11 +140,18 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, merged: true })
   }
 
+  const leadId = isContact ? randomUUID() : null
   const inserted = await client.from('leads').insert({
+    ...(isContact ? { id: leadId } : {}),
     ...values,
     workspace_id: owner.data.workspace_id,
     created_by: owner.data.user_id,
   })
   if (inserted.error) return res.status(502).json({ ok: false, error: 'Lead capture is unavailable.' })
+  if (isContact && !await notifyContactLead(leadId, values)) return notificationFailure(res)
   return res.status(201).json({ ok: true })
+}
+
+function notificationFailure(res) {
+  return res.status(502).json({ ok: false, error: 'Your inquiry was saved, but the notification could not be confirmed. Please retry or contact us directly.' })
 }
