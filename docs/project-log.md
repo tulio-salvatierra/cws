@@ -244,3 +244,9 @@ Release verified: PR #91 merged as a1afa67; production dpl_GKiXWiCGUS3k3HTnYq2nh
 ## 2026-11-12 — Saved Evergreen slot drafts
 
 Added owner-only save_draft handling before provider access, a private workspace-scoped draft table, and an approved library selector with persistent shared/channel captions. Reloaded previews and publication resolve the exact saved asset; unavailable saved assets fail closed. Attempted/resolved slots remain immutable. Generated private PNG/JPEG paths are now accepted by slot resolutions so all-error attempts can be closed without retries. Unknown actions cannot fall through to publishing. Migration 20261112192039 applied. 998 full-suite tests plus one new UI save/preview regression pass; lint and full production build checked before release. Production release and Friday assignment verification pending. No publication authorized.
+
+## 2026-11-12 — CWS-EVERGREEN-BRANDING-20261112
+
+Added branding/README.md and branding/evergreen-generation.md, linked from root and Codex/Claude guidance. Verified public CSS/font/logo sources, positioning copy and current generation/validation code; distinguished suggested visual direction from verified facts and scoped admin tokens separately. Documentation only, no automatic prompt loading or runtime changes. Checks passed: 38 relative links, documented hex values present in inspected sources, all 11 preset sizes/ratios, git diff --check. Isolated checkout based on a1afa67; original CWS checkout untouched. No commit, push, merge, deployment, generation or publication.
+
+Follow-up: Owner authorized committing the guides and opening a review PR; merge and deployment remain unauthorized.

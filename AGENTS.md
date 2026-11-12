@@ -41,3 +41,9 @@ the only state store. Supabase project `cws-os-staging` is **production**.
 - Laya rules set verdicts with source-backed claims; only owner responses persist evaluations.
 - Retirement order: code removal and deployment, verified export, database migration. Keep `agent_runs`, `channels`, `decisions`, and shared `update_updated_at()`.
 - Project time is owner-entered whole hours.
+
+## Evergreen brand reference
+
+For CWS brand or Evergreen image work, read the [canonical brand guide](branding/README.md)
+and [generation instructions](branding/evergreen-generation.md). Keep brand rules there;
+these documents do not change application prompts automatically.
