@@ -250,4 +250,3 @@ Added owner-only save_draft handling before provider access, a private workspace
 Added branding/README.md and branding/evergreen-generation.md, linked from root and Codex/Claude guidance. Verified public CSS/font/logo sources, positioning copy and current generation/validation code; distinguished suggested visual direction from verified facts and scoped admin tokens separately. Documentation only, no automatic prompt loading or runtime changes. Checks passed: 38 relative links, documented hex values present in inspected sources, all 11 preset sizes/ratios, git diff --check. Isolated checkout based on a1afa67; original CWS checkout untouched. No commit, push, merge, deployment, generation or publication.
 
 Follow-up: Owner authorized committing the guides and opening a review PR; merge and deployment remain unauthorized.
-
