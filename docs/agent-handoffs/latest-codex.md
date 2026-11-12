@@ -1,24 +1,19 @@
-Task ID: CWS-CONTACT-20261112
+Task ID: CWS-CONTACT-NOTIFY-20261112
 Agent: Codex
-Objective: Implement approved contact page and connect it to existing capture flow on a review-only branch.
-Files inspected: AGENTS.md, .agents/codex-project-instructions.md, product definition, conventions, decisions, learnings, current handoff; Contact/Layout/Header/Footer/CustomButton, public-lead and Negocio Listo client/form, Sales read/queue/UI, lead schema/types and tests.
-Files changed: Contact.tsx; new ContactLeadForm.tsx and TrustindexReviews.tsx; shared public-lead transport; public-lead handler/tests; Sales handler/queue/UI; lead types; additive migration; project records.
-Database or API changes: Existing POST /api/outreach/public-lead accepts form=contact, required email, optional US phone, allow-listed service and bounded message. Migration 20261112200524_contact_page_inquiry_details.sql adds nullable inquiry_service and inquiry_message to leads. Applied and verified in production on 2026-11-12. Must apply before deploying because Sales queries and public lead capture use the new columns. Preserve exact remote migration version at release.
-Security decisions: Server owns workspace/created_by; no client database keys or new grants. Existing RLS remains. Honeypot and fill-time guard retained. Contacts only deduplicate identical recent inquiries, never rewrite a different inquiry or authenticated Sales fields. NL duplicate lookup excludes contact inquiries. No email or external business action triggered.
-Decisions made: Reuse current capture endpoint and site components. Render vendor widget in its own document to isolate loader globals across React remounts. Preserve approved pricing/commitments.
-Assumptions: Existing owner/environment configuration will serve this endpoint after deployment. Existing 15-minute audit copy and /30min booking URL remain unchanged for owner review.
-Tests added: Contact API validation, optional phone, workspace ownership, exact retry, insert failure; form confirmed-success and failed-submit retry tests. Existing NL regressions retained.
-Tests run: 1001 tests / 98 files pass; lint pass; isolated PGlite migration validation passes (valid insert, invalid service/empty/oversized message rejected, existing RLS stays enabled). Full production build and all public-page prerenders pass with placeholder client environment. Desktop/mobile branch inspected locally; Trustindex badge rendered. No production submission performed.
-Known issues: Migration unapplied; live persistence intentionally not exercised. Client timeout + recent identical-inquiry match provides normal retry behavior, not a database uniqueness guarantee for concurrent requests. Existing chunk-size build warning.
-Recommended next task: Owner authorized commit, push and review PR on 2026-11-12. Review implementation; do not merge or apply migration yet. Release separately requires migration before deployment and controlled end-to-end verification.
-Questions requiring Tulio: Resolve existing audit duration mismatch before changing either copy or scheduling configuration.
-Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md, product-definition.md capture-flow description.
+Objective: Notify info@cicerowebstudio.xyz for saved contact-page inquiries, as explicitly requested by owner.
+Files inspected: Product definition, technical conventions, project records, public lead handler/tests, Resend helper and intake sending pattern.
+Files changed: Contact notification helper/tests; public lead handler/tests; product definition and project records.
+Database or API changes: No migration. Contact insert generates its persisted UUID before sending. Identical retries reuse that ID and provider idempotency key.
+Security decisions: Fixed recipient; existing verified sender; validated visitor Reply-To; plain text only. No visitor notification, no change to Negocio Listo, invalid/bot/write-failure requests never email. Logs exclude submitted contents.
+Decisions made: Explicit owner authorization covers automatic internal contact notifications. Save first, await provider; retry transient failures once with 500ms backoff. Unconfirmed notification returns 502 while preserving the inquiry and allowing identical form retry. No durable background retry queue introduced.
+Assumptions: Existing production Resend sender/key remain available.
+Tests added: Correct recipient/reply-to/details, idempotent transient/browser retries, network/permanent errors, missing sender, persist-before-send, saved-lead retry, no emails on invalid/NL/failed persistence.
+Tests run: 1,026 tests across 100 files passed; lint passed. Release checks and real delivery pending.
+Known issues: Existing 30-minute duplicate window bounds form retry matching; no new concurrency uniqueness guarantee or durable retry worker. Provider acceptance is not mailbox delivery; live provider delivery verification remains required.
+Recommended next task: Complete tests, release and controlled delivery verification.
+Questions requiring Tulio: None.
+Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md, product-definition.md.
 Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: None.
-Git diff summary: Fresh checkout at a1afa67, local branch feat/contact-page-lead-capture. Committed and pushed; draft PR #94 is open. Rebased onto current main 22eb6f2, preserving concurrent project log and ledger entries. Merge and migration remain prohibited. No pre-existing changes in isolated checkout; original checkout has unrelated image edits and is untouched.
-
-
-PR #94 review follow-up (2026-11-12): Found and fixed a valid long-message submission failure risk: the previous PostgREST duplicate lookup put up to 4,000 Unicode characters into a GET URL. The query now reads at most 20 recent rows scoped by workspace/email/source and compares the exact submitted fields server-side. It still never overwrites a different inquiry. Added regressions for long Unicode messages, different inquiries and failed lookups. 1,013 tests / 98 files and lint pass on the rebased branch. No migration or merge performed; final GitHub checks are being verified for this follow-up commit. Recent-retry detection is bounded to 20 candidates and is not a concurrent-request uniqueness guarantee.
-
-Release authorization (2026-11-12): Owner authorized migration, merge and live verification. Applied exact remote migration 20261112200524; verified both columns, constraints and unchanged enabled RLS. Prior merge/migration holds are superseded. All checks on 8ef8235 passed (Supabase Preview skipped); release checks for this migration-record update pending.
+Git diff summary: Isolated feature branch from released PR #94. Includes prior local contact release verification notes. Original unrelated checkout untouched.
