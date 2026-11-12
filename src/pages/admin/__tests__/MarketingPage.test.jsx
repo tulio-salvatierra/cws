@@ -79,6 +79,25 @@ describe('MarketingPage M5', () => {
 
   afterEach(() => vi.unstubAllGlobals())
 
+  it('saves a library selection and caption without opening a publish confirmation', async () => {
+    const chosen = { ...assets.postB, asset_url: '/images/en-bilingual.png' }
+    const initial = statusBody({ slots: [slot('post-a')], draft_assets: [assets.postA, chosen] })
+    const saved = statusBody({ slots: [{ ...slot('post-a'), asset: chosen, caption: 'Reviewed caption.', draft_saved_at: '2026-09-08T17:00:00Z' }], draft_assets: [assets.postA, chosen] })
+    globalThis.fetch.mockResolvedValueOnce(response(initial)).mockResolvedValueOnce(response({ ok: true })).mockResolvedValueOnce(response(saved))
+    render(<MarketingPage />)
+    await screen.findByRole('combobox', { name: 'Post A approved image and caption' })
+    fireEvent.change(screen.getByRole('combobox', { name: 'Post A approved image and caption' }), { target: { value: chosen.id } })
+    fireEvent.change(screen.getByLabelText('Post A caption'), { target: { value: 'Reviewed caption.' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save draft for this slot' }))
+    await screen.findByText(/Draft saved in CWS/)
+    expect(globalThis.confirm).not.toHaveBeenCalled()
+    const writes = globalThis.fetch.mock.calls.filter(([, options]) => options.method === 'POST')
+    expect(writes).toHaveLength(1)
+    expect(JSON.parse(writes[0][1].body)).toMatchObject({ action: 'save_draft', asset_id: chosen.id, caption: 'Reviewed caption.' })
+    fireEvent.click(screen.getByRole('tab', { name: 'Instagram' }))
+    expect(screen.getByTestId('channel-preview-caption-INSTAGRAM')).toHaveTextContent('Reviewed caption.')
+  })
+
   it('shows exactly two deterministic weekly slots with editable captions and no automatic post', async () => {
     render(<MarketingPage />)
     await waitFor(() => expect(screen.getByRole('button', { name: 'Confirm Post A' })).toBeEnabled())

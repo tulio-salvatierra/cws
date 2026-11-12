@@ -239,8 +239,15 @@ Release verified: PR #90 merged as f7d9bce; production dpl_5Geb1sh1Nd1x1Wn7rTYwa
 
 Extended explicit gpt-image-2 native-ratio generation to square/portrait feeds across Instagram, Facebook and LinkedIn, plus LinkedIn landscape. Exact-ratio exports reject mismatched output rather than padding. Landscape uses 1200x624 (25:13), within LinkedIn photo limits and exactly generatable at 1600x832; prior 1200x628 cannot meet the model edge grid within its maximum edge. Legacy/unvalidated and padded unapproved drafts can be remade with their original image as a reference. Approved assets remain protected. 990 tests, lint and full build pass. Release/live private check in progress. No migration or publishing.
 
+Release verified: PR #91 merged as a1afa67; production dpl_GKiXWiCGUS3k3HTnYq2nhw2EW1gu READY. Live portrait reference remake exported 1080x1350 JPEG (410134 bytes) from 1152x1440, original retained. Fresh LinkedIn landscape exported 1200x624 JPEG (274764 bytes) from 1600x832. Both padded false/cropped false, private storage, ready/needs_review, null approvals, loaded previews visually checked. Published posts 59, publish attempts 21, approved assets 1 unchanged. No blocker; remaining presets have automated coverage.
+
+## 2026-11-12 — Saved Evergreen slot drafts
+
+Added owner-only save_draft handling before provider access, a private workspace-scoped draft table, and an approved library selector with persistent shared/channel captions. Reloaded previews and publication resolve the exact saved asset; unavailable saved assets fail closed. Attempted/resolved slots remain immutable. Generated private PNG/JPEG paths are now accepted by slot resolutions so all-error attempts can be closed without retries. Unknown actions cannot fall through to publishing. Migration 20261112192039 applied. 998 full-suite tests plus one new UI save/preview regression pass; lint and full production build checked before release. Production release and Friday assignment verification pending. No publication authorized.
+
 ## 2026-11-12 — CWS-EVERGREEN-BRANDING-20261112
 
 Added branding/README.md and branding/evergreen-generation.md, linked from root and Codex/Claude guidance. Verified public CSS/font/logo sources, positioning copy and current generation/validation code; distinguished suggested visual direction from verified facts and scoped admin tokens separately. Documentation only, no automatic prompt loading or runtime changes. Checks passed: 38 relative links, documented hex values present in inspected sources, all 11 preset sizes/ratios, git diff --check. Isolated checkout based on a1afa67; original CWS checkout untouched. No commit, push, merge, deployment, generation or publication.
 
 Follow-up: Owner authorized committing the guides and opening a review PR; merge and deployment remain unauthorized.
+

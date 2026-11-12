@@ -17,3 +17,5 @@ Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: Suggested visual direction is explicitly labeled, not recorded as approved policy.
 Git diff summary: Nine documentation files (two new), isolated branch codex/evergreen-branding-guide based on a1afa67; no pre-existing edits in this checkout.
+
+PR #93 opened for review. Updated branch with main (22eb6f2); preserved concurrent release and saved-slot records in project-log.md/task-ledger.md. The automatic preview for 302842c was canceled; no PR merge or production deployment authorized.
