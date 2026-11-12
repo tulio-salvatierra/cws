@@ -40,6 +40,7 @@ export default async function handler(req, res) {
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
 
   const body = req.method === 'POST' ? parseRequestBody(req.body) : null
+  if (body?.action === 'save_draft') return saveSlotDraft(res, client, context, body)
   if (isOfferCatalogRequest(body)) return updateOfferCatalog(res, client, context, body)
   if (isSlotResolutionRequest(body)) {
     return body.action === 'close_failed'
@@ -47,10 +48,38 @@ export default async function handler(req, res) {
       : resolveMissedSlot(res, client, context, body)
   }
 
+  if (body?.action) return res.status(400).json({ ok: false, error: 'Unknown Marketing action.' })
+
   if (getMissingProviderEnv().length) return res.status(503).json({ ok: false, error: 'Marketing publishing is not configured.' })
   const destinations = await verifyDestinations()
   if (req.method === 'GET') return getMarketingStatus(res, client, context, destinations)
   return createMarketingPost(res, client, context, destinations, body)
+}
+
+// Saving is owner-only preparation. No provider configuration, upload, or publish path runs.
+async function saveSlotDraft(res, client, context, body) {
+  const validation = validatePublishRequest({ ...body, reference_key: 'cws-marketing:00000000-0000-4000-8000-000000000000', owner_confirmation_token: '' })
+  if (validation) return res.status(400).json({ ok: false, error: validation })
+  const loaded = await loadMarketingAttempts(client, context.workspaceId)
+  if (loaded.error) return databaseFailure(res, loaded.error)
+  const resolutions = await loadSlotResolutions(client, context.workspaceId)
+  if (resolutions.error) return databaseFailure(res, resolutions.error)
+  const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
+  if (catalog.error) return databaseFailure(res, catalog.error)
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data, assets: marketingAssets(catalog.data, loaded.data), drafts: catalog.data.drafts, selectableAssets: catalog.data.selectableAssets })
+  const slot = plan.currentWeekSlots.find(row => row.slotKey === body.slot_key)
+  if (!slot || slot.attempt || slot.resolution || slot.carriedResolution || !['ready', 'upcoming'].includes(slot.state)) {
+    return res.status(409).json({ ok: false, error: 'Only an unattempted current or upcoming slot can receive a saved draft.' })
+  }
+  const asset = catalog.data.selectableAssets.find(row => row.id === body.asset_id)
+  if (!asset) return res.status(409).json({ ok: false, error: 'Choose an active approved feed image and caption from an active offer.' })
+  const saved = await client.from('marketing_slot_drafts').upsert({
+    workspace_id: context.workspaceId, slot_key: slot.slotKey, asset_id: asset.id,
+    caption: body.caption.trim(), platform_captions: normalizePlatformOverrides(body.platform_captions),
+    created_by: context.userId, updated_at: new Date().toISOString(),
+  }, { onConflict: 'workspace_id,slot_key' })
+  if (saved.error) return databaseFailure(res, saved.error)
+  return res.status(200).json({ ok: true, saved: true, slot_key: slot.slotKey })
 }
 
 async function getMarketingStatus(res, client, context, destinations) {
@@ -96,7 +125,7 @@ async function createMarketingPost(res, client, context, destinations, body) {
   if (resolutions.error) return databaseFailure(res, resolutions.error)
   const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
   if (catalog.error) return databaseFailure(res, catalog.error)
-  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data, assets: marketingAssets(catalog.data, loaded.data) })
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data, assets: marketingAssets(catalog.data, loaded.data), drafts: catalog.data.drafts, selectableAssets: catalog.data.selectableAssets })
   const slots = plan.slots
   const slot = slots.find(candidate => candidate.slotKey === body.slot_key)
   if (!slot || !slot.asset || slot.asset.id !== body.asset_id) {
@@ -309,7 +338,9 @@ async function resolveMissedSlot(res, client, context, body) {
   const resolutions = await loadSlotResolutions(client, context.workspaceId)
   if (resolutions.error) return databaseFailure(res, resolutions.error)
 
-  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data })
+  const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
+  if (catalog.error) return databaseFailure(res, catalog.error)
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data, assets: marketingAssets(catalog.data, loaded.data), drafts: catalog.data.drafts, selectableAssets: catalog.data.selectableAssets })
   const slot = plan.missedSlots.find(candidate => candidate.slotKey === body.slot_key)
   const oldestMissedSlot = plan.missedSlots[0]
   if (!slot || !slot.asset || !oldestMissedSlot || oldestMissedSlot.slotKey !== slot.slotKey) {
@@ -370,7 +401,9 @@ async function closeFailedSlot(res, client, context, body) {
   const resolutions = await loadSlotResolutions(client, context.workspaceId)
   if (resolutions.error) return databaseFailure(res, resolutions.error)
 
-  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data })
+  const catalog = await loadOfferCatalog(client, context.workspaceId, loaded.data)
+  if (catalog.error) return databaseFailure(res, catalog.error)
+  const plan = buildMarketingOccurrencePlan({ attempts: loaded.data, resolutions: resolutions.data, assets: marketingAssets(catalog.data, loaded.data), drafts: catalog.data.drafts, selectableAssets: catalog.data.selectableAssets })
   const slot = plan.slots.find(candidate => candidate.slotKey === body.slot_key)
   const closeableSlot = nextClosableFailedSlot(plan.slots)
   if (!slot || !closeableSlot || closeableSlot.slotKey !== slot.slotKey || !slot.asset || !isFailedWithoutPublication(slot.attempt)) {
@@ -467,12 +500,13 @@ async function reconcileUnfinishedSlotAttempts(client, attempts) {
 }
 
 async function loadOfferCatalog(client, workspaceId, attempts) {
-  const [offers, media, captions] = await Promise.all([
+  const [offers, media, captions, drafts] = await Promise.all([
     client.from('offers').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(100),
     client.from('offer_media').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(300),
     client.from('offer_captions').select('*').eq('workspace_id', workspaceId).order('created_at', { ascending: true }).limit(300),
+    client.from('marketing_slot_drafts').select('*').eq('workspace_id', workspaceId).order('updated_at', { ascending: false }).limit(100),
   ])
-  const failure = [offers, media, captions].find(result => result.error)
+  const failure = [offers, media, captions, drafts].find(result => result.error)
   if (failure) return { data: null, error: failure.error }
   const signedMedia = await Promise.all((media.data || []).map(async medium => {
     if (medium.media_source !== 'generated') return medium
@@ -480,12 +514,12 @@ async function loadOfferCatalog(client, workspaceId, attempts) {
     return { ...medium, preview_url: signed.error ? null : signed.data?.signedUrl || null }
   }))
   return {
-    data: buildOfferCatalog({
+    data: { ...buildOfferCatalog({
       offers: offers.data || [],
       media: signedMedia,
       captions: captions.data || [],
       attempts: attempts || [],
-    }),
+    }), drafts: drafts.data || [] },
     error: null,
   }
 }
@@ -499,7 +533,7 @@ function marketingAssets(catalog, attempts) {
 }
 
 function marketingStatusResponse(destinations, storage, attempts, resolutions, context, catalog) {
-  const plan = buildMarketingOccurrencePlan({ attempts, resolutions, assets: marketingAssets(catalog, attempts) })
+  const plan = buildMarketingOccurrencePlan({ attempts, resolutions, assets: marketingAssets(catalog, attempts), drafts: catalog.drafts, selectableAssets: catalog.selectableAssets })
   const slots = plan.slots
   const activeSlotKeys = new Set(slots.map(slot => slot.slotKey))
   const history = attempts.filter(attempt => !activeSlotKeys.has(attempt.marketing_slot_key))
@@ -517,6 +551,7 @@ function marketingStatusResponse(destinations, storage, attempts, resolutions, c
     missed_slot_signal: plan.missedSlotSignal,
     missed_slot_decisions: resolutions.map(serializeSlotResolution),
     offer_catalog: catalog.offers,
+    draft_assets: catalog.selectableAssets.map(asset => serializeSlot({ asset, destinationResults: [] }).asset),
     poll_after_ms: hasUnfinishedAttempt ? MARKETING_POLL_INTERVAL_MS : null,
   }
 }
@@ -872,10 +907,13 @@ function serializeSlot(slot, ownerConfirmationToken = null) {
       asset_path: slot.asset.assetPath,
       asset_url: slot.asset.assetUrl || slot.asset.assetPath,
       label: slot.asset.label,
+      offer_media_id: slot.asset.offerMediaId,
+      offer_caption_id: slot.asset.offerCaptionId,
       price: slot.asset.price,
       default_caption: slot.asset.defaultCaption,
       fallback: slot.asset.fallback === true,
     } : null,
+    draft_saved_at: slot.draft?.updated_at || null,
     caption: slot.caption,
     platform_captions: slot.platformCaptions || {},
     owner_confirmation_token: ownerConfirmationToken,

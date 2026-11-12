@@ -40,6 +40,8 @@ export default function MarketingPage() {
   const [channelEdits, setChannelEdits] = useState({})
   const [confirmingSlotKey, setConfirmingSlotKey] = useState('')
   const [resolvingSlotKey, setResolvingSlotKey] = useState('')
+  const [draftSelections, setDraftSelections] = useState({})
+  const [savingDraft, setSavingDraft] = useState('')
   const [catalogSaving, setCatalogSaving] = useState(false)
   const [creative, setCreative] = useState({ loading: true, ideaRuns: [], assets: [], error: '' })
   const [creativeBusy, setCreativeBusy] = useState('')
@@ -61,6 +63,7 @@ export default function MarketingPage() {
         slots,
         attemptHistory: body.attempt_history || [],
         offerCatalog: body.offer_catalog || [],
+        draftAssets: body.draft_assets || [],
         storageReady: body.storage_ready === true,
         storageError: body.storage_error || '',
         pollAfterMs: body.poll_after_ms || null,
@@ -102,6 +105,25 @@ export default function MarketingPage() {
     const interval = window.setInterval(refreshStatus, POLL_INTERVAL_MS)
     return () => window.clearInterval(interval)
   }, [refreshStatus, state.pollAfterMs])
+
+  async function saveDraft(slot) {
+    if (!session?.access_token || savingDraft) return
+    setSavingDraft(slot.slot_key)
+    try {
+      const response = await requestMarketing('/api/marketing-linkedin', session.access_token, {
+        action: 'save_draft', slot_key: slot.slot_key,
+        asset_id: draftSelections[slot.slot_key] || slot.asset?.id,
+        caption: captions[slot.slot_key] ?? slot.caption ?? '',
+        platform_captions: slotChannelOverrides(slot, channelEdits),
+      })
+      const body = await readJson(response)
+      if (!response.ok) throw new Error(body.error || 'The draft could not be saved.')
+      setDraftSelections(current => { const next = { ...current }; delete next[slot.slot_key]; return next })
+      await refreshStatus()
+    } catch (error) {
+      setState(current => ({ ...current, error: error.message }))
+    } finally { setSavingDraft('') }
+  }
 
   async function confirm(slot) {
     const caption = captions[slot.slot_key] ?? slot.caption ?? ''
@@ -306,6 +328,11 @@ export default function MarketingPage() {
           {state.slots.map(slot => <WeeklySlot
             key={slot.slot_key}
             slot={slot}
+            draftAssets={state.draftAssets || []}
+            selectedDraftAsset={draftSelections[slot.slot_key] || slot.asset?.id || ''}
+            onDraftAssetChange={value => setDraftSelections(current => ({ ...current, [slot.slot_key]: value }))}
+            onSaveDraft={() => saveDraft(slot)}
+            savingDraft={savingDraft === slot.slot_key}
             destinations={state.destinations}
             caption={captions[slot.slot_key] ?? slot.caption ?? ''}
             channelOverrides={slotChannelOverrides(slot, channelEdits)}
@@ -317,7 +344,7 @@ export default function MarketingPage() {
             onCloseFailed={() => closeFailedSlot(slot)}
             confirming={confirmingSlotKey === slot.slot_key}
             resolving={resolvingSlotKey === slot.slot_key}
-            canConfirm={canConfirmSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '', slotChannelOverrides(slot, channelEdits))}
+            canConfirm={!draftSelections[slot.slot_key] && !savingDraft && canConfirmSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '', slotChannelOverrides(slot, channelEdits))}
             canResolve={canResolveMissedSlot(state, slot, captions[slot.slot_key] ?? slot.caption ?? '')}
             canCloseFailed={canCloseFailedSlot(state, slot)}
           />)}
@@ -518,12 +545,23 @@ function isCompatibleActiveMedia(media) { return media.status === 'active' && me
 function dollarsToCents(value) { const match = String(value || '').trim().match(/^(\d+)(?:\.(\d{1,2}))?$/); return match ? Number(match[1]) * 100 + Number((match[2] || '').padEnd(2, '0')) : null }
 function centsToDollars(value) { return Number.isInteger(value) ? String(value / 100) : '' }
 
-function WeeklySlot({ slot, destinations, caption, channelOverrides = {}, onOpenChannel, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed, onEvaluate }) {
+function WeeklySlot({ slot, draftAssets = [], selectedDraftAsset, onDraftAssetChange, onSaveDraft, savingDraft, destinations, caption, channelOverrides = {}, onOpenChannel, onCaptionChange, onConfirm, onResolve, onCloseFailed, confirming, resolving, canConfirm, canResolve, canCloseFailed, onEvaluate }) {
   const detail = SLOT_DETAILS[slot.state] || SLOT_DETAILS.processing
   const locked = Boolean(slot.attempt) || confirming || resolving || slot.state === 'resolved'
   const fallback = slot.asset?.fallback === true
   return <section aria-labelledby={`${slot.key}-heading`} className="rounded-2xl border border-gray-800 bg-gray-900/70 p-5 shadow-2xl shadow-black/20 sm:p-6">
     <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300">{slot.label}</p><h2 id={`${slot.key}-heading`} className="mt-2 text-xl font-semibold text-white">{slot.weekday}</h2><p className="mt-1 text-sm text-gray-400">{slot.state === 'missed' ? `Original scheduled day: ${formatSlotDate(slot.slot_date)}` : formatSlotDate(slot.slot_date)}</p></div><span className={`rounded-full border px-3 py-1 text-xs font-semibold ${slot.state === 'posted' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200' : slot.state === 'ready' ? 'border-indigo-400/30 bg-indigo-400/10 text-indigo-100' : slot.state === 'missed' ? 'border-amber-400/30 bg-amber-400/10 text-amber-100' : slot.state === 'failed' ? 'border-rose-400/30 bg-rose-400/10 text-rose-200' : 'border-gray-700 bg-gray-800 text-gray-300'}`}>{detail.label}</span></div>
+    {!slot.attempt && !slot.resolution && !slot.carried_from && ['ready', 'upcoming'].includes(slot.state) && draftAssets.length > 0 && <div className="mt-4 space-y-2">
+      <label className="block text-sm text-gray-200">Approved image and caption
+        <select aria-label={`${slot.label} approved image and caption`} value={selectedDraftAsset} onChange={event => onDraftAssetChange(event.target.value)} disabled={savingDraft} className="mt-2 w-full rounded-lg border border-gray-700 bg-gray-950 p-2 text-sm">
+          {!draftAssets.some(asset => asset.id === selectedDraftAsset) && <option value="">Choose a library asset</option>}
+          {draftAssets.map((asset, index) => <option key={asset.id} value={asset.id}>{asset.label} · {asset.default_caption.slice(0,90)} · option {index + 1}</option>)}
+        </select>
+      </label>
+      {draftAssets.find(asset => asset.id === selectedDraftAsset) && <img src={draftAssets.find(asset => asset.id === selectedDraftAsset).asset_url} alt="Selected library image" className="max-h-64 w-auto rounded-lg" />}
+      <button type="button" onClick={onSaveDraft} disabled={savingDraft || !caption.trim() || !selectedDraftAsset} className="rounded-lg border border-indigo-400 px-4 py-2 text-sm text-indigo-100 disabled:opacity-40">{savingDraft ? 'Saving draft…' : 'Save draft for this slot'}</button>
+      <p className="text-xs text-gray-400">{slot.draft_saved_at ? 'Draft saved in CWS. Save again after editing.' : 'Save the selected image and current captions to this slot.'} Nothing is scheduled or published. Channel previews show the saved image.</p>
+    </div>}
     {slot.asset ? <>
       <div className="mt-5 overflow-hidden rounded-xl border border-gray-700 bg-gray-100"><img src={slot.asset.asset_url || slot.asset.asset_path} alt={slot.asset.label} className="block max-h-[34rem] w-full object-contain" /></div>
       <div className="mt-4 flex items-center gap-2"><h3 className="font-medium text-white">{slot.asset.label}</h3>{slot.asset.price && <span className="text-sm text-gray-400">{slot.asset.price}</span>}{fallback && <span className="rounded bg-amber-400/10 px-2 py-0.5 text-xs text-amber-100">Fallback asset</span>}</div>

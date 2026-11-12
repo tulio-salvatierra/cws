@@ -20,4 +20,6 @@ Git diff summary: Isolated current-main checkout at 277b1c3, branch codex/evergr
 
 Follow-up CWS-STORY-FULL-FRAME-20261110: native 9:16 image tool output and composition-reference remakes implemented; 954 tests, lint and full build passed; PR #90 merged, production READY, reference-based live remake verified at 1080x1920 JPEG with no padding/cropping. Original retained; nothing approved or published. No migration required or publishing authorized.
 
-Current follow-up CWS-FEED-FULL-FRAME-20261110: all presets now request exact model aspect ratios, reject mismatches and allow reference-based legacy/padded draft remake. LinkedIn landscape export 1200x624. Automated validation/release/live private feed check in progress; no migration or publishing.
+Current follow-up CWS-FEED-FULL-FRAME-20261110: all presets now request exact model aspect ratios, reject mismatches and allow reference-based legacy/padded draft remake. LinkedIn landscape export 1200x624. 990 tests, lint and build passed; PR #91 merged and production READY. Live private portrait remake and landscape generation verified without padding/cropping; original portrait retained; no approval/publication. No remaining blocker.
+
+2026-11-12 follow-up: CWS-SAVED-SLOT-DRAFTS-20261112 adds private marketing_slot_drafts, safe save_draft action and weekly selection controls. Migration 20261112192039 applied to production; generated path check repaired for slot closure. All publication requires existing separate exact-resource owner confirmation. Release and authenticated Friday review are still pending.
