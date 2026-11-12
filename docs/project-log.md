@@ -250,3 +250,8 @@ Release verified: PR #92 merged as 22eb6f2; production dpl_gq7d96suN2Ad2WkgaNLFA
 ## 2026-11-12 — Portrait preview frame
 
 Removed fixed image-height caps from all four channel previews, the weekly slot cards, and shared live preview. Images now render full width at their intrinsic aspect ratio. No crop, padding, image generation, stored asset changes, or publishing. Validation and live release pending.
+## 2026-11-12 — CWS-EVERGREEN-BRANDING-20261112
+
+Added branding/README.md and branding/evergreen-generation.md, linked from root and Codex/Claude guidance. Verified public CSS/font/logo sources, positioning copy and current generation/validation code; distinguished suggested visual direction from verified facts and scoped admin tokens separately. Documentation only, no automatic prompt loading or runtime changes. Checks passed: 38 relative links, documented hex values present in inspected sources, all 11 preset sizes/ratios, git diff --check. Isolated checkout based on a1afa67; original CWS checkout untouched. No commit, push, merge, deployment, generation or publication.
+
+Follow-up: Owner authorized committing the guides and opening a review PR; merge and deployment remain unauthorized.
