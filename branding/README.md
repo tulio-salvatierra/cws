@@ -3,7 +3,8 @@
 Canonical agent-readable brand reference for Evergreen creative work. Verified
 against repository sources on 2026-11-12; this is not a new visual identity.
 Read [Evergreen generation instructions](evergreen-generation.md) next.
-These files guide agents; the application does not automatically load Markdown.
+The existing idea and image requests load both guides as server-side brand context.
+Guide edits take effect after deployment; no separate brand configuration is required.
 Runtime behavior and product authority remain defined by the linked code and
 [product definition](../docs/product-definition.md). Update this guide when its
 sources change; do not copy competing brand rules into other agent files.
