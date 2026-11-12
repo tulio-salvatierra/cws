@@ -1,23 +1,24 @@
-Task ID: CWS-EVERGREEN-BRAND-REQUESTS-20261112
+Task ID: CWS-CONTACT-20261112
 Agent: Codex
-Objective: Connect existing Evergreen New Generation requests to the canonical branding guides; prepare a review PR only.
-Files inspected: Product definition, technical conventions, decisions, learnings, current records; AGENTS/role guidance; both branding guides; creative API, prompt builders and tests; MarketingPage; image presets/output validator; Vercel config/ignore and CI workflow.
-Files changed: server/marketing/brand-guidance.js and its tests; creative.js and tests; API creative tests; MarketingPage help text; vercel.json; branding guides, root/role discovery guidance; three project records.
-Database or API changes: No schema, routes, request contract or extra model calls. Existing requests carry both Markdown guides as server instructions before their authoritative task rules.
-Security decisions: Fixed local paths only; no request-controlled guide content; missing/empty/oversized files fail before provider access. Owner-only draft creation and separate publication confirmation unchanged. Brand suggestions cannot authorize text/logo overlays or override the selected preset/reference composition.
-Decisions made: Read canonical Markdown directly instead of duplicating brand rules; package the two files explicitly in the creative function. Disable auto-deploy only for codex/evergreen-branding-integration using git.deploymentEnabled; main and other branches retain defaults.
-Assumptions: Guide edits take effect after deployment. Generated images remain subject to visual owner review, not a guarantee of model adherence.
-Tests added: Canonical file inclusion and invalid/missing guide cases; actual idea request payload and input isolation; provider/upload suppression on missing guidance; existing tests now verify both guides on all 11 formats and four remake cases. Server tests run in Node, matching runtime.
-Tests run: 1006 tests / 98 files passed; lint passed; full production build/prerender passed with non-secret placeholders. Relocated server-module/guide copy loads outside repo cwd. git diff --check passed. Initial restricted prerender could not bind localhost; permitted local rerun passed.
-Known issues: Existing dependency advisories and large client chunk warning unchanged. No live model request or Vercel deployment performed. Explicit file inclusion and relocated-loader check do not substitute for deployed-function verification after release approval.
-Recommended next task: Review PR; after authorization, merge/deploy and verify one private branded generation, without publication.
-Questions requiring Tulio: None for PR preparation.
-Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md. Prior PR #93 release result recorded from this session.
+Objective: Implement approved contact page and connect it to existing capture flow on a review-only branch.
+Files inspected: AGENTS.md, .agents/codex-project-instructions.md, product definition, conventions, decisions, learnings, current handoff; Contact/Layout/Header/Footer/CustomButton, public-lead and Negocio Listo client/form, Sales read/queue/UI, lead schema/types and tests.
+Files changed: Contact.tsx; new ContactLeadForm.tsx and TrustindexReviews.tsx; shared public-lead transport; public-lead handler/tests; Sales handler/queue/UI; lead types; additive migration; project records.
+Database or API changes: Existing POST /api/outreach/public-lead accepts form=contact, required email, optional US phone, allow-listed service and bounded message. Migration 20261112200524_contact_page_inquiry_details.sql adds nullable inquiry_service and inquiry_message to leads. Applied and verified in production on 2026-11-12. Must apply before deploying because Sales queries and public lead capture use the new columns. Preserve exact remote migration version at release.
+Security decisions: Server owns workspace/created_by; no client database keys or new grants. Existing RLS remains. Honeypot and fill-time guard retained. Contacts only deduplicate identical recent inquiries, never rewrite a different inquiry or authenticated Sales fields. NL duplicate lookup excludes contact inquiries. No email or external business action triggered.
+Decisions made: Reuse current capture endpoint and site components. Render vendor widget in its own document to isolate loader globals across React remounts. Preserve approved pricing/commitments.
+Assumptions: Existing owner/environment configuration will serve this endpoint after deployment. Existing 15-minute audit copy and /30min booking URL remain unchanged for owner review.
+Tests added: Contact API validation, optional phone, workspace ownership, exact retry, insert failure; form confirmed-success and failed-submit retry tests. Existing NL regressions retained.
+Tests run: 1001 tests / 98 files pass; lint pass; isolated PGlite migration validation passes (valid insert, invalid service/empty/oversized message rejected, existing RLS stays enabled). Full production build and all public-page prerenders pass with placeholder client environment. Desktop/mobile branch inspected locally; Trustindex badge rendered. No production submission performed.
+Known issues: Migration unapplied; live persistence intentionally not exercised. Client timeout + recent identical-inquiry match provides normal retry behavior, not a database uniqueness guarantee for concurrent requests. Existing chunk-size build warning.
+Recommended next task: Owner authorized commit, push and review PR on 2026-11-12. Review implementation; do not merge or apply migration yet. Release separately requires migration before deployment and controlled end-to-end verification.
+Questions requiring Tulio: Resolve existing audit duration mismatch before changing either copy or scheduling configuration.
+Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md, product-definition.md capture-flow description.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: No new brand policy; existing suggestions retain their status.
-Git diff summary: Isolated branch codex/evergreen-branding-integration from main 7696188. Original CWS checkout untouched. No merge/deploy authorized for this integration.
+Memory updates withheld: None.
+Git diff summary: Fresh checkout at a1afa67, local branch feat/contact-page-lead-capture. Committed and pushed; draft PR #94 is open. Rebased onto current main 22eb6f2, preserving concurrent project log and ledger entries. Merge and migration remain prohibited. No pre-existing changes in isolated checkout; original checkout has unrelated image edits and is untouched.
 
-PR #96 opened for review. Synced main d6907f3 (PR #95 preview sizing); only this handoff conflicted. Concurrent project log entries retained.
 
-Concurrent work carried forward: PR #92 production release was verified; the Friday draft was saved/restored with its exact caption and approved portrait across all four channels, Not submitted. PR #95 removed fixed-height image frames in channel/weekly previews; its live verification remains owned by that task. This integration does not alter stored images, drafts or publication state.
+PR #94 review follow-up (2026-11-12): Found and fixed a valid long-message submission failure risk: the previous PostgREST duplicate lookup put up to 4,000 Unicode characters into a GET URL. The query now reads at most 20 recent rows scoped by workspace/email/source and compares the exact submitted fields server-side. It still never overwrites a different inquiry. Added regressions for long Unicode messages, different inquiries and failed lookups. 1,013 tests / 98 files and lint pass on the rebased branch. No migration or merge performed; final GitHub checks are being verified for this follow-up commit. Recent-retry detection is bounded to 20 candidates and is not a concurrent-request uniqueness guarantee.
+
+Release authorization (2026-11-12): Owner authorized migration, merge and live verification. Applied exact remote migration 20261112200524; verified both columns, constraints and unchanged enabled RLS. Prior merge/migration holds are superseded. All checks on 8ef8235 passed (Supabase Preview skipped); release checks for this migration-record update pending.

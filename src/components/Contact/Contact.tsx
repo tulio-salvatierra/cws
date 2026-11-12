@@ -1,168 +1,94 @@
-import {
-  PINTEREST_URL,
-  FACEBOOK_URL,
-  INSTAGRAM_URL,
-  YOUTUBE_URL,
-  LINKEDIN_URL,
-  TWITTER_URL,
-  EMAIL,
-  PHONE,
-  CALENDLY_URL,
-} from "../../Constants/Constants";
-
-import { useEffect, useState, useRef } from "react";
 import CustomButton from "../CustomButton/CustomButton";
-import { useScramble } from "../../Hooks/useScramble";
-import MaskedLines from "../MaskedLines/MaskedLines";
-import { useFadeIn } from "../../Hooks/useFadeIn";
-import Banner from "../Banner/Banner";
 import StudioMap from "./StudioMap";
-
+import ContactLeadForm from "./ContactLeadForm";
+import TrustindexReviews from "./TrustindexReviews";
+import { EMAIL, PHONE, CALENDLY_URL } from "../../Constants/Constants";
 export default function Contact() {
-  const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 });
-
-  const scrambleRef2 = useScramble("FOLLOW ME", 0.15);
-  const fadeInRef = useFadeIn();
-  const imageRef = useRef<HTMLImageElement>(null);
-  useEffect(() => {
-    const updateDimensions = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-    return () => window.removeEventListener("resize", updateDimensions);
-  }, []);
-
   return (
-    <section
-      id="contact"
-      className="relative p- mt-10 w-full min-h-screen flex flex-col items-center justify-center p-1 gap-1 overflow-hidden contact-container animate-in fade-in-0 fade-out-0 duration-300 "
-    >
-      {/* Main content block */}
-      <div className="relative p-4 z-10 text-white w-full rounded-2xl bg-zinc-800/40 backdrop-blur-sm">
-        {/* Header with brand name */}
-        <div className="text-center p-1">
-          <Banner/>
-          
-          <MaskedLines
-            as="h1"
-            scroll
-            scrollStart="top 85%"
-            className="font-main text-[2rem] sm:text-[3rem] text-zinc-900 mt-1 text-left mx-auto leading-none tracking-wide w-100"
-          >
-            Schedule a free 15-minute site audit to discover
-            how a strategic website can boost your business.
-          </MaskedLines>
+    <div className="relative max-w-7xl mx-auto px-4 md:px-8 pt-40 pb-10 text-white">
+      <section
+        id="contact"
+        className="bg-zinc-800/80 backdrop-blur-sm rounded-2xl p-6 md:p-12 grid lg:grid-cols-2 gap-10 items-center"
+      >
+        <div>
+          <p className="text-orange-500 uppercase text-sm mb-5">
+            Cicero Web Studio / Contact
+          </p>
+          <h1 className="font-main text-4xl sm:text-5xl lg:text-6xl leading-none mb-6">
+            Good websites start with a{" "}
+            <span className="text-orange-500">conversation.</span>
+          </h1>
+          <p className="text-zinc-300 text-lg mb-8">
+            Schedule a free 15-minute site audit to discover how a strategic
+            website can boost your business.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <CustomButton
+              label="Book a free site audit"
+              href={CALENDLY_URL}
+              newTab
+            />
+            <CustomButton
+              label="Tell us about your project"
+              href="#project-inquiry"
+              secondary
+            />
+          </div>
+          <div className="flex flex-col gap-3 mt-8 text-sm">
+            <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+            <a href={`tel:+1${PHONE}`}>786-314-6121</a>
+          </div>
         </div>
-
-        {/* Main content area with profile and contact info */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 flex-col lg:flex-row items-center lg:items-start gap-12 lg:gap-16">
-          {/* Profile Picture Section */}
-          <div className="flex-shrink-0 text-center lg:text-left">
-            <div className="relative inline-block">
-              <div
-                ref={fadeInRef}
-                className="flex justify-center items-end mx-auto shadow-2xl"
-              >
-                <img
-                  ref={imageRef}
-                  src="/images/tulio.png"
-                  alt="Tulio Salvatierra"
-                  className=" object-cover w-full h-full rounded-md"
-                />
-              </div>
-            </div>
-            <h3
-              ref={fadeInRef}
-              className="text-xl md:text-2xl font-main font-bold text-black mt-6"
-            >
-              Tulio Salvatierra
-            </h3>
-            <p
-              ref={fadeInRef}
-              className="text-black text-sm md:text-base font-secondary"
-            >
-              Founder & Developer
+        <div>
+          <img
+            src="/images/tulio.png"
+            alt="Tulio Salvatierra"
+            className="w-full h-[24rem] md:h-[30rem] object-cover object-top rounded-xl"
+          />
+          <h2 className="font-main text-2xl mt-5">Tulio Salvatierra</h2>
+          <p className="text-zinc-300 mt-2">Founder & Developer</p>
+        </div>
+      </section>
+      <section id="project-inquiry" className="py-16 scroll-mt-28">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12">
+          <div>
+            <p className="text-orange-500 text-sm uppercase mb-4">
+              Tell us about your project
             </p>
-            {/* Email address */}
-            <div className="flex flex-col gap-4 items-start justify-start mt-4">
-              <MaskedLines
-                as="p"
-                scroll
-                scrollStart="top 85%"
-                className="font-main leading-none text-black text-lg w-100"
-              >
-                I am available for call or emails. Let's talk about your
-                project.
-              </MaskedLines>
-
-              <div
-                ref={fadeInRef}
-                className="flex sm:flex-row flex-col gap-1 m-1 items-center justify-start mt-4"
-              >
-              
-                <CustomButton
-                  label="Call Us Now"
-                  href={`tel:+1${PHONE}`}
-                  secondary={true}
-                />
-              </div>
-            </div>
+            <h2 className="text-4xl md:text-5xl font-main mb-6">
+              What are you working on?
+            </h2>
+            <p className="text-xl text-zinc-300">
+              Starting something new or improving an existing website? Share a
+              few details so we can understand what you need.
+            </p>
           </div>
-          <div className="flex flex-col gap-1 h-full items-center justify-center">
-            <h3
-              ref={scrambleRef2}
-              className="text-xl font-main font-bold sm:text-[4rem] text-[2rem] text-center text-black hover:text-orange-900 transition-colors duration-200 block mb-2"
-            >
-              FOLLOW ME
-            </h3>
-
-            <div ref={fadeInRef} className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-white w-100">
-              {[
-                { label: "INSTAGRAM", href: INSTAGRAM_URL },
-                { label: "YOUTUBE", href: YOUTUBE_URL },
-                { label: "FACEBOOK", href: FACEBOOK_URL },
-                { label: "TWITTER", href: TWITTER_URL },
-                { label: "PINTEREST", href: PINTEREST_URL },
-                { label: "LINKEDIN", href: LINKEDIN_URL },
-              ].map(({ label, href }) => (
-                <div key={label} className="w-fit">
-                  <a
-                    className="text-white hover:text-orange-900 leading-none font-main font-semibold text-[1.5rem] sm:text-[1.5rem]"
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {label}
-                  </a>
-                </div>
-              ))}
-            </div>
-            <div
-              ref={fadeInRef}
-              className="mt-8 h-[20rem] w-full overflow-hidden rounded-xl sm:h-[24rem]"
-            >
-              <StudioMap />
-            </div>
-          </div>
+          <ContactLeadForm />
         </div>
-
-        {/* Contact Information Section */}
-
-        <div className="flex flex-row gap-4 items-center justify-center">
-          {/* Main heading */}
-
-          <div className="flex flex-row gap-4 items-center justify-center"></div>
-
-          {/* Social section */}
+      </section>
+      <TrustindexReviews />
+      <section className="bg-zinc-800/80 backdrop-blur-sm rounded-2xl p-6 md:p-12 grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <p className="text-orange-500 text-sm uppercase mb-4">
+            Based in Chicago
+          </p>
+          <h2 className="text-3xl md:text-4xl mb-6">
+            A local studio. A direct connection.
+          </h2>
+          <p className="text-zinc-300 mb-6">
+            Have a website in mind, or one that needs a fresh look? Let’s talk
+            about your project.
+          </p>
+          <CustomButton
+            label="Email Tulio"
+            href={`mailto:${EMAIL}`}
+            secondary
+          />
         </div>
-
-        {/* Google Maps Embed */}
-      </div>
-    </section>
+        <div className="h-80 overflow-hidden rounded-xl">
+          <StudioMap />
+        </div>
+      </section>
+    </div>
   );
 }

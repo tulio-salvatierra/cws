@@ -179,6 +179,7 @@ function CommandItem({ item, onNotNow, onAction, onEdit }) {
       : lead.phone ? <a href={`tel:${lead.phone}`} className="rounded-xl bg-orange-300 px-4 py-2 text-sm font-semibold text-slate-950">Call</a> : null
   const callIsPrimary = !(item.category === 'promised') && !(item.sendType && lead.email) && Boolean(lead.phone)
   return <article className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 md:px-5">
+    {lead.inquiry_message && <details className="mb-4 rounded-xl bg-slate-900/60 p-4"><summary className="cursor-pointer text-sm text-orange-200">Contact inquiry · {lead.inquiry_service}</summary><p className="mt-3 whitespace-pre-wrap break-words text-sm text-slate-200">{lead.inquiry_message}</p></details>}
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
       <div aria-hidden="true" className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] font-semibold text-slate-300">{name.charAt(0).toUpperCase()}</div>
       <div className="min-w-[12rem] flex-1"><h2 className="truncate text-base font-semibold">{name}</h2><p className="truncate text-xs text-slate-400">{subtitle}</p></div>

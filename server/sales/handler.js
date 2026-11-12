@@ -47,7 +47,7 @@ async function loadQueue(req, res) {
   const context = await authenticateWorkspace(req)
   if (context.error) return res.status(context.status).json({ ok: false, error: context.error })
   const [leads, promisedActions, outreachSends, prospects, verificationRequired] = await Promise.all([
-    context.client.from('leads').select('id, name, email, company, status, is_test, test_record_reason, test_record_by, test_record_at, sales_classification, response_state, phone, locality, google_business_profile_url, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
+    context.client.from('leads').select('id, name, email, company, inquiry_service, inquiry_message, status, is_test, test_record_reason, test_record_by, test_record_at, sales_classification, response_state, phone, locality, google_business_profile_url, last_contacted_at, created_at').eq('workspace_id', context.workspaceId).order('created_at', { ascending: true }),
     context.client.from('sales_promised_actions').select('id, lead_id, action_text, due_on, completed_at, created_at').eq('workspace_id', context.workspaceId).is('completed_at', null).order('due_on', { ascending: true }).order('created_at', { ascending: true }),
     context.client.from('outreach_sends').select('id, lead_id, send_type, status, sent_at, created_at').eq('workspace_id', context.workspaceId).not('lead_id', 'is', null).order('created_at', { ascending: true }),
     context.client.from('sales_discovery_candidates').select('id, business_name, category, locality, website_url, business_email, business_phone, observed_facts, opportunity, opportunities, review_basis, evidence_urls, inspected_at, possible_duplicate, possible_duplicate_reason, prospect_brief_run_id, created_at').eq('workspace_id', context.workspaceId).eq('review_state', 'ready').order('created_at', { ascending: true }),
@@ -934,7 +934,7 @@ async function updateLeadSalesState(context, body, res) {
     status: leadStatus || lead.data.status,
   }
   if (hasGoogleBusinessProfileUrl) changes.google_business_profile_url = googleBusinessProfileUrl
-  const updated = await context.client.from('leads').update(changes).eq('id', lead.data.id).eq('workspace_id', context.workspaceId).select('id, name, email, company, status, is_test, test_record_reason, test_record_by, test_record_at, sales_classification, response_state, phone, locality, google_business_profile_url').single()
+  const updated = await context.client.from('leads').update(changes).eq('id', lead.data.id).eq('workspace_id', context.workspaceId).select('id, name, email, company, inquiry_service, inquiry_message, status, is_test, test_record_reason, test_record_by, test_record_at, sales_classification, response_state, phone, locality, google_business_profile_url').single()
   return updated.error
     ? res.status(502).json({ ok: false, error: updated.error.message })
     : res.status(200).json({ ok: true, lead: updated.data })

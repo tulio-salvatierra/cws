@@ -261,3 +261,21 @@ PR #93 release follow-up: owner authorized merge and deployment verification. Me
 ## 2026-11-12 — CWS-EVERGREEN-BRAND-REQUESTS-20261112
 
 Connected both canonical branding guides to the existing idea/image instruction builders, including remakes. Fixed repository paths, bounded file loading and a clear failure before provider calls prevent silent unbranded fallback. Existing text/logo restrictions, presets, validation and owner confirmation remain intact. Explicit Vercel includeFiles bundles the guides; only this review branch has automatic deployment disabled. UI and agent documentation explain the connection. 1006 tests across 98 files, lint, full placeholder-env production build/prerender, relocated server loader check and diff checks passed. No paid generation, database change, merge or deployment; PR preparation only. Live generated-image quality and deployed packaging verification remain release checks after authorization.
+
+
+## 2026-11-12 — CWS-CONTACT-20261112 contact page review branch
+
+Implemented the owner-approved contact layout using shared site styles/components. Added a validated contact inquiry form using the existing public-lead endpoint and its server-owned workspace flow; email required, optional US phone, honeypot, elapsed-time guard, pending/error/retry/success states and 15-second client timeout. Contact source is distinct from Negocio Listo; identical recent contact submissions are acknowledged without overwriting prior records. Added bounded project type/message columns in an unapplied migration and exposed those details in private Sales. Isolated Trustindex in its own embedded document after verifying a loader issue during React navigation; the supplied rating badge renders. No prices or commitments changed. The existing 15-minute audit copy / 30min scheduling URL mismatch remains unchanged.
+
+1001 tests across 98 files, lint, and full production build/public prerender pass with placeholder client environment. Local PostgreSQL migration check verifies valid insert, constraints and preserved RLS. No live lead insertion, email, production migration, commit, push, merge or deployment. Fresh isolated checkout based on a1afa67; original CWS checkout and its unrelated image edits untouched. Review branch: feat/contact-page-lead-capture.
+
+Owner follow-up authorized committing and pushing the review branch and opening a PR. Merge and migration application remain explicitly prohibited.
+
+
+## 2026-11-12 — CWS-CONTACT-20261112 PR #94 review
+
+Reviewed capture validation, ownership, duplicate handling, Sales detail projection, form state handling, Trustindex isolation, migration boundaries and CI. Initial tests/build/security/Vercel checks passed; Supabase Preview was skipped. Fixed long Unicode project messages being placed in PostgREST lookup URLs: candidate reads are now workspace/email/source scoped and capped at 20, with exact message/payload comparison on the server. Added long-message, distinct-inquiry and failed-lookup regressions. 1,013 tests across 98 files and lint pass locally. No migration application or merge; final remote checks pending for the fix commit.
+
+## 2026-11-12 — Contact release migration
+
+Owner authorized release of PR #94. Applied contact_page_inquiry_details to production, remote version 20261112200524; matched committed filename. Verified both nullable columns, service/message constraints and enabled RLS. Merge and live verification follow after checks.

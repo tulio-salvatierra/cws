@@ -4,6 +4,7 @@ Open work and the 40 most recent tasks. Older completed rows: `docs/archive/task
 
 | Task ID | Agent | Status | Result | Next |
 | --- | --- | --- | --- | --- |
+| CWS-CONTACT-20261112 | Codex | Release authorized; migration applied | PR #94 reviewed; 1013 tests and lint pass; production migration 20261112200524 verified | Merge after final checks; verify production contact page and synthetic lead capture |
 | CWS-PORTRAIT-PREVIEW-20261112 | Codex | Release verification pending | Intrinsic aspect ratio, full-width images in every channel and weekly preview | 999 tests/lint/build pass; deploy and verify original image and no letterboxing |
 | CWS-SAVED-SLOT-DRAFTS-20261112 | Codex | Complete — merged, deployed and live verified | Private saved slot image/caption selection; generated-image failed-slot closure | PR #92, 999 test cases plus lint/build pass; Friday saved and four live previews verified after reload; no publishing |
 | CWS-FEED-FULL-FRAME-20261110 | Codex | Complete — merged, deployed and live verified | Native ratios for every feed preset; composition-reference remake for legacy/padded drafts; LinkedIn landscape 1200x624 | 990 tests/lint/build pass; PR #91 merged, production READY; live portrait/landscape private JPEGs verified, no padding/cropping; approval/publishing unchanged |
