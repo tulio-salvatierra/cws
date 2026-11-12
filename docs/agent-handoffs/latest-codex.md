@@ -17,3 +17,7 @@ Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: No new brand policy; existing suggestions retain their status.
 Git diff summary: Isolated branch codex/evergreen-branding-integration from main 7696188. Original CWS checkout untouched. No merge/deploy authorized for this integration.
+
+PR #96 opened for review. Synced main d6907f3 (PR #95 preview sizing); only this handoff conflicted. Concurrent project log entries retained.
+
+Concurrent work carried forward: PR #92 production release was verified; the Friday draft was saved/restored with its exact caption and approved portrait across all four channels, Not submitted. PR #95 removed fixed-height image frames in channel/weekly previews; its live verification remains owned by that task. This integration does not alter stored images, drafts or publication state.
