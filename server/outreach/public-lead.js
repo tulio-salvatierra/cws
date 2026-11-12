@@ -1,9 +1,9 @@
 import { randomUUID } from 'node:crypto'
-import { notifyContactLead } from './contact-notification.js'
+import { notifyContactLead, notifyNegocioListoLead } from './contact-notification.js'
 import { cleanText, createOutreachClient, missingOutreachEnv, parseBody } from './shared.js'
 
 // Public, unauthenticated lead capture for Negocio Listo and the contact page.
-// Writes one inbound `leads` row owned by the workspace owner. Contact inquiries
+// Writes one inbound `leads` row owned by the workspace owner. Validated submissions
 // notify the fixed owner inbox, explicitly authorized by the owner; no visitor email.
 
 export const PUBLIC_LEAD_FORMS = new Set(['popup', 'inline', 'contact'])
@@ -126,29 +126,32 @@ export default async function handler(req, res) {
   }
 
   if (recent.data) {
+    const mergedValues = { ...values, email: values.email || recent.data.email || null, company: values.company || recent.data.company || null }
     const updated = await client
       .from('leads')
       .update({
         name: values.name,
-        email: values.email || recent.data.email,
-        company: values.company || recent.data.company,
+        email: mergedValues.email,
+        company: mergedValues.company,
         source: values.source,
       })
       .eq('id', recent.data.id)
       .eq('workspace_id', owner.data.workspace_id)
     if (updated.error) return res.status(502).json({ ok: false, error: 'Lead capture is unavailable.' })
+    if (!await notifyNegocioListoLead(recent.data.id, mergedValues, lead)) return notificationFailure(res)
     return res.status(200).json({ ok: true, merged: true })
   }
 
-  const leadId = isContact ? randomUUID() : null
+  const leadId = randomUUID()
   const inserted = await client.from('leads').insert({
-    ...(isContact ? { id: leadId } : {}),
+    id: leadId,
     ...values,
     workspace_id: owner.data.workspace_id,
     created_by: owner.data.user_id,
   })
   if (inserted.error) return res.status(502).json({ ok: false, error: 'Lead capture is unavailable.' })
-  if (isContact && !await notifyContactLead(leadId, values)) return notificationFailure(res)
+  const notified = isContact ? await notifyContactLead(leadId, values) : await notifyNegocioListoLead(leadId, values, lead)
+  if (!notified) return notificationFailure(res)
   return res.status(201).json({ ok: true })
 }
 
