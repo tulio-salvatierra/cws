@@ -1,10 +1,10 @@
 import { cleanText, createOutreachClient, missingOutreachEnv, parseBody } from './shared.js'
 
-// Public, unauthenticated lead capture for the Negocio Listo landing page.
+// Public, unauthenticated lead capture for Negocio Listo and the contact page.
 // Writes one inbound `leads` row owned by the workspace owner. No email or other
 // external action is triggered here (external actions need owner confirmation).
 
-export const PUBLIC_LEAD_FORMS = new Set(['popup', 'inline'])
+export const PUBLIC_LEAD_FORMS = new Set(['popup', 'inline', 'contact'])
 export const PUBLIC_LEAD_PLANS = new Set(['basico', 'crecer', 'destacado', 'unsure'])
 export const PUBLIC_LEAD_TYPES = new Set(['construction', 'roofing', 'plumbing', 'electrical', 'hvac', 'landscaping', 'cleaning', 'painting', 'other'])
 const MIN_FILL_MS = 1000 // browser autofill can complete the short popup form in ~1–2 s
@@ -24,7 +24,7 @@ function pick(value, allowed) {
 
 /** Compact, human-readable source tag; the leads table has no dedicated columns for these. */
 export function buildSource(fields) {
-  const parts = ['negocio-listo', fields.form, fields.lang]
+  const parts = [fields.form === 'contact' ? 'contact-page' : 'negocio-listo', fields.form, fields.lang]
   if (fields.plan) parts.push(`plan=${fields.plan}`)
   if (fields.type) parts.push(`type=${fields.type}`)
   if (fields.hasWebsite) parts.push(`site=${fields.hasWebsite}`)
@@ -37,6 +37,9 @@ export function readLead(body) {
   const utmCampaign = cleanText(body.utm_campaign, 40).replace(/[|=]/g, '')
   return {
     name: cleanText(body.name, 200),
+    service: pick(body.service, new Set(['new', 'redesign', 'audit', 'other'])),
+    message: cleanText(body.message, 4001),
+    rawPhone: cleanText(body.phone, 50),
     phone: normalizePhone(body.phone),
     email: cleanText(body.email, 320).toLowerCase(),
     company: cleanText(body.business_name, 200),
@@ -61,7 +64,11 @@ export default async function handler(req, res) {
   if (lead.honeypot || (Number.isFinite(lead.elapsedMs) && lead.elapsedMs < MIN_FILL_MS)) {
     return res.status(202).json({ ok: true })
   }
-  if (!lead.name || !lead.phone) return res.status(400).json({ ok: false, error: 'A name and a valid US phone number are required.' })
+  const isContact = lead.form === 'contact'
+  if (isContact && (!lead.name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email) || !lead.service || !lead.message || lead.message.length > 4000 || (lead.rawPhone && !lead.phone))) {
+    return res.status(400).json({ ok: false, error: 'Enter your name, valid email, project type and message, and a valid US phone number if provided.' })
+  }
+  if (!isContact && (!lead.name || !lead.phone)) return res.status(400).json({ ok: false, error: 'A name and a valid US phone number are required.' })
   if (lead.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email)) lead.email = ''
 
   const client = createOutreachClient()
@@ -77,25 +84,30 @@ export default async function handler(req, res) {
 
   const values = {
     name: lead.name,
-    phone: lead.phone,
+    phone: lead.phone || null,
     email: lead.email || null,
     company: lead.company || null,
     source: buildSource(lead),
     sales_classification: 'inbound',
+    ...(isContact ? { inquiry_service: lead.service, inquiry_message: lead.message } : {}),
   }
 
   // The popup and the inline form can both be sent by one visitor: merge into the recent row.
   const since = new Date(Date.now() - DUPLICATE_WINDOW_MS).toISOString()
-  const recent = await client
-    .from('leads')
-    .select('id, email, company')
-    .eq('workspace_id', owner.data.workspace_id)
-    .eq('phone', lead.phone)
-    .gte('created_at', since)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  let recentQuery = client.from('leads').select('id, email, company').eq('workspace_id', owner.data.workspace_id)
+  if (isContact) {
+    // Only identical contact inquiries are retries. Never overwrite another inquiry or a Sales record.
+    recentQuery = recentQuery.eq('email', lead.email).eq('source', values.source)
+      .eq('name', lead.name).eq('inquiry_service', lead.service).eq('inquiry_message', lead.message)
+    recentQuery = lead.phone ? recentQuery.eq('phone', lead.phone) : recentQuery.is('phone', null)
+    recentQuery = lead.company ? recentQuery.eq('company', lead.company) : recentQuery.is('company', null)
+  } else {
+    recentQuery = recentQuery.eq('phone', lead.phone).is('inquiry_message', null)
+  }
+  const recent = await recentQuery.gte('created_at', since).order('created_at', { ascending: false }).limit(1).maybeSingle()
   if (recent.error) return res.status(502).json({ ok: false, error: 'Lead capture is unavailable.' })
+
+  if (recent.data && isContact) return res.status(200).json({ ok: true, merged: true })
 
   if (recent.data) {
     const updated = await client

@@ -164,6 +164,7 @@ function commandItem(category, lead, details) {
     priority: PRIORITY[category],
     lead: {
       id: lead.id, name: lead.name, email: lead.email, company: lead.company,
+      inquiry_service: lead.inquiry_service, inquiry_message: lead.inquiry_message,
       phone: lead.phone, locality: lead.locality, status: lead.status,
       google_business_profile_url: lead.google_business_profile_url,
       sales_classification: lead.sales_classification, response_state: lead.response_state,

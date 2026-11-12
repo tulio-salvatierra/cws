@@ -250,3 +250,12 @@ Added owner-only save_draft handling before provider access, a private workspace
 Added branding/README.md and branding/evergreen-generation.md, linked from root and Codex/Claude guidance. Verified public CSS/font/logo sources, positioning copy and current generation/validation code; distinguished suggested visual direction from verified facts and scoped admin tokens separately. Documentation only, no automatic prompt loading or runtime changes. Checks passed: 38 relative links, documented hex values present in inspected sources, all 11 preset sizes/ratios, git diff --check. Isolated checkout based on a1afa67; original CWS checkout untouched. No commit, push, merge, deployment, generation or publication.
 
 Follow-up: Owner authorized committing the guides and opening a review PR; merge and deployment remain unauthorized.
+
+
+## 2026-11-12 — CWS-CONTACT-20261112 contact page review branch
+
+Implemented the owner-approved contact layout using shared site styles/components. Added a validated contact inquiry form using the existing public-lead endpoint and its server-owned workspace flow; email required, optional US phone, honeypot, elapsed-time guard, pending/error/retry/success states and 15-second client timeout. Contact source is distinct from Negocio Listo; identical recent contact submissions are acknowledged without overwriting prior records. Added bounded project type/message columns in an unapplied migration and exposed those details in private Sales. Isolated Trustindex in its own embedded document after verifying a loader issue during React navigation; the supplied rating badge renders. No prices or commitments changed. The existing 15-minute audit copy / 30min scheduling URL mismatch remains unchanged.
+
+1001 tests across 98 files, lint, and full production build/public prerender pass with placeholder client environment. Local PostgreSQL migration check verifies valid insert, constraints and preserved RLS. No live lead insertion, email, production migration, commit, push, merge or deployment. Fresh isolated checkout based on a1afa67; original CWS checkout and its unrelated image edits untouched. Review branch: feat/contact-page-lead-capture.
+
+Owner follow-up authorized committing and pushing the review branch and opening a PR. Merge and migration application remain explicitly prohibited.

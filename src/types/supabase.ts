@@ -1369,6 +1369,8 @@ export type Database = {
       }
       leads: {
         Row: {
+          inquiry_service: string | null
+          inquiry_message: string | null
           company: string | null
           created_at: string
           created_by: string
@@ -1391,6 +1393,8 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          inquiry_service?: string | null
+          inquiry_message?: string | null
           company?: string | null
           created_at?: string
           created_by: string
@@ -1413,6 +1417,8 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          inquiry_service?: string | null
+          inquiry_message?: string | null
           company?: string | null
           created_at?: string
           created_by?: string
