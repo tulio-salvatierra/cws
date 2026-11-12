@@ -244,3 +244,9 @@ Release verified: PR #91 merged as a1afa67; production dpl_GKiXWiCGUS3k3HTnYq2nh
 ## 2026-11-12 — Saved Evergreen slot drafts
 
 Added owner-only save_draft handling before provider access, a private workspace-scoped draft table, and an approved library selector with persistent shared/channel captions. Reloaded previews and publication resolve the exact saved asset; unavailable saved assets fail closed. Attempted/resolved slots remain immutable. Generated private PNG/JPEG paths are now accepted by slot resolutions so all-error attempts can be closed without retries. Unknown actions cannot fall through to publishing. Migration 20261112192039 applied. 998 full-suite tests plus one new UI save/preview regression pass; lint and full production build checked before release. Production release and Friday assignment verification pending. No publication authorized.
+
+Release verified: PR #92 merged as 22eb6f2; production dpl_gq7d96suN2Ad2WkgaNLFATZo9oqS READY. Earlier failed occurrence closed and Tuesday skipped using normal owner controls, failures preserved. Friday approved portrait and reviewed caption saved through save_draft; reload and all four live channel previews verified exact caption, 1080x1350 image and Not submitted status. No content published.
+
+## 2026-11-12 — Portrait preview frame
+
+Removed fixed image-height caps from all four channel previews, the weekly slot cards, and shared live preview. Images now render full width at their intrinsic aspect ratio. No crop, padding, image generation, stored asset changes, or publishing. Validation and live release pending.
