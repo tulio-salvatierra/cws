@@ -446,7 +446,7 @@ function CreativeStudio({ offers, creative, busy, onGenerateIdeas, onGenerateVis
   return <section aria-labelledby="creative-studio-heading" className="mt-8 rounded-2xl border border-indigo-400/20 bg-indigo-400/5 p-5 sm:p-6">
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Creative studio</p>
     <h2 id="creative-studio-heading" className="mt-2 text-xl font-semibold text-white">Turn an offer into a reviewable post asset</h2>
-    <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Generate ideas first. Create a visual only for an idea you choose. Nothing here schedules or publishes a post.</p>
+    <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">Generate ideas first. Create a visual only for an idea you choose. CWS brand guidance is included automatically; images are requested without text or logos. Nothing here schedules or publishes a post.</p>
     {creative.error && <p role="alert" className="mt-4 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-sm text-rose-200">{creative.error}</p>}
 
     <div className="mt-5 grid gap-3 sm:grid-cols-2">

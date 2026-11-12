@@ -1,21 +1,19 @@
-Task ID: CWS-EVERGREEN-BRANDING-20261112
+Task ID: CWS-EVERGREEN-BRAND-REQUESTS-20261112
 Agent: Codex
-Objective: Small, agent-readable Evergreen branding reference grounded in repository sources.
-Files inspected: AGENTS.md; Codex/Claude instructions; product definition, technical conventions, decisions, learnings, log, ledger and prior handoff; public CSS, Tailwind, header SVG/import, Problem artwork/import, Hero/Chicago/Negocio Listo copy, admin theme; imageFormats.js, creative.js, image-output.js, existing format documentation.
-Files changed: branding/README.md; branding/evergreen-generation.md; AGENTS.md; README.md; .agents/codex-project-instructions.md; .agents/claude-project-instructions.md; this handoff; docs/project-log.md; docs/task-ledger.md.
-Database or API changes: None. Markdown is not loaded automatically into generation prompts.
-Security decisions: No external mutations or client data; existing confirmation boundaries retained.
-Decisions made: Source-linked facts separated from suggested editorial/visual defaults. Existing text-free/logo-free prompt preserved. Runtime code remains authority for presets/validation.
-Assumptions: Suggested photo/composition/overlay guidance is not a separately approved brand policy.
-Tests added: None; documentation-only change.
-Tests run: 38 relative links resolve; every documented hex is present in inspected source files; all 11 current presets match documented ratios and generation/export sizes; git diff --check passed. Application suite/build not run because runtime code is unchanged.
-Known issues: Owner authorized commit, push and review PR on 2026-11-12; merge and deployment remain unauthorized. Original /Users/tuliosalvatierra/CWS contains unrelated modified project records and untracked outputs/tools, left untouched.
-Recommended next task: Owner review of the documentation PR. Runtime prompt integration is separate scope if requested.
-Questions requiring Tulio: None to complete this documentation request.
-Project-memory files updated: This handoff, project-log.md, task-ledger.md.
+Objective: Connect existing Evergreen New Generation requests to the canonical branding guides; prepare a review PR only.
+Files inspected: Product definition, technical conventions, decisions, learnings, current records; AGENTS/role guidance; both branding guides; creative API, prompt builders and tests; MarketingPage; image presets/output validator; Vercel config/ignore and CI workflow.
+Files changed: server/marketing/brand-guidance.js and its tests; creative.js and tests; API creative tests; MarketingPage help text; vercel.json; branding guides, root/role discovery guidance; three project records.
+Database or API changes: No schema, routes, request contract or extra model calls. Existing requests carry both Markdown guides as server instructions before their authoritative task rules.
+Security decisions: Fixed local paths only; no request-controlled guide content; missing/empty/oversized files fail before provider access. Owner-only draft creation and separate publication confirmation unchanged. Brand suggestions cannot authorize text/logo overlays or override the selected preset/reference composition.
+Decisions made: Read canonical Markdown directly instead of duplicating brand rules; package the two files explicitly in the creative function. Disable auto-deploy only for codex/evergreen-branding-integration using git.deploymentEnabled; main and other branches retain defaults.
+Assumptions: Guide edits take effect after deployment. Generated images remain subject to visual owner review, not a guarantee of model adherence.
+Tests added: Canonical file inclusion and invalid/missing guide cases; actual idea request payload and input isolation; provider/upload suppression on missing guidance; existing tests now verify both guides on all 11 formats and four remake cases. Server tests run in Node, matching runtime.
+Tests run: 1006 tests / 98 files passed; lint passed; full production build/prerender passed with non-secret placeholders. Relocated server-module/guide copy loads outside repo cwd. git diff --check passed. Initial restricted prerender could not bind localhost; permitted local rerun passed.
+Known issues: Existing dependency advisories and large client chunk warning unchanged. No live model request or Vercel deployment performed. Explicit file inclusion and relocated-loader check do not substitute for deployed-function verification after release approval.
+Recommended next task: Review PR; after authorization, merge/deploy and verify one private branded generation, without publication.
+Questions requiring Tulio: None for PR preparation.
+Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md. Prior PR #93 release result recorded from this session.
 Permanent decisions added: None.
 Reusable learnings added: None.
-Memory updates withheld: Suggested visual direction is explicitly labeled, not recorded as approved policy.
-Git diff summary: Nine documentation files (two new), isolated branch codex/evergreen-branding-guide based on a1afa67; no pre-existing edits in this checkout.
-
-PR #93 opened for review. Updated branch with main (22eb6f2); preserved concurrent release and saved-slot records in project-log.md/task-ledger.md. The automatic preview for 302842c was canceled; no PR merge or production deployment authorized.
+Memory updates withheld: No new brand policy; existing suggestions retain their status.
+Git diff summary: Isolated branch codex/evergreen-branding-integration from main 7696188. Original CWS checkout untouched. No merge/deploy authorized for this integration.

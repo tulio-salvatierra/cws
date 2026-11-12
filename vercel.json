@@ -5,7 +5,8 @@
       "maxDuration": 60
     },
     "api/marketing-creative.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "branding/{README,evergreen-generation}.md"
     },
     "api/client-portal-intake.js": {
       "maxDuration": 60,
@@ -145,5 +146,10 @@
         }
       ]
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "codex/evergreen-branding-integration": false
+    }
+  }
 }
