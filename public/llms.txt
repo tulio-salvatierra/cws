@@ -6,39 +6,33 @@ Cicero Web Studio provides affordable, high-quality web design and development s
 
 ## Negocio Listo (primary offer)
 
-- [Negocio Listo (Español)](https://cicerowebstudio.xyz/negocio-listo): Plan mensual para contratistas y negocios locales en Cicero, Berwyn y Chicago: sitio web bilingüe, perfil de Google y optimización para IA. Básico $150/mes, Crecer $250/mes, Destacado $350/mes, más instalación única de $300. Revisión gratis del perfil de Google.
-- [Negocio Listo (English)](https://cicerowebstudio.xyz/en/negocio-listo): Monthly plan for contractors and local businesses in Cicero, Berwyn and Chicago: bilingual website, Google Business Profile and AI search optimization. Básico $150/mo, Crecer $250/mo, Destacado $350/mo, plus a one-time $300 setup. Free Google profile check.
+- [Negocio Listo (Español)](https://www.cicerowebstudio.xyz/negocio-listo): Plan mensual para contratistas y negocios locales en Cicero, Berwyn y Chicago: sitio web bilingüe, perfil de Google y optimización para IA. Básico $150/mes, Crecer $250/mes, Destacado $350/mes, más instalación única de $300. Revisión gratis del perfil de Google.
+- [Negocio Listo (English)](https://www.cicerowebstudio.xyz/en/negocio-listo): Monthly plan for contractors and local businesses in Cicero, Berwyn and Chicago: bilingual website, Google Business Profile and AI search optimization. Básico $150/mo, Crecer $250/mo, Destacado $350/mo, plus a one-time $300 setup. Free Google profile check.
 
 ## Core Pages
 
-- [Home](https://cicerowebstudio.xyz/): Main landing page featuring services, portfolio, and company information
-- [About](https://cicerowebstudio.xyz/about): Information about Cicero Web Studio, our mission, and team
-- [Services](https://cicerowebstudio.xyz/services): Detailed service offerings including custom websites, photo/video content, local SEO, and growth bundles
-- [Contact](https://cicerowebstudio.xyz/contact): Contact information, social media links, and location details
-- [Policy](https://cicerowebstudio.xyz/policy): Privacy policy and terms of service
+- [Home](https://www.cicerowebstudio.xyz/): Main landing page featuring services, portfolio, and company information
+- [About](https://www.cicerowebstudio.xyz/about): Information about Cicero Web Studio, our mission, and team
+- [Services](https://www.cicerowebstudio.xyz/services): Detailed service offerings including custom websites, photo/video content, local SEO, and growth bundles
+- [Contact](https://www.cicerowebstudio.xyz/contact): Contact information, social media links, and location details
+- [Policy](https://www.cicerowebstudio.xyz/policy): Privacy policy and terms of service
 
 ## Blog & Resources
 
-- [Blog Home](https://cicerowebstudio.xyz/blog): Latest articles on web development, SEO, and digital marketing
-- [Future of Web Development: AI-Powered Tools](https://cicerowebstudio.xyz/blog/future-of-web-development-ai-tools): Article about AI in web development
-- [Mobile-First Website Design](https://cicerowebstudio.xyz/blog/mobile-first-website-design-why-it-matters): Why mobile-first design matters for businesses
-- [SEO Strategies That Work](https://cicerowebstudio.xyz/blog/seo-strategies-that-work-2024): Effective SEO strategies for 2024
-- [Scalable E-commerce Solutions](https://cicerowebstudio.xyz/blog/scalable-ecommerce-lessons): Building scalable e-commerce stores
-- [Choosing Web Design Packages](https://cicerowebstudio.xyz/blog/choose-right-web-design-package): Guide to selecting the right web design package
-- [Lead Capture Forms](https://cicerowebstudio.xyz/blog/why-lead-capture-forms-high-performing-website-chicago): Importance of lead capture forms for high-performing websites
+- [Blog Home](https://www.cicerowebstudio.xyz/blog): Latest articles on web development, SEO, and digital marketing
 
 ## Service Landing Pages
 
-- [Cicero Web Design](https://cicerowebstudio.xyz/cicero-web-design): Affordable web design services for Cicero and Chicago small businesses
-- [Chicago Digital Marketing](https://cicerowebstudio.xyz/chicago-digital-marketing): Digital marketing solutions for Chicago businesses
-- [Oak Park SEO](https://cicerowebstudio.xyz/oak-park-seo): Local SEO services for Oak Park businesses
-- [Elmwood Park Maintenance](https://cicerowebstudio.xyz/elmwood-park-maintenance): Website maintenance services for Elmwood Park
-- [Website Refresh & Redesign](https://cicerowebstudio.xyz/website-refresh-redesign): Website redesign and refresh services
+- [Cicero Web Design](https://www.cicerowebstudio.xyz/landing/cicero-web-design): Affordable web design services for Cicero and Chicago small businesses
+- [Chicago Digital Marketing](https://www.cicerowebstudio.xyz/landing/chicago-digital-marketing): Digital marketing solutions for Chicago businesses
+- [Oak Park SEO](https://www.cicerowebstudio.xyz/landing/oak-park-seo): Local SEO services for Oak Park businesses
+- [Elmwood Park Maintenance](https://www.cicerowebstudio.xyz/landing/elmwood-park-maintenance): Website maintenance services for Elmwood Park
+- [Website Refresh & Redesign](https://www.cicerowebstudio.xyz/landing/website-refresh-redesign): Website redesign and refresh services
 
 ## Site Structure
 
-- **Sitemap**: [https://cicerowebstudio.xyz/sitemap.xml](https://cicerowebstudio.xyz/sitemap.xml)
-- **Robots.txt**: [https://cicerowebstudio.xyz/robots.txt](https://cicerowebstudio.xyz/robots.txt)
+- **Sitemap**: [https://www.cicerowebstudio.xyz/sitemap.xml](https://www.cicerowebstudio.xyz/sitemap.xml)
+- **Robots.txt**: [https://www.cicerowebstudio.xyz/robots.txt](https://www.cicerowebstudio.xyz/robots.txt)
 
 ## Services Offered
 
