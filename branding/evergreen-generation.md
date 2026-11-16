@@ -94,3 +94,18 @@ existing export and destination requirements separately when it is requested.
    remaining review issues. Keep draft creation, library approval, scheduling and
    exact-resource publication confirmation separate. Never imply a checked image
    has been approved or published; follow the existing owner-confirmation flow.
+
+## Required CWS signature — owner update 2026-11-16
+
+Every **new** CWS Evergreen image draft must visibly include the actual approved CWS logo and the exact text `#hablamosespañol` in the website's bundled `Clash` typeface. This section records a new owner requirement; the current `creative.js` model prompt still generates text-free, logo-free artwork, and `image-output.js` currently normalizes without an overlay. **Do not report the requirement as implemented until the compositing pipeline and tests have been updated.**
+
+Implementation contract for the existing workflow:
+
+1. Keep the image-model request text-free and logo-free to avoid malformed words or recreated branding. Instruct the model to reserve unobstructed room inside the selected canvas for a later brand signature.
+2. After generation, composite the authentic, owner-approved logo asset without reinterpreting, stretching, cropping or recoloring it. The uploaded owner reference must be matched to a checked-in reusable asset; the current repository logo candidates must not be assumed interchangeable.
+3. Typeset `#hablamosespañol` using the bundled website `Clash` font. Check font rendering/embedding support in the actual compositing runtime; do not silently fall back to an unrelated typeface.
+4. Use a legible high-contrast placement that keeps the logo and hashtag out of platform UI overlays and away from the edge. Respect the existing format picker and avoid obscuring the main subject.
+5. Re-run exact-dimension, JPEG, ratio and file-size validation **after** the brand overlay is applied. Preview at phone size and flag any impossible composition for owner review instead of clipping branding or the subject.
+6. Apply to all new CWS image requests (including remakes) in the New Generation flow; leave already approved images unchanged. Caption hashtags and actual publishing remain separate reviewable choices.
+
+This new owner requirement supersedes any earlier suggestion in this guide that brand overlays are optional. It does not override the present code's behavior until implemented.
