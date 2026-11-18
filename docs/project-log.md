@@ -297,3 +297,7 @@ Owner explicitly approved merge and one labeled production email. PR #97 merged 
 ## 2026-11-12 — Negocio Listo owner notifications
 
 Extended existing owner notification flow to popup and inline submissions after successful lead insert/merge. Includes phone, optional email/business, plan, business type, website status, form/language and Sales link. Fixed recipient and optional validated Reply-To; no visitor outreach. Stable saved lead ID plus payload hash deduplicates exact retries while notifying changed details. Contact payload/key unchanged. 1032 tests/100 files and lint passed; no migration. CI/release pending.
+
+## 2026-11-18 — Carolina Skin Centre: policy copy + homepage policy section removed
+
+Client: Carolina Skin Centre (repo tulio-salvatierra/csc). Implemented the client's requested copy as given on /policies: gift card line drops "except as required by law"; standing appointments adds a $75 non-refundable deposit for future bookings; cancellation now charges only no-shows (100%), removing the 50% under-48h and same-day tiers, with a new closing line. Removed the cancellation policy section from the homepage (component and its background image deleted; footer link to /policies remains). On /policies removed the floating Book button and the header Book button as redundant; the in-page "Book Your Experience" CTA stays. Build passed. PR https://github.com/tulio-salvatierra/csc/pull/13 opened; not merged, awaiting owner OK. Open: owner review/merge; MangoMint/GBP policy text should match the new terms. Next: merge after preview check.
