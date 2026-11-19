@@ -1,18 +1,16 @@
-Task ID: CWS-NL-SIGNED-20261109
+Task ID: CWS-SEO-REDIRECT-LINKS-20261119
 Agent: Claude
-Objective: One "Signed" action that puts a Negocio Listo deal into Accounting and Square under DEC-040.
+Objective: Stop the CWS site from pointing Google at redirecting (non-www) URLs after Search Console reported the "Page with redirect" validation as failed (Nov 16) and Ahrefs Site Audit reported 4 redirects (Nov 17).
 
 Files changed:
-- `server/accounting/negocio-listo-signing.js`, `server/accounting/square.js` (new), `server/accounting/handler.js` (route)
-- `supabase/migrations/20261109163646_schedule_agreement_billing.sql` (applied to production; version verified)
-- `src/pages/admin/SignNegocioListoForm.jsx` (new), `RecentLeads.jsx` ("Signed…"), `ClientAgreements.jsx` + `AccountingPage.jsx` ("Record Negocio Listo signing")
-- `env.keys.js`, `.env.example` (`SQUARE_ACCESS_TOKEN`)
-- Tests: `server/accounting/__tests__/negocio-listo-signing.test.js`, `src/pages/admin/__tests__/SignNegocioListoForm.test.jsx`
+- `src/data/landingPagesData.ts`: the six landing pages' Service JSON-LD `imageUrl` pointed at `https://cicerowebstudio.xyz/images/*.png` (apex 308 to www, and the files are not in `public/images`); now `https://www.cicerowebstudio.xyz/og-image.jpg`.
+- `src/marketing/channels.js`: `GOOGLE_BUSINESS_CTA_URL` now `https://www.cicerowebstudio.xyz/` (Google Business post "Learn more" link).
+- Tests updated to the new URL: `src/pages/admin/__tests__/MarketingPage.test.jsx`, `api/__tests__/marketing-linkedin.test.js`.
 
-Findings: Square already had per-client static plans (Upholstery $150, 12 periods then ongoing) and a relative-price Carolina plan; the new flow creates one plan per tier and reuses it. Subscriptions are created without a card, so Square emails an invoice each month; a card the client saves in Square takes over automatically.
+Findings: Vercel domain config sends apex to www with 308 (intentional). Sitemap, canonicals, robots.txt and internal nav links already use https://www with no trailing slash. The http/apex "Page with redirect" entries in Search Console are expected and will not validate. Ahrefs URL-level data was not available (plan does not include API access), so the exact four URLs were not confirmed.
 
-Tests run: server/accounting + src/pages/admin (188 passed); eslint clean. Not run against live Square (no test charge made).
+Tests run: full Vitest suite 1032/1032 passed; eslint on changed files clean; import-casing check passed. Production build not run.
 
-Not changed: existing manual agreement flow, Sherry's records (her written terms differ; owner deciding).
+Not changed: oversized images (blog article images such as profile.png ~32 MB, Palette.png, Arrow.png, video.png ~3 MB each, website.jpg 381 KB); `/images/sd.png` is referenced on landing pages but exists only in `src/assets/images`.
 
-Next: first real signing verifies the Square path end to end; build Square → Accounting payment sync (webhook) when ready.
+Next: owner reviews and merges the branch (production deploys from main); then compress blog images and decide on sd.png.

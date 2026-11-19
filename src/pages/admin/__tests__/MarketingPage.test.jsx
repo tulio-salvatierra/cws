@@ -390,7 +390,7 @@ describe('Marketing channel tabs', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Google Business Profile' }))
     expect(screen.getByRole('tabpanel')).toHaveAttribute('id', 'channel-panel-GOOGLE_BUSINESS')
     expect(screen.getByRole('tabpanel')).toHaveTextContent('Shared caption for every channel.')
-    expect(screen.getAllByRole('link', { name: 'Learn more →' })[0]).toHaveAttribute('href', 'https://cicerowebstudio.xyz/')
+    expect(screen.getAllByRole('link', { name: 'Learn more →' })[0]).toHaveAttribute('href', 'https://www.cicerowebstudio.xyz/')
     expect(globalThis.fetch).toHaveBeenCalledTimes(calls)
     fireEvent.keyDown(screen.getByRole('tab', { name: 'Google Business Profile' }), { key: 'Home' })
     expect(screen.getByRole('textbox', { name: 'Post A caption' })).toHaveValue('Shared caption for every channel.')

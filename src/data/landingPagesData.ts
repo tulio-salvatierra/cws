@@ -59,7 +59,7 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Web Design in Cicero, IL | Cicero Web Studio',
       description: 'Cicero web design services for small businesses. Affordable web design Cicero with fast, mobile-friendly websites. Cicero small business websites that attract local customers. Get a free quote today.'
     },
-    imageUrl: 'https://cicerowebstudio.xyz/images/cicero-web-design.png',
+    imageUrl: 'https://www.cicerowebstudio.xyz/og-image.jpg',
     sku: 'CWS-WD-001'
   },
   {
@@ -122,7 +122,7 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Digital Marketing in Chicago, IL | Cicero Web Studio',
       description: 'Digital marketing Chicago services including local SEO services Chicago and Google Business Profile optimization. Expert SEO, PPC, and social media marketing that drives traffic and increases brand awareness.'
     },
-    imageUrl: 'https://cicerowebstudio.xyz/images/digital-marketing.png',
+    imageUrl: 'https://www.cicerowebstudio.xyz/og-image.jpg',
     sku: 'CWS-DM-001'
   },
   {
@@ -183,7 +183,7 @@ export const landingPagesData: LandingPageData[] = [
       title: 'E-commerce in Berwyn, IL | Cicero Web Studio',
       description: 'Berwyn ecommerce website development services. Professional ecommerce website development for businesses in Berwyn. Online stores that drive sales and grow your business.'
     },
-    imageUrl: 'https://cicerowebstudio.xyz/images/ecommerce-development.png',
+    imageUrl: 'https://www.cicerowebstudio.xyz/og-image.jpg',
     sku: 'CWS-EC-001'
   },
   {
@@ -245,7 +245,7 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Local SEO in Oak Park, IL | Cicero Web Studio',
       description: 'Oak Park SEO services for local businesses. Expert on-page SEO services and local SEO strategies to get found by customers searching in Oak Park.'
     },
-    imageUrl: 'https://cicerowebstudio.xyz/images/local-seo.png',
+    imageUrl: 'https://www.cicerowebstudio.xyz/og-image.jpg',
     sku: 'CWS-LSEO-001'
   },
   {
@@ -306,7 +306,7 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Site Maintenance in Elmwood Park, IL | Cicero Web Studio',
       description: 'Elmwood Park website maintenance services for businesses. Professional website maintenance services including security updates, performance optimization, and ongoing support. Keep your site secure, fast, and up-to-date.'
     },
-    imageUrl: 'https://cicerowebstudio.xyz/images/website-maintenance.png',
+    imageUrl: 'https://www.cicerowebstudio.xyz/og-image.jpg',
     sku: 'CWS-WM-001'
   },
   {
@@ -367,7 +367,7 @@ export const landingPagesData: LandingPageData[] = [
       title: 'Website Redesign in Chicago, IL | Cicero Web Studio',
       description: 'Website refresh services for Chicago businesses. Professional website redesign Chicago services that are modern, mobile-friendly, and improve performance, SEO, and customer experience.'
     },
-    imageUrl: 'https://cicerowebstudio.xyz/images/website-redesign.png',
+    imageUrl: 'https://www.cicerowebstudio.xyz/og-image.jpg',
     sku: 'CWS-WRR-001'
   }
 ];

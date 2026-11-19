@@ -1,6 +1,6 @@
 export const MARKETING_PLATFORMS = ['LINKEDIN', 'FACEBOOK', 'INSTAGRAM', 'GOOGLE_BUSINESS']
 export const MARKETING_CAPTION_LIMIT = 1500
-export const GOOGLE_BUSINESS_CTA_URL = 'https://cicerowebstudio.xyz/'
+export const GOOGLE_BUSINESS_CTA_URL = 'https://www.cicerowebstudio.xyz/'
 export function marketingPlatformName(platform) {
   return { LINKEDIN: 'LinkedIn', FACEBOOK: 'Facebook', INSTAGRAM: 'Instagram', GOOGLE_BUSINESS: 'Google Business Profile' }[platform] || platform
 }
