@@ -305,3 +305,7 @@ Client: Carolina Skin Centre (repo tulio-salvatierra/csc). Implemented the clien
 ## 2026-11-18 — Carolina Skin Centre: footer full width
 
 Client: Carolina Skin Centre (repo tulio-salvatierra/csc). Footer left blank side columns because its flex wrapper centered the footer element at content width; it now stretches to the full viewport. Verified footer width equals viewport at 1440px and 390px on /, /policies and /about. Owner approved merge: csc PR #14 merged as f90af0a; production deploy succeeded. Same day, csc PR #13 (policy copy) was merged on owner OK and deployed. Open: owner to eyeball live site; check that MangoMint/GBP cancellation wording matches the new no-show-only policy.
+
+## 2026-11-19 — CWS site redirect links fixed on branch
+
+CWS-SEO-REDIRECT-LINKS-20261119. Search Console reported the "Page with redirect" validation as failed (Nov 16); Ahrefs reported 4 redirects (Nov 17). Apex and http variants redirect to www by design (Vercel 308) and are expected. Sitemap, canonicals and internal links were already on www. Changed the six landing-page JSON-LD images from missing apex image URLs to the www og-image, and the Google Business post CTA URL to www; updated two tests. 1032 tests, lint on changed files and import-casing pass. Owner approved committing to a branch; not merged or deployed to production. Open: compress oversized blog images; `/images/sd.png` missing from public/.

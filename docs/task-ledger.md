@@ -4,6 +4,7 @@ Open work and the 40 most recent tasks. Older completed rows: `docs/archive/task
 
 | Task ID | Agent | Status | Result | Next |
 | --- | --- | --- | --- | --- |
+| CWS-SEO-REDIRECT-LINKS-20261119 | Claude | Committed on branch `fix/seo-redirect-links-20261119`; merge pending | Landing JSON-LD images and GBP CTA moved from apex to www; 1032 tests pass | Owner merges; then compress blog images and fix missing sd.png |
 | CWS-NL-NOTIFY-20261112 | Codex | Tests/lint passed; release pending | Owner notifications for NL popup/inline after insert/merge; idempotent payload retries | Verify CI and release |
 | CWS-CONTACT-NOTIFY-20261112 | Codex | Complete — merged, deployed and delivery verified | PR #97 / b706bb1; 1026 tests/lint/build; live form and Resend delivery verified | One authorized labeled test sent; synthetic lead excluded via owner controls |
 | CWS-CONTACT-20261112 | Codex | Complete — merged, deployed and live verified | PR #94; migration 20261112200524; 1020 tests plus lint/build; production capture and Trustindex verified | Synthetic inquiry excluded through owner test controls; no outreach; existing audit duration mismatch unchanged |
