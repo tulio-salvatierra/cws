@@ -57,7 +57,7 @@ export const NEGOCIO_LISTO = {
       items: [
         { id: 'basico', name: 'Básico', price: 150, tagline: 'Tu negocio listo en línea', features: ['Sitio web bilingüe de 5 páginas', 'Hosting y cambios pequeños incluidos', 'Perfil de Google configurado y optimizado', 'SEO local básico'] },
         { id: 'crecer', name: 'Crecer', price: 250, popular: true, tagline: 'Más llamadas, más reseñas', features: ['Todo lo de Básico', 'Publicaciones mensuales en tu perfil de Google', 'Sistema para pedir reseñas', 'Respuesta automática por texto cuando pierdes una llamada', 'Reporte mensual de una página'] },
-        { id: 'destacado', name: 'Destacado', price: 350, tagline: 'Aparece en Google y en la IA', features: ['Todo lo de Crecer', 'Optimización para búsquedas con IA (ChatGPT, Gemini, Google)', 'Una página nueva de preguntas frecuentes cada mes', 'Revisión mensual: ¿apareces cuando preguntan por tu servicio?'] },
+        { id: 'destacado', name: 'Destacado', price: 350, tagline: 'Aparece en Google y en la IA', features: ['Todo lo de Crecer', 'Optimización para búsquedas con IA (ChatGPT, Gemini, Google)', 'Una página nueva cada mes que responde lo que preguntan tus clientes, conectada a tu servicio principal', 'Revisamos que ninguna de tus páginas compita con otra', 'Revisión mensual: ¿apareces cuando preguntan por tu servicio?'] },
       ],
       addon: { label: '+ EXTRA', name: 'Contenido', price: '+$300/mes', body: 'Sesión de foto y video cada trimestre, convertida en publicaciones mensuales.' },
     },
@@ -179,7 +179,7 @@ export const NEGOCIO_LISTO = {
       items: [
         { id: 'basico', name: 'Básico', price: 150, tagline: 'Your business, ready online', features: ['Bilingual 5-page website', 'Hosting and small edits included', 'Google Business Profile set up and optimized', 'Local SEO basics'] },
         { id: 'crecer', name: 'Crecer', price: 250, popular: true, tagline: 'More calls, more reviews', features: ['Everything in Básico', 'Monthly Google profile posts', 'Review-request system', 'Automatic text-back when you miss a call', '1-page monthly report'] },
-        { id: 'destacado', name: 'Destacado', price: 350, tagline: 'Show up on Google and in AI answers', features: ['Everything in Crecer', 'AI search optimization (ChatGPT, Gemini, Google)', 'One new FAQ page every month', 'Monthly check: do you show up when people ask for your service?'] },
+        { id: 'destacado', name: 'Destacado', price: 350, tagline: 'Show up on Google and in AI answers', features: ['Everything in Crecer', 'AI search optimization (ChatGPT, Gemini, Google)', 'One new page every month answering what your customers ask, linked to your main service page', 'We check that none of your pages compete with each other', 'Monthly check: do you show up when people ask for your service?'] },
       ],
       addon: { label: '+ ADD-ON', name: 'Contenido', price: '+$300/mo', body: 'Quarterly photo and video shoot, turned into monthly posts.' },
     },
