@@ -7,7 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import logoCicero from "../../assets/images/problem/cicero-web-studio-problem.webp";
 
 import problemDivider from "../../assets/images/problem/divider.svg";
-import workspacePhoto from "../../assets/images/problem/workspace.jpg";
+import workspacePhoto from "../../assets/images/problem/workspace.webp";
 import "./Problem.css";
 
 gsap.registerPlugin(ScrollTrigger);

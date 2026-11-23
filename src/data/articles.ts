@@ -119,7 +119,7 @@ If you are deciding what to build first, start with the [small-business website 
     date,
     readTime: '5 min read',
     category: 'Website Planning',
-    image: '/images/Palette.png',
+    image: '/images/Palette.webp',
     tags: ['Website Planning', 'Templates', 'Custom Website'],
   },
   {
@@ -181,7 +181,7 @@ Read [how to choose a website designer](/blog/choose-website-designer-chicago) n
     date,
     readTime: '6 min read',
     category: 'Website Planning',
-    image: '/images/Arrow.png',
+    image: '/images/Arrow.webp',
     tags: ['Website Checklist', 'Chicago', 'Small Business'],
   },
   {
@@ -225,7 +225,7 @@ Use the [small-business website checklist](/blog/small-business-website-checklis
     date,
     readTime: '5 min read',
     category: 'Hiring Help',
-    image: '/images/profile.png',
+    image: '/images/profile.webp',
     tags: ['Hiring Help', 'Chicago', 'Website Project'],
   },
   {
@@ -273,7 +273,7 @@ For help identifying the right scope, read [what website design services a small
     date,
     readTime: '5 min read',
     category: 'Website Planning',
-    image: '/images/video.png',
+    image: '/images/video.webp',
     tags: ['Website Refresh', 'Website Redesign', 'Small Business'],
   },
 ];
