@@ -17,7 +17,7 @@ const defaultItems: WhyChooseItem[] = [
     description: "High-end custom websites built with React, Next.js, and modern web development technologies following SEO best practices"
   },
   {
-    icon: <img src="/images/Lifering.png" alt="Ongoing Support" className="w-10 h-10" />,
+    icon: <img src="/images/Lifering.webp" alt="Ongoing Support" className="w-10 h-10" />,
     title: "Ongoing Support",
     description: "Continuous website maintenance, local SEO updates, and technical support to keep your Chicago small business website running smoothly"
   }

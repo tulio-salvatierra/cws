@@ -200,19 +200,19 @@ export default function Infinite3DScroll() {
             <section ref={containerRef} className="mwg_effect012">
           
                 <div className="container">
-                    <div className="media"><img src="/images/Bulb.png" alt="" /></div>
-                    <div className="media"><img src="/images/Rocket.png" alt="" /></div>
-                    <div className="media"><img src="/images/Mailbox.png" alt="" /></div>
-                    <div className="media"><img src="/images/Speaker.png" alt="" /></div>
+                    <div className="media"><img src="/images/Bulb.webp" alt="" /></div>
+                    <div className="media"><img src="/images/Rocket.webp" alt="" /></div>
+                    <div className="media"><img src="/images/Mailbox.webp" alt="" /></div>
+                    <div className="media"><img src="/images/Speaker.webp" alt="" /></div>
                     <div className="media"><img src="/images/Lightbulb.png" alt="" /></div>
-                    <div className="media"><img src="/images/Bulb.png" alt="" /></div>
-                    <div className="media"><img src="/images/Bulb.png" alt="" /></div>
+                    <div className="media"><img src="/images/Bulb.webp" alt="" /></div>
+                    <div className="media"><img src="/images/Bulb.webp" alt="" /></div>
 
                     <div className="preload-medias">
-                        <img src="/images/Bulb.png" alt="" />
-                        <img src="/images/Rocket.png" alt="" />
-                        <img src="/images/Mailbox.png" alt="" />
-                        <img src="/images/Speaker.png" alt="" />
+                        <img src="/images/Bulb.webp" alt="" />
+                        <img src="/images/Rocket.webp" alt="" />
+                        <img src="/images/Mailbox.webp" alt="" />
+                        <img src="/images/Speaker.webp" alt="" />
 
                     </div>
                 </div>

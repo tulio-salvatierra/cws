@@ -4,7 +4,7 @@ export const servicesData: Service[] = [
   {
     id: 1,
     title: "Custom Websites",
-    icon: "/images/Palette.png",
+    icon: "/images/Palette.webp",
     description: "We build fast, SEO‑ready sites that reflect your brand and turn visitors into customers. Mobile‑first design ensures your clients can book appointments or make purchases from any device.",
     details: [
       "Custom website design and development from scratch or full website refresh",
@@ -19,7 +19,7 @@ export const servicesData: Service[] = [
   {
     id: 2,
     title: "Photo & Video Content",
-    icon: "/images/video.png",
+    icon: "/images/video.webp",
     description: "High‑impact photos and videos tailored to your brand that boost engagement on your website and social media, helping you attract and retain more clients.",
     details: [
       "On-location photo and video production tailored to your brand and business",
@@ -34,7 +34,7 @@ export const servicesData: Service[] = [
   {
     id: 3,
     title: "Local SEO & Visibility",
-    icon: "/images/Arrow.png",
+    icon: "/images/Arrow.webp",
     description: "We help Chicago and Cicero businesses rise to the top of local search results—driving foot traffic, phone calls and online enquiries.",
     details: [
       "On-page SEO optimization including titles, headings, and metadata for search engines",
@@ -49,7 +49,7 @@ export const servicesData: Service[] = [
   {
     id: 4,
     title: "Website Growth Bundle",
-    icon: "/images/Puzzle.png",
+    icon: "/images/Puzzle.webp",
     description: "Everything you need to grow online in one package: custom website, professional visuals, and local SEO services working together to boost your online presence and reach local customers.",
     details: [
       "Custom website design and development with modern refresh and responsive layout",
