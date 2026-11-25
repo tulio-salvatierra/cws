@@ -1,9 +1,14 @@
+type ProjectExtraLink = { label: string; href: string };
+
 export type Project = {
   title: string;
   image?: string;
   alt: string;
   description: string;
-} & ({ status?: "launched"; link: string } | { status: "upcoming"; link?: never });
+} & (
+  | { status?: "launched" | "beta"; link: string; linkLabel?: string; secondaryLink?: ProjectExtraLink }
+  | { status: "upcoming"; link?: never; linkLabel?: never; secondaryLink?: never }
+);
 
 export const projects: Project[] = [
   {
@@ -50,9 +55,15 @@ export const projects: Project[] = [
     link: "https://www.ecclection.com/",
   },
   {
-    title: "Drum Chart AI",
-    alt: "Drum Chart AI — upcoming project",
-    description: "A drum-chart project in development. Upcoming — not yet launched.",
-    status: "upcoming",
+    // TODO: add a cover image (e.g. /images/projects/drummer-chart-ai.jpg) once the
+    // final logo and screenshots are picked. Until then the card shows the text placeholder.
+    title: "Drummer Chart AI",
+    alt: "Drummer Chart AI click track web app for drummers",
+    description:
+      "Drop in a song, get a click track that knows where the chorus is. Upload an MP3 and it finds the tempo and the one, marks each section, and cues you before every change. Built in-house by Tulio, our founder and a drummer, and tested on real songs.",
+    status: "beta",
+    link: "https://drummerchartai-production.up.railway.app",
+    linkLabel: "Try the beta →",
+    secondaryLink: { label: "See how it works →", href: "https://drummerchart-ai.vercel.app" },
   },
 ];

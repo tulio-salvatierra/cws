@@ -15,18 +15,36 @@ function formatStep(current: number, total: number) {
 
 type ProjectEntryProps = Project & { step: string };
 
+const STATUS_LABELS: Partial<Record<NonNullable<Project["status"]>, string>> = {
+  upcoming: "Upcoming",
+  beta: "Public beta",
+};
+
 function ProjectStatus({ status }: Pick<Project, "status">) {
-  return status === "upcoming" ? <span className="projects-card__status">Upcoming</span> : null;
+  const label = status ? STATUS_LABELS[status] : undefined;
+  return label ? <span className="projects-card__status">{label}</span> : null;
 }
 
-function ProjectLink({ link, status }: Pick<Project, "link" | "status">) {
+function ProjectLink({ link, status, linkLabel, secondaryLink }: Pick<Project, "link" | "status" | "linkLabel" | "secondaryLink">) {
   if (status === "upcoming" || !link) return null;
-  return <a href={link} target="_blank" rel="noopener noreferrer" className="projects-card__link">View project →</a>;
+  return (
+    <>
+      <a href={link} target="_blank" rel="noopener noreferrer" className="projects-card__link">{linkLabel ?? "View project →"}</a>
+      {secondaryLink ? (
+        <a href={secondaryLink.href} target="_blank" rel="noopener noreferrer" className="projects-card__link">{secondaryLink.label}</a>
+      ) : null}
+    </>
+  );
 }
 
-function ProjectMedia({ image, alt }: { image?: string; alt: string }) {
+function ProjectMedia({ image, alt, title, status }: { image?: string; alt: string; title: string; status?: Project["status"] }) {
   if (!image) {
-    return <div className="projects-card__media projects-card__placeholder" role="img" aria-label={alt}><span>Drum Chart AI</span><span>In development</span></div>;
+    return (
+      <div className="projects-card__media projects-card__placeholder" role="img" aria-label={alt}>
+        <span>{title}</span>
+        <span>{status === "upcoming" ? "In development" : "Image coming soon"}</span>
+      </div>
+    );
   }
   if (image.endsWith(".mp4")) {
     return (
@@ -64,6 +82,8 @@ function ProjectEntry({
   alt,
   description,
   link,
+  linkLabel,
+  secondaryLink,
   status,
   step,
 }: ProjectEntryProps) {
@@ -71,7 +91,7 @@ function ProjectEntry({
     <>
       <div className="projects-card__frame">
         <div className="projects-card__frame-inner">
-          <ProjectMedia image={image} alt={alt} />
+          <ProjectMedia image={image} alt={alt} title={title} status={status} />
         </div>
       </div>
 
@@ -80,7 +100,7 @@ function ProjectEntry({
         <h3 className="projects-card__title">{title}</h3>
         <ProjectStatus status={status} />
         <p className="projects-card__description">{description}</p>
-        <ProjectLink link={link} status={status} />
+        <ProjectLink link={link} status={status} linkLabel={linkLabel} secondaryLink={secondaryLink} />
       </div>
     </>
   );
@@ -211,10 +231,10 @@ export default function Projects() {
                 </div>
                 <div className="projects-card__frame">
                   <div className="projects-card__frame-inner">
-                    <ProjectMedia image={project.image} alt={project.alt} />
+                    <ProjectMedia image={project.image} alt={project.alt} title={project.title} status={project.status} />
                   </div>
                 </div>
-                <ProjectLink link={project.link} status={project.status} />
+                <ProjectLink link={project.link} status={project.status} linkLabel={project.linkLabel} secondaryLink={project.secondaryLink} />
               </div>
             ))}
           </div>
