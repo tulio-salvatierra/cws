@@ -34,6 +34,8 @@ Numbers DEC-001–003 and DEC-014–024 were never recorded in this file; do not
 | 038 | Owner-entered whole project hours | Approved; implementation pending where applicable |
 
 | 039 | Grandfather the existing advisory Marketing assessment | Approved |
+| 040 | Negocio Listo billing starts 14 days after the setup payment | Approved |
+| 041 | Read-only CWS OS access for the owner's Claude client (MCP) | Proposed |
 
 ---
 
@@ -606,3 +608,47 @@ Applies to new agreements from this date. Agreements signed earlier keep their w
 - `skills/negocio-listo-proposal` states the rule in every proposal.
 - Planned app work: a "Signed" action that creates the client, agreement, setup bill and the 12 monthly bills from setup date + 14 days, plus the matching Square subscription (needs `SQUARE_ACCESS_TOKEN` and a migration allowing a future billing start date).
 
+
+## DEC-041 — Read-only CWS OS access for the owner's Claude client (MCP)
+
+Date drafted: 2026-11-27
+Status: **Proposed** (draft for Tulio's review; not approved, nothing built)
+Spec: [mcp-read-001-spec.md](mcp-read-001-spec.md) (MCP-READ-001)
+
+### Context
+
+Strategy conversation happens in Claude (§9a), but Claude can't see live CWS OS state. Today the owner pastes screenshots or exports. A Model Context Protocol (MCP) server would let the owner's own Claude client read the same state the admin shows.
+
+**Purpose: a dogfooding experiment.** CWS treats a client's website as an extension of the business, not just a brochure. The goal is to learn on our own site which agentic and management help is actually useful, and then turn the proven pieces into Negocio Listo features and upsells for clients who buy a website. This DEC covers only the internal experiment. Any client-facing version needs its own DEC (see Consequences).
+
+### Decision
+
+1. CWS OS exposes one MCP endpoint, `POST /api/mcp`, routed by a `vercel.json` rewrite into an existing handler. No new Vercel function.
+2. **Every MCP tool is AUTO only.** Tools read and derive through the existing read models. They never create, update, draft, send, publish, activate, or record owner responses. No PREPARE or CONFIRM tool may be exposed over MCP without a new DEC, and CONFIRM never can be (§3: AI never CONFIRMs).
+3. **Owner only.** Access uses an owner-issued personal token, stored only as a hash in `mcp_tokens` and revocable from the admin. Each request re-checks that the token's user is still an active owner of the workspace. Updating `last_used_at` is the only write, and it is auth bookkeeping, not business data.
+4. Tool output is scoped to the token's workspace, excludes test leads, and never includes signing tokens (`review_token`, `move_token`, `*_token`), service keys, provider references, or raw evidence snapshots.
+5. This is **not an in-app LLM call** and is not gated by §9a. The LLM runs in the owner's Claude client; CWS OS only returns data, and no CWS OS code calls a model.
+
+### Data handling
+
+Tool results include client and lead names, emails, phone numbers, and amounts. They leave CWS OS and are processed by Anthropic under the owner's Claude account terms. The owner accepts this by issuing a token. Tokens should not be issued to shared or third-party accounts. Test fixtures use invented data only, because the repo is public.
+
+### Consequences
+
+- Product definition §3 gains a rule naming MCP as an AUTO-only surface. That rule is drafted in the same change as this entry.
+- Adds the `@modelcontextprotocol/sdk` dependency and one migration (`mcp_tokens`, exact remote version).
+- Revoking every token turns the feature off with no deploy.
+- The experiment's findings feed a later, separate DEC for client-facing Negocio Listo features. That DEC must settle the following, none of which this DEC authorizes:
+  - each client's data isolation and consent;
+  - whether any in-app LLM is involved (§9a gate);
+  - pricing as an add-on;
+  - support load.
+
+### Resolved
+
+- MCP access stays **owner-only**. No member scope is planned (Tulio, 2026-11-27).
+
+### Open questions (resolve before approval)
+
+- Token lifetime: no expiry plus manual revoke, or a 90-day expiry?
+- Host handler: CEO Today (already imports most read models) or Operations (smaller bundle)?
