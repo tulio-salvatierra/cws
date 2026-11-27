@@ -1,16 +1,19 @@
-Task ID: CWS-SEO-REDIRECT-LINKS-20261119
+Task ID: MCP-READ-001
 Agent: Claude
-Objective: Stop the CWS site from pointing Google at redirecting (non-www) URLs after Search Console reported the "Page with redirect" validation as failed (Nov 16) and Ahrefs Site Audit reported 4 redirects (Nov 17).
+Objective: Build the first slice of DEC-041. Give the owner's own Claude client read-only MCP access to CWS OS, starting with CEO Today. This is the dogfooding experiment that will inform future Negocio Listo features.
 
 Files changed:
-- `src/data/landingPagesData.ts`: the six landing pages' Service JSON-LD `imageUrl` pointed at `https://cicerowebstudio.xyz/images/*.png` (apex 308 to www, and the files are not in `public/images`); now `https://www.cicerowebstudio.xyz/og-image.jpg`.
-- `src/marketing/channels.js`: `GOOGLE_BUSINESS_CTA_URL` now `https://www.cicerowebstudio.xyz/` (Google Business post "Learn more" link).
-- Tests updated to the new URL: `src/pages/admin/__tests__/MarketingPage.test.jsx`, `api/__tests__/marketing-linkedin.test.js`.
+- `supabase/migrations/20261127165717_mcp_tokens.sql`: `mcp_tokens` stores only a SHA-256 hash and a short display prefix. Tokens never expire; the owner revokes them. The table is service-role only, and after issue only `last_used_at` and `revoked_at` can be updated. Applied to production as remote version 20261127165717; local and remote lists match (90 each).
+- `server/mcp/tokens.js`: generates `cws_mcp_` tokens and handles hash lookup, the active-owner recheck on every request, and owner list/create/revoke.
+- `server/mcp/tools.js`: the `get_ceo_today` tool (readOnlyHint) returns a compact summary. `stripSecrets` deep-removes `*_token`, snapshots, and provider references.
+- `server/mcp/handler.js`: stateless SDK `McpServer` plus a web-standard streamable HTTP transport (JSON responses). POST only; GET and DELETE return 405.
+- `api/ceo-today.js`: routes `?mcp=1` to the MCP handler before session auth. Adds the owner POST actions `mcp_token_create` / `mcp_token_revoke`, the owner GET `view=mcp_tokens`, and `loadMcpCeoToday` (same next-move visibility as the admin, no signing).
+- `vercel.json`: rewrite `/api/mcp` → `/api/ceo-today?mcp=1`. No new function, so we stay at 12.
+- `vite.config.js`: dev middleware for `/api/mcp`.
+- `src/pages/admin/McpTokens.jsx` and `AdminOverview.jsx`: a "Claude connection (MCP)" panel on CEO Today for owners. It shows the token once, gives the `claude mcp add` command, and has confirm-to-revoke.
+- `server/mcp/__tests__/mcp.test.js`: 15 tests, using fixture data only.
+- `package.json`: adds `@modelcontextprotocol/sdk` 1.32.2 and `zod` 4.
 
-Findings: Vercel domain config sends apex to www with 308 (intentional). Sitemap, canonicals, robots.txt and internal nav links already use https://www with no trailing slash. The http/apex "Page with redirect" entries in Search Console are expected and will not validate. Ahrefs URL-level data was not available (plan does not include API access), so the exact four URLs were not confirmed.
+Tests run: full Vitest 1048/1048, eslint clean, `npm run build` passed. No live check yet, because the table does not exist in production.
 
-Tests run: full Vitest suite 1032/1032 passed; eslint on changed files clean; import-casing check passed. Production build not run.
-
-Not changed: oversized images (blog article images such as profile.png ~32 MB, Palette.png, Arrow.png, video.png ~3 MB each, website.jpg 381 KB); `/images/sd.png` is referenced on landing pages but exists only in `src/assets/images`.
-
-Next: owner reviews and merges the branch (production deploys from main); then compress blog images and decide on sd.png.
+Next: the owner approves applying the migration to `cws-os-staging` (production). Then check migration parity, open the PR, merge, create a token in CEO Today, run `claude mcp add`, and compare `get_ceo_today` with /admin. Record the result in `docs/verification/`. More tools (leads, promises, projects, accounting, compliance) follow in later PRs.

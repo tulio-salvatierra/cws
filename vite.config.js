@@ -29,6 +29,20 @@ function clientPortalApiPlugin(env) {
         await layaAssessHandler({ method: req.method, headers: req.headers, body }, createVercelResponse(res))
       })
 
+      // DEC-041 read-only MCP endpoint; production rewrites /api/mcp the same way.
+      server.middlewares.use('/api/mcp', async (req, res) => {
+        const body = req.method === 'POST' ? await readJsonBody(req).catch(() => null) : undefined
+        if (req.method === 'POST' && body === null) {
+          sendJson(res, 400, { jsonrpc: '2.0', error: { code: -32000, message: 'Request body must be valid JSON.' }, id: null })
+          return
+        }
+        const { default: ceoTodayHandler } = await import('./api/ceo-today.js')
+        const response = createVercelResponse(res)
+        response.setHeader = (key, value) => res.setHeader(key, value)
+        response.send = (text) => res.end(text)
+        await ceoTodayHandler({ method: req.method, headers: req.headers, body, query: { mcp: '1' }, url: '/api/mcp?mcp=1' }, response)
+      })
+
       server.middlewares.use('/api/client-portal-intake', async (req, res) => {
         if (req.method !== 'POST') {
           sendJson(res, 405, { ok: false, error: 'Method not allowed' })

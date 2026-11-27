@@ -8,6 +8,7 @@ import DealFits from './DealFits'
 import BusinessDecisions from './BusinessDecisions'
 import LayaResponseHistory from './LayaResponseHistory'
 import RecentLeads from './RecentLeads'
+import McpTokens from './McpTokens'
 import { supabase } from '../../lib/supabase'
 
 const departmentNavigation = [
@@ -104,6 +105,8 @@ export default function AdminOverview() {
         <Link to="/admin/marketing#laya-assessments" className="mt-4 inline-block text-sm font-semibold text-indigo-300">Evaluate content in Marketing →</Link>
         <p className="mt-2 text-xs text-gray-500">Human review only. Laya does not approve or publish content.</p>
       </section>
+
+      <McpTokens canManage={ceo?.business_decisions?.can_manage} />
 
       <section className="mt-10 border-t border-gray-800 pt-8" aria-labelledby="departments-heading">
         <h2 id="departments-heading" className="text-lg font-semibold text-white">Departments</h2>
