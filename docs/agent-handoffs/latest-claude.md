@@ -3,7 +3,7 @@ Agent: Claude
 Objective: Build the first slice of DEC-041. Give the owner's own Claude client read-only MCP access to CWS OS, starting with CEO Today. This is the dogfooding experiment that will inform future Negocio Listo features.
 
 Files changed:
-- `supabase/migrations/20261127170000_mcp_tokens.sql`: `mcp_tokens` stores only a SHA-256 hash and a short display prefix. Tokens never expire; the owner revokes them. The table is service-role only, and after issue only `last_used_at` and `revoked_at` can be updated. **Not applied yet.** Rename the file to the exact remote version after apply.
+- `supabase/migrations/20261127165717_mcp_tokens.sql`: `mcp_tokens` stores only a SHA-256 hash and a short display prefix. Tokens never expire; the owner revokes them. The table is service-role only, and after issue only `last_used_at` and `revoked_at` can be updated. Applied to production as remote version 20261127165717; local and remote lists match (90 each).
 - `server/mcp/tokens.js`: generates `cws_mcp_` tokens and handles hash lookup, the active-owner recheck on every request, and owner list/create/revoke.
 - `server/mcp/tools.js`: the `get_ceo_today` tool (readOnlyHint) returns a compact summary. `stripSecrets` deep-removes `*_token`, snapshots, and provider references.
 - `server/mcp/handler.js`: stateless SDK `McpServer` plus a web-standard streamable HTTP transport (JSON responses). POST only; GET and DELETE return 405.
