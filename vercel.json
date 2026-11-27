@@ -27,6 +27,10 @@
       "destination": "/api/sales"
     },
     {
+      "source": "/api/mcp",
+      "destination": "/api/ceo-today?mcp=1"
+    },
+    {
       "source": "/api/intake",
       "destination": "/api/client-portal-intake?intake=1"
     },

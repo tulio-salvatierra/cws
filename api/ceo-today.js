@@ -17,12 +17,19 @@ import { buildAccountingReadModel } from '../server/accounting/read-model.js'
 import { buildComplianceReadModel } from '../server/compliance/read-model.js'
 import { agreementSummary } from '../src/lib/clientAgreements.js'
 import { buildRecentLeads } from '../server/ceo/recent-leads.js'
+import mcpHandler, { isMcpRequest } from '../server/mcp/handler.js'
+import { createMcpToken, listMcpTokens, revokeMcpToken } from '../server/mcp/tokens.js'
 
 const complianceRequirementFields = 'id, workspace_id, title, category, authority_name, source_url, jurisdiction, description, applicability_status, verified_by_owner_at, verified_by_owner_id, verified_source_at, recurrence_type, recurrence_interval, last_completed_at, next_due_date, status, notes, created_at, updated_at'
 const complianceCompletionFields = 'id, workspace_id, compliance_requirement_id, completed_at, notes, created_at'
 
 export default async function handler(req, res) {
   res.setHeader?.('Cache-Control', 'no-store')
+  // DEC-041: /api/mcp rewrites here. MCP uses its own owner token, never a session JWT.
+  if (isMcpRequest(req)) {
+    if (missingOutreachEnv().length) return res.status(500).json({ ok: false, error: 'MCP is not configured.' })
+    return mcpHandler(req, res, { loadCeoToday: loadMcpCeoToday })
+  }
   if (!['GET', 'POST'].includes(req.method)) return res.status(405).json({ ok: false, error: 'Method not allowed.' })
 
   const missing = missingOutreachEnv()
@@ -37,6 +44,14 @@ export default async function handler(req, res) {
     if (owner.error) return res.status(502).json({ ok: false, error: 'Ownership could not be verified.' })
     if (owner.data?.role !== 'owner') return res.status(403).json({ ok: false, error: 'Only the workspace owner can respond to Laya.' })
     const body = parseBody(req.body)
+    if (body.action === 'mcp_token_create') {
+      const created = await createMcpToken(context, body)
+      return res.status(created.error ? created.status : 200).json(created.error ? { ok: false, error: created.error } : { ok: true, token: created.token, mcp_token: created.record })
+    }
+    if (body.action === 'mcp_token_revoke') {
+      const revoked = await revokeMcpToken(context, body)
+      return res.status(revoked.error ? revoked.status : 200).json(revoked.error ? { ok: false, error: revoked.error } : { ok: true, revoked: revoked.revoked })
+    }
     if (body.action === 'next_move_choice') {
       const saved = await saveMove(context, body)
       return res.status(saved.status).json(saved.error ? { ok: false, error: saved.error } : { ok: true, response_id: saved.id })
@@ -59,6 +74,14 @@ export default async function handler(req, res) {
     } catch {
       return res.status(502).json({ ok: false, error: 'Company context is unavailable.' })
     }
+  }
+  if (query.view === 'mcp_tokens') {
+    const owner = await context.client.from('workspace_members').select('role').eq('workspace_id', context.workspaceId)
+      .eq('user_id', context.user.id).eq('status', 'active').maybeSingle()
+    if (owner.error) return res.status(502).json({ ok: false, error: 'Ownership could not be verified.' })
+    if (owner.data?.role !== 'owner') return res.status(403).json({ ok: false, error: 'Only the workspace owner can manage MCP tokens.' })
+    const listed = await listMcpTokens(context)
+    return res.status(listed.error ? listed.status : 200).json(listed.error ? { ok: false, error: listed.error } : { ok: true, mcp_tokens: listed.tokens })
   }
   if (query.view === 'laya_history') {
     const owner = await context.client.from('workspace_members').select('role').eq('workspace_id', context.workspaceId)
@@ -128,6 +151,18 @@ export default async function handler(req, res) {
     delete item.response_input
   }
   return res.status(200).json({ ok: true, ...loaded.data, laya_reviews: layaReviews, business_decisions: decisions, laya_response_history: historyPage })
+}
+
+// MCP view of CEO Today: same load and next-move visibility as the admin GET, no signing.
+export async function loadMcpCeoToday(context, now = new Date()) {
+  const loaded = await loadCeoToday(context, now)
+  if (loaded.error) return loaded
+  const moves = await loadMoves(context)
+  if (moves.available) {
+    loaded.data.actions = visibleMoves(loaded.data.all_actions.length ? loaded.data.all_actions : loaded.data.actions, moves.events)
+    for (const item of loaded.data.actions) item.next_move = recommendation(item, now, moves.events)
+  }
+  return loaded
 }
 
 export async function loadCeoToday(context, now = new Date()) {
