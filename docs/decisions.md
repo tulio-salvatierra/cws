@@ -35,7 +35,7 @@ Numbers DEC-001–003 and DEC-014–024 were never recorded in this file; do not
 
 | 039 | Grandfather the existing advisory Marketing assessment | Approved |
 | 040 | Negocio Listo billing starts 14 days after the setup payment | Approved |
-| 041 | Read-only CWS OS access for the owner's Claude client (MCP) | Proposed |
+| 041 | Read-only CWS OS access for the owner's Claude client (MCP) | Approved; implementation pending |
 
 ---
 
@@ -611,8 +611,8 @@ Applies to new agreements from this date. Agreements signed earlier keep their w
 
 ## DEC-041 — Read-only CWS OS access for the owner's Claude client (MCP)
 
-Date drafted: 2026-11-27
-Status: **Proposed** (draft for Tulio's review; not approved, nothing built)
+Date recorded: 2026-11-27
+Status: Approved (Tulio, direct instruction); implementation pending
 Spec: [mcp-read-001-spec.md](mcp-read-001-spec.md) (MCP-READ-001)
 
 ### Context
@@ -646,9 +646,8 @@ Tool results include client and lead names, emails, phone numbers, and amounts. 
 
 ### Resolved
 
-- MCP access stays **owner-only**. No member scope is planned (Tulio, 2026-11-27).
+- MCP access stays **owner-only**. No member scope is planned.
+- Tokens have **no expiry**. The owner revokes them manually from the admin.
+- The endpoint is **hosted in the CEO Today handler**: `/api/mcp` rewrites to `/api/ceo-today?mcp=1`.
 
-### Open questions (resolve before approval)
-
-- Token lifetime: no expiry plus manual revoke, or a 90-day expiry?
-- Host handler: CEO Today (already imports most read models) or Operations (smaller bundle)?
+All resolved by Tulio on 2026-11-27.

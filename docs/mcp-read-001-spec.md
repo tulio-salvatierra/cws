@@ -1,7 +1,7 @@
 # MCP-READ-001 — Read-only CWS OS MCP server (sketch)
 
-Status: **draft sketch, not approved.** Governed by DEC-041 (Proposed) and the
-proposed §3 rule in the product definition; build waits for approval.
+Status: **approved, not built.** Governed by DEC-041 (Approved 2026-11-27) and the
+§3 MCP rule in the product definition.
 
 Reference pattern: [lydiahallie/issue-tracker-mcp](https://github.com/lydiahallie/issue-tracker-mcp)
 (Express + `@modelcontextprotocol/sdk` + zod, stateless streamable HTTP). That repo has
@@ -148,8 +148,10 @@ Before any of this reaches a client, a separate DEC has to cover:
 - add-on pricing;
 - who handles support when the assistant gets something wrong.
 
-## Open questions
+## Decisions on the open questions
 
-- ~~Owner-only or member scope?~~ Resolved: owner-only.
-- Token lifetime: no expiry plus manual revoke, or a 90-day expiry?
-- Is CEO Today the right host handler, or Operations (smaller bundle)?
+All resolved by Tulio on 2026-11-27:
+
+- Access is owner-only.
+- Tokens have no expiry and are revoked manually.
+- The host handler is CEO Today.
