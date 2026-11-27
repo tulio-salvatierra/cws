@@ -1,6 +1,6 @@
 # MCP-READ-001 — Read-only CWS OS MCP server (sketch)
 
-Status: **approved, not built.** Governed by DEC-041 (Approved 2026-11-27) and the
+Status: **v1 tools built.** MCP-READ-001 (`get_ceo_today`) is live; MCP-READ-002 adds the remaining six. Governed by DEC-041 (Approved 2026-11-27) and the
 §3 MCP rule in the product definition.
 
 Reference pattern: [lydiahallie/issue-tracker-mcp](https://github.com/lydiahallie/issue-tracker-mcp)
