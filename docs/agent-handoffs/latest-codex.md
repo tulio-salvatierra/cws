@@ -17,3 +17,27 @@ Permanent decisions added: None.
 Reusable learnings added: None.
 Memory updates withheld: None.
 Git diff summary: Isolated feat/negocio-listo-lead-notifications from released b706bb1. Includes prior contact release verification notes. Existing unrelated duplicate files untouched.
+
+---
+
+Task ID: CWS-LEAD-FIT-20261112
+Agent: Codex
+Objective: Review prior-round thirteen prospects for 12–24-month business age and social following; prioritize in CWS without outreach.
+Files inspected: Product definition, role instructions, project records, technical conventions, decisions/learnings excerpts and recent-lead projection.
+Files changed: Three project-memory documents; private qualification and pending JSON outside public repository.
+Database changes: Eight existing lead source records enriched with qualification_2026_11_12 and visible opportunity_hypothesis priority notes. Compare-and-set guards preserved concurrent changes; prior source fields retained.
+Decisions: Operating age rather than license age. Earliest activity is a lower bound. One verify-first candidate, two secondary age exceptions, three hold/needs-evidence and two lower-priority records; no fully confirmed matches.
+Assumptions: Scope is thirteen from previous contact round. Social counts are observation snapshots, not local/customer authenticity audits.
+Verification: Eight saved reviews and eight new/no_response/null-last-contacted states confirmed by read-back. No code tests needed for data-only research; git diff check.
+Known issues: Actual founding dates remain unverified for most prospects. Five remain outside CWS because no matched phone/email. Existing app has no manual priority column; visible notes express priorities, queue sort unchanged. One salon age signal and owner audience are indexed snippets, explicitly marked as such.
+Private research: /private/tmp/cws-lead-fit-review-2026-11-12.json. Pending file /private/tmp/cws-license-leads-pending-2026-11-12.json updated with all five reviews.
+Next task: Confirm actual start date for first verification candidate before treating it as a strict match.
+Security: No outreach, social interactions, sending, schema changes, deployment, commit or push. Raw lead research excluded from public repository.
+Project-memory files updated: latest-codex.md, project-log.md, task-ledger.md.
+Permanent decisions and reusable learnings: None.
+Memory updates withheld: No permanent prospecting threshold inferred from this one review.
+Git diff summary: Three project-document changes, including earlier-turn edits. Unrelated untracked outputs and Laya prototypes untouched.
+
+## CWS-SEO-REDIRECTS-20261116
+
+Audited live sitemap, canonical tags, homepage aliases, route variants, and November 16 reports. GitHub main was nine commits ahead of the checkout, with no public routing changes in the comparison. The four reported redirects are intentional host/protocol variants. The local public URL guide was updated to match canonical routes and retired article links were removed. Sampled trailing-slash paths fall back to the homepage canonical and were outside the reported URL sets. No API, database, deployment, or Search Console state changes.
