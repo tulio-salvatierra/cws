@@ -68,6 +68,7 @@ Owner-controlled test leads: an authenticated active workspace owner may toggle 
 Rules:
 
 - **AI may AUTO and PREPARE. It never CONFIRMs.** There is no AI execute tier. "Auto" in any proposal means AUTO as defined here, which is read-only.
+- *(DEC-041.)* The MCP endpoint (`/api/mcp`) is an AUTO-only surface for the owner's own Claude client. It authenticates with an owner-issued, revocable token. It exposes no PREPARE or CONFIRM tool, and it never returns signing tokens.
 - Reloads, GETs, reconciliation, and "Not now" actions can never trigger a CONFIRM action.
 - Time-based state is derived, never stored. Only the owner's decision or response is persisted (DEC-029).
 - **Confirmation ≠ approval.** A *confirmation* is the owner authorizing one exact external action, and it is always a gate. There is no separate approval gate in the solo-operator model.
