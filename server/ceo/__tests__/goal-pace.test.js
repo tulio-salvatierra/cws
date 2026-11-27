@@ -22,6 +22,16 @@ describe('goal pace evidence boundaries', () => {
     expect(pace.checkpoint.recorded).toBeNull()
     expect(pace.assumptions).toEqual([])
   })
+  it('names the client on register rows and missing-evidence messages without changing the snapshot', () => {
+    const agreement = { id:'a',workspace_id:'workspace-a',client_id:'client-a',product_name:'Negocio Listo Básico' }
+    const named = buildGoalPace({...input,agreements:[agreement],clients:[{id:'client-a',name:'Test Bakery'}]})
+    const unnamed = buildGoalPace({...input,agreements:[agreement]})
+    expect(named.register[0].client_name).toBe('Test Bakery')
+    expect(named.missing_data).toContain('Test Bakery (agreement a): owner signature, subscription and goal inclusion evidence is missing.')
+    expect(unnamed.register[0].client_name).toBeNull()
+    expect(unnamed.missing_data).toContain('Agreement a: owner signature, subscription and goal inclusion evidence is missing.')
+    expect(named.register_snapshot).toEqual(unnamed.register_snapshot)
+  })
   it('reports failed reads as unavailable, never as zero', () => {
     const pace = buildGoalPace({...input,available:false})
     expect(pace.recorded_agreements).toBeNull()

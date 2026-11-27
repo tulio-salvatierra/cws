@@ -154,6 +154,7 @@ describe('CEO Today endpoint', () => {
       'agreement_installments',
       'negocio_listo_deal_budgets',
       'project_costs',
+      'clients',
       'marketing_publish_destination_results',
       'agent_runs',
       'business_decisions',

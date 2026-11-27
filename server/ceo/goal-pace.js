@@ -6,8 +6,10 @@ export function goalSnapshot(rows, evidence) {
 }
 const canonical = value => JSON.stringify(value, ['id','client_id','product_name','revision'])
 
-export function buildGoalPace({workspaceId,agreements=[],evidence=[],completeness=[],available=true,now=new Date()}) {
+export function buildGoalPace({workspaceId,agreements=[],evidence=[],completeness=[],clients=[],available=true,now=new Date()}) {
   const today=chicagoDate(now)
+  const clientName=id=>clients.find(c=>c.id===id)?.name || null
+  const label=row=>clientName(row.client_id) ? `${clientName(row.client_id)} (agreement ${row.id})` : `Agreement ${row.id}`
   const rows=available?agreements.filter(row=>row.workspace_id===workspaceId && isNegocioListo(row)):[]
   const latest=[...evidence].filter(e=>e.workspace_id===workspaceId).sort((a,b)=>Number(b.revision)-Number(a.revision)).filter((e,i,all)=>all.findIndex(r=>r.agreement_id===e.agreement_id)===i)
   const snapshot=goalSnapshot(rows,latest)
@@ -19,12 +21,12 @@ export function buildGoalPace({workspaceId,agreements=[],evidence=[],completenes
   const why=[]
   for(const row of rows) {
     const e=latest.find(item=>item.agreement_id===row.id && item.client_id===row.client_id)
-    if(!e){missing.push(`Agreement ${row.id}: owner signature, subscription and goal inclusion evidence is missing.`);continue}
+    if(!e){missing.push(`${label(row)}: owner signature, subscription and goal inclusion evidence is missing.`);continue}
     why.push({claim:e.counts_toward_goal?'Owner-recorded core subscription evidence.':'Owner excluded this agreement from goal counts (add-on or replaced agreement).',source:{table:'negocio_listo_evidence',id:String(e.revision),workspace_id:workspaceId,fields:{agreement_id:e.agreement_id,signature_status:e.signature_status,signed_on:e.signed_on,subscription_status:e.subscription_status,status_on:e.status_on,source_note:e.source_note,created_by:e.created_by,created_at:e.created_at}}})
     if(!e.counts_toward_goal)continue
     included.push(e)
-    if(!['signed','unsigned'].includes(e.signature_status) || (e.signature_status==='signed' && (!e.signed_on || e.signed_on>today || e.signed_on>e.status_on))) missing.push(`Agreement ${row.id}: verified signature date/status is missing or invalid.`)
-    if(!['active','not_started','paused','cancelled','ended'].includes(e.subscription_status) || e.status_on!==today || (e.subscription_status!=='not_started' && e.signature_status!=='signed')) missing.push(`Agreement ${row.id}: current-day subscription status is missing or inconsistent.`)
+    if(!['signed','unsigned'].includes(e.signature_status) || (e.signature_status==='signed' && (!e.signed_on || e.signed_on>today || e.signed_on>e.status_on))) missing.push(`${label(row)}: verified signature date/status is missing or invalid.`)
+    if(!['active','not_started','paused','cancelled','ended'].includes(e.subscription_status) || e.status_on!==today || (e.subscription_status!=='not_started' && e.signature_status!=='signed')) missing.push(`${label(row)}: current-day subscription status is missing or inconsistent.`)
   }
   if(new Set(included.map(e=>e.client_id)).size!==included.length)missing.push('Multiple core agreements for one client require owner reconciliation; exclude add-ons or replaced agreements.')
   const verified=available && !missing.length
@@ -40,7 +42,7 @@ export function buildGoalPace({workspaceId,agreements=[],evidence=[],completenes
     next_action:!verified?'Review agreement evidence and confirm the complete Negocio Listo register for today before using counts.':reached?'Targets are met in current owner-verified records; review status again when it changes.':`Verified gap: ${goal.remaining} active subscriptions and ${checkpoint.remaining} signatures dated by the checkpoint. Review Sales; no on-track forecast is inferred.`,
     why,target_source:{document:'docs/product-definition.md',section:'1a',version:3},assumptions:[],missing_data:missing,
     forecast_note:'No on-track forecast or required weekly rate is inferred without a pace baseline.',money_at_stake:null,related_decisions:[],
-    register:available?rows.map(row=>({...row,evidence:latest.find(e=>e.agreement_id===row.id) || null})):[],
+    register:available?rows.map(row=>({...row,client_name:clientName(row.client_id),evidence:latest.find(e=>e.agreement_id===row.id) || null})):[],
     workspace_id:workspaceId,register_snapshot:snapshot,
   }
 }
