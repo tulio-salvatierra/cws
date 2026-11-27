@@ -4,7 +4,7 @@ Open work and the 40 most recent tasks. Older completed rows: `docs/archive/task
 
 | Task ID | Agent | Status | Result | Next |
 | --- | --- | --- | --- | --- |
-| MCP-READ-002 | Claude | Built on branch `feat/mcp-read-002`; PR pending | Six more read-only tools: `list_leads` (contact details opt-in), `list_promised_actions`, `list_projects`, `get_project`, `get_accounting_summary`, `list_compliance_due`; 1060 tests/lint/build pass | Merge; live check each tool |
+| MCP-READ-002 | Claude | Complete — merged (#113, 405bef8), live verified | Six more read-only tools; live check of all 7 in `docs/verification/mcp-read-002-2026-11-27.md` | Owner revokes the pasted token; verify the 10 unverified compliance items; log experiment notes weekly in `docs/learnings.md` |
 | MCP-READ-001 | Claude | Complete — merged (#112, c440237), migration 20261127165717, live verified | Token auth, `/api/mcp` → CEO Today, `get_ceo_today`; live check in `docs/verification/mcp-read-001-2026-11-27.md` | Owner revokes the token pasted into chat and issues a new one |
 | CWS-SEO-REDIRECT-LINKS-20261119 | Claude | Committed on branch `fix/seo-redirect-links-20261119`; merge pending | Landing JSON-LD images and GBP CTA moved from apex to www; 1032 tests pass | Owner merges; then compress blog images and fix missing sd.png |
 | CWS-NL-NOTIFY-20261112 | Codex | Tests/lint passed; release pending | Owner notifications for NL popup/inline after insert/merge; idempotent payload retries | Verify CI and release |
