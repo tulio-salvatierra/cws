@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import mcpHandler, { isMcpRequest } from '../handler.js'
 import { authenticateMcpToken, createMcpToken, generateToken, hashToken, revokeMcpToken } from '../tokens.js'
-import { stripSecrets, summarizeCeoToday } from '../tools.js'
+import { TOOL_NAMES, stripSecrets, summarizeCeoToday } from '../tools.js'
 
 // Fixture data only: the repo is public.
 const OWNER = { id: '11111111-1111-4111-8111-111111111111' }
@@ -87,7 +87,8 @@ describe('MCP protocol', () => {
   it('lists exactly the v1 tools, all read-only', async () => {
     const res = await rpc({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }, { loadCeoToday: vi.fn() })
     const tools = res.body.result.tools
-    expect(tools.map(tool => tool.name)).toEqual(['get_ceo_today'])
+    expect(tools.map(tool => tool.name)).toEqual(TOOL_NAMES)
+    expect(TOOL_NAMES).toHaveLength(7)
     expect(tools.every(tool => tool.annotations?.readOnlyHint === true)).toBe(true)
   })
 
